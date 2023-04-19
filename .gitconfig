@@ -1,3 +1,8 @@
+[user]
+
+	email = magnus.rinnan@gmail.com
+	name = Magnus
+
 [alias]
 
 	# View abbreviated SHA, description, and history graph of the latest 20 commits.
@@ -181,7 +186,3 @@
 [init]
 
 	defaultBranch = main
-
-[user]
-	email = magnus.rinnan@gmail.com
-	name = Magnus
