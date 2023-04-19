@@ -181,3 +181,7 @@
 [init]
 
 	defaultBranch = main
+
+[user]
+	email = magnus.rinnan@gmail.com
+	name = Magnus
