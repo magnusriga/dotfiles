@@ -1,8 +1,12 @@
-[ -n "$PS1" ] && source ~/.bash_profile;
+#!/usr/bin/env bash
 
 env=~/.ssh/agent.env
 
+echo 'running 1?'
+
 agent_load_env () { test -f "$env" && . "$env" >| /dev/null ; }
+
+echo 'running 2?'
 
 agent_start () {
     (umask 077; ssh-agent >| "$env")
