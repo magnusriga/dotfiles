@@ -1,0 +1,15 @@
+// Place your key bindings in this file to override the defaultsauto[]
+[
+    {
+        "key": "ctrl+alt+q",
+        "command": "workbench.action.toggleMaximizedPanel"
+    },
+    {
+        "key": "ctrl+alt+x",
+        "command": "workbench.action.terminal.kill"
+    },
+    {
+        "key": "ctrl+alt+s",
+        "command": "workbench.action.terminal.focusNext"
+    }
+]
