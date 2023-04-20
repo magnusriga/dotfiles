@@ -4,6 +4,7 @@
     },
   "terminal.integrated.defaultProfile.windows": "Git Bash",
   "workbench.iconTheme": "material-icon-theme",
+  "security.workspace.trust.untrustedFiles": "open",
 }
 
 // {
