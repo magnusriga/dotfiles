@@ -16,8 +16,8 @@ alias dt="cd ~/Desktop"
 alias p="cd ~/projects"
 alias n="cd ~/nfront"
 alias g="git"
-alias gp="git push"
 alias gc="git add -A && git commit -am"
+alias gp="git push"
 
 
 # Detect which `ls` flavor is in use
