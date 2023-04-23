@@ -1,3 +1,6 @@
+# Never runs, as long as we have a .bash_profile file in home folder.
+# Keep it foe other shells.
+
 env=~/.ssh/agent.env
 
 agent_load_env () { test -f "$env" && . "$env" >| /dev/null ; }
