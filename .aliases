@@ -16,6 +16,8 @@ alias dt="cd ~/Desktop"
 alias p="cd ~/projects"
 alias n="cd ~/nfront"
 alias g="git"
+alias gp="git push"
+alias gc="git add -A && git commit -am"
 
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
