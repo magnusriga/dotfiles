@@ -1,5 +1,24 @@
 # Never runs, as long as we have a .bash_profile file in home folder.
-# Keep it foe other shells.
+# Fill it in, so important code runs even for other shells.
+
+# Set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
+
+# set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+
+# ================================================================
+
+# ----------------------------------------------------------------
+# Start ssh agent to avoid typing GitHub password.
+# ----------------------------------------------------------------
 
 env=~/.ssh/agent.env
 
@@ -22,3 +41,4 @@ elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
 fi
 
 unset env
+
