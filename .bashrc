@@ -1,24 +1,10 @@
+# Runs whenever a new shell is opened, but NOT the FIRST (login) shell.
+# Calls bash_profile, which originally only runs when FIRST shell (login shell) opens.
+# Result:
+# 1) .bashrc ONLY runs when shell opens for second or later time
+# 2) .bash_profile RUNS EVERY TIME ANY SHELL OPENS (login or non-login).
+
+# CONCLUSION: Do not use this file, it does not run every time (runs all times except first).
+# CONCLUSION: We do not have a file that ONLY runs on first shell.
+
 [ -n "$PS1" ] && source ~/.bash_profile;
-
-# Start ssh agent to avoid typing GitHub password:
-env=~/.ssh/agent.env
-
-agent_load_env () { test -f "$env" && . "$env" >| /dev/null ; }
-
-agent_start () {
-    (umask 077; ssh-agent >| "$env")
-    . "$env" >| /dev/null ; }
-
-agent_load_env
-
-# agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
-agent_run_state=$(ssh-add -l >| /dev/null 2>&1; echo $?)
-
-if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
-    agent_start
-    ssh-add
-elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
-    ssh-add
-fi
-
-unset env
