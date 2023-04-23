@@ -19,6 +19,11 @@ alias g="git"
 alias gc="git add -A && git commit -am"
 alias gp="git push"
 
+alias pd="pnpm dev"
+alias pb="pnpm build"
+alias ps="pnpm start"
+alias pt="pnpm test"
+
 
 # Detect which `ls` flavor is in use
 if ls --color > /dev/null 2>&1; then # GNU `ls`
