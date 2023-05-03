@@ -97,15 +97,15 @@ export NVM_DIR="$HOME/.nvm"
 # ================================================================
 
 # ----------------------------------------------------------------
-# Needed for gloabl pnpm installs.
+# Needed to ensure pnpm binary is added to PATH.
 # ----------------------------------------------------------------
 SHELL='/bin/bash'
 
-# pnpm
 # PNPM_HOME is path to pnpm executable file (i.e. bin file)
 # Below was the default path, but docker did otherwise
 # export PNPM_HOME="/home/magnus/.local/share/pnpm"
-export PNPM_HOME="/home/magnus/.nvm/versions/node/v20.0.0/bin/pnpm"
+# pnpm
+export PNPM_HOME="/home/magnus/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
