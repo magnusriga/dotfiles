@@ -1,15 +1,37 @@
-// Place your key bindings in this file to override the default
+// Place your key bindings in this file to override the defaults
 [
-    {
-        "key": "ctrl+alt+q",
-        "command": "workbench.action.toggleMaximizedPanel"
-    },
-    {
-        "key": "ctrl+alt+x",
-        "command": "workbench.action.terminal.kill"
-    },
-    {
-        "key": "ctrl+alt+s",
-        "command": "workbench.action.terminal.focusNext"
-    }
-]
+	{
+	  "key": "ctrl+alt+q",
+	  "command": "workbench.action.toggleMaximizedPanel"
+	},
+	{
+	  "key": "ctrl+alt+x",
+	  "command": "workbench.action.terminal.kill"
+	},
+	{
+	  "key": "ctrl+alt+s",
+	  "command": "workbench.action.terminal.focusNext"
+	},
+	{
+	  "key": "alt+shift+s",
+	  "command": "editor.action.showHover"
+	},
+	{
+	  "key": "ctrl+down",
+	  "command": "cursorMove",
+	  "when": "editorTextFocus",
+	  "args": {
+		"to": "nextBlankLine",
+		"by": "wrappedLine"
+	  }
+	},
+	{
+	  "key": "ctrl+up",
+	  "command": "cursorMove",
+	  "when": "editorTextFocus",
+	  "args": {
+		"to": "prevBlankLine",
+		"by": "wrappedLine"
+	  }
+	}
+  ]
