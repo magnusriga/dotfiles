@@ -21,7 +21,7 @@ alias gp="git push"
 
 alias pd="pnpm dev"
 alias pb="pnpm build"
-alias ps="pnpm start"
+# alias ps="pnpm start"
 alias pt="pnpm test"
 
 
