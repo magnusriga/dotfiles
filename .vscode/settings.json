@@ -1,9 +1,9 @@
 {
-	"workbench.iconTheme": "material-icon-theme",
-	"[json]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
-	},
-	"terminal.integrated.defaultProfile.windows": "Git Bash",
+  "workbench.iconTheme": "material-icon-theme",
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
   "terminal.integrated.defaultProfile.linux": "bash",
   "eslint.runtime": "/home/magnus/.nvm/versions/node/v20.1.0/bin/node",
   "eslint.packageManager": "pnpm",
