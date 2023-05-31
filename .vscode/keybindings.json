@@ -1,37 +1,67 @@
 // Place your key bindings in this file to override the defaults
 [
 	{
-	  "key": "ctrl+alt+q",
-	  "command": "workbench.action.toggleMaximizedPanel"
+		"key": "ctrl+alt+q",
+		"command": "workbench.action.toggleMaximizedPanel"
 	},
 	{
-	  "key": "ctrl+alt+x",
-	  "command": "workbench.action.terminal.kill"
+		"key": "ctrl+alt+x",
+		"command": "workbench.action.terminal.kill"
 	},
 	{
-	  "key": "ctrl+alt+s",
-	  "command": "workbench.action.terminal.focusNext"
+		"key": "ctrl+alt+s",
+		"command": "workbench.action.terminal.focusNext"
 	},
 	{
-	  "key": "alt+shift+s",
-	  "command": "editor.action.showHover"
+		"key": "alt+shift+s",
+		"command": "editor.action.showHover"
 	},
 	{
-	  "key": "ctrl+down",
-	  "command": "cursorMove",
-	  "when": "editorTextFocus",
-	  "args": {
-		"to": "nextBlankLine",
-		"by": "wrappedLine"
-	  }
+		"key": "ctrl+down",
+		"command": "cursorMove",
+		"when": "editorTextFocus",
+		"args": {
+			"to": "nextBlankLine",
+			"by": "wrappedLine"
+		}
 	},
 	{
-	  "key": "ctrl+up",
-	  "command": "cursorMove",
-	  "when": "editorTextFocus",
-	  "args": {
-		"to": "prevBlankLine",
-		"by": "wrappedLine"
-	  }
+		"key": "ctrl+up",
+		"command": "cursorMove",
+		"when": "editorTextFocus",
+		"args": {
+			"to": "prevBlankLine",
+			"by": "wrappedLine"
+		}
+	},
+	{
+		"key": "ctrl+up",
+		"command": "workbench.action.terminal.scrollUp",
+		"when": "terminalFocus && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocus && terminalProcessSupported && !terminalAltBufferActive"
+	},
+	{
+		"key": "ctrl+down",
+		"command": "workbench.action.terminal.scrollDown",
+		"when": "terminalFocus && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocus && terminalProcessSupported && !terminalAltBufferActive"
+	},
+	{
+		"key": "ctrl+alt+up",
+		"command": "workbench.action.terminal.scrollUpPage",
+		"when": "terminalFocus && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocus && terminalProcessSupported && !terminalAltBufferActive"
+	},
+	{
+		"key": "ctrl+alt+down",
+		"command": "workbench.action.terminal.scrollDownPage",
+		"when": "terminalFocus && terminalHasBeenCreated && !terminalAltBufferActive || terminalFocus && terminalProcessSupported && !terminalAltBufferActive"
+	},
+	{
+		"key": "ctrl+alt+pageup",
+		"command": "workbench.action.terminal.scrollToPreviousCommand",
+		"when": "terminalFocus && terminalHasBeenCreated && !accessibilityModeEnabled || terminalFocus && terminalProcessSupported && !accessibilityModeEnabled"
+	},
+	{
+		"key": "ctrl+alt+pagedown",
+		"command": "workbench.action.terminal.scrollToNextCommand",
+		"when": "terminalFocus && terminalHasBeenCreated && !accessibilityModeEnabled || terminalFocus && terminalProcessSupported && !accessibilityModeEnabled"
 	}
-  ]
+]
