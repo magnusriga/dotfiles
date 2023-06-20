@@ -2,6 +2,21 @@
 // Copy keybindings into vscode's install location (check ctrl+shift+p).
 [
   {
+    "key": "ctrl+n",
+    "command": "explorer.newFile",
+    "when": "explorerViewletFocus"
+  },
+  {
+    "key": "ctrl+shift+n",
+    "command": "explorer.newFolder",
+    "when": "explorerViewletFocus"
+  },
+  {
+    "key": "ctrl+shift+n",
+    "command": "workbench.action.newWindow",
+    "when": "!explorerViewletFocus"
+  },
+  {
     "key": "ctrl+alt+q",
     "command": "workbench.action.toggleMaximizedPanel"
   },
