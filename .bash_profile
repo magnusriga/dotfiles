@@ -13,7 +13,10 @@ case $- in
 esac
 
 # Add `~/bin` to the `$PATH`
-export PATH="$HOME/bin:$PATH";
+# Set PATH so it includes user's private bin if it exists
+if [ -d "$HOME/bin" ] ; then
+    PATH="$HOME/bin:$PATH"
+fi
 
 # Load the shell dotfiles, and then some:
 # * ~/.path can be used to extend `$PATH`.
@@ -80,11 +83,6 @@ complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes Syste
 # Needed for NVM, node, npm to work in docker.
 # Make sure it maches path set for .nvm in Dockerfile.
 # ----------------------------------------------------------------
-
-# Set PATH so it includes user's private bin if it exists
-if [ -d "$HOME/bin" ] ; then
-    PATH="$HOME/bin:$PATH"
-fi
 
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/.local/bin" ] ; then
