@@ -99,17 +99,23 @@ export NVM_DIR="$HOME/.nvm"
 # ----------------------------------------------------------------
 SHELL='/bin/bash'
 
-# PNPM_HOME is path to pnpm executable file (i.e. bin file)
-# Below was the default path, but docker did otherwise
-# export PNPM_HOME="/home/magnus/.local/share/pnpm"
-# pnpm
-export PNPM_HOME="/home/magnus/.local/share/pnpm"
+# PNPM NOTES:
+# PNPM_HOME is path to pnpm executable file (i.e. bin file).
+# Below we add binary location (as set by pnpm curl install script) to path.
+# We could install pnpm with corepack, in which case it is installed in nvm folder which is already in PATH.
+# Thus, using corepack, adding PNPM_HOME to path is not needed.
+# It is anyways needed to set PNPM_HOME env, because we use it to set virtual store path.
+# If we set it below, and use corepack to install pnpm binary, binary location and PNPM_HOME would not match.
+# Thus, install pnpm with curl, but remember to delete entry it makes to .bashrc,
+# since that automatic entry sets PNPM_HOME with hardcoded username then adds that to path: PNPM_HOME="/home/<username>/.local/share/pnpm".
+# Instead, we make set PNPM_HOME below, using USER env.
+# PS: No crisis if we forget to delet bashrc entry made by pnpm install script, as it should use the correct username.
+# Below only adds PNPM_HOME to path is it does not already exist in PATH.
+export PNPM_HOME="/home/${USER}/.local/share/pnpm"
 case ":$PATH:" in
   *":$PNPM_HOME:"*) ;;
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
-# pnpm end
-
 
 # ================================================================
 
