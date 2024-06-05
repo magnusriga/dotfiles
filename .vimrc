@@ -91,9 +91,23 @@ function! StripWhitespace()
 	call setpos('.', save_cursor)
 	call setreg('/', old_query)
 endfunction
-noremap <leader>ss :call StripWhitespace()<CR>
+" noremap <leader>ss :call StripWhitespace()<CR>
 " Save a file as root (,W)
 noremap <leader>W :w !sudo tee % > /dev/null<CR>
+
+noremap <leader>w :w<CR>
+
+" noremap <leader>vs :vsplit<CR>
+
+noremap <leader>t :tabnew<CR>
+
+noremap <leader>e :Explore<CR>
+
+noremap <leader>q :q<CR>
+
+noremap <leader>Q :q!<CR>
+
+noremap <leader>h :set hlsearch!<CR>
 
 " Automatic commands
 if has("autocmd")
