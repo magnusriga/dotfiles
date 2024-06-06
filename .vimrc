@@ -91,7 +91,7 @@ function! StripWhitespace()
 	call setpos('.', save_cursor)
 	call setreg('/', old_query)
 endfunction
-" noremap <leader>ss :call StripWhitespace()<CR>
+noremap <leader>ss :call StripWhitespace()<CR>
 " Save a file as root (,W)
 noremap <leader>W :w !sudo tee % > /dev/null<CR>
 
@@ -108,6 +108,40 @@ noremap <leader>q :q<CR>
 noremap <leader>Q :q!<CR>
 
 noremap <leader>h :set hlsearch!<CR>
+
+map Y y$
+
+noremap <leader>d "_d
+noremap <leader>dd "_dd
+noremap <leader>D "_D
+" noremap <leader>p "+p
+" noremap <leader>P "+P
+" noremap <leader>p "0p (used in vim vscode extension, to open quickMenu)
+
+" noremap <leader>o o<Esc>
+" noremap <leader>O O<Esc>
+
+noremap <leader>l :ls<CR>
+" On this approach 'x' acts like classic 'delete' key
+" nnoremap x "_x
+" vnoremap x "_d
+" noremap X "_X
+" On this approach 'c' does not copy to working registers
+" vnoremap c "_c
+" noremap C "_C
+" On this approach 'd' acts like classic 'cut' (i.e. copies to working registers)
+" vnoremap d "*d:let @+=@*<CR>
+" noremap dd "*dd:let @+=@*<CR>
+" noremap D "*D:let @+=@*<CR>
+" noremap y "*y:let @+=@*<CR>
+" noremap yw "*yw:let @+=@*<CR>
+" noremap yiw "*yiw:let @+=@*<CR>
+" noremap yy "*yy:let @+=@*<CR>
+" nnoremap Y "*Y:let @+=@*<CR>
+" vnoremap Y "*y`>:let @+=@*<CR>
+" " Re-yank what just got pasted in visual mode
+" vnoremap p pgvy
+
 
 " Automatic commands
 if has("autocmd")
