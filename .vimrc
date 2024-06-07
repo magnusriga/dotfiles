@@ -95,13 +95,15 @@ noremap <leader>ss :call StripWhitespace()<CR>
 " Save a file as root (,W)
 noremap <leader>W :w !sudo tee % > /dev/null<CR>
 
-noremap <leader>w :w<CR>
+" noremap <leader>w :w<CR> <-- Clashed with camelCaseMotion
 
 " noremap <leader>vs :vsplit<CR>
 
 noremap <leader>t :tabnew<CR>
+nnoremap H gT
+nnoremap L gt
 
-noremap <leader>e :Explore<CR>
+" noremap <leader>e :Explore<CR> <-- Clashed with camelCaseMotion
 
 noremap <leader>q :q<CR>
 
@@ -122,6 +124,10 @@ noremap <leader>D "_D
 " noremap <leader>O O<Esc>
 
 noremap <leader>l :ls<CR>
+
+" Remove search highlighting (until next search)
+noremap <C-n> :nohl<CR>
+
 " On this approach 'x' acts like classic 'delete' key
 " nnoremap x "_x
 " vnoremap x "_d
@@ -139,7 +145,7 @@ noremap <leader>l :ls<CR>
 " noremap yy "*yy:let @+=@*<CR>
 " nnoremap Y "*Y:let @+=@*<CR>
 " vnoremap Y "*y`>:let @+=@*<CR>
-" " Re-yank what just got pasted in visual mode
+" Re-yank what just got pasted in visual mode
 " vnoremap p pgvy
 
 
