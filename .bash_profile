@@ -97,25 +97,21 @@ export NVM_DIR="$HOME/.nvm"
 # ----------------------------------------------------------------
 # Needed to ensure pnpm binary is added to PATH.
 # ----------------------------------------------------------------
-SHELL='/bin/bash'
+# SHELL='/bin/bash'
 
 # PNPM NOTES:
-# PNPM_HOME is path to pnpm executable file (i.e. bin file).
-# Below we add binary location (as set by pnpm curl install script) to path.
-# We could install pnpm with corepack, in which case it is installed in nvm folder which is already in PATH.
-# Thus, using corepack, adding PNPM_HOME to path is not needed.
-# It is anyways needed to set PNPM_HOME env, because we use it to set virtual store path.
-# If we set it below, and use corepack to install pnpm binary, binary location and PNPM_HOME would not match.
-# Thus, install pnpm with curl, but remember to delete entry it makes to .bashrc,
-# since that automatic entry sets PNPM_HOME with hardcoded username then adds that to path: PNPM_HOME="/home/<username>/.local/share/pnpm".
-# Instead, we make set PNPM_HOME below, using USER env.
-# PS: No crisis if we forget to delet bashrc entry made by pnpm install script, as it should use the correct username.
-# Below only adds PNPM_HOME to path is it does not already exist in PATH.
-export PNPM_HOME="/home/${USER}/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+# PNPM_HOME is used as the path to the virtual store (default behaviour of pnpm).
+# If we install pnpm with curl, we can also use the PNPM_HOME variable as the location for the pnpm executable file (i.e. bin file).
+# In that case, however, PNPM_HOME will have to be added to PATH.
+# If we install pnpm with corepack, the pnpm executable file will be installed in nvm folder, which is already in PATH.
+# Moreover, corepack makes it easy to update pnpm, which also ensures the package-manager filed in package.json is updated.
+# Thus, we use  corepack instead of curl.
+# It is anyways necessary to set PNPM_HOME env, because we use it to set virtual store path. This is done in the Dockerfile.
+# export PNPM_HOME="/home/${USER}/.local/share/pnpm"
+# case ":$PATH:" in
+#   *":$PNPM_HOME:"*) ;;
+#   *) export PATH="$PNPM_HOME:$PATH" ;;
+# esac
 
 # ================================================================
 
