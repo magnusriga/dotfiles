@@ -1,6 +1,37 @@
 # ================================================================
 # Notes
 # ================================================================
+# Five profile scripts gets executed (in the below order) when an zsh shell is launched and closed.
+# Place code in .zshenv or .zshrc.
+#
+# (1) .zshenv
+# Always sourced when any zsh shell lauches, regardless if the shell is a login shell or not, or an interactive shell or not.
+# Used to:
+# * Set (export) variables that should be available to other programs (e.g. $PATH, $EDITOR, $PAGER, etc.).
+# * Set $ZDOTDIR, to specify an alternative location for the rest of the zsh configuration files.
+#
+# (2) .zprofile
+# The Same as .zlogin, except that it's sourced before .zshrc.
+# An alternative to .zlogin, for ksh fans. The two are not intended to be used together.
+#
+# (3) .zshrc
+# Only runs when an interactive shell is opened.
+# Used to:
+# * Set options for interactive shells, with the setopt and unsetopt commands.
+# * Load shell modules, set history options, change the prompt, set up zle and completion, et cetera.
+# * Set variables that are only used in the interactive shell (e.g. $LS_COLORS).
+#
+# (4) .zlogin
+# Only runs when a login shell is opened (i.e. the first zsh terminal opened after starting vscdoe).
+# Runs after .zshrc, if the login shell is also interactive.
+# Used to:
+# * Start X using startx. Some systems start X on boot, so this file is not always very useful.
+#
+# (5).zlogout
+# Executed when closing a zsh shell.
+# Used to clear and reset the terminal.
+#
+# Conclusions:
 # * Information:
 #   - https://unix.stackexchange.com/questions/462663/purpose-of-n-ps1-in-bashrc
 #   - https://unix.stackexchange.com/questions/3052/is-there-a-bashrc-equivalent-file-read-by-all-shells
@@ -24,67 +55,7 @@
 # ================================================================
 
 # ================================================================
-# Add User's Private Bin (`~/bin`) to `$PATH`
+# Source the environment variables and other login-time settings (e.g. ssh-agent) from .profile.
+# Only runs when a login shell is opened (i.e. the first zsh terminal opened after starting vscdoe).
 # ================================================================
-if [ -d "$HOME/bin" ]; then
-  PATH="$HOME/bin:$PATH"
-fi
-
-# ================================================================
-# Add User's Private .local Bin to Path
-# ================================================================
-if [ -d "$HOME/.local/bin" ]; then
-  PATH="$HOME/.local/bin:$PATH"
-fi
-
-# ================================================================
-# Add Node Version Manager (NVM) to Path.
-# Needed for NVM, node, npm to Work in Docker.
-# Make Sure It Maches Path Set for .nvm in Dockerfile.
-# ================================================================
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-# ================================================================
-# Set Default Shell to Zsh
-# ================================================================
-SHELL=$(which zsh)
-
-# ================================================================
-# Add Bun to Path
-# ================================================================
-export BUN_INSTALL="$HOME/.bun"
-export PATH=$BUN_INSTALL/bin:$PATH
-
-
-# ================================================================
-# Start SSH agent to Avoid Typing Github Password
-# ================================================================
-env=~/.ssh/agent.env
-
-agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
-
-agent_start() {
-  (
-    umask 077
-    ssh-agent >|"$env"
-  )
-  . "$env" >|/dev/null
-}
-
-agent_load_env
-
-# agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
-agent_run_state=$(
-  ssh-add -l >|/dev/null 2>&1
-  echo $?
-)
-
-if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
-  agent_start
-  ssh-add
-elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
-  ssh-add
-fi
-
-unset env
+source ~/.profile
