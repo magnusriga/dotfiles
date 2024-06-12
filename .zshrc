@@ -88,3 +88,7 @@ ZSH_HIGHLIGHT_STYLES[globbing]='none'
 
 # Command color (git etc.)
 ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
+
+# Quoted argument color
+ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=green'
+ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=green'
