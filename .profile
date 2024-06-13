@@ -56,6 +56,10 @@ SHELL=$(which zsh)
 export BUN_INSTALL="$HOME/.bun"
 export PATH=$BUN_INSTALL/bin:$PATH
 
+# ================================================================
+# Make Google Chrome Default Browser
+# ================================================================
+export BROWSER=google-chrome
 
 # ================================================================
 # Start SSH agent to Avoid Typing Github Password
