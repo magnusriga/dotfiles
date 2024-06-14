@@ -2,7 +2,7 @@
 # Notes
 # ================================================================
 # Five profile scripts gets executed (in the below order) when an zsh shell is launched and closed.
-# Place code in .zshenv or .zshrc.
+# Place code in .zshenv, .zshrc, and .zprofile.
 #
 # (1) .zshenv
 # Always sourced when any zsh shell lauches, regardless if the shell is a login shell or not, or an interactive shell or not.
@@ -31,11 +31,10 @@
 # Executed when closing a zsh shell.
 # Used to clear and reset the terminal.
 #
-# Conclusions:
 # * Information:
 #   - https://unix.stackexchange.com/questions/462663/purpose-of-n-ps1-in-bashrc
 #   - https://unix.stackexchange.com/questions/3052/is-there-a-bashrc-equivalent-file-read-by-all-shells
-# * Do NOT run .[..]profile from .[..]rc files.
+# * Do NOT source .[..]profile from .[..]rc files.
 #   - .profile, .bash_profile, .zprofile, etc, are login-time scripts, i.e. meant to run ONCE when the first terminal instance Launches.
 #   - As such, they might run programs intended to execute only once per session.
 #   - Running .[..]profile every time a terminal launches might override environment variables set by the user manually.
@@ -48,11 +47,26 @@
 # * Add all other code, related to interactive shells, to .shrc.
 #   - Prompt settings, aliases, functions, etc.
 #   - This file is not sourced automatically by any shell, so we source it manually in other shell's rc files (.bashrc, .zshrc, etc.).
+# * Source .[..]rc from .[..]profile.
+#   - rc files do not run when the first shell, aka. the login shell, launches.
+#   - profile files always run when the first shell, aka. the login shell, launches, regardless if it is an interactive shell or not.
+#   - Therefore, run the rc file belonging to the profile file, from the profile file, if the shell (which is a login shell) is interactive.
+#   - This ensures that setup code for interactive shells run both for the first shell, aka. the login shell (if interactive), and for subserquent (non-login) shells.
+#   - .[..]profile > .profile && .[..]profile > .[..]rc > .shrc
 # * Result:
-#   - Code in .profile runs when the first shell is openend, so environment variables and ssh-agents, etc. are available to all shells from the start.
-#   - Code in .shrc runs whenever an interactive shell is opened.
+#   - code in .profile runs when the first shell is openend, so environment variables and ssh-agents, etc. are available to all shells from the start.
+#   - code in .shrc also runs whenever an interactive shell is opened whether it is the first shell, aka. the login shell, or not.
+#   - code in the specifc .[..]profile and .[..]rc also runs.
 #
 # ================================================================
+
+# ================================================================
+# Only Proceed if the Shell is an Interactive Shell.
+# The Setup Code Below Should Only Apply to Interactive Shells.
+# Other Setup Code, Meant to Apply to All Shells, Should Be Placed
+# In .[..]profile -> .profile (path additions, ssh-agent, etc.)
+# ================================================================
+[[ $- == *i* ]] || [ -n "$PS1" ] || return
 
 # ================================================================
 # Run Generic Interactive Shell Configuration.
