@@ -65,9 +65,10 @@ source ~/.shrc
 eval "$(starship init zsh)"
 
 # ================================================================
-# Source zsh-syntax-highlighting at the End of .zshrc.
+# Source Zsh Plugins Near Top of .zshrc.
 # ================================================================
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # ================================================================
 # Change Syntax Highlighting Colors.
@@ -92,3 +93,11 @@ ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
 # Quoted argument color
 ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=green'
 ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=green'
+
+# ================================================================
+# Enable vi Mode and Activate Vim Plugin for oh-my-zsh.
+# ================================================================
+bindkey -v
+plugins=(... vi-mode)
+zle-line-init() { zle -K vicmd; }
+zle -N zle-line-init
