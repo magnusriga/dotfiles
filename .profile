@@ -96,6 +96,14 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
 # ================================================================
+# Add the Global pnpm Store (CAS) to Path.
+# ================================================================
+export PNPM_HOME="$HOME/.local/share/pnpm"
+if [ -d "$HOME/.local/share/pnpm" ]; then
+  PATH="$HOME/.local/share/pnpm:$PATH"
+fi
+
+# ================================================================
 # Set Default Shell to Zsh
 # ================================================================
 SHELL=$(which zsh)
