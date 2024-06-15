@@ -117,6 +117,11 @@ if [ -d "$BUN_INSTALL" ]; then
 fi
 
 # ================================================================
+# Add Homebrew to Path
+# ================================================================
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# ================================================================
 # Make Google Chrome Default Browser
 # ================================================================
 export BROWSER=google-chrome
