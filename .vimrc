@@ -1,3 +1,8 @@
+# ================================================================================================
+# Due to how vscode and the vim extension works, this file must be place on the
+# host machine, .e.g. under C://Users/<username>/.vimrc
+# ================================================================================================
+
 " Use the Solarized Dark theme
 set background=dark
 colorscheme solarized
@@ -83,7 +88,7 @@ endif
 " Start scrolling three lines before the horizontal window border
 set scrolloff=3
 
-" Strip trailing whitespace (,ss)
+" Strip trailing whitespace function.
 function! StripWhitespace()
 	let save_cursor = getpos(".")
 	let old_query = getreg('/')
@@ -91,7 +96,10 @@ function! StripWhitespace()
 	call setpos('.', save_cursor)
 	call setreg('/', old_query)
 endfunction
+
+" Strip trailing whitespace.
 noremap <leader>ss :call StripWhitespace()<CR>
+
 " Save a file as root (,W)
 noremap <leader>W :w !sudo tee % > /dev/null<CR>
 
@@ -99,20 +107,46 @@ noremap <leader>W :w !sudo tee % > /dev/null<CR>
 
 " noremap <leader>vs :vsplit<CR>
 
+" Tab movement.
+noremap <leader>1 1gt
+noremap <leader>2 2gt
+noremap <leader>3 3gt
+noremap <leader>4 4gt
+noremap <leader>5 5gt
+noremap <leader>6 6gt
+noremap <leader>7 7gt
+noremap <leader>8 8gt
+noremap <leader>9 9gt
+noremap <leader>0 :tablast<cr>
+nnoremap <leader>j :tabnext<CR>
+nnoremap <leader>k :tabprevious<CR>
+
+" Go to last active tab.
+au TabLeave * let g:lasttab = tabpagenr()
+nnoremap <silent> <c-l> :exe "tabn ".g:lasttab<cr>
+vnoremap <silent> <c-l> :exe "tabn ".g:lasttab<cr>
+
+" Show list of open buffers, i.e. tabs.
+noremap <leader>l :ls<CR>
+
+" New tab.
 noremap <leader>t :tabnew<CR>
-nnoremap H gT
-nnoremap L gt
 
 " noremap <leader>e :Explore<CR> <-- Clashed with camelCaseMotion
 
+" Close tab.
 noremap <leader>q :q<CR>
 
+" Close tab without saving.
 noremap <leader>Q :q!<CR>
 
+" Remove search highlighting.
 noremap <leader>h :set hlsearch!<CR>
 
+" Make Y behave like C and D, i.e. yank to end of line.
 map Y y$
 
+" Delete without overwriting the yank register.
 noremap <leader>d "_d
 noremap <leader>dd "_dd
 noremap <leader>D "_D
@@ -122,8 +156,6 @@ noremap <leader>D "_D
 
 " noremap <leader>o o<Esc>
 " noremap <leader>O O<Esc>
-
-noremap <leader>l :ls<CR>
 
 " Remove search highlighting (until next search)
 noremap <C-n> :nohl<CR>
