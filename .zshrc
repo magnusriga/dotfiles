@@ -104,6 +104,12 @@
 # ================================================================
 
 # ================================================================
+# Source the .zprofile here, since vscode seems to be tricky,
+# when it comes to running the login shell first.
+# ================================================================
+source ~/.zprofile
+
+# ================================================================
 # Only Proceed if the Shell is an Interactive Shell.
 # Other Setup Code, Meant to Apply to All Shells, Should Be Placed
 # In .[..]profile -> .profile (path additions, ssh-agent, etc.)
@@ -122,6 +128,7 @@ eval "$(starship init zsh)"
 
 # ================================================================
 # Source Zsh Plugins Near Top of .zshrc.
+# zsh-syntax-highlighting.zsh must be sourced at the end of the .zshrc file.
 # ================================================================
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh

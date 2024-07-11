@@ -12,11 +12,19 @@ function doIt() {
 		--exclude "README.md" \
 		--exclude "LICENSE-MIT.txt" \
 		-avh --no-perms . ~;
-	source ~/.profile;
+  # .bash_profile runs .profile, but not .bash_rc,
+  # since this will not be an interactive shell.
+  # .profile adds the environment variables and
+  # other login-time settings (e.g. ssh-agent) to the shell.
+  # Do not run zsh scripts from here, as the Zsh commands are
+  # not reccognized by bash.
 	source ~/.bash_profile;
+  # .bashrc runs when a non-login interactive shell is opened,
+  # and runs .shrc, which contains prompt settings, aliases, etc.
+	source ~/.bashrc;
 }
 
-if [ "$1" == "--force" -o "$1" == "-f" ]; then
+if [ "$1" = "--force" -o "$1" = "-f" ]; then
 	doIt;
 else
 	read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1;

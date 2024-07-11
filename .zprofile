@@ -113,4 +113,5 @@ source ~/.profile
 # Source the .[..]rc File If the Current Shell, i.e. the Login
 # Shell, is Interactive, Which Ensures Interactive Login Shells Get All the Setup They Need.
 # ================================================================
-[[ $- == *i* ]] && [ -n "$PS1" ] && source ~/.zshrc
+# [[ $- == *i* ]] && [ -n "$PS1" ] && source ~/.zshrc
+# Instead, we source .[..]profile from the .[..]rc file, since vscode seems to be difficult.
