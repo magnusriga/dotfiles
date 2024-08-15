@@ -131,6 +131,7 @@ eval "$(starship init zsh)"
 # zsh-syntax-highlighting.zsh must be sourced at the end of the .zshrc file.
 # ================================================================
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ~/.zsh/zsh-z/zsh-z.plugin.zsh
 # source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # ================================================================

@@ -15,9 +15,20 @@ alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
 alias p="cd ~/projects"
 alias n="cd ~/nfront"
+
 alias g="git"
 alias gc="git add -A && git commit -am"
 alias gp="git push"
+alias gs="git status"
+
+alias python=python3
+
+alias ls="exa --icons"
+alias ll="exa -l -g --icons"
+alias lt="exa --tree --icons -a -I '.git|__pycache__|.mypy_cache|.ipynb_checkpoints'"
+
+alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
+
 alias cs="pnpm changeset"
 alias csv="pnpm changeset version"
 alias csp="pnpm changeset publish"
