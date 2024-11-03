@@ -127,9 +127,35 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 . "$HOME/.cargo/env"
 
 # ================================================================
+# Add snap binary directory to PATH.
+# ================================================================
+if [ -d "/snap/bin" ]; then
+  PATH="/snap/bin:$PATH"
+fi
+
+# ================================================================
+# Add symlink to fd, since another program has taken fd name.
+# Add ~/.local/bin, where symlink is placed, to path so fd is found.
+# ================================================================
+if [ ! -d "$HOME/.local/bin" ]; then
+  mkdir "$HOME/.local/bin" ];
+fi
+if [ ! -L "$HOME/.local/bin/fd" ]; then
+  ln -fs $(which fdfind) ~/.local/bin/fd
+fi
+PATH="$HOME/.local/bin:$PATH"
+
+# ================================================================
 # Make Google Chrome Default Browser
 # ================================================================
 export BROWSER=google-chrome
+
+# ================================================================
+# Update apt, apt-get, Homebrew, ...
+# ================================================================
+brew update && brew upgrade
+sudo apt-get update && sudo apt-get upgrade
+sudo apt update && sudo apt upgrade
 
 # ================================================================
 # Start SSH agent to Avoid Typing Github Password

@@ -110,8 +110,23 @@
 source ~/.profile
 
 # ================================================================
-# Source the .[..]rc File If the Current Shell, i.e. the Login
-# Shell, is Interactive, Which Ensures Interactive Login Shells Get All the Setup They Need.
+# Source the .[..]rc File If the Current Shell, i.e. Login Shell,
+# is Interactive, Ensuring Interactive Login Shells Get All Needed Setup.
 # ================================================================
-# [[ $- == *i* ]] && [ -n "$PS1" ] && source ~/.zshrc
-# Instead, we source .[..]profile from the .[..]rc file, since vscode seems to be difficult.
+#
+# ----------------------------------------------------------------
+# Note
+# ----------------------------------------------------------------
+# vscode is unpredictable when it comes to login shells,
+# leading to hack where .[..]profile is sourced from .[..]rc,
+# rather than other way around (which is correct, see above).
+#
+# However, when new tab is opened in Windows Terminal | WesTerm,
+# new shell is always login shell: `echo $-` includes 'l'.
+# When new shell is spawned by that first shell,
+# e.g. by running `zsh` | `bash`, new inner shell is NOT login shell.
+#
+# Thus, since we no longer use vscode, it is OK to follow correct
+# apporach and source .[..]rc from .[..]profile.
+# ================================================================
+[[ $- == *i* ]] && [ -n "$PS1" ] && source ~/.zshrc

@@ -104,10 +104,24 @@
 # ================================================================
 
 # ================================================================
-# Source the .zprofile here, since vscode seems to be tricky,
-# when it comes to running the login shell first.
+# Do not source .zprofile here, since we do not use vscode.
+#
+# ----------------------------------------------------------------
+# Note
+# ----------------------------------------------------------------
+# vscode is unpredictable when it comes to login shells,
+# leading to hack where .[..]profile is sourced from .[..]rc,
+# rather than other way around (which is correct, see above).
+#
+# However, when new tab is opened in Windows Terminal | WesTerm,
+# new shell is always login shell: `echo $-` includes 'l'.
+# When new shell is spawned by that first shell,
+# e.g. by running `zsh` | `bash`, new inner shell is NOT login shell.
+#
+# Thus, since we no longer use vscode, it is OK to follow correct
+# apporach and source .[..]rc from .[..]profile.
 # ================================================================
-source ~/.zprofile
+# source ~/.zprofile
 
 # ================================================================
 # Only Proceed if the Shell is an Interactive Shell.
