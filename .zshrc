@@ -179,3 +179,9 @@ bindkey -v
 plugins=(... vi-mode)
 zle-line-init() { zle -K vicmd; }
 zle -N zle-line-init
+
+# ================================================================
+# Set up fzf key bindings, e.g. <C-T>, <C-R>, <A-C>, and fuzzy completion.
+# Must be done after the vi mode settings above.
+# ================================================================
+source <(fzf --zsh)
