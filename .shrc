@@ -82,3 +82,10 @@ for file in ~/.{path,exports,aliases,functions,extra}; do
   [ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
 unset file
+
+# ================================================================
+# Set up shell integration for Wezterm.
+# Enables scrollback to start of earlier command,
+# selecting output of previous commands, etc.
+# ================================================================
+source $WEZTERM_HOME/shell-integration/wezterm.sh

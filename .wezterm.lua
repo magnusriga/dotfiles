@@ -1,11 +1,17 @@
 -- ==============================================================
 -- NOTES
 -- ==============================================================
--- Search
+-- Search and copy
 -- --------------------------------------------------------------
 -- CTRL-SHIFT-F and CMD-F to search.
--- CTRL-SHIFT-C will copy the selected text to the clipboard.
--- Esc to escape.
+-- Not that useful to copy, as it just copies search term.
+--
+-- --------------------------------------------------------------
+-- Copy and Paste
+-- --------------------------------------------------------------
+-- Copy: CTRL-SHIFT-C
+-- Paste: CTRL-SHIFT-V
+-- Uses system clipboard, so cannot paste with p.
 --
 -- --------------------------------------------------------------
 -- Quick Select Mode
