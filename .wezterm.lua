@@ -31,6 +31,7 @@
 
 -- Pull in the wezterm API
 local wezterm = require("wezterm")
+local act = wezterm.action
 
 -- This will hold the configuration.
 local config = wezterm.config_builder()
@@ -48,6 +49,11 @@ config.font = wezterm.font("JetBrains Mono")
 -- If right padding is set to 0 then it will be increased
 -- to a single cell width
 config.enable_scroll_bar = true
+
+config.keys = {
+  { key = "UpArrow", mods = "SHIFT", action = act.ScrollToPrompt(-1) },
+  { key = "DownArrow", mods = "SHIFT", action = act.ScrollToPrompt(1) },
+}
 
 -- and finally, return the configuration to wezterm
 return config
