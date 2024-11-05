@@ -43,6 +43,7 @@ config.font = wezterm.font("JetBrains Mono")
 -- Changing the color scheme.
 -- config.color_scheme = 'Batman'
 -- config.color_scheme = "AdventureTime"
+config.color_scheme = "OneHalfDark"
 
 -- Enable the scrollbar.
 -- It will occupy the right window padding space.
@@ -53,6 +54,14 @@ config.enable_scroll_bar = true
 config.keys = {
   { key = "UpArrow", mods = "SHIFT", action = act.ScrollToPrompt(-1) },
   { key = "DownArrow", mods = "SHIFT", action = act.ScrollToPrompt(1) },
+}
+
+config.mouse_bindings = {
+  {
+    event = { Down = { streak = 3, button = "Left" } },
+    action = wezterm.action.SelectTextAtMouseCursor("SemanticZone"),
+    mods = "NONE",
+  },
 }
 
 -- and finally, return the configuration to wezterm

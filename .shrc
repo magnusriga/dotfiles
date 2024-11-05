@@ -88,4 +88,5 @@ unset file
 # Enables scrollback to start of earlier command,
 # selecting output of previous commands, etc.
 # ================================================================
+export WEZTERM_HOME="$HOME/.local/share/wezterm"
 source $WEZTERM_HOME/shell-integration/wezterm.sh
