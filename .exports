@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Make vim the default editor.
-export EDITOR='nvim';
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else

@@ -141,14 +141,6 @@ source ~/.shrc
 eval "$(starship init zsh)"
 
 # ================================================================
-# Source Zsh Plugins Near Top of .zshrc.
-# zsh-syntax-highlighting.zsh must be sourced at the end of the .zshrc file.
-# ================================================================
-source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source ~/.zsh/zsh-z/zsh-z.plugin.zsh
-# source ~/.zsh/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
-# ================================================================
 # Change Syntax Highlighting Colors.
 # ================================================================
 # Source: https://github.com/zsh-users/zsh-syntax-highlighting/tree/master/highlighters/main
@@ -189,6 +181,10 @@ source <(fzf --zsh)
 # ================================================================
 # Add custom settings to fzf.
 # ================================================================
+export FZF_DEFAULT_COMMAND='fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
+export FZF_CTRL_T_COMMAND='fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
+export FZF_ALT_C_COMMAND='fd --hidden --type d --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
+
 # Use ~~ as the trigger sequence instead of the default **
 export FZF_COMPLETION_TRIGGER='~~'
 
@@ -206,3 +202,21 @@ _fzf_compgen_path() {
 _fzf_compgen_dir() {
   fd --type d --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history" . "$1"
 }
+
+# ================================================================
+# Yazi wrapper script.
+# ================================================================
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
+
+# ================================================================
+# Start Zoxide, at end of zshrc, AFTER compinit.
+# ================================================================
+eval "$(zoxide init zsh)"
+rm ~/.zcompdump*; compinit
