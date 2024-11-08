@@ -1,0 +1,35 @@
+[[manager.prepend_keymap]]
+on = "!"
+run = 'shell "$SHELL" --block --confirm'
+desc = "Open shell here"
+
+# Do not use, as normal mode in search boxes is needed.
+# [[input.prepend_keymap]]
+# on = "<Esc>"
+# run = "close"
+# desc = "Cancel input"
+
+[[manager.prepend_keymap]]
+on = "y"
+run = ['''
+  shell 'echo "$@" | xclip -i -selection clipboard -t text/uri-list' --confirm
+''', "yank"]
+
+[[manager.prepend_keymap]]
+on = ["g", "r"]
+run = '''
+  shell 'ya pub dds-cd --str "$(git rev-parse --show-toplevel)"' --confirm
+'''
+
+[[manager.prepend_keymap]]
+on   = "T"
+run  = "plugin --sync max-preview"
+desc = "Maximize or restore preview"
+
+[[manager.prepend_keymap]]
+on  = "k"
+run = "plugin --sync arrow --args=-1"
+
+[[manager.prepend_keymap]]
+on  = "j"
+run = "plugin --sync arrow --args=1"

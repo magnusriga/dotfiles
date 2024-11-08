@@ -22,6 +22,9 @@ function doIt() {
   # .bashrc runs when a non-login interactive shell is opened,
   # and runs .shrc, which contains prompt settings, aliases, etc.
 	source ~/.bashrc;
+
+  # Run install script(s).
+  source install.sh;
 }
 
 if [ "$1" = "--force" -o "$1" = "-f" ]; then
