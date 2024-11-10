@@ -22,14 +22,115 @@ run = '''
 '''
 
 [[manager.prepend_keymap]]
-on   = "T"
-run  = "plugin --sync max-preview"
+on = "T"
+run = "plugin --sync max-preview"
 desc = "Maximize or restore preview"
 
 [[manager.prepend_keymap]]
-on  = "k"
+on = "k"
 run = "plugin --sync arrow --args=-1"
 
 [[manager.prepend_keymap]]
-on  = "j"
+on = "j"
 run = "plugin --sync arrow --args=1"
+
+# [manager]
+# keymap = [
+#   { on = [
+#     "E",
+#   ], run = "plugin eza-preview", desc = "Toggle tree/list dir preview" },
+# ]
+
+[[manager.prepend_keymap]]
+on = ["1"]
+run = "plugin relative-motions --args=1"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["2"]
+run = "plugin relative-motions --args=2"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["3"]
+run = "plugin relative-motions --args=3"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["4"]
+run = "plugin relative-motions --args=4"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["5"]
+run = "plugin relative-motions --args=5"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["6"]
+run = "plugin relative-motions --args=6"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["7"]
+run = "plugin relative-motions --args=7"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["8"]
+run = "plugin relative-motions --args=8"
+desc = "Move in relative steps"
+
+[[manager.prepend_keymap]]
+on = ["9"]
+run = "plugin relative-motions --args=9"
+desc = "Move in relative steps"
+
+# [[manager.prepend_keymap]]
+# on = "f"
+# run = "plugin jump-to-char"
+# desc = "Jump to char"
+
+[[manager.prepend_keymap]]
+on = ["m"]
+run = "plugin bookmarks --args=save"
+desc = "Save current position as a bookmark"
+
+[[manager.prepend_keymap]]
+on = ["'"]
+run = "plugin bookmarks --args=jump"
+desc = "Jump to a bookmark"
+
+[[manager.prepend_keymap]]
+on = ["b", "d"]
+run = "plugin bookmarks --args=delete"
+desc = "Delete a bookmark"
+
+[[manager.prepend_keymap]]
+on = ["b", "D"]
+run = "plugin bookmarks --args=delete_all"
+desc = "Delete all bookmarks"
+
+[[manager.prepend_keymap]]
+on = ["c", "m"]
+run = "plugin chmod"
+desc = "Chmod on selected files"
+
+[[manager.prepend_keymap]]
+on = ["g", "i"]
+run = "plugin lazygit"
+desc = "run lazygit"
+
+[[manager.prepend_keymap]]
+on = ["u"]
+run = "plugin restore"
+desc = "Restore last deleted files/folders"
+
+[[manager.prepend_keymap]]
+on = "<C-y>"
+run = ["plugin system-clipboard"]
+
+[[manager.prepend_keymap]]
+on = "F"
+run = "plugin smart-filter"
+desc = "Smart filter"

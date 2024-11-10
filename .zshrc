@@ -13,13 +13,20 @@
 # (2) .zprofile
 # The Same as .zlogin, except that it's sourced before .zshrc.
 # An alternative to .zlogin, for ksh fans. The two are not intended to be used together.
+# Used to:
+# * Set PATH.
+# * Set other exported shell vairables.
+# * Note: All exported shell variables, aka. environment variables, are inherited by non-login
+#   shells from login shell, beause non-login shells are subshells of parent login shell.
 #
 # (3) .zshrc
-# Only runs when an interactive shell is opened.
+# Only runs when an interactive shell is opened, both for login shell or non-login shells,
+# i.e. subshells of login shells.
 # Used to:
-# * Set options for interactive shells, with the setopt and unsetopt commands.
-# * Load shell modules, set history options, change the prompt, set up zle and completion, et cetera.
-# * Set variables that are only used in the interactive shell (e.g. $LS_COLORS).
+# * Set options for interactive shells, e.g. with the setopt and unsetopt commands.
+# * Set up prompt, alias, and other settings not inherited by subshells from parent shells.
+# * Load shell modules, set history options, set up zle and completion, etc.
+# * Set variables only used in nteractive shells (e.g. $LS_COLORS).
 #
 # (4) .zlogin
 # Only runs when a login shell is opened (i.e. the first zsh terminal opened after starting vscdoe).
@@ -34,42 +41,40 @@
 # * Information:
 #   - https://unix.stackexchange.com/questions/462663/purpose-of-n-ps1-in-bashrc
 #   - https://unix.stackexchange.com/questions/3052/is-there-a-bashrc-equivalent-file-read-by-all-shells
-# * Do NOT source .[..]profile from .[..]rc files.
-#   - .profile, .bash_profile, .zprofile, etc, are login-time scripts, i.e. meant to run ONCE when the first terminal instance Launches.
+# * Do NOT source .[..]profile from .[..]rc.
+#   - .profile, .bash_profile, .zprofile, etc, are login-time scripts, i.e. meant to run ONCE when the first shell session Launches.
 #   - As such, they might run programs intended to execute only once per session.
-#   - Running .[..]profile every time a terminal launches might override environment variables set by the user manually.
-#   - Thus, ideally, one should not run .[..]profile files every time an (interactive) shell opens.
-#   - To keep it simple, however, both WSL and vscode starts a login shell when a new terminal window opens, which means relevant .[..]profile files run.j
-#   - WSL starts every new terminal window as a login shell.
-#   - vscode first runs a login shell when it starts, which runs .profile and potentiallly the .[..]profile of the default shell (not sure).
-#   - vscode then runs another login shell when the integrated terminal is opened, which in turn spins up a sub-shell (non-login shell) used for the integrated terminal.
-#   - Thus, WSL will show each terminal window as a login shell, whereas vscode will not, but both have run the .[..]profile files when the terminal launched.
-#   - Thus, in both WSL and vscode, when a new terminal is opened the .[..]profile files run.
+#   - Running .[..]profile every time a shell session launches might override environment variables set by the user manually.
+#   - Thus, ideally, one should not run .[..]profile files every time an (interactive) shell opens, only when first parent shell,
+#   - aka. login shell, opens.
+#   - Login shells are launched when new terminal window is opened.
+#   - Non-login shells are launched when login shell spawns a subshell, by running script | subshell command | launching new shell: `zsh`.
 #   - Remember to make the dotfiles executable, otherwise they will not run and the setup will not work.
-# * Add all environment variables and non-graphical programs (ssh-agent, etc.) to .profile, which is run by the other shell's profile files.
+# * Add all environment variables and non-graphical programs (ssh-agent, etc.) to .profile, which is run by other shell's profile files.
 #   - .profile is run automatically by bash, sh, dash, and perhaps others, when they are login shells (interactive or not).
+#   - Environment variables, i.e. exported shell variables, are visible to subshells because they are exported.
 #   - Thus, .profile is ideal for code that should only run once, when the first shell opens.
-#   - Zsh does not run .profile by default, instead it runs .zprofile, so run .profile from .zprofile.
+#   - Zsh does not run .profile directly, instead it runs .zprofile, which in turn runs .profile.
 #   - That way, all needed environment variables are sourced in one place, and only once.
-# * Add all other code, related to interactive shells, to .shrc.
-#   - Prompt settings, aliases, functions, etc.
-#   - This file is not sourced automatically by any shell, so we source it manually in other shell's rc files (.bashrc, .zshrc, etc.).
-# * Source .[..]rc from .[..]profile.
-#   - rc files do not run when the first shell, aka. the login shell, launches.
-#   - profile files always run when the first shell, aka. the login shell, launches, regardless if it is an interactive shell or not.
-#   - Therefore, run the rc file belonging to the profile file from the profile file, if the shell (which is a login shell) is interactive.
-#   - That ensures setup code for interactive shells run both for the first shell, aka. the login shell (if interactive), and for subserquent (non-login) shells.
+# * Add other code, related to interactive shells, to .shrc.
+#   - Prompt settings, aliases, non-exported functions, etc.
+#   - This file is not sourced automatically by any shell, so source manually in other shell's rc files (.bashrc, .zshrc, etc.).
+# * Do NOT source .[..]rc from .[..]profile.
+#   - When login shell runs, i.e. when terminal window is first opened, both .[..]profile and .[..]rc runs.
+#   - Note: .[..]rc only runs if shell is interactive, which it is when new terminal is opened.
+#   - Moreover, shell variables exported in login shell, aka. environment variables, are also set in non-login shells,
+#     because they are subshells of login shell.
+#   - Thus, since both .[..]rc and .[..]profile are called when new terminal is opened,
+#     and .[..]rc runs again in new interactive subshells which inherits environment from parent shell that ran .[..]profile,
+#     it is NOT nececcary to source .[..]rc from .[..]profile.
+#   - In fact, sourcing .[..]rc from .[..]profile will cause profile to run twice, when new login shell is launched, i.e. when new terminal window is opened.
 #   - .[..]profile > .profile && .[..]profile > .[..]rc > .shrc
-# * Result:
-#   - code in .[..]profile and .profile runs when the first shell is openend, so environment variables and ssh-agents, etc. are available to all shells from the start.
-#   - code in .shrc, .[..]profile, and .profile also run whenever an interactive shell is opened, whether it is the first shell, aka. the login shell, or not.
-# * IMPORTANT:
-#   - In WSL, every new terminal window is a login shell, so .[..]profile files are sourced.
-#   - In vscode, every new terminal window launches a login shell, which in turn spins up a sub-shell (non-login shell) used as the shell for the integrated terminal.
-#   - Thus, WSL will show each terminal window as a login shell, whereas vscode will not.
-#   - Thus, both WSL and vscode runs the .[..]profile files when a new terminal window is opened.
-#   - Remember to make the dotfiles executable, otherwise they will not run and the setup will not work.
 #
+# * Result:
+#   - .[..]profile > .profile and .[..]rc > .shrc all run when new terminal is opened, because termianl launches an interactive login shell.
+#   - When subshells, i.e. non-login shells, are launched from login shell, .[..]rc > .shrc runs again.
+#   - Subshell inherits environment, i.e. all exported shell variables, from parent login shell.
+#   - .[..]rc > .shrc sets up aliases and prompt, which are not inherited by subshell from parent login shell, so should run again.
 # ================================================================
 
 # ================================================================
@@ -79,54 +84,33 @@
 # * A login shell is a shell given to a user upon login into a Unix system.
 # * A login shell is the first process that executes under the user's ID, when logging in for an interactive session.
 # * A login shell is the shell that executes the commands in the user's .profile file.
-# * The login process tells the shell to behave as a login shell by passing argument 0- (0 is normally the name of the shell executable), e.g. -bash instead of bash.
+# * Terminal emulators start login shell when new terminal window is started.
+# * Login process tells shell to behave as login shell by passing argument 0- (0 is normally the name of the shell executable), e.g. -bash instead of bash.
 # * Login shells (Bourne shells like sh and bash, but not zsh) read /etc/profile and ~/.profile.
 # * If ~/.bash_profile is present, bash only reads that and not ~/.profile.
-# * A login shell does not read .[..]rc files.
+# * All interactive shells read .[..]rc files, including login shells.
 # * When you log in on a text console, or through SSH, or with su -, you get an interactive login shell.
 # * When you log in in graphical mode (on an X display manager), you don't get a login shell, instead you get a session manager or a window manager.
 # * It's rare to run a non-interactive login shell, but some X settings do that when you log in with a display manager, so as to arrange to read the profile files.
 # * Another way to get a non-interactive login shell is to log in remotely with a command passed through standard input which is not a terminal.
-#   - For example: ssh example.com <my-script-which-is-stored-locally
-#   - As opposed to: ssh example.com my-script-which-is-on-the-remote-machine, which runs a non-interactive, non-login shell.
+#   - For example: ssh example.com script-stored-locally
+#   - As opposed to: ssh example.com script-on-remote-machine, which runs non-interactive, login shell.
 # * Interactive, non-login shell:
 #   - An interactive, non-login shell is launched whenever an interactive shell is started in a terminal in an existing session.
-#   - For example by launching a shell inside another shell with e.g. `bash`.
-#   - Interactive, non-login shells read ~/.[..]rc
-#   - By default, there is no ~/.shrc, so the files that automatically run are ~/bashrc, ~/.zshrc, etc.
+#   - For example by launching shell inside another shell, e.g. with `bash`.
+#   - All interactive shells run ~/.[..]rc
+#   - By default, there is no ~/.shrc, files that automatically run are ~/bashrc, ~/.zshrc, etc.
 #   - $ENV, if set, is also invoked by POSIX/XSI-compliant shells such as dash, ksh, and bash when invoked as `sh`.
 # * Non-interactive, non-login shells:
-#   - A non-interactive, non-login shell is used whenever a shell runs a script or a command runs (unless script is executed with exec, which replaces the current shell).
-#   - Some shells read a startup file in this case
+#   - A non-interactive, non-login shell is used whenever shell runs script or command (unless script is executed with exec, which replaces current shell).
+#   - Some shells read a startup file in this case.
 #   - Bash runs the file indicated by the BASH_ENV variable, zsh runs /etc/zshenv and ~/.zshenv
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
-#
 # ================================================================
 
 # ================================================================
-# Do not source .zprofile here, since we do not use vscode.
-#
-# ----------------------------------------------------------------
-# Note
-# ----------------------------------------------------------------
-# vscode is unpredictable when it comes to login shells,
-# leading to hack where .[..]profile is sourced from .[..]rc,
-# rather than other way around (which is correct, see above).
-#
-# However, when new tab is opened in Windows Terminal | WesTerm,
-# new shell is always login shell: `echo $-` includes 'l'.
-# When new shell is spawned by that first shell,
-# e.g. by running `zsh` | `bash`, new inner shell is NOT login shell.
-#
-# Thus, since we no longer use vscode, it is OK to follow correct
-# apporach and source .[..]rc from .[..]profile.
-# ================================================================
-# source ~/.zprofile
-
-# ================================================================
-# Only Proceed if the Shell is an Interactive Shell.
-# Other Setup Code, Meant to Apply to All Shells, Should Be Placed
-# In .[..]profile -> .profile (path additions, ssh-agent, etc.)
+# .[..]rc should generally only run if shell is interactive,
+# but double check here and only procede if shell is interactive.
 # ================================================================
 [[ $- == *i* ]] || [ -n "$PS1" ] || return
 
@@ -136,39 +120,35 @@
 source ~/.shrc
 
 # ================================================================
-# Run Starship Prompt Configuration.
+# Export zsh-syntax-highlighting shell variables here instead of
+# in .zprofile, because they only apply to interactive shells.
 # ================================================================
-eval "$(starship init zsh)"
-
-# ================================================================
-# Change Syntax Highlighting Colors.
-# ================================================================
-# Source: https://github.com/zsh-users/zsh-syntax-highlighting/tree/master/highlighters/main
+source $ZSH_HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Declare the variable
 typeset -A ZSH_HIGHLIGHT_STYLES
 
 # To differentiate aliases from other command types
-ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
+export ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
 
 # To have paths colored instead of underlined
-ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
+export ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
 
 # To disable highlighting of globbing expressions
-ZSH_HIGHLIGHT_STYLES[globbing]='none'
+export ZSH_HIGHLIGHT_STYLES[globbing]='none'
 
 # Command color (git etc.)
-ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
+export ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
 
 # Quoted argument color
-ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=green'
-ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=green'
+export ZSH_HIGHLIGHT_STYLES[single-quoted-argument]='fg=green'
+export ZSH_HIGHLIGHT_STYLES[double-quoted-argument]='fg=green'
 
 # ================================================================
 # Enable vi Mode and Activate Vim Plugin for oh-my-zsh.
 # ================================================================
 bindkey -v
-plugins=(... vi-mode)
+plugins=+(vi-mode)
 zle-line-init() { zle -K vicmd; }
 zle -N zle-line-init
 
@@ -179,44 +159,14 @@ zle -N zle-line-init
 source <(fzf --zsh)
 
 # ================================================================
-# Add custom settings to fzf.
-# ================================================================
-export FZF_DEFAULT_COMMAND='fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
-export FZF_CTRL_T_COMMAND='fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
-export FZF_ALT_C_COMMAND='fd --hidden --type d --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
-
-# Use ~~ as the trigger sequence instead of the default **
-export FZF_COMPLETION_TRIGGER='~~'
-
-# Options to fzf command.
-export FZF_COMPLETION_OPTS='--border --info=inline'
-
-# Use fd (https://github.com/sharkdp/fd) for listing path candidates.
-# - The first argument to the function ($1) is the base path to start traversal
-# - See the source code (completion.{bash,zsh}) for the details.
-_fzf_compgen_path() {
-  fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history" . "$1"
-}
-
-# Use fd to generate the list for directory completion
-_fzf_compgen_dir() {
-  fd --type d --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history" . "$1"
-}
-
-# ================================================================
-# Yazi wrapper script.
-# ================================================================
-function y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  yazi "$@" --cwd-file="$tmp"
-  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-    builtin cd -- "$cwd"
-  fi
-  rm -f -- "$tmp"
-}
-
-# ================================================================
 # Start Zoxide, at end of zshrc, AFTER compinit.
+# Docker desktop should run to avoid error message form compinit.
 # ================================================================
 eval "$(zoxide init zsh)"
+autoload -Uz compinit
 rm ~/.zcompdump*; compinit
+
+# ================================================================
+# Run Starship Prompt Configuration.
+# ===============================================================
+eval "$(starship init zsh)"

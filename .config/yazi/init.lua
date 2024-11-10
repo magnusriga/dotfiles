@@ -31,5 +31,24 @@ function Status:name()
   return ui.Line(" " .. h.name .. linked)
 end
 
+require("bookmarks"):setup({
+  last_directory = { enable = true, persist = false },
+  persist = "none",
+  desc_format = "full",
+  file_pick_mode = "hover",
+  notify = {
+    enable = true,
+    timeout = 1,
+    message = {
+      new = "New bookmark '<key>' -> '<folder>'",
+      delete = "Deleted bookmark in '<key>'",
+      delete_all = "Deleted all bookmarks",
+    },
+  },
+})
+
 require("full-border"):setup()
 require("folder-rules"):setup()
+require("relative-motions"):setup({ show_numbers = "relative", show_motion = true })
+require("git"):setup()
+-- require("eza-preview"):setup()
