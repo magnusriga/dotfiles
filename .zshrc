@@ -148,7 +148,9 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # ================================================================
 # Completetions.
 # ================================================================
-source $HOME/zsh/completion.zsh
+source "$HOME/zsh/completion.zsh"
+export EZA_HOME="/home/$USERNAME/.local/share/eza/eza"
+export FPATH="$EZA_HOME/completions/zsh:$FPATH"
 
 # ================================================================
 # Enable vi mode in zsh (at end of zshrc).
