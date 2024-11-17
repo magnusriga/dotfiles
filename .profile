@@ -108,7 +108,15 @@
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
 # ================================================================
 
-echo profile
+# ================================================================
+# Source API Keys.
+# ================================================================
+if [ -f "$HOME/.env" ]; then
+  set -a
+  source $HOME/.env
+  set +a
+fi
+
 # ================================================================
 # Add User's Private Bin (`~/bin`) to `$PATH`
 # ================================================================
@@ -181,7 +189,7 @@ export CARGO_HOME="$HOME/.cargo"
 # Add ~/.local/bin, where symlink is placed, to path so fd is found.
 # ================================================================
 if [ ! -d "$HOME/.local/bin" ]; then
-  mkdir "$HOME/.local/bin" ];
+  mkdir "$HOME/.local/bin" ]
 fi
 if [ ! -L "$HOME/.local/bin/fd" ]; then
   ln -fs $(which fdfind) ~/.local/bin/fd
@@ -194,11 +202,9 @@ PATH="$HOME/.local/bin:$PATH"
 export BROWSER=google-chrome
 
 # ================================================================
-# Update apt, apt-get, Homebrew, ...
+# Set Ripgrep Configuration File
 # ================================================================
-brew update && brew upgrade
-sudo apt-get update && sudo apt-get upgrade
-sudo apt update && sudo apt upgrade
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
 # ================================================================
 # Start SSH agent to Avoid Typing Github Password

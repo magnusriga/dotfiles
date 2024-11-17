@@ -1,3 +1,14 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# By default, promt has newline above it.
+# Do not disable it, as that will leave prompts directly
+# add_newline = false
+
+continuation_prompt = '▶▶ '
+# continuation_prompt = "[xxxx ](red bold)"
+# continuation_prompt = "[▸▹ ](red bold)"
+
 format = """
 [ ](#DA6771)\
 ${custom.directory-with-git}\
@@ -17,6 +28,11 @@ $git_state\
 $git_metrics\
 $git_status\
 $hg_branch\
+$character
+"""
+
+right_format = """
+${custom.arrow}\
 $pijul_channel\
 $docker_context\
 $package\
@@ -81,15 +97,18 @@ $env_var\
 $crystal\
 $sudo\
 $cmd_duration\
-$line_break\
+${custom.yazi}\
 $jobs\
 $battery\
 $status\
 $os\
 $shell\
-$character
 """
 
+# $cmd_duration\
+# ${custom.yazi}\
+
+# $line_break\
 # $time\
 # $container\
 
@@ -106,6 +125,24 @@ $character
 # command = "echo 🚀"
 # when = "~/.test_zsh.sh"
 # prefix = ""
+
+# [character]
+# success_symbol = "[>](bold green)"
+# error_symbol = "[x](bold red)"
+# vimcmd_symbol = "[<](bold green)"
+
+[custom.arrow]
+format = '[ ❮  ](bold fg:green)'
+when = true
+# disabled = true
+# success_symbol = "[❮   ](bold green)"
+# success_symbol = "[❮   ](bold red)"
+
+[sudo]
+format = "[$symbol]($style)"
+style = "bold italic bright-purple"
+symbol = "⋈┈"
+disabled = false
 
 [custom.ssh_keys]
 description = "SSH key count"
@@ -155,6 +192,11 @@ else
   return 0
 fi
 """
+
+[custom.yazi]
+description = "Indicate the shell was launched by `yazi`"
+symbol = " "
+when = """ test -n "$YAZI_LEVEL" """
 
 [username]
 show_always = true
@@ -282,5 +324,11 @@ style = "bg:#33658A"
 format = '[ ♥ $time ]($style)'
 
 [package]
-format = 'is [🎁 $version](208 bold) '
+format = '[🎁 $version](208 bold) '
 display_private = true
+
+[lua]
+# format = " [lua](italic) [${symbol}${version}]($style)"
+# version_format = "${raw}"
+# symbol = "⨀ "
+# style = "bold bright-yellow"

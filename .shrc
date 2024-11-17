@@ -108,6 +108,7 @@
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
 # ================================================================
 
+echo "Running .shrc..."
 # ================================================================
 # Load the Shell Dotfiles, and Then Some
 # ================================================================
@@ -117,6 +118,12 @@ for file in ~/.{path,exports,aliases,functions,extra}; do
   [ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
 unset file
+
+# ================================================================
+# Autoload own functions.
+# ================================================================
+fpath=($HOME/.zfunc $fpath)
+autoload -U rgf
 
 # ================================================================
 # Set up shell integration for Wezterm.
@@ -143,26 +150,80 @@ source $CARGO_HOME/env
 # Note: .[..]rc files are sourced for every interactive shell,
 # both for login and non-login shells.
 # ================================================================
-export FZF_DEFAULT_COMMAND='fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
-export FZF_CTRL_T_COMMAND='fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
-export FZF_ALT_C_COMMAND='fd --hidden --type d --follow --exclude ".git" --exclude ".node_modules" --exclude ".history"'
+# FZF_DEFAULT_COMPLETION_OPTIONS is our own environment variable.
+export FD_DEFAULT_OPTIONS=(--hidden --no-ignore --follow
+  --exclude .git
+  --exclude node_modules
+  --exclude .history
+  --exclude .rustup
+  --exclude .cargo
+  --exclude .cache)
 
-# Use ~~ as the trigger sequence instead of the default **
-export FZF_COMPLETION_TRIGGER='~~'
+export EZA_OPTIONS=(-la --color=always --icons=always --git --git-repos --hyperlink --header --grid --octal-permissions --no-permissions --time-style=relative)
 
-# Options to fzf command.
-export FZF_COMPLETION_OPTS='--border --info=inline'
+# Always execute nvim when Enter is pressed (will crash on input that is not a file, but OK tradeoff).
+export FZF_DEFAULT_OPTS="--ansi --height=90% --layout=reverse --info=inline --border --margin=1 --padding=1
+  --color \"hl:-1:underline,hl+:-1:underline:reverse\"
+  --tmux 90%,90%
+  --multi
+  --bind 'Enter:become(nvim {+})'
+  --prompt 'All> '
+  --header 'CTRL-T: Files/Directories | CTRL-R: All'
+  --bind 'ctrl-t:transform:[[ {fzf:prompt} =~ Files ]] && echo \"change-prompt(Directories> )+reload(fd $FD_DEFAULT_OPTIONS --type d)+change-preview-window(up,60%,border-bottom)\" || echo \"change-prompt(Files> )+reload(fd $FD_DEFAULT_OPTIONS --type f)+change-preview-window(right,70%,border-left)\"'
+  --bind 'ctrl-r:transform:echo \"change-prompt(All> )+reload(fd $FD_DEFAULT_OPTIONS)\"'
+  --preview '[[ {fzf:prompt} =~ Directories ]] && eza $EZA_OPTIONS {} || bat --color=always {}'
+  --preview-window 'right'
+  "
 
-# Use fd (https://github.com/sharkdp/fd) for listing path candidates.
+export FZF_DEFAULT_COMMAND="fd $FD_DEFAULT_OPTIONS"
+# ================================================================
+# Options for fzf in <c-t> | <m-c> | <c-r> mode.
+# FZF_DEFAULT_OPTS also apply here, so overwrite its options if
+# necessary to deviate from general settings.
+# ================================================================
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# export FZF_ALT_C_COMMAND="fd $FZF_DEFAULT_OPTS --type d"
+export FZF_CTRL_R_OPTS="--prompt 'Commands> ' --header '' --preview ''"
+
+# ================================================================
+# Options for fzf in completions mode: **<Tab>.
+# FZF_DEFAULT_OPTS also apply here, so overwrite its options if
+# necessary to deviate from general settings.
+# ================================================================
+# Use ~~ as the trigger sequence instead of the default **.
+# export FZF_COMPLETION_TRIGGER='~~'
+
+# General options for fzf in completion mode.
+# export FZF_COMPLETION_OPTS='--border --info=inline'
+
+# Command run by fzf completion mode when preceding command lists file paths.
+# Example: ls **<Tab>.
 # - The first argument to the function ($1) is the base path to start traversal
 # - See the source code (completion.{bash,zsh}) for the details.
 _fzf_compgen_path() {
-  fd --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history" . "$1"
+  $FZF_DEFAULT_COMMAND . "$1"
 }
 
-# Use fd to generate the list for directory completion
+# Command run by fzf completion mode when preceding command lists directories.
+# Example: cd **<Tab>.
 _fzf_compgen_dir() {
-  fd --type d --hidden --follow --exclude ".git" --exclude ".node_modules" --exclude ".history" . "$1"
+  fd "$FD_DEFAULT_OPTIONS" --type d . "$1"
+}
+
+# Cusom list of commands run by fzf completion mode, for different preceding commands.
+# Overwrites compgen functions above.
+# Example: cd **<Tab>.
+_fzf_comprun() {
+  local command=$1
+  shift
+
+  case "$command" in
+  # cd) fzf --preview "eza $EZA_OPTIONS {} | head -200' "$@" ;;
+  cd) fzf --preview "eza $EZA_OPTIONS {}" "$@" ;;
+  export | unset) fzf --preview "eval 'echo \$'{}" "$@" ;;
+  ssh) fzf --preview 'dog {}' "$@" ;;
+  *) fzf --preview 'bat -n --color=always {}' "$@" ;;
+  esac
 }
 
 # ================================================================
@@ -181,3 +242,80 @@ function y() {
 # Setup Cargo.
 # ================================================================
 source "$HOME/.cargo/env"
+
+# ================================================================
+# Setup and launch tmux.
+# ================================================================
+# ----------------------------------------------------------------
+# Notes
+# ----------------------------------------------------------------
+# - Panes are indexed from 0, within a window (each has a unique index).
+# - TMUX_PANE however, is globel, meaning third pane in second window has TMUX_PANE=4.
+# ----------------------------------------------------------------
+SESSION_NAME="main"
+if [ -z ${TMUX+x} ]; then
+  echo "Not attached to tmux."
+  # ================================================================
+  # Runs if tmux is not attached.
+  # ================================================================
+
+  # ================================================================
+  # If tmux session does not exist, create new session, windows and panes.
+  # If tmux session exists, attach to it without creating windows.
+  # ================================================================
+  if ! tmux has-session -t$SESSION_NAME 2>/dev/null; then
+    tmux new-session -nnvim -s$SESSION_NAME \; \
+      new-window -d -ndev \; \
+      split-window -dh -t$SESSION_NAME:1.0 \; \
+      split-window -dv -t$SESSION_NAME:1.1 \;
+  else
+    tmux attach -t$SESSION_NAME
+  fi
+else
+  # ================================================================
+  # Runs if tmux is attached.
+  # ================================================================
+
+  # ================================================================
+  # Open specific windows in specific panes.
+  # ================================================================
+  if [ "$TMUX_PANE" = "%0" ]; then
+    echo "Shell is currently in the first pane."
+    # ================================================================
+    # Start nvim, unless already running.
+    # ================================================================
+    if ! tmux list-panes -F "#{pane_current_command}" -t$SESSION_NAME | grep -q "nvim"; then
+      tmux send-keys -t$SESSION_NAME:0.0 "source ~/launch-session.sh" C-m
+    fi
+  elif [ "$TMUX_PANE" = "%1" ]; then
+    echo "Shell is currently in the second pane."
+    cd ~/nfront/ || cd ~ || return
+    # ================================================================
+    # This pane should just run interactive shell at start.
+    # ================================================================
+  elif [ "$TMUX_PANE" = "%2" ]; then
+    echo "Shell is currently in the third pane."
+    cd ~/nfront/ || cd ~ || return
+    # ================================================================
+    # This pane should just run interactive shell at start.
+    # ================================================================
+  elif [ "$TMUX_PANE" = "%3" ]; then
+    echo "Shell is currently in the fourth pane."
+    if ! tmux list-panes -aF "#{pane_current_command}" | grep -q "top"; then
+      # ================================================================
+      # Update apt, apt-get, Homebrew, ...
+      # ================================================================
+      echo "Updating Package Managers in last tmux pane (they are all login shells)..."
+      brew update && brew upgrade
+      sudo apt-get update && sudo apt-get upgrade
+      sudo apt update && sudo apt upgrade
+
+      # ================================================================
+      # Start top, unless already running.
+      # ================================================================
+      echo "Starting top..."
+      tmux send-keys -t$SESSION_NAME:1.2 "top" C-m
+      tmux select-pane -t$SESSION_NAME:1.0
+    fi
+  fi
+fi

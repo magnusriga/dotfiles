@@ -1,6 +1,10 @@
 -- ==============================================================
 -- NOTES
 -- ==============================================================
+-- General
+-- This file must be placed in OS home directory,
+-- where Wezterm is installed, not e.g. in WSL home directory.
+--
 -- Search and copy
 -- --------------------------------------------------------------
 -- CTRL-SHIFT-F and CMD-F to search.
@@ -38,7 +42,8 @@ local config = wezterm.config_builder()
 
 -- This is where you actually apply your config choices
 
-config.font = wezterm.font("JetBrains Mono")
+-- Remember to install all the fonts in the chosen family, in OS.
+config.font = wezterm.font("JetBrainsMono Nerd Font")
 
 -- Changing the color scheme.
 -- config.color_scheme = 'Batman'
@@ -63,6 +68,29 @@ config.mouse_bindings = {
     mods = "NONE",
   },
 }
+
+wezterm.on("user-var-changed", function(window, pane, name, value)
+  local overrides = window:get_config_overrides() or {}
+  if name == "ZEN_MODE" then
+    local incremental = value:find("+")
+    local number_value = tonumber(value)
+    if incremental ~= nil then
+      while number_value > 0 do
+        window:perform_action(wezterm.action.IncreaseFontSize, pane)
+        number_value = number_value - 1
+      end
+      overrides.enable_tab_bar = false
+    elseif number_value < 0 then
+      window:perform_action(wezterm.action.ResetFontSize, pane)
+      overrides.font_size = nil
+      overrides.enable_tab_bar = true
+    else
+      overrides.font_size = number_value
+      overrides.enable_tab_bar = false
+    end
+  end
+  window:set_config_overrides(overrides)
+end)
 
 -- and finally, return the configuration to wezterm
 return config
