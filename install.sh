@@ -12,9 +12,13 @@ ya pack -a Lil-Dank/lazygit
 ya pack -a yazi-rs/plugins:smart-filter
 ya pack -a yazi-rs/plugins:git
 ya pack -a Rolv-Apneseth/starship
+ya pack -a yazi-rs/plugins:diff
 
 # Setup cron jobs.
-(crontab -l ; echo "@daily $(which trash-empty) 30") | crontab -
+(
+  crontab -l
+  echo "@daily $(which trash-empty) 30"
+) | crontab -
 
 # Create symlinks to programs, overwriting default programs.
 ln -s $(which fdfind) ~/.local/bin/fd
