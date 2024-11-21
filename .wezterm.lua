@@ -54,8 +54,8 @@ config.font_size = 11
 config.color_scheme = "OneHalfDark"
 
 -- Make underlines thicker and slightly down from text.
-config.underline_thickness = 3
-config.underline_position = -4
+config.underline_thickness = 2
+config.underline_position = -2
 
 -- Enable the scrollbar.
 -- It will occupy the right window padding space.
