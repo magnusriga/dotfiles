@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# Ensure sudo.
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run as root"
+  exit
+fi
+
 # Install packages.
 apt-get update &&
   apt-get install -y \
