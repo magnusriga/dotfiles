@@ -162,8 +162,8 @@ fi
 
 COMMAND_HISTORY_DIR="/commandhistory"
 if [ ! -d "$COMMAND_HISTORY_DIR" ]; then
-  mkdir -p "$COMMAND_HISTORY_DIR"
-  touch /commandhistory/.shell_history
+  sudo mkdir -p "$COMMAND_HISTORY_DIR"
+  sudo touch /commandhistory/.shell_history
 fi
 
 # Update sudoers file.
@@ -220,7 +220,7 @@ brew install zsh-autosuggestions
 # brew install contentful-cli
 
 # Uninstall Homebrew packages that clash with below installations.
-if [ -n "$(brew list --versions rust)" ]; then brew uninstall rusta; fi
+if [ -n "$(brew list --versions rust)" ]; then brew uninstall rust; fi
 brew autoremove
 
 # Install packages with snap.
@@ -274,6 +274,7 @@ rustup update
 
 # Install Yazi plugins.
 rm -rf "${YAZI_HOME:-$HOME/.config/yazi}/plugins" "${YAZI_HOME:-$HOME/.config/yazi}/flavors"
+rm -rf $(find ~/.config/yazi/plugins -maxdepth 1 -type d | grep -v -e 'arrow.yazi' -e 'folder-rules.yazi' -e 'system-clipboard.yazi' -e 'plugins$' -)
 rm "${YAZI_HOME:-$HOME/.config/yazi}/package.toml"
 git clone https://github.com/sharklasers996/eza-preview.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/eza-preview.yazi"
 git clone https://github.com/boydaihungst/restore.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/restore.yazi"
