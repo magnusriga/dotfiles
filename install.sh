@@ -39,18 +39,15 @@ sudo apt-get update &&
   echo "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list &&
   sudo apt-get install -y docker-ce-cli
 
-# Install packages with snap.
-sudo snap install dog
-
 # Set username and UID variables.
 USERNAME="$(id -un)"
 USER_UID="$(id -u)"
 USER_GID="$(id -g)"
 
 # Setup directories.
-linuxbrew_home="/home/linuxbrew/.linuxbrew"
-if [ ! -d $linuxbrew_home ]; then
-  mkdir -p $linuxbrew_home
+LINUXBREW_HOME="/home/linuxbrew/.linuxbrew"
+if [ ! -d $LINUXBREW_HOME ]; then
+  mkdir -p $LINUXBREW_HOME
   # chown -R $USERNAME:$USERNAME $linuxbrew_home
 fi
 
@@ -143,6 +140,13 @@ if [ ! -d "/etc/sudoers.d/$USERNAME" ] || ! grep -iFq "User_Alias ADMIN" "/etc/s
   echo 'ADMIN, FULLTIMERS ALL = NOPASSWD: /usr/bin/apt-get, NOPASSWD: /usr/bin/apt' | sudo tee -a "/etc/sudoers.d/$USERNAME" &>/dev/null
 fi
 
+# Install Nerd Font.
+echo "Installing Nerd Font, this must also be done manually on Windows if using WSL..."
+curl -fsSLO --create-dirs --output-dir "$FONT_HOME" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz &&
+  unzip "$FONT_HOME"/JetBrainsMono.zip &&
+  rm "$FONT_HOME"/JetBrainsMono.zip &&
+  fc-cache -fv "$FONT_HOME"
+
 # Download and install Homebrew.
 if [ -z "$(brew --version)" ]; then
   curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
@@ -179,6 +183,9 @@ brew install zsh-autosuggestions
 brew uninstall rust
 brew autoremove
 
+# Install packages with snap.
+sudo snap install dog
+
 # Install trash-cli.
 pipx ensurepath
 pipx install 'trash-cli[completion]'
@@ -213,6 +220,9 @@ curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 nvm use default
+
+# Install pnpm.
+curl -fsSL https://get.pnpm.io/install.sh | sh -
 
 # Install bun.
 curl -fsSL https://bun.sh/install | bash
