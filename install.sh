@@ -271,6 +271,7 @@ rustup update
 
 # Install Yazi plugins.
 rm -rf "${YAZI_HOME:-$HOME/.config/yazi}/plugins" "${YAZI_HOME:-$HOME/.config/yazi}/flavors"
+rm "${YAZI_HOME:-$HOME/.config/yazi}/package.toml"
 git clone https://github.com/sharklasers996/eza-preview.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/eza-preview.yazi"
 git clone https://github.com/boydaihungst/restore.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/restore.yazi"
 git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.config/yazi}/flavors/onedark.yazi"
@@ -334,6 +335,7 @@ ya pack -a Rolv-Apneseth/starship
 ya pack -a yazi-rs/plugins:diff
 
 # Create symlinks to programs, overwriting default programs.
+rm ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat
 ln -s "$(which fdfind)" ~/.local/bin/fd
 ln -s "$(which ast-grep)" ~/.local/bin/sg
 ln -s "$(which batcat)" ~/.local/bin/bat
