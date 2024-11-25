@@ -186,7 +186,9 @@ if [ -z "$(brew --version)" ]; then
 fi
 
 # Clone kickstart.nvim.
-git clone https://github.com/magnusriga/kickstart.nvim.git "${NVIM_HOME:-$HOME/.config/nvim}"
+if [ ! -d "${NVIM_HOME:-$HOME/.config/nvim}" ]; then
+  git clone https://github.com/magnusriga/kickstart.nvim.git "${NVIM_HOME:-$HOME/.config/nvim}"
+fi
 
 # Update Homebrew and upgrade its packages.
 brew update
@@ -216,7 +218,7 @@ brew install glow
 brew install zsh-autosuggestions
 
 # Uninstall Homebrew packages that clash with below installations.
-brew uninstall rust
+brew list rust && brew uninstall rust
 brew autoremove
 
 # Install packages with snap.
