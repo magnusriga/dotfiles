@@ -120,12 +120,6 @@ done
 unset file
 
 # ================================================================
-# Autoload own functions.
-# ================================================================
-fpath=($HOME/.zfunc $fpath)
-autoload -U rgf
-
-# ================================================================
 # Set up shell integration for Wezterm.
 # Enables scrollback to start of earlier command,
 # selecting output of previous commands, etc.
