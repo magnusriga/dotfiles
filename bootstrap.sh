@@ -23,7 +23,9 @@ function doIt() {
   if ! grep -iFq "/bin/zsh" "/etc/shells"; then
     echo 'Adding zsh to /etc/shells...'
     sudo sh -c "echo $(which zsh) >> /etc/shells"
+    echo 'Done adding zsh to /etc/shells'
   fi
+  echo 'miiiii Done adding zsh to /etc/shells'
   echo 'Setting zsh as default shell...'
   chsh -s "$(which zsh)"
 
