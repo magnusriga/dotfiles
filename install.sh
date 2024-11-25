@@ -138,6 +138,8 @@ fi
 
 # Update sudoers file.
 if [ ! -d "/etc/sudoers.d/$USERNAME" ] || ! grep -iFq "User_Alias ADMIN" "/etc/sudoers.d/$USERNAME"; then
+  echo "\$USERNAME is $USERNAME, adding ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
+
   echo "User_Alias ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : FULLTIMERS = $USERNAME, %$USERNAME" | sudo tee "/etc/sudoers.d/$USERNAME" &>/dev/null
   echo 'ADMIN, FULLTIMERS ALL = NOPASSWD: /usr/bin/apt-get, NOPASSWD: /usr/bin/apt' | sudo tee -a "/etc/sudoers.d/$USERNAME" &>/dev/null
 fi
