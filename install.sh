@@ -136,6 +136,7 @@ if [ ! -d "$COMMAND_HISTORY_DIR" ]; then
   touch /commandhistory/.shell_history
 fi
 
+echo 'Running install script, about to add aliases...'
 # Update sudoers file.
 if [ ! -d "/etc/sudoers.d/$USERNAME" ] || ! grep -iFq "User_Alias ADMIN" "/etc/sudoers.d/$USERNAME"; then
   echo "\$USERNAME is $USERNAME, adding ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
