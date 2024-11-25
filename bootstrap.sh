@@ -42,10 +42,10 @@ function doIt() {
 }
 
 # Ensure sudo.
-if [ "$EUID" -ne 0 ]; then
-  echo "Please run as root"
-  exit
-fi
+# if [ "$EUID" -ne 0 ]; then
+#   echo "Please run as root"
+#   exit
+# fi
 
 if [ "$1" = "--force" -o "$1" = "-f" ]; then
   doIt
