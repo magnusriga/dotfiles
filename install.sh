@@ -196,12 +196,10 @@ brew upgrade
 
 # Install Homebrew packages.
 brew install preslavmihaylov/taps/todocheck
-brew install neonctl
 brew install pre-commit
 brew install gh
 brew install jless
 brew install gcc
-brew install contentful-cli
 brew install bat
 brew install fzf
 brew install rg
@@ -216,6 +214,10 @@ brew install yazi --HEAD
 brew install zsh-vi-mode
 brew install glow
 brew install zsh-autosuggestions
+
+# These install node via linuxbrew, so do not install them with brew.
+# brew install neonctl
+# brew install contentful-cli
 
 # Uninstall Homebrew packages that clash with below installations.
 if [ -n "$(brew list --versions rust)" ]; then brew uninstall rusta; fi
@@ -236,7 +238,8 @@ done
 
 # Install eza.
 mkdir -p /etc/apt/keyrings
-wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor
+# wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
 echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
 sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
 sudo apt-get update
@@ -284,7 +287,7 @@ curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https:/
 # If $ZSH folder is pre-created, oh-my-zsh complains.
 # $ZSH is used by oh-my-zsh install script, as install directory for oh-my-zsh.
 rm -rf "$ZSH"
-sh -c "export ZSH=${ZSH_HOME:-$HOME/.local/share/zsh}/oh-my-zsh; $(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --keep-zshrc
+sh -c "export ZSH=${ZSH_HOME:-$HOME/.local/share/zsh}/oh-my-zsh; $(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 
 # Install ZSH plugins and addins.
 rm -rf "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting" "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-completions" "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autocomplete"

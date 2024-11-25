@@ -20,7 +20,7 @@ function doIt() {
     brew update
     brew install zsh
   fi
-  if ! grep -iFq "/bin/zsh" "/etc/shells"; then
+  if ! grep -iFq ".linuxbrew/bin/zsh" "/etc/shells"; then
     echo 'Adding zsh to /etc/shells...'
     which zsh | sudo tee -a /etc/shells
   fi
