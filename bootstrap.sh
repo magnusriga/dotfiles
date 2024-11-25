@@ -23,6 +23,9 @@ function doIt() {
   # and runs .shrc, which contains prompt settings, aliases, etc.
   source ~/.bashrc
 
+  # Set zsh as default shell.
+  chsh -s "$(which zsh)"
+
   # Run install script(s).
   source install.sh
 
