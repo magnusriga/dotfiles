@@ -24,6 +24,10 @@ function doIt() {
   source ~/.bashrc
 
   # Set zsh as default shell.
+  if [ -z "$(which zsh)" ]; then
+    brew update
+    brew install zsh
+  fi
   chsh -s "$(which zsh)"
 
   # Run install script(s).
