@@ -260,7 +260,7 @@ nvm alias default $NODE_VERSION
 nvm use default
 
 # Install pnpm.
-curl -fsSL https://get.pnpm.io/install.sh | sh -
+curl -fsSL https://get.pnpm.io/install.sh | SHELL="$(which bash)" sh -
 
 # Install bun.
 curl -fsSL https://bun.sh/install | bash
@@ -270,11 +270,13 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 rustup update
 
 # Install Yazi plugins.
+rm -rf "${YAZI_HOME:-$HOME/.config/yazi}/plugins" "${YAZI_HOME:-$HOME/.config/yazi}/flavors"
 git clone https://github.com/sharklasers996/eza-preview.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/eza-preview.yazi"
 git clone https://github.com/boydaihungst/restore.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/restore.yazi"
 git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.config/yazi}/flavors/onedark.yazi"
 
 # Install Wezterm shell intergration.
+rm -rf "$WEZTERM_HOME/shell-integration"
 curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https://raw.githubusercontent.com/wez/wezterm/refs/heads/main/assets/shell-integration/wezterm.sh
 
 # Remove existing oh-my-zsh install folder, then install oh-my-zsh.
@@ -284,6 +286,7 @@ rm -rf "$ZSH"
 sh -c "export ZSH=${ZSH_HOME:-$HOME/.local/share/zsh}/oh-my-zsh; $(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --keep-zshrc
 
 # Install ZSH plugins and addins.
+rm -rf "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting" "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-completions" "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autocomplete"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting"
 git clone https://github.com/zsh-users/zsh-completions "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-completions"
 git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autocomplete"
@@ -294,14 +297,17 @@ curl -sSL https://github.com/Slackadays/Clipboard/raw/main/install.sh | sh -s --
 # Install Starship.
 curl -sS https://starship.rs/install.sh | sh -s -- -y
 
-# Install eza theme.
+# Install eza theme and symlink default theme to our own theme.
+rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
 git clone https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
 ln -sf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes/themes/default.yml" "${EZA_CONFIG_DIR:-$HOME/.config/eza}/theme.yml"
 
 # Setup eza completions.
+rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza"
 git clone https://github.com/eza-community/eza.git "${EZA_HOME:-$HOME/.local/share/eza}/eza"
 
 # Setup tmux plugin manager and manually install plugins.
+rm -rf "${TMUX_HOME:-$HOME/.config/tmux}/plugins"
 git clone https://github.com/tmux-plugins/tpm "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tpm"
 git clone -b v2.1.1 https://github.com/catppuccin/tmux.git "${TMUX_HOME:-$HOME/.config/tmux}/plugins/catppuccin/tmux"
 git clone https://github.com/tmux-plugins/tmux-battery "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-battery"
