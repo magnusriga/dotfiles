@@ -22,7 +22,7 @@ function doIt() {
   fi
   if ! grep -iFq "/bin/zsh" "/etc/shells"; then
     echo 'Adding zsh to /etc/shells...'
-    sudo sh -c "echo $(which zsh) >> /etc/shells"
+    "$(which zsh)" | sudo tee -a /etc/shells
     echo 'Done adding zsh to /etc/shells'
   fi
   echo 'miiiii Done adding zsh to /etc/shells'
