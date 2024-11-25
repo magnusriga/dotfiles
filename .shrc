@@ -162,11 +162,11 @@ export FD_DEFAULT_OPTIONS=(--hidden --no-ignore --follow
 export EZA_OPTIONS=(-la --color=always --icons=always --git --git-repos --hyperlink --header --grid --octal-permissions --no-permissions --time-style=relative)
 
 # Always execute nvim when Enter is pressed (will crash on input that is not a file, but OK tradeoff).
+# Do not bind Enter to open in nvim here, because fzf is also used by yazi and others.
 export FZF_DEFAULT_OPTS="--ansi --height=90% --layout=reverse --info=inline --border --margin=1 --padding=1
   --color \"hl:-1:underline,hl+:-1:underline:reverse\"
   --tmux 90%,90%
   --multi
-  --bind 'Enter:execute(nvim {+})'
   --prompt 'All> '
   --header 'CTRL-T: Files/Directories | CTRL-R: All'
   --bind 'ctrl-t:transform:[[ {fzf:prompt} =~ Files ]] && echo \"change-prompt(Directories> )+reload(fd $FD_DEFAULT_OPTIONS --type d)+change-preview-window(up,60%,border-bottom)\" || echo \"change-prompt(Files> )+reload(fd $FD_DEFAULT_OPTIONS --type f)+change-preview-window(right,70%,border-left)\"'
@@ -182,6 +182,8 @@ export FZF_DEFAULT_COMMAND="fd $FD_DEFAULT_OPTIONS"
 # necessary to deviate from general settings.
 # ================================================================
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS="
+  --bind 'enter:execute(nvim {+})'"
 # export FZF_ALT_C_COMMAND="fd $FZF_DEFAULT_OPTS --type d"
 export FZF_CTRL_R_OPTS="--prompt 'Commands> ' --header '' --preview ''"
 

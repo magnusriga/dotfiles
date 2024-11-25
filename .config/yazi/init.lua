@@ -21,14 +21,19 @@ end, 500, Header.LEFT)
 
 function Status:name()
   local h = self._tab.current.hovered
+  local url = h.url
+  -- local home_prefix = "/home/$USERNAME"
   if not h then
     return ui.Line({})
   end
+  -- if url.starts_with(home_prefix) then
+  --   url = url.strip_prefix(home_prefix)
+  -- end
   local linked = ""
   if h.link_to ~= nil then
     linked = " -> " .. tostring(h.link_to)
   end
-  return ui.Line(" " .. h.name .. linked)
+  return ui.Line(" " .. url .. linked)
 end
 
 require("bookmarks"):setup({
@@ -49,7 +54,7 @@ require("bookmarks"):setup({
 
 require("full-border"):setup()
 require("folder-rules"):setup()
-require("relative-motions"):setup({ show_numbers = "relative", show_motion = true })
+-- require("relative-motions"):setup({ show_numbers = "relative", show_motion = true })
 require("git"):setup()
 require("starship"):setup()
 -- require("eza-preview"):setup()
