@@ -19,6 +19,7 @@ function doIt() {
   # Do not run zsh scripts from here, as the Zsh commands are
   # not reccognized by bash.
   source ~/.bash_profile
+
   # .bashrc runs when a non-login interactive shell is opened,
   # and runs .shrc, which contains prompt settings, aliases, etc.
   source ~/.bashrc
