@@ -1,38 +1,41 @@
 #!/usr/bin/env bash
 
 # Install packages.
-sudo apt-get update &&
-  sudo apt-get install -y \
-    locales \
-    sudo \
-    curl \
-    wget \
-    pipx \
-    snapd \
-    unzip zip \
-    apt-transport-https \
-    ca-certificates \
-    gnupg2 \
-    lsb-release \
-    git \
-    zsh zsh-common zsh-doc \
-    iputils-ping \
-    vim \
-    nvim \
-    file \
-    ssh \
-    iproute2 \
-    rsync \
-    python3-pip \
-    gpg \
-    bat \
-    tree \
-    jq \
-    poppler-utils \
-    build-essential \
-    fd-find \
-    sysstat \
-    libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb &&
+sudo add-apt-repository ppa:neovim-ppa/unstable -y
+sudo apt-get update
+sudo apt-get install -y \
+  locales \
+  sudo \
+  curl \
+  wget \
+  pipx \
+  snapd \
+  make \
+  unzip zip \
+  git \
+  xclip \
+  neovim \
+  apt-transport-https \
+  ca-certificates \
+  gnupg2 \
+  lsb-release \
+  zsh zsh-common zsh-doc \
+  iputils-ping \
+  vim \
+  file \
+  ssh \
+  iproute2 \
+  rsync \
+  python3-pip \
+  gpg \
+  bat \
+  tree \
+  jq \
+  poppler-utils \
+  build-essential \
+  fd-find \
+  sysstat \
+  libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb &&
   sudo rm -rf /var/lib/apt/lists/* &&
   localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 &&
   curl -fsSL "https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg" | sudo apt-key add - 2>/dev/null &&
@@ -43,6 +46,9 @@ sudo apt-get update &&
 USERNAME="$(id -un)"
 USER_UID="$(id -u)"
 USER_GID="$(id -g)"
+
+# Set needed environment variables.
+export XDG_CONFIG_HOME="/home/$USERNAME/.config"
 
 # Setup directories.
 LINUXBREW_HOME="/home/linuxbrew/.linuxbrew"
@@ -71,7 +77,7 @@ if [ ! -d "$FONT_HOME" ]; then
   mkdir -p "$FONT_HOME"
 fi
 
-STARSHIP_HOME="/home/$USERNAME/.config/starship"
+STARSHIP_HOME="$XDG_CONFIG_HOME/starship"
 if [ ! -d "$STARSHIP_HOME" ]; then
   mkdir -p "$STARSHIP_HOME"
 fi
@@ -81,7 +87,13 @@ if [ ! -d "$WEZTERM_HOME" ]; then
   mkdir -p "$WEZTERM_HOME"
 fi
 
-YAZI_HOME="/home/$USERNAME/.config/yazi"
+NVIM_HOME="$XDG_CONFIG_HOME/nvim"
+# Let git make the folder.
+# if [ ! -d "$NVIM_HOME" ]; then
+#   mkdir -p "$NVIM_HOME"
+# fi
+
+YAZI_HOME="$XDG_CONFIG_HOME/yazi"
 if [ ! -d "$YAZI_HOME" ]; then
   mkdir -p "$YAZI_HOME"
 fi
@@ -102,7 +114,7 @@ if [ ! -d "$EZA_HOME" ]; then
   mkdir -p "$EZA_HOME"
 fi
 
-EZA_CONFIG_DIR="/home/$USERNAME/.config/eza"
+EZA_CONFIG_DIR="$XDG_CONFIG_HOME/eza"
 if [ ! -d "$EZA_CONFIG_DIR" ]; then
   mkdir -p "$EZA_CONFIG_DIR"
 fi
@@ -122,7 +134,7 @@ if [ ! -d "$CARGO_HOME" ]; then
   mkdir -p "$CARGO_HOME"
 fi
 
-TMUX_HOME="/home/$USERNAME/.config/tmux"
+TMUX_HOME="$XDG_CONFIG_HOME/tmux"
 if [ ! -d "$TMUX_HOME" ]; then
   mkdir -p "$TMUX_HOME"
 fi
@@ -151,6 +163,9 @@ curl -fsSLO --create-dirs --output-dir "$FONT_HOME" https://github.com/ryanoasis
 if [ -z "$(brew --version)" ]; then
   curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 fi
+
+# Clone kickstart.nvim.
+git clone https://github.com/magnusriga/kickstart.nvim.git "${NVIM_HOME:-$HOME/.config/nvim}"
 
 # Update Homebrew and upgrade its packages.
 brew update
@@ -234,7 +249,7 @@ rustup update
 # Install Yazi plugins.
 git clone https://github.com/sharklasers996/eza-preview.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/eza-preview.yazi"
 git clone https://github.com/boydaihungst/restore.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/restore.yazi"
-git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.config/yazi}/.config/yazi/flavors/onedark.yazi"
+git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.config/yazi}/flavors/onedark.yazi"
 
 # Install Wezterm shell intergration.
 curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https://raw.githubusercontent.com/wez/wezterm/refs/heads/main/assets/shell-integration/wezterm.sh

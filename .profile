@@ -215,6 +215,11 @@ export BROWSER=google-chrome
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
 # ================================================================
+# Set XDG_CONFIG_HOME, used by nvim.
+# ================================================================
+export XDG_CONFIG_HOME="$HOME/.config"
+
+# ================================================================
 # Start SSH agent to Avoid Typing Github Password
 # ================================================================
 env=~/.ssh/agent.env
