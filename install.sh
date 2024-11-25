@@ -218,7 +218,7 @@ brew install glow
 brew install zsh-autosuggestions
 
 # Uninstall Homebrew packages that clash with below installations.
-brew list rust && brew uninstall rust
+if [ -n "$(brew list --versions rust)" ]; then brew uninstall rusta; fi
 brew autoremove
 
 # Install packages with snap.
