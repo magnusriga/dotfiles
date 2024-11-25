@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Stop snapd service if it is running, so it can be upgraded.
+systemctl is-active snapd.service && sudo service snapd stop
+
 # Install packages.
 sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt-get update
@@ -37,7 +40,7 @@ sudo apt-get install -y \
   sysstat \
   libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb &&
   sudo rm -rf /var/lib/apt/lists/* &&
-  localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 &&
+  sudo localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 &&
   curl -fsSL "https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg" | sudo apt-key add - 2>/dev/null &&
   echo "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list &&
   sudo apt-get install -y docker-ce-cli
