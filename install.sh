@@ -345,6 +345,10 @@ ln -s "$(which batcat)" ~/.local/bin/bat
 pnpm install -g tree-node-cli
 
 # Print tool versions
+echo -e "\n\n================================\n\
+PACKAGE VERSIONS\
+\n================================\n\n\
+"
 bash --version | head -n 1
 git --version
 curl --version
@@ -352,10 +356,9 @@ wget --version
 
 # Print package versions.
 # nvm, npm must be called in same RUN as nvm.sh, to access the shell variables set there.
-node --version
-npm --version
-pnpm --version
-bun --version
+echo 'node version:' "$(node --version)"
+echo 'npm version:' "$(npm --version)"
+echo 'bun version:' "$(bun --version)"
 
 # Print package binaray paths, to verify that the right binaries are used.
 which node
