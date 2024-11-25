@@ -2,7 +2,7 @@
 
 # Install packages.
 sudo apt-get update &&
-  apt-get install -y \
+  sudo apt-get install -y \
     locales \
     sudo \
     curl \
@@ -33,15 +33,14 @@ sudo apt-get update &&
     fd-find \
     sysstat \
     libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb &&
-  rm -rf /var/lib/apt/lists/* &&
+  sudo rm -rf /var/lib/apt/lists/* &&
   localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 &&
-  curl -fsSL "https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg" | apt-key add - 2>/dev/null &&
-  echo "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list &&
-  apt-get update &&
-  apt-get install -y docker-ce-cli
+  curl -fsSL "https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/gpg" | sudo apt-key add - 2>/dev/null &&
+  echo "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | tr '[:upper:]' '[:lower:]') $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list &&
+  sudo apt-get install -y docker-ce-cli
 
 # Install packages with snap.
-snap install dog
+sudo snap install dog
 
 # Set username and UID variables.
 USERNAME="$(id -un)"
@@ -96,9 +95,10 @@ if [ ! -d "$ZSH_HOME" ]; then
 fi
 
 ZSH="$ZSH_HOME/oh-my-zsh"
-if [ ! -d "$ZSH" ]; then
-  mkdir -p "$ZSH"
-fi
+# Do not pre-create $ZSH directory, otherwise oh-my-zsh will complain.
+# if [ ! -d "$ZSH" ]; then
+#   mkdir -p "$ZSH"
+# fi
 
 EZA_HOME="/home/$USERNAME/.local/share/eza"
 if [ ! -d "$EZA_HOME" ]; then
@@ -136,17 +136,21 @@ if [ ! -d "$COMMAND_HISTORY_DIR" ]; then
   touch /commandhistory/.shell_history
 fi
 
-echo 'Running install script, about to add aliases...'
 # Update sudoers file.
 if [ ! -d "/etc/sudoers.d/$USERNAME" ] || ! grep -iFq "User_Alias ADMIN" "/etc/sudoers.d/$USERNAME"; then
   echo "\$USERNAME is $USERNAME, adding ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
-
   echo "User_Alias ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : FULLTIMERS = $USERNAME, %$USERNAME" | sudo tee "/etc/sudoers.d/$USERNAME" &>/dev/null
   echo 'ADMIN, FULLTIMERS ALL = NOPASSWD: /usr/bin/apt-get, NOPASSWD: /usr/bin/apt' | sudo tee -a "/etc/sudoers.d/$USERNAME" &>/dev/null
 fi
 
 # Download and install Homebrew.
-curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
+if [ -z "$(brew --version)" ]; then
+  curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
+fi
+
+# Update Homebrew and upgrade its packages.
+brew update
+brew upgrade
 
 # Install Homebrew packages.
 brew install preslavmihaylov/taps/todocheck
@@ -171,7 +175,12 @@ brew install zsh-vi-mode
 brew install glow
 brew install zsh-autosuggestions
 
+# Uninstall Homebrew packages that clash with below installations.
+brew uninstall rust
+brew autoremove
+
 # Install trash-cli.
+pipx ensurepath
 pipx install 'trash-cli[completion]'
 cmds=(trash-empty trash-list trash-restore trash-put trash)
 for cmd in "${cmds[@]}"; do
@@ -182,9 +191,9 @@ done
 
 # Install eza.
 mkdir -p /etc/apt/keyrings
-wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
 echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
-chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
 sudo apt-get update
 sudo apt-get install -y eza
 
@@ -220,12 +229,13 @@ git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.confi
 # Install Wezterm shell intergration.
 curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https://raw.githubusercontent.com/wez/wezterm/refs/heads/main/assets/shell-integration/wezterm.sh
 
-# Install oh-my-zsh.
-# ZSH env is used by oh-my-zsh install script, for where it installs oh-my-zsh.
+# Remove existing oh-my-zsh install folder, then install oh-my-zsh.
+# If $ZSH folder is pre-created, oh-my-zsh complains.
+# $ZSH is used by oh-my-zsh install script, as install directory for oh-my-zsh.
+rm -rf "$ZSH"
 sh -c "export ZSH=${ZSH_HOME:-$HOME/.local/share/zsh}/oh-my-zsh; $(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --keep-zshrc
 
 # Install ZSH plugins and addins.
-git clone "https://github.com/jeffreytse/zsh-vi-mode.git" "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-vi-mode"
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting"
 git clone https://github.com/zsh-users/zsh-completions "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-completions"
 git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autocomplete"

@@ -176,6 +176,12 @@ source <(fzf --zsh)
 eval "$(zoxide init zsh)"
 
 # ================================================================
+# Enable zsh-autocomplete.
+# ================================================================
+# Do not use this, implement own completions.
+# source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autocomplete/zsh-autocomplete.plugin.zsh"
+
+# ================================================================
 # Enable zsh-autosuggestions (end of zshrc).
 # ================================================================
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
