@@ -179,6 +179,12 @@ fi
 export WEZTERM_HOME="$HOME/.local/share/wezterm"
 
 # ================================================================
+# Export variables for shell history persistence.
+# ================================================================
+export PROMPT_COMMAND=(history -a)
+export HISTFILE="/commandhistory/.shell_history"
+
+# ================================================================
 # Export CARGO_HOME shell variable.
 # Subshells, e.g. non-login shells, inherit login shell's environment.
 # ================================================================

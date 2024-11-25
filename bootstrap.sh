@@ -12,17 +12,6 @@ function doIt() {
     --exclude "README.md" \
     --exclude "LICENSE-MIT.txt" \
     -avh --no-perms . ~
-  # .bash_profile runs .profile, but not .bash_rc,
-  # since this will not be an interactive shell.
-  # .profile adds the environment variables and
-  # other login-time settings (e.g. ssh-agent) to the shell.
-  # Do not run zsh scripts from here, as the Zsh commands are
-  # not reccognized by bash.
-  source ~/.bash_profile
-
-  # .bashrc runs when a non-login interactive shell is opened,
-  # and runs .shrc, which contains prompt settings, aliases, etc.
-  source ~/.bashrc
 
   # Set zsh as default shell.
   if [ -z "$(which zsh)" ]; then
@@ -35,8 +24,21 @@ function doIt() {
   # Run install script(s).
   source install.sh
 
+  # .[.]profile runs .profile, but not .[.]sh_rc,
+  # since this will not be an interactive shell.
+  # .profile adds the environment variables and
+  # other login-time settings (e.g. ssh-agent) to the shell.
+  # Do not run zsh scripts from here, as the Zsh commands are
+  # not reccognized by bash.
+  source ~/.bash_profile
+
+  # .[.]shrc runs when a non-login interactive shell is opened,
+  # and runs .shrc, which contains prompt settings, aliases, etc.
+  source ~/.bashrc
+
   # Customizations.
-  mv -f ./.config/eza/theme.yml ~/.config/eza/theme.yml
+  # Should be synced above.
+  # mv -f ./.config/eza/theme.yml ~/.config/eza/theme.yml
 }
 
 if [ "$1" = "--force" -o "$1" = "-f" ]; then
