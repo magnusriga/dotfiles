@@ -128,12 +128,6 @@ unset file
 source $WEZTERM_HOME/shell-integration/wezterm.sh
 
 # ================================================================
-# Source cargo environment variables.
-# PATH is already set up in .zprofile > .profile.
-# ================================================================
-source $CARGO_HOME/env
-
-# ================================================================
 # Add custom fzf settings.
 # Could be set in .profile, since exported shell variables,
 # aka. environment variables, are inherited by non-login shells

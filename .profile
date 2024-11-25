@@ -161,6 +161,14 @@ if [ -d "$BUN_INSTALL" ]; then
 fi
 
 # ================================================================
+# Add Cargo to Path
+# ================================================================
+export CARGO_HOME="$HOME/.cargo"
+if [ -d "$CARGO_HOME/bin" ]; then
+  PATH="$CARGO_HOME/bin:$PATH"
+fi
+
+# ================================================================
 # Add Homebrew to Path
 # ================================================================
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
@@ -183,12 +191,6 @@ export WEZTERM_HOME="$HOME/.local/share/wezterm"
 # ================================================================
 export PROMPT_COMMAND=(history -a)
 export HISTFILE="/commandhistory/.shell_history"
-
-# ================================================================
-# Export CARGO_HOME shell variable.
-# Subshells, e.g. non-login shells, inherit login shell's environment.
-# ================================================================
-export CARGO_HOME="$HOME/.cargo"
 
 # ================================================================
 # Add symlink to fd, since another program has taken fd name.
