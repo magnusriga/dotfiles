@@ -19,7 +19,7 @@ function doIt() {
     brew install zsh
   fi
   if ! grep -iFq "/bin/zsh" "/etc/shells"; then
-    sh -c "echo $(which zsh) >> /etc/shells"
+    sudo sh -c "echo $(which zsh) >> /etc/shells"
   fi
   chsh -s "$(which zsh)"
 

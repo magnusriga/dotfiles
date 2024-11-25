@@ -1,13 +1,7 @@
 #!/usr/bin/env bash
 
-# Ensure sudo.
-if [ "$EUID" -ne 0 ]; then
-  echo "Please run as root"
-  exit
-fi
-
 # Install packages.
-apt-get update &&
+sudo apt-get update &&
   apt-get install -y \
     locales \
     sudo \
@@ -143,8 +137,10 @@ if [ ! -d "$COMMAND_HISTORY_DIR" ]; then
 fi
 
 # Update sudoers file.
-echo 'User_Alias ADMIN = #1000, %#1000, magnus, %magnus, nfu, %nfu : FULLTIMERS = magnus, %magnus' | sudo tee "/etc/sudoers.d/$USERNAME" &>/dev/null
-echo 'ADMIN, FULLTIMERS ALL = NOPASSWD: /usr/bin/apt-get, NOPASSWD: /usr/bin/apt' | sudo tee -a "/etc/sudoers.d/$USERNAME" &>/dev/null
+if [ ! -d "/etc/sudoers.d/$USERNAME" ] || ! grep -iFq "User_Alias ADMIN" "/etc/sudoers.d/$USERNAME"; then
+  echo "User_Alias ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : FULLTIMERS = $USERNAME, %$USERNAME" | sudo tee "/etc/sudoers.d/$USERNAME" &>/dev/null
+  echo 'ADMIN, FULLTIMERS ALL = NOPASSWD: /usr/bin/apt-get, NOPASSWD: /usr/bin/apt' | sudo tee -a "/etc/sudoers.d/$USERNAME" &>/dev/null
+fi
 
 # Download and install Homebrew.
 curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
@@ -184,10 +180,10 @@ done
 # Install eza.
 mkdir -p /etc/apt/keyrings
 wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | tee /etc/apt/sources.list.d/gierens.list
+echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
 chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
-apt-get update
-apt-get install -y eza
+sudo apt-get update
+sudo apt-get install -y eza
 
 # Download and install nvm, node, npm.
 # 1) Clone the nvm repository to ~/.nvm.
