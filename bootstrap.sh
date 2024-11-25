@@ -17,6 +17,8 @@ function doIt() {
   if [ -z "$(which zsh)" ]; then
     brew update
     brew install zsh
+  fi
+  if ! grep -iFq "/bin/zsh" "/etc/shells"; then
     sh -c "echo $(which zsh) >> /etc/shells"
   fi
   chsh -s "$(which zsh)"
