@@ -303,9 +303,12 @@ curl -sSL https://github.com/Slackadays/Clipboard/raw/main/install.sh | sh -s --
 curl -sS https://starship.rs/install.sh | sh -s -- -y
 
 # Install eza theme and symlink default theme to our own theme.
+# eza uses the theme.yml file stored in $EZA_CONFIG_DIR, or if that is not defined then in $XDG_CONFIG_HOME/eza.
+# Download theme repo as reference, but do not symlink $EZA_CONFIG_DIR/theme to it,
+# instead just keep own theme from dotfiles sync.
 rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
 git clone https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
-ln -sf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes/themes/default.yml" "${EZA_CONFIG_DIR:-$HOME/.config/eza}/theme.yml"
+# ln -sf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes/themes/default.yml" "${EZA_CONFIG_DIR:-$HOME/.config/eza}/theme.yml"
 
 # Setup eza completions.
 rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza"
