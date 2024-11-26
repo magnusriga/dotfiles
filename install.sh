@@ -273,7 +273,7 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 rustup update
 
 # Install Yazi plugins.
-rm -rf "${YAZI_HOME:-$HOME/.config/yazi}/plugins" "${YAZI_HOME:-$HOME/.config/yazi}/flavors"
+# rm -rf "${YAZI_HOME:-$HOME/.config/yazi}/plugins" "${YAZI_HOME:-$HOME/.config/yazi}/flavors"
 rm -rf $(find ~/.config/yazi/plugins -maxdepth 1 -type d | grep -v -e 'arrow.yazi' -e 'folder-rules.yazi' -e 'system-clipboard.yazi' -e 'plugins$' -)
 rm "${YAZI_HOME:-$HOME/.config/yazi}/package.toml"
 git clone https://github.com/sharklasers996/eza-preview.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/eza-preview.yazi"
