@@ -108,6 +108,8 @@
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
 # ================================================================
 
+echo "Running .profile..."
+
 # ================================================================
 # Source API Keys.
 # ================================================================
