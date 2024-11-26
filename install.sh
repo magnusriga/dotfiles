@@ -145,6 +145,11 @@ if [ ! -d "$TRASH_HOME" ]; then
   mkdir -p "$TRASH_HOME"
 fi
 
+VIM_SESSIONS="/home/$USERNAME/.vim/sessions"
+if [ ! -d "$VIM_SESSIONS" ]; then
+  mkdir -p "$VIM_SESSIONS"
+fi
+
 # For trash-cli completion.
 mkdir -p "/usr/share/zsh/site-functions/"
 mkdir -p "/usr/share/bash-completion/completions"
