@@ -24,7 +24,7 @@ alias gs="git status"
 alias python=python3
 
 # --grid is default.
-alias l='eza -la --icons=always --git --git-repos --hyperlink --header --grid --octal-permissions -w 50 --time-style=relative'
+alias l='eza -la --icons=always --git --git-repos --hyperlink --group-directories-first --header --grid --octal-permissions -w 50 --time-style=relative'
 alias lt="eza -la --icons=always --git --git-repos --hyperlink --header --grid --octal-permissions -w 50 --time-style=relative --tree --level=2"
 
 alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
