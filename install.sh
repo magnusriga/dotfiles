@@ -140,10 +140,15 @@ if [ ! -d "$EZA_CONFIG_DIR" ]; then
   mkdir -p "$EZA_CONFIG_DIR"
 fi
 
-TRASH_HOME="/home/$USERNAME/.local/Trash"
+TRASH_HOME="/home/$USERNAME/.local/share/Trash"
 if [ ! -d "$TRASH_HOME" ]; then
   mkdir -p "$TRASH_HOME"
 fi
+
+# For trash-cli completion.
+mkdir -p "/usr/share/zsh/site-functions/"
+mkdir -p "/usr/share/bash-completion/completions"
+mkdir -p "/etc/profile.d"
 
 RUST_HOME="/home/$USERNAME/.rustup"
 if [ ! -d "$RUST_HOME" ]; then
@@ -231,9 +236,9 @@ pipx ensurepath
 pipx install 'trash-cli[completion]'
 cmds=(trash-empty trash-list trash-restore trash-put trash)
 for cmd in "${cmds[@]}"; do
-  $cmd --print-completion bash | sudo tee "/usr/share/bash-completion/completions/$cmd"
-  $cmd --print-completion zsh | sudo tee "/usr/share/zsh/site-functions/_$cmd"
-  $cmd --print-completion tcsh | sudo tee "/etc/profile.d/$cmd.completion.csh"
+  $cmd --print-completion bash | sudo tee "/usr/share/bash-completion/completions/$cmd" 1>/dev/null
+  $cmd --print-completion zsh | sudo tee "/usr/share/zsh/site-functions/_$cmd" 1>/dev/null
+  $cmd --print-completion tcsh | sudo tee "/etc/profile.d/$cmd.completion.csh" 1>/dev/null
 done
 
 # Install eza.
