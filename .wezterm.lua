@@ -44,23 +44,25 @@ local config = wezterm.config_builder()
 
 -- Remember to install all the fonts in the chosen family, in OS.
 config.font = wezterm.font("JetBrainsMono Nerd Font")
+-- config.font = wezterm.font("JetBrains Mono")
+-- config.font = wezterm.font("Hack Nerd Font")
+-- config.font = wezterm.font_with_fallback("Hack Nerd Font")
 
 -- vscode uses 14px (11pt) by default.
-config.font_size = 11
+config.font_size = 10
 
 -- Changing the color scheme.
 -- config.color_scheme = 'Batman'
 -- config.color_scheme = "AdventureTime"
 config.color_scheme = "OneHalfDark"
 
--- Make underlines thicker and slightly down from text.
 config.underline_thickness = 2
 config.underline_position = -2
 
 -- Enable the scrollbar.
 -- It will occupy the right window padding space.
 -- If right padding is set to 0 then it will be increased
--- to a single cell width
+-- to a single cell width.
 config.enable_scroll_bar = true
 
 config.keys = {
