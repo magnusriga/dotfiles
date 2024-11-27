@@ -29,6 +29,7 @@ sudo apt-get install -y \
   ssh \
   iproute2 \
   rsync \
+  cron \
   python3-pip \
   gpg \
   bat \
