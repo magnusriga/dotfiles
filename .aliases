@@ -21,6 +21,8 @@ alias gc="git add -A && git commit -am"
 alias gp="git push"
 alias gs="git status"
 
+alias lg="lazygit"
+
 alias python=python3
 
 # --grid is default.
