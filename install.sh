@@ -363,6 +363,8 @@ ln -s "$(which batcat)" ~/.local/bin/bat
 # Install global packages.
 # RUN pnpm install -g turbo
 pnpm install -g tree-node-cli
+pnpm install -g contentful-cli
+pnpm install -g neonctl
 
 # Print tool versions
 echo -e "\n\n================================\n\
