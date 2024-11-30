@@ -152,9 +152,12 @@ if [ ! -d "$VIM_SESSIONS" ]; then
 fi
 
 # For trash-cli completion.
-mkdir -p "/usr/share/zsh/site-functions/"
-mkdir -p "/usr/share/bash-completion/completions"
-mkdir -p "/etc/profile.d"
+sudo mkdir -p "/usr/share/zsh/site-functions/"
+sudo chown 1000:1000 "/usr/share/zsh/site-functions/"
+sudo mkdir -p "/usr/share/bash-completion/completions"
+sudo chown 1000:1000 "/usr/share/bash-completion/completions"
+sudo mkdir -p "/etc/profile.d"
+sudo chown 1000:1000 "/etc/profile.d"
 
 RUST_HOME="/home/$USERNAME/.rustup"
 if [ ! -d "$RUST_HOME" ]; then
@@ -249,9 +252,8 @@ done
 
 # Install eza.
 mkdir -p /etc/apt/keyrings
-wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor
-# wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
-echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor >/dev/null
+echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list >/dev/null
 sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
 sudo apt-get update
 sudo apt-get install -y eza
