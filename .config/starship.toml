@@ -133,6 +133,7 @@ $shell\
 
 [custom.arrow]
 format = '[ ❮  ](bold fg:green)'
+shell = ['zsh']
 when = true
 # disabled = true
 # success_symbol = "[❮   ](bold green)"
@@ -146,10 +147,11 @@ disabled = false
 
 [custom.ssh_keys]
 description = "SSH key count"
+shell = ['zsh']
+# shell = ["bash", "--noprofile", "--norc"]
 when = "ssh-add -l | grep -v -q 'no identities'"
 command = "ssh-add -l | grep -v 'no identities' | wc -l"
 format = "($symbol[$output]($style)) "
-shell = ["bash", "--noprofile", "--norc"]
 symbol = "🔑"
 style = "bold fg:green"
 
@@ -173,6 +175,7 @@ style = "bold fg:green"
 [custom.directory-with-git]
 command = 'echo ${${PWD##*/}:-/}' # shows output of command
 # format = '[$output](bg:red)[](fg:red)'
+shell = ['zsh']
 format = '[ $output ](bold bg:red fg:#000000)[](fg:red bg:yellow)'
 when = """
 if git rev-parse --git-dir > /dev/null 2>&1; then
@@ -184,6 +187,7 @@ fi
 
 [custom.directory-without-git]
 command = 'echo ${${PWD##*/}:-/}' # shows output of command
+shell = ['zsh']
 format = '[ $output ](bold bg:red fg:#000000)[ ](fg:red)'
 when = """
 if git rev-parse --git-dir > /dev/null 2>&1; then
@@ -195,6 +199,7 @@ fi
 
 [custom.yazi]
 description = "Indicate the shell was launched by `yazi`"
+shell = ['zsh']
 symbol = " "
 when = """ test -n "$YAZI_LEVEL" """
 
