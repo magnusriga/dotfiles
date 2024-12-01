@@ -22,13 +22,13 @@ end, 500, Header.LEFT)
 function Status:name()
   local h = self._tab.current.hovered
   local url = h.url
-  -- local home_prefix = "/home/$USERNAME"
+  local home_prefix = "/home/magnus"
   if not h then
     return ui.Line({})
   end
-  -- if url.starts_with(home_prefix) then
-  --   url = url.strip_prefix(home_prefix)
-  -- end
+  if url:starts_with(home_prefix) then
+    url = Url("~/"):join(url:strip_prefix(home_prefix))
+  end
   local linked = ""
   if h.link_to ~= nil then
     linked = " -> " .. tostring(h.link_to)
