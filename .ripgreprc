@@ -18,6 +18,7 @@ web:*.{html,css,js,ts,json,md}*
 --glob=!.history/*
 --glob=!.rust*/*
 --glob=!.cargo/*
+--glob=!.next/*
 --glob=!node_modules/*
 
 # or
