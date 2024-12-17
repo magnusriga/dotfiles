@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+
+echo "Running .path..."
+
+# ================================================================
+# Add User's Private Bin (`~/bin`) to `$PATH`
+# ================================================================
+if [ -d "$HOME/bin" ]; then
+  PATH="$HOME/bin:$PATH"
+fi
+
+# ================================================================
+# Add User's Private .local Bin to Path
+# ================================================================
+if [ -d "$HOME/.local/bin" ]; then
+  PATH="$HOME/.local/bin:$PATH"
+fi
+
+# ================================================================
+# Add Node Version Manager (NVM) to Path.
+# Needed for NVM, node, npm to Work in Docker.
+# Make Sure It Maches Path Set for .nvm in Dockerfile.
+# ================================================================
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+# ================================================================
+# Add the Global pnpm Store (CAS) to Path.
+# ================================================================
+export PNPM_HOME="$HOME/.local/share/pnpm"
+if [ -d "$HOME/.local/share/pnpm" ]; then
+  PATH="$HOME/.local/share/pnpm:$PATH"
+fi
+
+# ================================================================
+# Add Bun to Path
+# ================================================================
+export BUN_INSTALL="$HOME/.bun"
+if [ -d "$BUN_INSTALL" ]; then
+  PATH="$BUN_INSTALL/bin:$PATH"
+fi
+
+# ================================================================
+# Add Cargo to Path
+# ================================================================
+export CARGO_HOME="$HOME/.cargo"
+if [ -d "$CARGO_HOME/bin" ]; then
+  PATH="$CARGO_HOME/bin:$PATH"
+fi
+
+# ================================================================
+# Add Homebrew to Path
+# ================================================================
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# ================================================================
+# Add snap binary directory to PATH.
+# ================================================================
+if [ -d "/snap/bin" ]; then
+  PATH="/snap/bin:$PATH"
+fi

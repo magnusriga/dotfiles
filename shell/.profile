@@ -120,106 +120,22 @@ if [ -f "$HOME/.env" ]; then
 fi
 
 # ================================================================
-# Add User's Private Bin (`~/bin`) to `$PATH`
+# Source exported environment variables.
 # ================================================================
-if [ -d "$HOME/bin" ]; then
-  PATH="$HOME/bin:$PATH"
+if [ -f "$HOME/.exports" ]; then
+  set -a
+  source $HOME/.exports
+  set +a
 fi
 
 # ================================================================
-# Add User's Private .local Bin to Path
+# Setup and source the PATH environment variable.
 # ================================================================
-if [ -d "$HOME/.local/bin" ]; then
-  PATH="$HOME/.local/bin:$PATH"
+if [ -f "$HOME/.path" ]; then
+  set -a
+  source $HOME/.path
+  set +a
 fi
-
-# ================================================================
-# Add Node Version Manager (NVM) to Path.
-# Needed for NVM, node, npm to Work in Docker.
-# Make Sure It Maches Path Set for .nvm in Dockerfile.
-# ================================================================
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-# ================================================================
-# Add the Global pnpm Store (CAS) to Path.
-# ================================================================
-export PNPM_HOME="$HOME/.local/share/pnpm"
-if [ -d "$HOME/.local/share/pnpm" ]; then
-  PATH="$HOME/.local/share/pnpm:$PATH"
-fi
-
-# ================================================================
-# Set Default Shell to Zsh
-# ================================================================
-SHELL=$(which zsh)
-
-# ================================================================
-# Add Bun to Path
-# ================================================================
-export BUN_INSTALL="$HOME/.bun"
-if [ -d "$BUN_INSTALL" ]; then
-  PATH="$BUN_INSTALL/bin:$PATH"
-fi
-
-# ================================================================
-# Add Cargo to Path
-# ================================================================
-export CARGO_HOME="$HOME/.cargo"
-if [ -d "$CARGO_HOME/bin" ]; then
-  PATH="$CARGO_HOME/bin:$PATH"
-fi
-
-# ================================================================
-# Add Homebrew to Path
-# ================================================================
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
-# ================================================================
-# Add snap binary directory to PATH.
-# ================================================================
-if [ -d "/snap/bin" ]; then
-  PATH="/snap/bin:$PATH"
-fi
-
-# ================================================================
-# Export WEZTERM_HOME shell variable.
-# Subshells, e.g. non-login shells, inherit login shell's environment.
-# ================================================================
-export WEZTERM_HOME="$HOME/.local/share/wezterm"
-
-# ================================================================
-# Export variables for shell history persistence.
-# ================================================================
-export PROMPT_COMMAND=(history -a)
-export HISTFILE="/commandhistory/.shell_history"
-
-# ================================================================
-# Add symlink to fd, since another program has taken fd name.
-# Add ~/.local/bin, where symlink is placed, to path so fd is found.
-# ================================================================
-if [ ! -d "$HOME/.local/bin" ]; then
-  mkdir "$HOME/.local/bin" ]
-fi
-if [ ! -L "$HOME/.local/bin/fd" ]; then
-  ln -fs $(which fdfind) ~/.local/bin/fd
-fi
-PATH="$HOME/.local/bin:$PATH"
-
-# ================================================================
-# Make Google Chrome Default Browser
-# ================================================================
-export BROWSER=google-chrome
-
-# ================================================================
-# Set Ripgrep Configuration File
-# ================================================================
-export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
-
-# ================================================================
-# Set XDG_CONFIG_HOME, used by nvim.
-# ================================================================
-export XDG_CONFIG_HOME="$HOME/.config"
 
 # ================================================================
 # Start SSH agent to Avoid Typing Github Password
