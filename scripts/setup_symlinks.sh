@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_symlinks.sh..."
+echo "Running setup_symlinks.sh."
 
 # ================================================================
 # Add symlink to fd, since another program has taken fd name.

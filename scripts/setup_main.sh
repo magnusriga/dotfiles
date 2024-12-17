@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Running setup_main.sh."
+
 # Stop snapd service if it is running, so it can be upgraded.
 systemctl is-active snapd.service && sudo service snapd stop
 
@@ -64,127 +66,17 @@ sudo apt-get update
 # Install the latest Docker versions.
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Set username and UID variables.
-USERNAME="$(id -un)"
-USER_UID="$(id -u)"
-USER_GID="$(id -g)"
-
 # Set needed environment variables.
 export XDG_CONFIG_HOME="/home/$USERNAME/.config"
 
 # Setup directories.
-LINUXBREW_HOME="/home/linuxbrew/.linuxbrew"
-if [ ! -d $LINUXBREW_HOME ]; then
-  mkdir -p $LINUXBREW_HOME
-  # chown -R $USERNAME:$USERNAME $linuxbrew_home
+if [ -f "./setup_directories.sh" ]; then
+  source ./setup_directories.sh
 fi
 
-BUN_INSTALL="/home/$USERNAME/.bun"
-if [ ! -d "$BUN_INSTALL" ]; then
-  mkdir -p "$BUN_INSTALL"
-fi
-
-NVM_DIR="/home/$USERNAME/.nvm"
-if [ ! -d "$NVM_DIR" ]; then
-  mkdir -p "$NVM_DIR"
-fi
-
-PNPM_HOME="/home/$USERNAME/.local/share/pnpm"
-if [ ! -d "$PNPM_HOME" ]; then
-  mkdir -p "$PNPM_HOME"
-fi
-
-FONT_HOME="/home/$USERNAME/.local/share/fonts"
-if [ ! -d "$FONT_HOME" ]; then
-  mkdir -p "$FONT_HOME"
-fi
-
-STARSHIP_HOME="$XDG_CONFIG_HOME/starship"
-if [ ! -d "$STARSHIP_HOME" ]; then
-  mkdir -p "$STARSHIP_HOME"
-fi
-
-WEZTERM_HOME="/home/$USERNAME/.local/share/wezterm"
-if [ ! -d "$WEZTERM_HOME" ]; then
-  mkdir -p "$WEZTERM_HOME"
-fi
-
-NVIM_HOME="$XDG_CONFIG_HOME/nvim"
-# Let git make the folder.
-# if [ ! -d "$NVIM_HOME" ]; then
-#   mkdir -p "$NVIM_HOME"
-# fi
-
-YAZI_HOME="$XDG_CONFIG_HOME/yazi"
-if [ ! -d "$YAZI_HOME" ]; then
-  mkdir -p "$YAZI_HOME"
-fi
-
-ZSH_HOME="/home/$USERNAME/.local/share/zsh"
-if [ ! -d "$ZSH_HOME" ]; then
-  mkdir -p "$ZSH_HOME"
-fi
-
-ZSH="$ZSH_HOME/oh-my-zsh"
-# Do not pre-create $ZSH directory, otherwise oh-my-zsh will complain.
-# if [ ! -d "$ZSH" ]; then
-#   mkdir -p "$ZSH"
-# fi
-
-EZA_HOME="/home/$USERNAME/.local/share/eza"
-if [ ! -d "$EZA_HOME" ]; then
-  mkdir -p "$EZA_HOME"
-fi
-
-EZA_CONFIG_DIR="$XDG_CONFIG_HOME/eza"
-if [ ! -d "$EZA_CONFIG_DIR" ]; then
-  mkdir -p "$EZA_CONFIG_DIR"
-fi
-
-TRASH_HOME="/home/$USERNAME/.local/share/Trash"
-if [ ! -d "$TRASH_HOME" ]; then
-  mkdir -p "$TRASH_HOME"
-fi
-
-VIM_SESSIONS="/home/$USERNAME/.vim/sessions"
-if [ ! -d "$VIM_SESSIONS" ]; then
-  mkdir -p "$VIM_SESSIONS"
-fi
-
-# For trash-cli completion.
-sudo mkdir -p "/usr/share/zsh/site-functions/"
-sudo chown 1000:1000 "/usr/share/zsh/site-functions/"
-sudo mkdir -p "/usr/share/bash-completion/completions"
-sudo chown 1000:1000 "/usr/share/bash-completion/completions"
-sudo mkdir -p "/etc/profile.d"
-sudo chown 1000:1000 "/etc/profile.d"
-
-RUST_HOME="/home/$USERNAME/.rustup"
-if [ ! -d "$RUST_HOME" ]; then
-  mkdir -p "$RUST_HOME"
-fi
-
-CARGO_HOME="/home/$USERNAME/.cargo"
-if [ ! -d "$CARGO_HOME" ]; then
-  mkdir -p "$CARGO_HOME"
-fi
-
-TMUX_HOME="$XDG_CONFIG_HOME/tmux"
-if [ ! -d "$TMUX_HOME" ]; then
-  mkdir -p "$TMUX_HOME"
-fi
-
-COMMAND_HISTORY_DIR="/commandhistory"
-if [ ! -d "$COMMAND_HISTORY_DIR" ]; then
-  sudo mkdir -p "$COMMAND_HISTORY_DIR"
-  sudo touch /commandhistory/.shell_history
-fi
-
-# Update sudoers file.
-if [ ! -e "/etc/sudoers.d/$USERNAME" ] || ! sudo grep -iFq "User_Alias ADMIN" "/etc/sudoers.d/$USERNAME"; then
-  echo "\$USERNAME is $USERNAME, adding ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
-  echo -e "User_Alias ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : FULLTIMERS = $USERNAME, %$USERNAME\n\
-  ADMIN, FULLTIMERS ALL = NOPASSWD: /usr/bin/apt-get, NOPASSWD: /usr/bin/apt" | sudo tee "/etc/sudoers.d/$USERNAME"
+# Install Homebrew and Homebrew packages.
+if [ -f "./setup_brew.sh" ]; then
+  source ./setup_brew.sh
 fi
 
 # Install Nerd Font.
@@ -194,48 +86,10 @@ curl -fsSLO --create-dirs --output-dir "$FONT_HOME" https://github.com/ryanoasis
   rm "$FONT_HOME"/JetBrainsMono.tar.xz &&
   fc-cache -fv
 
-# Download and install Homebrew.
-if [ -z "$(brew --version)" ]; then
-  curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
-fi
-
 # Clone kickstart.nvim.
 if [ ! -d "${NVIM_HOME:-$HOME/.config/nvim}" ]; then
   git clone https://github.com/magnusriga/kickstart.nvim.git "${NVIM_HOME:-$HOME/.config/nvim}"
 fi
-
-# Update Homebrew and upgrade its packages.
-brew update
-brew upgrade
-
-# Install Homebrew packages.
-brew install preslavmihaylov/taps/todocheck
-brew install pre-commit
-brew install gh
-brew install jless
-brew install gcc
-brew install bat
-brew install fzf
-brew install rg
-brew install ast-grep
-brew install tmux
-brew install jesseduffield/lazygit/lazygit
-brew tap wez/wezterm-linuxbrew
-brew install wezterm
-brew install zoxide
-brew install ffmpegthumbnailer sevenzip imagemagick
-brew install yazi --HEAD
-brew install zsh-vi-mode
-brew install glow
-brew install zsh-autosuggestions
-
-# These install node via linuxbrew, so do not install them with brew.
-# brew install neonctl
-# brew install contentful-cli
-
-# Uninstall Homebrew packages that clash with below installations.
-if [ -n "$(brew list --versions rust)" ]; then brew uninstall rust; fi
-brew autoremove
 
 # Install packages with snap.
 sudo snap install dog
