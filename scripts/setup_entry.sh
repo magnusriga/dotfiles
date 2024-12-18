@@ -2,6 +2,32 @@
 
 echo "Running setup_entry.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
+# Files not needing any user
+# print_versions
+# setup_brew
+# 
+# Files needing sudo
+# bootstrap
+# setup_apt-get_packages
+# setup_docker
+# setup_entry
+# 
+# Files needing to be run by new user,
+# because it uses $HOME, $USERNAME,
+# or otherwise populates new user's home directory.
+# - bootstrap (also nees sudo)
+# - setup_main
+# - setup_eza (also needs sudo, add new user to sudoers.d/[username])
+# - setup_directories
+# - setup_git_credentials
+# - setup_fonts
+# - setup_nvm
+# - setup_pnpm
+# - setup_symlinks
+# - setup_tmux
+# - setup_yazi
+# - setup_zsh
+
 # $0 only works when script is run with shell, e.g. bash foo.sh,
 # not when script is sourced, e.g. source foo.sh.
 # SCRIPT=$(realpath "$BASH_SOURCE || $0")
