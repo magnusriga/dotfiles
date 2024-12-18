@@ -36,20 +36,20 @@ fi
 
 # Add ZSH to `/etc/shells`.
 # Note: Must be done after `setup_brew.sh`, which installs ZSH.
-if ! grep -iFq ".linuxbrew/bin/zsh" "/etc/shells"; then
-  echo 'Adding zsh to /etc/shells...'
-  which zsh | sudo tee -a /etc/shells 1> /dev/null
-fi
+# if ! grep -iFq ".linuxbrew/bin/zsh" "/etc/shells"; then
+#   echo 'Adding zsh to /etc/shells...'
+#   which zsh | sudo tee -a /etc/shells 1> /dev/null
+# fi
 
 # Run stow after installing packages,
 # to avoid symlinked .config folders, e.g. $HOME/.config/eza,
 # being overwritten by install scripts that create e.g. $HOME/.config/eza.
-echo 'Running `stow .`.'
-sudo -u $USERNAME stow .
+# echo 'Running `stow .`.'
+# sudo -u $USERNAME stow .
 
 # Set ZSH as default shell.
-echo 'Setting ZSH as default shell...'
-sudo -u $USERNAME chsh -s "$(which zsh)"
+# echo 'Setting ZSH as default shell...'
+# sudo -u $USERNAME chsh -s "$(which zsh)"
 
 # Delete old user.
 # if [[ -n "$(id -un $CURRENT_USER)" && "$(id -un $CURRENT_USER)" != $USERNAME && "$(id -un $CURRENT_USER)" != 'root' ]]; then
