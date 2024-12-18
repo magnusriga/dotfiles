@@ -35,6 +35,11 @@ if [ ! -d "$STARSHIP_HOME" ]; then
   mkdir -p "$STARSHIP_HOME"
 fi
 
+export AEROSPACE_HOME="${XDG_CONFIG_HOME:-/home/$USERNAME/.config}/aerospace"
+if [ ! -d "$AEROSPACE_HOME" ]; then
+  mkdir -p "$AEROSPACE_HOME"
+fi
+
 export WEZTERM_HOME="/home/$USERNAME/.local/share/wezterm"
 if [ ! -d "$WEZTERM_HOME" ]; then
   mkdir -p "$WEZTERM_HOME"
