@@ -11,6 +11,12 @@ fi
 brew update
 brew upgrade
 
+# Install ZSH shell.
+if [ -z "$(which zsh)" ]; then
+  echo 'Installing zsh...'
+  brew install zsh
+fi
+
 # Install Homebrew packages.
 brew install preslavmihaylov/taps/todocheck
 brew install pre-commit

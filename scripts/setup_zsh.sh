@@ -5,7 +5,7 @@ echo "Running setup_zsh.sh."
 # Remove existing oh-my-zsh install folder, then install oh-my-zsh.
 # If $ZSH folder is pre-created, oh-my-zsh complains.
 # $ZSH is used by oh-my-zsh install script, as install directory for oh-my-zsh.
-rm -rf "$ZSH"
+rm -rf "${ZSH:-$HOME/.local/share/zsh/oh-my-zsh}"
 sh -c "export ZSH=${ZSH_HOME:-$HOME/.local/share/zsh}/oh-my-zsh; $(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended --keep-zshrc
 
 # Install ZLE widgets.

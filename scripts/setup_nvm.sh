@@ -2,6 +2,8 @@
 
 echo "Running setup_nvm.sh."
 
+NVM_DIR = ${NVM_DIR:-/home/$USERNAME/.nvm}
+
 # Download and install nvm, node, npm.
 # 1) Clone the nvm repository to ~/.nvm.
 # 2) Run $NVM_DIR/nvm.sh, which copies a snippet that starts nmv insto the correct profile file (~/.bash_profile, ~/.zshrc, ~/.profile, or ~/.bashrc).

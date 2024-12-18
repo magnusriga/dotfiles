@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-echo "Running setup_main.sh."
+echo "Running setup_main.sh with USERNAME $USERNAME."
 
 # apt-get: Update registry, upgrade existing packages, install new packages.
 if [ -f "./setup_apt-get_packages.sh" ]; then
-  source ./setup_apt-get_packages.sh
+  sudo ./setup_apt-get_packages.sh
 fi
 
 # Set locale.
@@ -12,15 +12,15 @@ sudo localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-
 
 # Install Docker.
 if [ -f "./setup_docker.sh" ]; then
-  source ./setup_docker.sh
+  sudo ./setup_docker.sh
 fi
-
-# Set needed environment variables.
-export XDG_CONFIG_HOME="/home/$USERNAME/.config"
 
 # Setup directories.
 if [ -f "./setup_directories.sh" ]; then
+  set -a
   source ./setup_directories.sh
+  set +a
+  echo -e "Just sourced setup_directories.sh, environment variables in current process are now:\n\n$(env)"
 fi
 
 # Setup the latest stable Rust toolchain via rustup, and add it to path.
@@ -29,37 +29,37 @@ rustup update
 
 # Install Homebrew and Homebrew packages.
 if [ -f "./setup_brew.sh" ]; then
-  source ./setup_brew.sh
+  sudo -u $USERNAME ./setup_brew.sh
 fi
 
 # Setup git credentials.
 if [ -f "./setup_git_credentials.sh" ]; then
-  source ./setup_git_credentials.sh
+  sudo -u $USERNAME ./setup_git_credentials.sh
 fi
 
 # Install eza: Program, theme, and completions.
 if [ -f "./setup_eza.sh" ]; then
-  source ./setup_eza.sh
+  sudo -u $USERNAME ./setup_eza.sh
 fi
 
 # Install oh-my-zsh and ZLE widgets.
 if [ -f "./setup_zsh.sh" ]; then
-  source ./setup_zsh.sh
+  sudo -u $USERNAME ./setup_zsh.sh
 fi
 
 # Install nvm and node.
 if [ -f "./setup_nvm.sh" ]; then
-  source ./setup_nvm.sh
+  sudo -u $USERNAME ./setup_nvm.sh
 fi
 
-# Manually install tmux plugins, including tmux plugin manager.
+# Install tmux plugins, including tmux plugin manager.
 if [ -f "./setup_tmux.sh" ]; then
-  source ./setup_tmux.sh
+  sudo -u $USERNAME ./setup_tmux.sh
 fi
 
 # Install pnpm and global pnpm packages.
 if [ -f "./setup_pnpm.sh" ]; then
-  source ./setup_pnpm.sh
+  sudo -u $USERNAME ./setup_pnpm.sh
 fi
 
 # Install bun.
@@ -86,12 +86,12 @@ done
 
 # Install fonts.
 if [ -f "./setup_fonts.sh" ]; then
-  source ./setup_fonts.sh
+  sudo -u $USERNAME ./setup_fonts.sh
 fi
 
 # Install yazi and yazi plugins.
 if [ -f "./setup_yazi.sh" ]; then
-  source ./setup_yazi.sh
+  sudo -u $USERNAME ./setup_yazi.sh
 fi
 
 # Install Wezterm shell intergration.
@@ -116,7 +116,7 @@ fi
 
 # Create symlinks, e.g. to commonly used programs.
 if [[ -f ./setup_symlinks.sh ]]; then
-  source ./setup_symlinks.sh
+  sudo -u $USERNAME ./setup_symlinks.sh
 fi
 
 # Print tool versions

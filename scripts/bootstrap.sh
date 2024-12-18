@@ -5,31 +5,18 @@ cd "$(dirname "${BASH_SOURCE}")"
 git pull origin main
 
 function doIt() {
-  echo 'About to rsync files...'
-  rsync --exclude ".git/" \
-    --exclude ".DS_Store" \
-    --exclude ".osx" \
-    --exclude "bootstrap.sh" \
-    --exclude "README.md" \
-    --exclude "LICENSE-MIT.txt" \
-    -avh --no-perms . ~
+#  echo 'About to rsync files...'
+#  rsync --exclude ".git/" \
+#    --exclude ".DS_Store" \
+#    --exclude ".osx" \
+#    --exclude "bootstrap.sh" \
+#    --exclude "README.md" \
+#    --exclude "LICENSE-MIT.txt" \
+#    -avh --no-perms . ~
 
-  # Set zsh as default shell.
-  if [ -z "$(which zsh)" ]; then
-    echo 'Installing zsh...'
-    brew update
-    brew install zsh
-  fi
-  if ! grep -iFq ".linuxbrew/bin/zsh" "/etc/shells"; then
-    echo 'Adding zsh to /etc/shells...'
-    which zsh | sudo tee -a /etc/shells
-  fi
-  echo 'Setting zsh as default shell...'
-  chsh -s "$(which zsh)"
-
-  # Run install script(s).
-  echo 'Sourcing install.sh...'
-  source install.sh
+  # Run install scripts.
+  echo 'Sourcing setup_entry.sh...'
+  sudo ./setup_entry.sh
 
   # .[.]profile runs .profile, but not .[.]sh_rc,
   # since this will not be an interactive shell.
@@ -42,6 +29,9 @@ function doIt() {
   # .[.]shrc runs when a non-login interactive shell is opened,
   # and runs .shrc, which contains prompt settings, aliases, etc.
   source ~/.bashrc
+
+  echo "Installations and setup now done, restart shell to start using ZSH."
+  echo "Manually delete existing user and its home folder, if desired."
 
   # Customizations.
   # Should be synced above.
