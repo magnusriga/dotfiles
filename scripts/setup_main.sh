@@ -33,9 +33,10 @@ if [ -f "./setup_brew.sh" ]; then
 fi
 
 # Setup git credentials.
-if [ -f "./setup_git_credentials.sh" ]; then
-  sudo -u $USERNAME ./setup_git_credentials.sh
-fi
+# Use .gitconfig from dotfiles instead.
+# if [ -f "./setup_git_credentials.sh" ]; then
+#   sudo -u $USERNAME ./setup_git_credentials.sh
+# fi
 
 # Install eza: Program, theme, and completions.
 if [ -f "./setup_eza.sh" ]; then
