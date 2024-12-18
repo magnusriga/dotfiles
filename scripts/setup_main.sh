@@ -3,6 +3,7 @@
 echo "Running setup_main.sh with USERNAME $USERNAME."
 
 SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE || $0")" >/dev/null 2>&1 ; pwd -P )/"
+echo "SCRIPTPATH is $SCRIPTPATH."
 
 # apt-get: Update registry, upgrade existing packages, install new packages.
 if [ -f "${SCRIPTPATH:-./}setup_apt-get_packages.sh" ]; then
