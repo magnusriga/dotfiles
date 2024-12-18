@@ -31,7 +31,7 @@ fi
 
 # Run remaining setup scripts as new user.
 if [ -f "./setup_main.sh" ]; then
-  set -a
-  sudo -u $USERNAME ./setup_main.sh
-  set +a
+  # set -a
+  # sudo -u $USERNAME ./setup_main.sh
+  # set +a
 fi
