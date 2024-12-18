@@ -2,6 +2,15 @@
 
 echo "Running setup_entry.sh."
 
+# This || probably does not work.
+# $0 only works when script is run with shell, e.g. bash foo.sh,
+# not when script is sourced, e.g. source foo.sh.
+# SCRIPT=$(realpath "$BASH_SOURCE || $0")
+# SCRIPT_PATH=$(dirname "$SCRIPT")
+# echo "SCRIPT_PATH is $SCRIPT_PATH."
+SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE || $0")" >/dev/null 2>&1 ; pwd -P )"
+echo "SCRIPTPATH is $SCRIPTPATH."
+
 # New user details.
 export USERNAME="nfu"
 export USER_UID="1000"
@@ -29,7 +38,7 @@ if [ ! -e "/etc/sudoers.d/$USERNAME" ] || ! sudo grep -iFq "User_Alias NEW_ADMIN
 fi
 
 # Run remaining setup scripts as new user.
-if [ -f "./setup_main.sh" ]; then
+if [ -f "$SCRIPTPATH/setup_main.sh" ]; then
   echo "Running setup_main.sh as user $USERNAME."
   sudo -u $USERNAME ./setup_main.sh
 fi
