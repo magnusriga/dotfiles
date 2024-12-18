@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_tmux.sh."
+echo "Running setup_tmux.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Manually install tmux plugins, including tmux plugin manager.
 rm -rf "${TMUX_HOME:-$HOME/.config/tmux}/plugins"

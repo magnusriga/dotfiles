@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_yazi.sh."
+echo "Running setup_yazi.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Install Yazi plugins from source.
 rm -rf $(find ~/.config/yazi/plugins -maxdepth 1 -type d | grep -v -e 'arrow.yazi' -e 'folder-rules.yazi' -e 'system-clipboard.yazi' -e 'plugins$' -)

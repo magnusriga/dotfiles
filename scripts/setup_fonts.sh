@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_fonts.sh."
+echo "Running setup_fonts.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 FONT_HOME = ${FONT_HOME:-/home/$USERNAME/.local/share/fonts}
 

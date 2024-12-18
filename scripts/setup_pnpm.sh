@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_pnpm.sh."
+echo "Running setup_pnpm.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Install pnpm.
 curl -fsSL https://get.pnpm.io/install.sh | SHELL="$(which bash)" sh -

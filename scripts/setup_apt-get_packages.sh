@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
-echo "Running setup_apt-get_packages.sh."
+echo "Running setup_apt-get_packages.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Stop snapd service if it is running, so it can be upgraded.
-systemctl is-active snapd.service && sudo service snapd stop
+systemctl --quiet is-active snapd.service && sudo service snapd stop
 
 # Install packages.
-sudo add-apt-repository ppa:neovim-ppa/unstable -y
 sudo apt-get update
 sudo apt-get install -y \
   locales \
@@ -19,7 +18,6 @@ sudo apt-get install -y \
   unzip zip \
   git \
   xclip \
-  neovim \
   apt-transport-https \
   ca-certificates \
   gnupg2 \

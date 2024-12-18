@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-echo "Running setup_directories.sh"
+echo "Running setup_directories.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Set needed environment variables.
 export XDG_CONFIG_HOME="/home/$USERNAME/.config"
 
 export LINUXBREW_HOME="/home/linuxbrew/.linuxbrew"
 if [ ! -d $LINUXBREW_HOME ]; then
-  mkdir -p $LINUXBREW_HOME
+  sudo mkdir -p $LINUXBREW_HOME
 fi
 
 export BUN_INSTALL="/home/$USERNAME/.bun"

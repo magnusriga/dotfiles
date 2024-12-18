@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-echo "Running setup_brew.sh."
+HOME=/home/$USERNAME
+
+echo "Running setup_brew.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Download and install Homebrew.
-if [ -z "$(brew --version)" ]; then
+if [ -z "$(brew --version 2> /dev/null)" ]; then
+  echo "Installing Homebrew."
   curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 fi
 
@@ -37,6 +40,7 @@ brew install yazi --HEAD
 brew install zsh-vi-mode
 brew install glow
 brew install zsh-autosuggestions
+brew install neovim
 
 # These install node via linuxbrew, so do not install them with brew.
 # brew install neonctl

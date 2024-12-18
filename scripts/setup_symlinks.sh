@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_symlinks.sh."
+echo "Running setup_symlinks.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # ================================================================
 # Create local bin folder if necessary.

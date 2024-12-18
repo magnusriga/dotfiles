@@ -1,15 +1,22 @@
 #!/usr/bin/env bash
 
-echo "Running setup_entry.sh."
+echo "Running setup_entry.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
-# This || probably does not work.
 # $0 only works when script is run with shell, e.g. bash foo.sh,
 # not when script is sourced, e.g. source foo.sh.
 # SCRIPT=$(realpath "$BASH_SOURCE || $0")
 # SCRIPT_PATH=$(dirname "$SCRIPT")
 # echo "SCRIPT_PATH is $SCRIPT_PATH."
-SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE || $0")" >/dev/null 2>&1 ; pwd -P )/"
+SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1 ; pwd -P )/"
+
 echo "SCRIPTPATH is $SCRIPTPATH."
+
+# Note:
+# If $BASH_SOURCE is equal to $0,
+# script is executed directly from shell, i.e. executed in bash sub-process,
+# otherwise, if $0 is e.g. -bash, script is being sourced,
+# i.e. run in current shell's process.
+# [[ $BASH_SOURCE = $0 ]] && exit 1 || return
 
 # New user details.
 export USERNAME="nfu"
@@ -39,8 +46,8 @@ fi
 
 # Run remaining setup scripts as new user.
 if [ -f "$SCRIPTPATH/setup_main.sh" ]; then
-  echo "Running setup_main.sh as user $USERNAME."
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh
+  echo "Running sudo -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh."
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh
 fi
 
 # Add ZSH to `/etc/shells`.

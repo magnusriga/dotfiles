@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_eza.sh."
+echo "Running setup_eza.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Install eza.
 mkdir -p /etc/apt/keyrings

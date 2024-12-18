@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_zsh.sh."
+echo "Running setup_zsh.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Remove existing oh-my-zsh install folder, then install oh-my-zsh.
 # If $ZSH folder is pre-created, oh-my-zsh complains.

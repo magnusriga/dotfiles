@@ -2,6 +2,8 @@
 
 cd "$(dirname "${BASH_SOURCE}")"
 
+echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+
 git pull origin main
 
 function doIt() {

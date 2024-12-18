@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_docker.sh."
+echo "Running setup_docker.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Add Docker's official GPG key.
 sudo install -m 0755 -d /etc/apt/keyrings

@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 
-echo "Running setup_main.sh with USERNAME $USERNAME."
+export HOME="/home/$USERNAME"
 
-SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE || $0")" >/dev/null 2>&1 ; pwd -P )/"
+echo "Running setup_main.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+
+SCRIPTPATH="$( cd -- "$(dirname $BASH_SOURCE)" ; pwd -P )/"
+
 echo "SCRIPTPATH is $SCRIPTPATH."
 
 # apt-get: Update registry, upgrade existing packages, install new packages.
 if [ -f "${SCRIPTPATH:-./}setup_apt-get_packages.sh" ]; then
+  echo "${SCRIPTPATH:-./}setup_apt-get_packages.sh found, executing script as sudo."
   sudo ${SCRIPTPATH:-./}setup_apt-get_packages.sh
 fi
 
@@ -32,38 +36,38 @@ rustup update
 
 # Install Homebrew and Homebrew packages.
 if [ -f "${SCRIPTPATH:-./}setup_brew.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_brew.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_brew.sh
 fi
 
 # Setup git credentials.
 # Use .gitconfig from dotfiles instead.
 # if [ -f "${SCRIPTPATH:-./}setup_git_credentials.sh" ]; then
-#   sudo -u $USERNAME ${SCRIPTPATH:-./}setup_git_credentials.sh
+#   sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_git_credentials.sh
 # fi
 
 # Install eza: Program, theme, and completions.
 if [ -f "${SCRIPTPATH:-./}setup_eza.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_eza.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_eza.sh
 fi
 
 # Install oh-my-zsh and ZLE widgets.
 if [ -f "${SCRIPTPATH:-./}setup_zsh.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_zsh.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_zsh.sh
 fi
 
 # Install nvm and node.
 if [ -f "${SCRIPTPATH:-./}setup_nvm.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_nvm.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_nvm.sh
 fi
 
 # Install tmux plugins, including tmux plugin manager.
 if [ -f "${SCRIPTPATH:-./}setup_tmux.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_tmux.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_tmux.sh
 fi
 
 # Install pnpm and global pnpm packages.
 if [ -f "${SCRIPTPATH:-./}setup_pnpm.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_pnpm.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_pnpm.sh
 fi
 
 # Install bun.
@@ -90,12 +94,12 @@ done
 
 # Install fonts.
 if [ -f "${SCRIPTPATH:-./}setup_fonts.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_fonts.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_fonts.sh
 fi
 
 # Install yazi and yazi plugins.
 if [ -f "${SCRIPTPATH:-./}setup_yazi.sh" ]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_yazi.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_yazi.sh
 fi
 
 # Install Wezterm shell intergration.
@@ -120,7 +124,7 @@ fi
 
 # Create symlinks, e.g. to commonly used programs.
 if [[ -f ${SCRIPTPATH:-./}setup_symlinks.sh ]]; then
-  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_symlinks.sh
+  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_symlinks.sh
 fi
 
 # Print tool versions
