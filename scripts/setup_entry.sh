@@ -8,7 +8,7 @@ echo "Running setup_entry.sh."
 # SCRIPT=$(realpath "$BASH_SOURCE || $0")
 # SCRIPT_PATH=$(dirname "$SCRIPT")
 # echo "SCRIPT_PATH is $SCRIPT_PATH."
-SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE || $0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE || $0")" >/dev/null 2>&1 ; pwd -P )/"
 echo "SCRIPTPATH is $SCRIPTPATH."
 
 # New user details.
@@ -40,7 +40,7 @@ fi
 # Run remaining setup scripts as new user.
 if [ -f "$SCRIPTPATH/setup_main.sh" ]; then
   echo "Running setup_main.sh as user $USERNAME."
-  sudo -u $USERNAME ./setup_main.sh
+  sudo -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh
 fi
 
 # Add ZSH to `/etc/shells`.
