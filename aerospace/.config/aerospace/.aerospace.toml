@@ -65,15 +65,19 @@ outer.right =      0
 
 [[on-window-detected]]
 if.app-id = 'com.github.wez.wezterm'
-run = 'move-node-to-workspace T' # mnemonics T - Terminal
+run = 'move-node-to-workspace 1' # Instead of: Mnemonics T - Terminal
 
 [[on-window-detected]]
 if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace W' # mnemonics W - Web browser
+run = 'move-node-to-workspace 2' # Instead of: Mnemonics W - Web browser
 
 [[on-window-detected]]
 if.app-id = 'company.thebrowser.Browser'
-run = 'move-node-to-workspace W' # mnemonics W - Web browser
+run = 'move-node-to-workspace 2' # Instead of: Mnemonics W - Web browser
+
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'move-node-to-workspace M' # Mnemonics M - Music
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
