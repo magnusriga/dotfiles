@@ -12,7 +12,7 @@ after-login-command = []
 after-startup-command = []
 
 # Start AeroSpace at login
-start-at-login = false
+start-at-login = true
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
@@ -63,6 +63,18 @@ outer.bottom =     0
 outer.top =        0
 outer.right =      0
 
+[[on-window-detected]]
+if.app-id = 'com.github.wez.wezterm'
+run = 'move-node-to-workspace T' # mnemonics T - Terminal
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace W' # mnemonics W - Web browser
+
+[[on-window-detected]]
+if.app-id = 'company.thebrowser.Browser'
+run = 'move-node-to-workspace W' # mnemonics W - Web browser
+
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 # 'main' binding mode must be always presented
@@ -87,9 +99,9 @@ outer.right =      0
 # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
 # You can uncomment the following lines to open up terminal with alt + enter shortcut (like in i3)
 alt-enter = '''exec-and-forget osascript -e '
-tell application "Terminal"
-    do script
+tell application "WezTerm"
     activate
+    do shell script "/Applications/WezTerm.app/Contents/MacOS/wezterm-gui"
 end tell'
 '''
 
