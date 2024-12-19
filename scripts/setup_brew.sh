@@ -10,6 +10,9 @@ if [ -z "$(brew --version 2> /dev/null)" ]; then
   curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 fi
 
+# Add $LINUXBREW_HOME to PATH.
+eval $(${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}/bin/brew shellenv)
+
 # Update Homebrew and upgrade its packages.
 brew update
 brew upgrade

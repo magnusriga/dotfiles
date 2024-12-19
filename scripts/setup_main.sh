@@ -32,6 +32,7 @@ fi
 
 # Setup the latest stable Rust toolchain via rustup, and add it to path.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+. $HOME/.cargo/env
 rustup update
 
 # Install Homebrew and Homebrew packages.
