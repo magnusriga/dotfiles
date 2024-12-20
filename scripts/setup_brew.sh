@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-
-HOME=/home/$USERNAME
-
+HOME=/home/magnus
 echo "Running setup_brew.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Download and install Homebrew.
+sudo rm -rf ${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}
+sudo mkdir ${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}
 if [ -z "$(brew --version 2> /dev/null)" ]; then
   echo "Installing Homebrew."
   curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
@@ -14,27 +14,29 @@ fi
 eval $(${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}/bin/brew shellenv)
 
 # Update Homebrew and upgrade its packages.
+echo "Brew prefix is: $(brew --prefix)"
+brew update-reset
 brew update
 brew upgrade
 
 # Install ZSH shell.
 if [ -z "$(which zsh)" ]; then
   echo 'Installing zsh...'
-  brew install zsh
+  brew install -vd zsh
 fi
 
 # Install Homebrew packages.
-brew install preslavmihaylov/taps/todocheck
-brew install pre-commit
-brew install gh
-brew install jless
-brew install gcc
-brew install bat
-brew install fzf
-brew install rg
-brew install ast-grep
-brew install tmux
-brew install jesseduffield/lazygit/lazygit
+brew install -vd preslavmihaylov/taps/todocheck
+brew install -vd pre-commit
+brew install -vd gh
+brew install -vd jless
+brew install -vd gcc
+brew install -vd bat
+brew install -vd fzf
+brew install -vd rg
+brew install -vd ast-grep
+brew install -vd tmux
+brew install -vd jesseduffield/lazygit/lazygit
 brew tap wez/wezterm-linuxbrew
 brew install wezterm
 brew install zoxide
