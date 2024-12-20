@@ -55,13 +55,6 @@ if [ -f "$SCRIPTPATH/setup_main.sh" ]; then
   sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh
 fi
 
-# Add ZSH to `/etc/shells`.
-# Note: Must be done after `setup_brew.sh`, which installs ZSH.
-# if ! grep -iFq ".linuxbrew/bin/zsh" "/etc/shells"; then
-#   echo 'Adding zsh to /etc/shells...'
-#   which zsh | sudo tee -a /etc/shells 1> /dev/null
-# fi
-
 # Run stow after installing packages,
 # to avoid symlinked .config folders, e.g. $HOME/.config/eza,
 # being overwritten by install scripts that create e.g. $HOME/.config/eza.

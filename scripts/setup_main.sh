@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
+# Set various needed environment variables.
 export HOME="/home/$USERNAME"
+export PATH="$PATH:$HOME/.local/bin"
 
 echo "Running setup_main.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
@@ -12,15 +14,13 @@ echo "SCRIPTPATH is $SCRIPTPATH."
 if [ -f "${SCRIPTPATH:-./}setup_apt-get_packages.sh" ]; then
   echo "${SCRIPTPATH:-./}setup_apt-get_packages.sh found, executing script as sudo."
   sudo ${SCRIPTPATH:-./}setup_apt-get_packages.sh
+
+  # Set necessary aliases (later set via dotfiles).
+  alias python=python3
 fi
 
 # Set locale.
 sudo localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
-
-# Install Docker.
-if [ -f "${SCRIPTPATH:-./}setup_docker.sh" ]; then
-  sudo ${SCRIPTPATH:-./}setup_docker.sh
-fi
 
 # Setup directories.
 if [ -f "${SCRIPTPATH:-./}setup_directories.sh" ]; then
@@ -30,10 +30,30 @@ if [ -f "${SCRIPTPATH:-./}setup_directories.sh" ]; then
   echo -e "Just sourced setup_directories.sh, environment variables in current process are now:\n\n$(env)"
 fi
 
+# Install Docker.
+if [ -f "${SCRIPTPATH:-./}setup_docker.sh" ]; then
+  sudo ${SCRIPTPATH:-./}setup_docker.sh
+fi
+
 # Setup the latest stable Rust toolchain via rustup, and add it to path.
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 . $HOME/.cargo/env
 rustup update
+
+# Install pip packages.
+if [ -f "${SCRIPTPATH:-./}setup_pip_packages.sh" ]; then
+  . ${SCRIPTPATH:-./}setup_pip_packages.sh
+fi
+
+# Install cargo packages (requires rust toolchain).
+if [ -f "${SCRIPTPATH:-./}setup_cargo_packages.sh" ]; then
+  . ${SCRIPTPATH:-./}setup_cargo_packages.sh
+fi
+
+# Install various packages for ARM.
+if [ -f "${SCRIPTPATH:-./}setup_packages_arm.sh" ]; then
+  sudo ${SCRIPTPATH:-./}setup_pip_packages.sh
+fi
 
 # Install Homebrew and Homebrew packages.
 if [ -f "${SCRIPTPATH:-./}setup_brew.sh" ]; then

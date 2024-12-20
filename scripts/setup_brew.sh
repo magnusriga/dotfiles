@@ -33,13 +33,10 @@ if [ -z "$(which zsh)" ]; then
 fi
 
 # Install Homebrew packages.
-brew install -vd preslavmihaylov/taps/todocheck
-brew install -vd pre-commit
-brew install -vd gh
-brew install -vd jless
-brew install -vd gcc
-brew install -vd bat
-brew install -vd fzf
+ brew install -vd preslavmihaylov/taps/todocheck
+ brew install -vd pre-commit
+ brew install -vd gh
+ brew install -vd jless
 brew install -vd rg
 brew install -vd ast-grep
 brew install -vd tmux

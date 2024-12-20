@@ -59,3 +59,10 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 if [ -d "/snap/bin" ]; then
   PATH="/snap/bin:$PATH"
 fi
+
+# ================================================================
+# Add fzf binary directory to PATH.
+# ================================================================
+if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
+  PATH="${PATH:+${PATH}:}$HOME/.fzf/bin"
+fi

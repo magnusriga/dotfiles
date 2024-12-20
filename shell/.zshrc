@@ -155,8 +155,10 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # Completetions.
 # ================================================================
 source "$HOME/zsh/completion.zsh"
-export EZA_HOME="/home/$USERNAME/.local/share/eza/eza"
+export EZA_HOME="$HOME/.local/share/eza/eza"
 export FPATH="$EZA_HOME/completions/zsh:$FPATH"
+
+eval "$(register-python-argcomplete pipx)"
 
 # ================================================================
 # Enable vi mode in zsh (at end of zshrc).
@@ -165,8 +167,12 @@ export FPATH="$EZA_HOME/completions/zsh:$FPATH"
 
 # ================================================================
 # Set up fzf key bindings, e.g. <C-T>, <C-R>, <A-C>, and fuzzy completion.
-# Must be done after the vi mode settings above.
+# Must be done after fzf has been added to PATH,
+# and after the vi mode settings above.
 # ================================================================
+if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
+  PATH="${PATH:+${PATH}:}$HOME/.fzf/bin"
+fi
 source <(fzf --zsh)
 
 # ================================================================
