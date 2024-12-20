@@ -76,6 +76,10 @@ if.app-id = 'company.thebrowser.Browser'
 run = 'move-node-to-workspace 2' # Instead of: Mnemonics W - Web browser
 
 [[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'move-node-to-workspace F' # Mnemonics F - Finder
+
+[[on-window-detected]]
 if.app-id = 'com.spotify.client'
 run = 'move-node-to-workspace M' # Mnemonics M - Music
 
