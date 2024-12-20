@@ -46,7 +46,7 @@ echo "SCRIPTPATH is $SCRIPTPATH."
 
 # Create new user if it does not already exist.
 if [ -f "$SCRIPTPATH/setup_user.sh" ]; then
-  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_user.sh
+  . ${SCRIPTPATH:-./}setup_user.sh
 fi
 
 # Run remaining setup scripts as new user.

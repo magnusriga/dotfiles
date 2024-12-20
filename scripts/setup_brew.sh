@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
-HOME=/home/magnus
+
+# HOME=/home/magnus
+USERNAME=nfu
+HOME=/home/$USERNAME
+
 echo "Running setup_brew.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Download and install Homebrew.
 sudo rm -rf ${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}
+sudo rm -rf $HOME/.cache/Homebrew
 sudo mkdir ${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}
+sudo chown -hR $USERNAME ${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}
+PATH=${LINUXBREW_HOME:-/home/linuxbrew/.linuxbrew}/bin:$PATH
 if [ -z "$(brew --version 2> /dev/null)" ]; then
   echo "Installing Homebrew."
   curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
