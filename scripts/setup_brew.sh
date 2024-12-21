@@ -40,10 +40,8 @@ fi
  brew install -vd rg
  brew install -vd ast-grep
  brew install -vd tmux
-brew install -vd jesseduffield/lazygit/lazygit
-brew tap wez/wezterm-linuxbrew
-brew install wezterm
-brew install zoxide
+ brew install -vd jesseduffield/lazygit/lazygit
+ brew install zoxide
 brew install ffmpegthumbnailer sevenzip imagemagick
 brew install yazi --HEAD
 brew install zsh-vi-mode

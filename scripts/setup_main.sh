@@ -50,10 +50,16 @@ if [ -f "${SCRIPTPATH:-./}setup_cargo_packages.sh" ]; then
   . ${SCRIPTPATH:-./}setup_cargo_packages.sh
 fi
 
-# Install various packages for ARM.
-if [ -f "${SCRIPTPATH:-./}setup_packages_arm.sh" ]; then
-  sudo ${SCRIPTPATH:-./}setup_pip_packages.sh
+# Install packages downloaded from version control.
+if [ -f "${SCRIPTPATH:-./}setup_git_packages.sh" ]; then
+  . ${SCRIPTPATH:-./}setup_git_packages.sh
 fi
+
+# Install various packages for ARM.
+#if [ -f "${SCRIPTPATH:-./}setup_packages_arm.sh" ]; then
+#  sudo ${SCRIPTPATH:-./}setup_pip_packages.sh
+#fi
+
 
 # Install Homebrew and Homebrew packages.
 if [ -f "${SCRIPTPATH:-./}setup_brew.sh" ]; then
@@ -147,6 +153,9 @@ fi
 if [[ -f ${SCRIPTPATH:-./}setup_symlinks.sh ]]; then
   sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_symlinks.sh
 fi
+
+# Update manual page cache.
+sudo mandb
 
 # Print tool versions
 if [[ -f ${SCRIPTPATH:-./}print_versions.sh ]]; then

@@ -31,12 +31,14 @@ sudo apt-get install -y \
   pipx \
   snapd \
   make \
+  cmake \
   unzip zip \
   git \
   gawk \
   xclip \
   autoconf \
   texinfo \
+  man-db \
   software-properties-common \
   apt-transport-https \
   ca-certificates \
@@ -58,10 +60,13 @@ sudo apt-get install -y \
   gh \
   poppler-utils \
   build-essential \
+  libssl-dev \
   fd-find \
   sysstat \
   python3 \
   python3-pip \
+  ffmpeg \
+  libjpeg-dev libpng-dev zlib1g libavcodec-dev libavformat-dev libavfilter-dev \
   libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb \
   libxcb-shape0-dev libxcb-xfixes0-dev libxcb1-dev \
   libevent-dev ncurses-dev bison pkg-config
