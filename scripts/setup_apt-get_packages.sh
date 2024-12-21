@@ -33,7 +33,10 @@ sudo apt-get install -y \
   make \
   unzip zip \
   git \
+  gawk \
   xclip \
+  autoconf \
+  texinfo \
   software-properties-common \
   apt-transport-https \
   ca-certificates \
@@ -42,6 +45,7 @@ sudo apt-get install -y \
   zsh zsh-common zsh-doc \
   iputils-ping \
   vim \
+  tmux \
   file \
   ssh \
   iproute2 \
@@ -59,7 +63,8 @@ sudo apt-get install -y \
   python3 \
   python3-pip \
   libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb \
-  libxcb-shape0-dev libxcb-xfixes0-dev libxcb1-dev 
+  libxcb-shape0-dev libxcb-xfixes0-dev libxcb1-dev \
+  libevent-dev ncurses-dev bison pkg-config
 
 # Package clean-up.
 sudo apt autoremove

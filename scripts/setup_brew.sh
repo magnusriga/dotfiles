@@ -37,9 +37,9 @@ fi
  brew install -vd pre-commit
  brew install -vd gh
  brew install -vd jless
-brew install -vd rg
-brew install -vd ast-grep
-brew install -vd tmux
+ brew install -vd rg
+ brew install -vd ast-grep
+ brew install -vd tmux
 brew install -vd jesseduffield/lazygit/lazygit
 brew tap wez/wezterm-linuxbrew
 brew install wezterm

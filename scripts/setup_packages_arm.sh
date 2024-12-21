@@ -21,11 +21,23 @@
 STOWDIR="/usr/local/stow"
 TMPDIR="/tmp"
 
-# Install todocheck
+# Install todocheck.
 PACKAGE="todocheck"
+VERSION=$(curl -s "https://api.github.com/repos/preslavmihaylov/todocheck/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
 mkdir $TMPDIR/$PACKAGE
 sudo mkdir -p $STOWDIR/$PACKAGE/bin
-curl -L --output $TMPDIR/$PACKAGE/$PACKAGE https://github.com/preslavmihaylov/todocheck/releases/download/v0.6.1/todocheck-v0.6.1-linux-arm64 --output $TMPDIR/$PACKAGE/$PACKAGE.sha256 https://github.com/preslavmihaylov/todocheck/releases/download/v0.6.1/todocheck-v0.6.1-linux-arm64.sha256
+curl -L --output $TMPDIR/$PACKAGE/$PACKAGE https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64 --output $TMPDIR/$PACKAGE/$PACKAGE.sha256 https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256
 if echo "$(cat $TMPDIR/$PACKAGE/$PACKAGE.sha256)" | echo "$(awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status ; then
   sudo mv $TMPDIR/$PACKAGE/$PACKAGE $STOWDIR/$PACKAGE/bin
 fi
+
+# Install stow.
+PACKAGE="stow"
+rm -rf $TMPDIR/$PACKAGE
+mkdir $TMPDIR/$PACKAGE
+cpan install Test::Output
+cpan install Test::More
+curl -Lo $TMPDIR/$PACKAGE.tar.gz https://ftp.gnu.org/gnu/stow/stow-latest.tar.gz
+tar xf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR/$PACKAGE
+cd $TMPDIR/$PACKAGE/stow-2.4.1
+sudo ./configure && sudo make install
