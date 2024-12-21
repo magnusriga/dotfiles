@@ -125,3 +125,16 @@ git clone https://github.com/dirkvdb/ffmpegthumbnailer.git $TMPDIR/$PACKAGE
 cd "$TMPDIR/$PACKAGE"
 cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GIO=ON -DENABLE_THUMBNAILER=ON .
 cd $CURRENTDIR
+
+
+# Install 7zip.
+PACKAGE="7zip"
+sudo rm -rf "$TMPDIR/$PACKAGE" 
+sudo rm -rf "$STOWDIR/$PACKAGE" 
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -LO --output-dir $TMPDIR "https://www.7-zip.org/a/7z2409-linux-arm64.tar.xz"
+tar xf $TMPDIR/7z2409-linux-arm64.tar.xz -C $TMPDIR/$PACKAGE
+sudo mv $TMPDIR/$PACKAGE/7zz $TMPDIR/$PACKAGE/7zzs $STOWDIR/$PACKAGE/bin
+chmod 755 $STOWDIR/$PACKAGE/bin/7zz $STOWDIR/$PACKAGE/bin/7zzs
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
