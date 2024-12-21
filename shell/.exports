@@ -8,6 +8,11 @@ echo "Running .exports..."
 SHELL=$(which zsh)
 
 # ================================================================
+# Folder for zsh plugins (no longer use oh-my-zsh).
+# ================================================================
+export ZSH_HOME="$HOME/.local/share/zsh"
+
+# ================================================================
 # Make vim the default editor in ssh sessions,
 # otherwise make nvim the default editor.
 # ================================================================

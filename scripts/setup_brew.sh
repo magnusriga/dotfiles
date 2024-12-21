@@ -42,11 +42,11 @@ fi
  brew install -vd tmux
  brew install -vd jesseduffield/lazygit/lazygit
  brew install zoxide
-brew install ffmpegthumbnailer sevenzip imagemagick
-brew install yazi --HEAD
-brew install zsh-vi-mode
-brew install glow
-brew install zsh-autosuggestions
+ brew install ffmpegthumbnailer sevenzip imagemagick
+ brew install yazi --HEAD
+ brew install zsh-vi-mode
+ brew install glow
+ brew install zsh-autosuggestions
 brew install neovim
 
 # These install node via linuxbrew, so do not install them with brew.

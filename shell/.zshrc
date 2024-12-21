@@ -130,7 +130,7 @@ source ~/.shrc
 # Export zsh-syntax-highlighting shell variables here instead of
 # in .zprofile, because they only apply to interactive shells.
 # ================================================================
-source $ZSH_HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Declare the variable
 typeset -A ZSH_HIGHLIGHT_STYLES
@@ -162,8 +162,9 @@ eval "$(register-python-argcomplete pipx)"
 
 # ================================================================
 # Enable vi mode in zsh (at end of zshrc).
+# ZSH_HOME: ZSH plugin directory.
 # ================================================================
-# source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+source ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
 # ================================================================
 # Set up fzf key bindings, e.g. <C-T>, <C-R>, <A-C>, and fuzzy completion.
@@ -190,7 +191,7 @@ eval "$(zoxide init zsh)"
 # ================================================================
 # Enable zsh-autosuggestions (end of zshrc).
 # ================================================================
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # ================================================================
 # Keybindings.

@@ -114,11 +114,3 @@
 # ================================================================
 echo "Running .zprofile, about to source .profile..."
 source ~/.profile
-
-# ================================================================
-# Set environment variables specific to ZSH.
-# These are all inherited by non-login shells,
-# because they are subshells of login shell that runs this file.
-# ================================================================
-# Folder for zsh plugins (no longer use oh-my-zsh).
-export ZSH_HOME="$HOME/.local/share/zsh"

@@ -68,18 +68,18 @@ cd $CURRENTDIR
 # https://superuser.com/a/1016137/618317
 hash -r
 
-# Install lazygit (note the architecture).
+# Install lazygit (Note: Architecture).
 PACKAGE="lazygit"
 VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
 sudo rm -rf "$TMPDIR/$PACKAGE" 
 sudo rm -rf "$STOWDIR/$PACKAGE" 
 curl -Lo $TMPDIR/$PACKAGE.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
-# tar'ed file is called lazygit.
+# tar'ed file name: lazygit.
 tar xf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
 sudo install $TMPDIR/$PACKAGE -D -t $STOWDIR/$PACKAGE/bin
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
-# Install todocheck.
+# Install todocheck (Note: Architecture).
 PACKAGE="todocheck"
 VERSION=$(curl -s "https://api.github.com/repos/preslavmihaylov/todocheck/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
 sudo rm -rf "$TMPDIR/$PACKAGE" 
@@ -94,9 +94,11 @@ if echo "$(cat $TMPDIR/$PACKAGE/$PACKAGE.sha256)" | echo "$(awk '{print $1}') $T
 fi
 
 # Install fzf.
-rm -rf $HOME/.fzf
-git clone --depth 1 https://github.com/junegunn/fzf.git $HOME/.fzf
-$HOME/.fzf/install
+PACKAGE="fzf"
+sudo rm -rf $TMPDIR/$PACKAGE
+mkdir $TMPDIR/$PACKAGE
+git clone --depth 1 https://github.com/junegunn/fzf.git $TMPDIR/$PACKAGE
+$TMPDIR/$PACKAGE/.fzf/install
 
 # Install zoxide.
 # Does not use stow, thus places binary in `$HOME/.local/bin`,
@@ -126,8 +128,7 @@ cd "$TMPDIR/$PACKAGE"
 cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GIO=ON -DENABLE_THUMBNAILER=ON .
 cd $CURRENTDIR
 
-
-# Install 7zip.
+# Install 7zip (Note: Architecture).
 PACKAGE="7zip"
 sudo rm -rf "$TMPDIR/$PACKAGE" 
 sudo rm -rf "$STOWDIR/$PACKAGE" 
@@ -137,4 +138,36 @@ curl -LO --output-dir $TMPDIR "https://www.7-zip.org/a/7z2409-linux-arm64.tar.xz
 tar xf $TMPDIR/7z2409-linux-arm64.tar.xz -C $TMPDIR/$PACKAGE
 sudo mv $TMPDIR/$PACKAGE/7zz $TMPDIR/$PACKAGE/7zzs $STOWDIR/$PACKAGE/bin
 chmod 755 $STOWDIR/$PACKAGE/bin/7zz $STOWDIR/$PACKAGE/bin/7zzs
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+
+# Install Vi Mode plugin for ZSH.
+# In .zshrc: source ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode/zsh-vi-mode.plugin.zsh
+git clone https://github.com/jeffreytse/zsh-vi-mode.git ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode
+
+# Install zsh-autosuggestions plugin for ZSH.
+git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions
+
+# Install neovim from source,
+# so it matches machine architecture.
+# Could place git repo into `/opt/`,
+# where optional, i.e. non-core, software is placed,
+# so it is easy to pull latest and rebuild. 
+PACKAGE=neovim
+BUILD_TYPE=Release
+# `$TMPDIR/$PACKAGE/build` holds CMake cache,
+# which must be cleared before rebuilding.
+sudo rm -rf "$TMPDIR/$PACKAGE" 
+sudo rm -rf "$STOWDIR/$PACKAGE" 
+mkdir "$TMPDIR/$PACKAGE"
+mkdir "$STOWDIR/$PACKAGE"
+git clone https://github.com/neovim/neovim "$TMPDIR/$PACKAGE"
+cd "$TMPDIR/$PACKAGE"
+# make: Downloads and builds dependencies,
+# and puts nvim executable in `build/nvim`.
+make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STOWDIR/$PACKAGE"
+# After building, nvim executable can be run with
+# `VIMRUNTIME=runtime ./build/bin/nvim`,
+# but install instead to transfer complete package (bin, lib, share),
+# to install location, set with flag in `make` step.
+make install
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
