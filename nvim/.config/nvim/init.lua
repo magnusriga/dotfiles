@@ -39,28 +39,33 @@ Neovim initialization (aka. startup)
     - `$HOME/.local/share/nvim/site`
 - runtimepath/pack/*/start/*
 
-Example: .lua files here are loaded automatically at start: `.local/share/nvim/site/pack/*/start/*/plugin`.
+- Examples:
+  - `.lua` files in this directory are loaded automatically at Neovim start: `.local/share/nvim/site/pack/*/start/*/plugin`.
 
-`.local/share/nvim/site/pack/*/start/*/syntax/some.vim will also be found by (built-in) syntax highlighting when file opens, as pack/*/start/*/ is also searched with runtimepath is searched.
+- Additional notes:
+  - `<runtimepath>/pack/*/start/*/syntax/some.vim` will be found by (built-in) syntax highlighting when file opens,
+    as pack/*/start/*/ is searched with runtimepath is searched.
 
-Nvim —clean to run clean, without config or plugins, and —noplugin without plugin folder loading.
+=============================================
+nvim CLI options
+=============================================
+- `—clean`: Run nvim without initialization file or `<runtimepath>/plugin` directories loading.
+- `—noplugin`: Run nvim without `<runtimepath>/plugin` directories loading.
 
-That is it, in terms of user files loaded automatically on startup.
+=============================================
+require()
+=============================================
+- `require(‘foo’)` searches for `foo.lua` at top-level of `lua` directory,
+  directly within runtimepath folders, and within `<runtimepath>/pack/*/start/*`.
+- Deeper levels within `lua` directory can be specified with `/` or `.`:
+  `require(‘foo/bar’)` | `require(‘foo.bar’)`.
+- Subfolder containing `init.lua` can be required without specifying `init`, just as if it was in top-level `lua` folder.
+- If required module is not found, script execution is aborted, avoided with pcall().
+- Require caches modules on first run, unlike source, so `.lua` files are not run again on second+ require.
 
-require(‘foo’) searches for `foo.lua` at top-level inside a `lua` directory, directly within runtimepath folders, and within runtimepath/pack/*/start/*.
-Deeper levels within `lua` directory can be specified with `/` or `.`:
-require(‘foo/bar’) | require(‘foo.bar’).
-
-Subfolder containing `init.lua` can be required without specifying `init`, just as if it was in top-level `lua` folder.
-
-Examples:
-require(‘foo) is searched for here: `.local/share/nvim/site/lua/foo.lua` and `.local/share/nvim/site/lua/foo/init.lua.
-require(‘foo.bar’) is searched for here: `.local/share/nvim/site/lua/foo/bar.lua` and `.local/share/nvim/site/lua/foo/bar/init.lua`.
-
-If module is not found, script execution is aborted. Avoid with pcall().
-
-Require caches modules on first run, unlike source, so .lua files are actually not run again on second require.
-
+- Examples:
+  - require(‘foo) searches for `foo.lua` in `<runtimepath>/lua` and `<runtimepath>/lua/foo/init.lua`.
+  - require(‘foo.bar’) searches for `bar.lua` in `<runtimepath>/lua/foo` and `<runtimepath>/lua/foo/bar/init.lua`.
 
 --]]
 
