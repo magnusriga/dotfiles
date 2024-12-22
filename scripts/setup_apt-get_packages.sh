@@ -70,6 +70,7 @@ sudo apt-get install -y \
   libssl-dev \
   fd-find \
   sysstat \
+  python-dev python-pip python3-dev \
   python3 \
   python3-pip \
   ffmpeg \

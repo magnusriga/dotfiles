@@ -20,6 +20,32 @@
 # - Remember: Add `/usr/local/bin` to PATH.
 # ========================================================
 
+# ========================================================
+# NOTE: configure, make, make install
+# ========================================================
+# - Guide: https://thoughtbot.com/blog/the-magic-behind-configure-make-make-install
+# - `configure.ac`: File executed with `autoconf`, to generate `configure` script.
+# - `Makefile.am`: File executed with `automake`, to generate `Makefile.in` template,
+#   which in turn is used by both `configure` script and `make` command.
+# - `configure` script: Reads `Makefile.in` and system information, to ready software,
+#   including checking all dependencies are installed (like C compiler `gcc`).
+# - `make`: Reads `Makefile.in` to build software, often into `build` folder in current directory,
+#   meaning compile source code into byte code, and download, build, and link in dependencies.
+# - `make install`: Copies package files (bin, lib, share, ...) into install location,
+#   often set when running `configure` or `make`,
+#   including copying binary to directory in PATH (e.g. `/usr/local/bin`),
+#   man pages to directory in MANPATH, etc.
+# - Typical steps to build and install (i.e. copy) software:
+#   1) autoconf     : Creates `configure` script, from `configure.ac`.
+#   2) automake     : Creates `Makefile.in` template, from `Makefile.am`.
+#   3) configure    : Readies software for install. <-- Sometimes skipped, if done by `make`.
+#   4) make         : Builds software, i.e. compile program and link dependencies.
+#   5) make install : Copies program files to appropriate locations,
+#                     often set in `configure` or `make` steps,
+#                     e.g. binary to directory from PATH,
+#                     man pages to directory from MANPATH.
+# ========================================================
+
 echo "Running setup_git_packages.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Store the current directory, restored at end of script.
@@ -149,9 +175,6 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_HOME:-$HOME/.lo
 
 # Install neovim from source,
 # so it matches machine architecture.
-# Could place git repo into `/opt/`,
-# where optional, i.e. non-core, software is placed,
-# so it is easy to pull latest and rebuild. 
 PACKAGE=neovim
 BUILD_TYPE=Release
 # `$TMPDIR/$PACKAGE/build` holds CMake cache,
@@ -166,8 +189,10 @@ cd "$TMPDIR/$PACKAGE"
 # and puts nvim executable in `build/nvim`.
 make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STOWDIR/$PACKAGE"
 # After building, nvim executable can be run with
-# `VIMRUNTIME=runtime ./build/bin/nvim`,
-# but install instead to transfer complete package (bin, lib, share),
-# to install location, set with flag in `make` step.
+# `VIMRUNTIME=runtime ./build/bin/nvim`.
+# Instead, run `make install`, to copy package files (bin, lib, share, ...),
+# to install location, set with flag in `make` step,
+# including copying binary to directory in PATH (e.g. `/usr/local/bin`),
+# man pages to directory in MANPATH, etc.
 make install
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
