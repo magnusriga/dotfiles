@@ -101,7 +101,7 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE" 
 curl -Lo $TMPDIR/$PACKAGE.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
 # tar'ed file name: lazygit.
-tar xf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
+tar xzf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
 sudo install $TMPDIR/$PACKAGE -D -t $STOWDIR/$PACKAGE/bin
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
@@ -195,4 +195,22 @@ make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STO
 # including copying binary to directory in PATH (e.g. `/usr/local/bin`),
 # man pages to directory in MANPATH, etc.
 make install
+cd $CURRENTDIR
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+
+# Install luarocks, needed by lazyvim.
+PACKAGE="luarocks"
+VERSION=$(curl -L "https://luarocks.org/releases" | grep -Po '(?<=luarocks-)(\d+\.\d+\.\d+)' | head -n 1)
+sudo rm -rf "$STOWDIR/$PACKAGE" 
+mkdir "$STOWDIR/$PACKAGE"
+curl -LO --output-dir $TMPDIR "https://luarocks.org/releases/$PACKAGE-$VERSION.tar.gz"
+tar xzpf $TMPDIR/$PACKAGE-$VERSION.tar.gz -C $TMPDIR
+cd $TMPDIR/$PACKAGE-$VERSION
+./configure --prefix=$STOWDIR/$PACKAGE
+make
+sudo make install
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+cd $CURRENTDIR
+sudo luarocks install luasocket
+lua require "socket"
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE

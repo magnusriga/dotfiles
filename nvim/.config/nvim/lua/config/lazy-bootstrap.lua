@@ -1,18 +1,13 @@
 --[[
 =============================================
-Usage (of this file).
+Bootstrap lazy.nvim plugin manager. 
 =============================================
-
-- Clones github repo `lazy.nvim.git` into `lazypath` directory:
-  `$HOME/.local/share/nvim/lazy/lazy.nvim`.
-
-- Adds `lazypath` directory to runtimepath,
-  so require can find `/lua` folders within it.
+-- 1. Clone repo `lazy.nvim.git` into `lazypath` directory: `$HOME/.local/share/nvim/lazy/lazy.nvim`.
+-- 2. Add `lazypath` to runtimepath, so `require("lazy")` resolves to: `<lazypath>/lua/lazy`.
 
 - Information:
   - `:help lazy.nvim.txt`.
   - https://github.com/folke/lazy.nvim.
-
 =============================================
 --]]
 
@@ -24,6 +19,11 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     error('Error cloning lazy.nvim:\n' .. out)
   end
 end ---@diagnostic disable-next-line: undefined-field
+vim.print('Bootstrapped lazy.nvim, adding lazypath to opt.rtp', lazypath)
 vim.opt.rtp:prepend(lazypath)
+vim.print('runtimepath is now: ', vim.o.rtp)
 
+---------------------------------------------
+-- Modeline: `:h modeline`.
+---------------------------------------------
 -- vim: ts=2 sts=2 sw=2 et

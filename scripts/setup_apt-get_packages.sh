@@ -76,6 +76,7 @@ sudo apt-get install -y \
   ffmpeg \
   imagemagick \
   glow \
+  lua5.4 liblua5.4-dev \
   ninja-build gettext \
   libjpeg-dev libpng-dev zlib1g libavcodec-dev libavformat-dev libavfilter-dev \
   libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb \
