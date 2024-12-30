@@ -219,6 +219,19 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # Install ghostty from source.
 PACKAGE=ghostty
+# - Prefix sets ghostty's install directory,
+#   including where `theme`, `shell-integration`, etc. is stored,
+#   e.g. `$prefix/share/ghostty/shell-integration`.
+# - Use `PREFIX=/usr/local/stow/ghostty`,
+#   which is symlinked to `/usr/local/ghostty`,
+#   meaning `shell-integration` folder.
+# - Ghostty install adds several directories directly into `$PREFIX/share`,
+#   i.e. not only into `$PREFIX/share/ghostty`,
+#   containing various application configurations for ghostty,
+#   e.g. `bat` folder contains syntax highlighting file for ghostty.
+# - Thus, as always, stow dotfiles into home directory after this file has run,
+#   to ensure symlinks are not overwritten.
+PREFIX=$STOWDIR/$PACKAGE
 sudo rm -rf "$TMPDIR/$PACKAGE" 
 sudo rm -rf "$STOWDIR/$PACKAGE" 
 sudo rm -rf "$HOME/.config/$PACKAGE" 
@@ -227,6 +240,6 @@ mkdir "$STOWDIR/$PACKAGE"
 mkdir "$HOME/.config/$PACKAGE"
 git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
 cd "$TMPDIR/$PACKAGE"
-zig build -p $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
+zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
 cd $CURRENTDIR
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
