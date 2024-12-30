@@ -2,13 +2,38 @@
 
 echo "Running setup_fonts.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
-FONT_HOME = ${FONT_HOME:-/home/$USERNAME/.local/share/fonts}
+# Get target root directory.
+if [[ $(uname) == 'Darwin' ]]; then
+  # MacOS
+  sys_share_dir="/Library"
+  usr_share_dir="$HOME/Library"
+  font_subdir="Fonts"
+else
+  # Linux
+  sys_share_dir="/usr/local/share"
+  usr_share_dir="$HOME/.local/share"
+  font_subdir="fonts"
+fi
 
-echo "FONT_HOME is $FONT_HOME"
+if [ -n "${XDG_DATA_HOME}" ]; then
+  usr_share_dir="${XDG_DATA_HOME}"
+fi
 
-# Install Nerd Font.
-echo "Installing Nerd Font, this must also be done manually on Windows if using WSL..."
-curl -fsSLO --create-dirs --output-dir "$FONT_HOME" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz &&
-  tar -xf "$FONT_HOME"/JetBrainsMono.tar.xz -C "$FONT_HOME" &&
-  rm "$FONT_HOME"/JetBrainsMono.tar.xz &&
+sys_font_dir="${sys_share_dir}/${font_subdir}/NerdFonts"
+usr_font_dir="${usr_share_dir}/${font_subdir}/NerdFonts"
+
+# Install fonts for all users, i.e. in `sys_font_dir`.
+font_dir="${sys_font_dir}"
+echo "font_dir is $font_dir"
+
+# Install Nerd Fonts.
+echo "Installing Nerd Fonts, this must also be done manually on Windows if using WSL..."
+fontNames=("JetBrainsMono" "NerdFontsSymbolsOnly")
+for font in ${fontNames[@]}; do
+  curl -fsSLO --create-dirs --output-dir "$font_dir" https://github.com/ryanoasis/nerd-fonts/releases/latest/download/$font.tar.xz
+  tar -xf "$font_dir"/$font.tar.xz -C "$font_dir"
+  rm "$font_dir"/$font.tar.xz
+done
+if [[ $(uname) != "Darwin" ]]; then
   fc-cache -fv
+fi

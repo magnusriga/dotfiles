@@ -4,8 +4,89 @@ Notes regarding require(<name>):
 
 Notes regarding plugin’s `plugin` directory:
 - All modules inside a plugin’s top-most plugin directory, at all levels, are sourced automatically by lazy.nvim.
-- Actually also sourced by nvim, as all plugin directories, e.g. $HOME/.local/share/nvim/lazy/<repo>, are added to runtimepath, and at nvim start all ‘plugin’ folders in runtimepath get all their modules, at any level, sourced.
+- Thus, all modules inside `$HOME/.local/share/nvim/lazy/<repo>/plugin` are sourced automatically by lazy.nvim.
+ - Not also sourced by nvim
+   - Even though all plugin directories (plugin.dir), e.g. `$HOME/.local/share/nvim/lazy/<repo>`, are added to runtimepath, and at nvim start all ‘plugin’ folders in runtimepath get all their modules, at any level, sourced.
+   - Because, lazy.nvim turns off step 10 of nvim initialization, i.e. plugin sourcing.
+   - See: https://lazy.folke.io/usage
 
+- plugin.dir
+  - Config.options.root/<plugin.name>,.
+  - vim.fn.stdpath("data") .. "/lazy”/<repo_name>.
+  - $HOME/.local/share/nvim/lazy/<repo_name>.
+
+config()
+- When “config(plugin, opts)” is called, it should call require(“<repo>”), which will look for <repo> inside all <runtimepath>/lua directories.
+- All plugin repos are previously added to runtimepath, i.e. Config.options.root/<plugin.name>, e.g. vim.fn.stdpath("data") .. "/lazy”/<repo_name>, e.g. $HOME/.local/share/nvim/lazy/<repo_name>.
+- Thus, require(“foo”) will look for “foo/init.lua” or “foo.lua” inside `$HOME/.local/share/nvim/lazy/<repo>/lua`.
+
+
+==============================
+Notes
+==============================
+- Installing an option, means to clone repo to Config.options.root/<repo> directory, e.g. $HOME/.local/share/nvim/lazy/<repo>.
+- There is no concept of plugin being run.
+- Instead, plugin specs are sourced, i.e. prlugin spec files are run, so that they can be added to Config.plugins (in special fragment form, but with full spec as parent, see below).
+- Then, the plugin spec’s config(options, opts) is called, which calls `require(“<name>”).setup({ options })`.
+- Loading an option, i.e. running it, means to call:  `require(“<name>”).setup({ options })`.
+
+==============================
+STEPS
+==============================
+Loader.setup() - Install plugins, including those from import’s.
+- Plugin.load()
+  - Sets Config.plugins to table containing tables with fields like plugin name, url (full GitHub url), dependency names, etc.
+  - Plugin.load() > parse > normalize ensures Config.spec.meta.plugins are set to all listed plugins from Config.options, i.e. user config, including those from import field.
+  - For { import=“plugins” } first “<runtimepath>/lua/plugin” folder in runtimepath is used as root, and all .lua files at any level within is loaded.
+    - At this point only our user config plugins folder is discoverable via runtimepath, non-of the lazy.nvim plugin.dir’s have been added to runtimepath yet, thus it re-runs Plugin.load() after all plugins have been installed (see install below).
+    - As result, every module inside <runtimepath>/lua/<importedFolder> will be added to Config.plugins, and thus installed in the next step, after Plugin.load(), in Loader.setup().
+  - Plugin being loaded, means to add resolved spec details to Config.plugins.
+  - Plugin.load() assigns Config.spec.meta.plugins to Config.plugins.
+  - In parse | resolve > rebuild > _rebuild, Config.spec.meta.plugin’s metatable key __index is set to metavalue super, which equals fragment.spec, which contains entire spec.
+     - Thus, each lookup in plugin that cannot be found, will be looked up in full spec.
+     - For instance, plugin.keys and plugin.events.
+  - Important: rebuild also sets plugin.dir to Config.options.root/<plugin.name>, which is where plugin is installed and the path that later (Loader.startup) is added to runtimepath.
+- Installing
+  - Happens in Loader.setup, after Plugin.load().
+  - First, Config.plugin.dir is set to Config.options.root/<plugin.name>, e.g. vim.fn.stdpath("data") .. "/lazy”/<repo_name>, e.g. $HOME/.local/share/nvim/lazy/<repo_name>.
+  - git clone is run from manage > task > git.lua, where it uses plugin.dir as install directory.
+  - After installing plugins, re-run Plugin.load(), so any import’s in specs of installed plugins are added to Config.plugins.
+
+Loader.startup()
+- Run Config.plugins[name].init(), for all plugins, passing in entire plugin, so it can access e.g. entire spec from its parent (entire spec table is metavalue of __index metatable key of the metatable for Config.plugins).
+  - plugins.url: Fully resolved url to github
+  - plugins.dir: Full install path of plugin on local disk, based on Config.options.root (not yet added to runtimepath, that happens next).
+  - plugins.name: Name of github repo, i.e. <repo> in <user>/<repo>.
+- Source each “start” plugin, i.e. plugins which do not have Config.plugins[name].lazy set to true.
+  1. Add each plugin.dir to runtimepath, e.g. `$HOME/.local/share/nvim/lazy/<repo_name>`.
+  2. For every plugin, call vim cmd “source <plugin.dir>/plugin” on every module inside that “plugin” (note it is singular) directory.
+      - Result: All plugins will need to place modules inside /plugin” to ensure they are sourced automatically by lazy.nvim.
+      - LazyVim does not have `/plugin` directory, only `/lua/plugins` used via `{ import=“lazyvim.plugins” }`.
+  3. Do the same for after/plugin: “source <plugin.dir>/after/plugin”.
+     - 2 and 3 just executes the files, it does not call their setup functions inside <repo>/lua/<name>/init.lua.
+     - As such, only handles some global setup done by modules inside plugin’s /plugins folder.
+  4. Run Config.plugins[name].config(plugin, opts) for all plugins, including those from { import=“<name>” }, i.e. those in `<runtimepath>/lua/<name>`, starting with dependencies.
+     - When “config(plugin, opts)” is called, it calls require(“<repo>”).setup({ options }), which will look for <repo> inside all <runtimepath>/lua directories.
+     - All plugin repos are previously added to runtimepath, i.e. Config.options.root/<plugin.name>, e.g. vim.fn.stdpath("data") .. "/lazy”/<repo_name>, e.g. $HOME/.local/share/nvim/lazy/<repo_name>.
+     - Thus, require(“<name>”) will look for “<name>/init.lua” or “<name>.lua” inside `$HOME/.local/share/nvim/lazy/<repo>/lua`, i.e. `$HOME/.local/share/nvim/lazy/<repo>/lua/<name>`.
+     - For simplicity, <name> is usually equal to <repo>.
+     - Result: Plugins must contain at top-level `/lua/<name>/init.lua, or /lua/<name>.lua`.
+     - config function has a default form, which calls require(<repo>).setup({ options }).
+     - Note regarding require(<name>): Searches in “<runtimepath>/lua” for <name>, i.e. plugin’s <repo> name, and since all plugins’ plugin.dir are added to runtimepath, each plugin must contain the folder “/lua/<repo>”, in order for `require(<name>)` to work.
+- Source plugins from original rtp
+  - For every runtimepath prior to adding plugins.dir, run “source <runtimepath>/plugin”.
+  - Thus, all modules inside `$HOME/.config/nvim/plugin` is sourced.
+- Source all modules inside <runtimepath>/after/plugin
+
+
+==============================
+Install Summary
+==============================
+For each plugin in spec, including those in directory from { import=“plugins” }, starting with their dependencies:
+1. Source each `.lua` module in plugin’s top-level ‘/plugin’ directory.
+2. Run plugin spec’s `config(plugin, opts)`, which calls `require(<name>).setup({ options })`, where `require(<name>)` resolves to plugin’s top-level `/lua/<name>.lua`OR `/lua/<name>/init.lua`.
+
+==============================
 
 Change linuxbrew vim.opt.rtp:appen in options.lua.
 Actually , install fzf-lua instead.
@@ -73,52 +154,7 @@ We need utils of our own, to register formatters, etc.
   - Create UIEnter autocommand, running stats
   - Create User autocommand, for pattern LazyDone, and User autocommand for pattern VeryLazy, which reloads nvim and checks for updates upon LazyDone > UIEnter.
 
-STEPS
-===============
-Loader.setup() - Install plugins, including those from import’s.
-- Plugin.load()
-  - Sets Config.plugins to table containing tables with fields like plugin name, url (full GitHub url), dependency names, etc.
-  - Plugin.load() > parse > normalize ensures Config.spec.meta.plugins are set to all listed plugins from Config.options, i.e. user config, including those from import field.
-  - For { import=“plugins” } first “<runtimepath>/lua/plugin” folder in runtimepath is used as root, and all .lua files at any level within is loaded.
-    - At this point only our user config plugins folder is discoverable via runtimepath, non-of the lazy.nvim plugin.dir’s have been added to runtimepath yet, thus it re-runs Plugin.load() after all plugins have been installed (see install below).
-    - As result, every module inside <runtimepath>/lua/<importedFolder> will be added to Config.plugins, and thus installed in the next step, after Plugin.load(), in Loader.setup().
-  - Plugin being loaded, means to add resolved spec details to Config.plugins.
-  - Plugin.load() assigns Config.spec.meta.plugins to Config.plugins.
-  - In parse | resolve > rebuild > _rebuild, Config.spec.meta.plugin’s metatable key __index is set to metavalue super, which equals fragment.spec, which contains entire spec.
-     - Thus, each lookup in plugin that cannot be found, will be looked up in full spec.
-     - For instance, plugin.keys and plugin.events.
-  - Important: rebuild also sets plugin.dir to Config.options.root/<plugin.name>, which is where plugin is installed and the path that later (Loader.startup) is added to runtimepath.
-- Installing
-  - Happens in Loader.setup, after Plugin.load().
-  - First, Config.plugin.dir is set to Config.options.root/<plugin.name>, e.g. vim.fn.stdpath("data") .. "/lazy”/<repo_name>, e.g. $HOME/.local/share/nvim/lazy/<repo_name>.
-  - git clone is run from manage > task > git.lua, where it uses plugin.dir as install directory.
-  - After installing plugins, re-run Plugin.load(), so any import’s in specs of installed plugins are added to Config.plugins.
 
-Loader.startup()
-- Run Config.plugins[name].init(), for all plugins, passing in entire plugin, so it can access e.g. entire spec from its parent (entire spec table is metavalue of __index metatable key of the metatable for Config.plugins).
-  - plugins.url: Fully resolved url to github
-  - plugins.dir: Full install path of plugin on local disk, based on Config.options.root (not yet added to runtimepath, that happens next).
-  - plugins.name: Name of github repo, i.e. <repo> in <user>/<repo>.
-- Source each “start” plugin, i.e. plugins which do not have Config.plugins[name].lazy set to true.
-  1. Add each plugin.dir to runtimepath, e.g. `$HOME/.local/share/nvim/lazy/<repo_name>`.
-  2. For every plugin, call vim cmd “source <plugin.dir>/plugin” on every module inside that “plugin” (note it is singular) directory.
-      - Result: All plugins will need to place modules inside /plugin” to ensure they are sourced automatically by lazy.nvim.
-  3. Do the same for after/plugin: “source <plugin.dir>/after/plugin”.
-     - 2 and 3 just executes the files, it does not call their setup functions inside <repo>/lua/<name>/init.lua.
-     - As such, only handles some global setup done by modules inside plugin’s /plugins folder.
-  4. Run Config.plugins[name].config, found on the parent object, i.e. the full plugin spec, passing in the full plugin table as the first parameter, and the opts from spec as the second.
-     - Note regarding require(<name>): Searches in “<runtimepath>/lua” for <name>, i.e. plugin’s <repo> name, and since all plugins’ plugin.dir are added to runtimepath, each plugin must contain the folder “/lua/<repo>”, in order for `require(<name>)` to work.
-- Source plugins from original rtp
-  - For every runtimepath prior to adding plugins.dir, run “source <runtimepath>/plugin”.
-  - Thus, all modules inside `$HOME/.config/nvim/plugin` is sourced.
-- Source all modules inside <runtimepath>/after/plugin
-
-  
-Run each non-lazy plugin’s config
-- Add each plugin.dir, e.g. vim.fn.stdpath("data") .. "/lazy”/<repo_name>, to runtimepath.
-- 
-
-===============
 
 Adding plugin to runtimepath
 - Happens in Loader.startup > load(plugin, ..) > _load > add_to_rtp(plugin), which loops through Config.plugins and adds plugins.dir.
@@ -196,7 +232,6 @@ Runs Config.spec:parse(specs), where specs is entire specs table from config.opt
 
 Config.spec.meta.fragments = N
 
-
 is_list: Table is list if it only contains values not key-value pairs: {  {…},  {…}, … } and { ‘foo’, ‘bar’, … }
 
 Require in nvim is set up, perhaps by setting lua’s package.path to <runtimepath>/lua/**/?.lua
@@ -234,3 +269,93 @@ meaning { import=“lazyvim.plugins” }  results in e.g. all modules in the fir
 topmod: lazynvim
 modname: plugins
 normname removes extensions .nvim .vim .lua, and digits.
+
+
+========================
+LazyVim
+========================
+---------------------------------------------
+LazyNvim starter sequence
+---------------------------------------------
+1. LazyVim starter's `require("lazy").setup(...)` adds plugins for:
+   - "LazyVim/LazyVim".
+   - `{ import="lazyvim.plugins" }`.
+   - `{ import="plugins" }`.
+2. Install LazyVim plugin and all plugins defined in other specs above, and their dependencies.
+   - Including specs added via `{ import=“lazyvim.plugins” }`,
+     i.e. specs in all moudles inside `<runtimepath>/lua/lazyvim/plugins/*`,
+     which it only finds in: `$HOME/.local/share/nvim/lazy/lazyvim/lua/lazyvim/plugins/*`,
+     and specs added via `{ import=“plugins” }`,
+     i.e. specs in all modules inside `<runtimepath>/lua/plugins/*`,
+     which it only finds in: `$HOME/.config/nvim/lua/plugins/*`.
+
+For each plugin:
+- Run init() function.
+- Defined in plugin spec.
+
+For each start plugin:
+(do below steps for plugin's dependencies, then for plugin itself)
+1. Add plugin directory to runtimepath.
+2. Source each `.lua` module in each plugin’s top-level `/plugin` and `/after/plugin` directories.
+   - lazyvim does not contain top-level `/plugin` or `/after/plugin` directory.
+   - Other plugin directories might.
+3. Run `config(plugin, opts)`,
+   which calls `require("<name>").setup( opts )`,
+   where `require("<name>") resolves to `<runtimepath>/lua/<name>/config/init.lua`,
+   meaning `<name>` should be unique across all plugin directories,
+   since they are all added to runtimepath,
+
+   - `require("lazyvim").setup( opts )`.
+     - `require("lazyvim")` resolves to `<runtimepath>/lua/lazyvim/config/init.lua`,
+       which it only finds in: `$HOME/.local/share/nvim/lazy/lazyvim/lua/lazyvim/config/init.lua`.
+     - Runs:
+       - `require(‘lazyvim.config.autocmd’)`
+       - `require(‘lazyvim.config.keymap’)`
+       - `require(‘lazyvim.config.options’)`
+     - These modules are found in `/lua` directory of lazyvim plugin directory,
+       which was added to runtimepath by lazy.nvim,
+       e.g. `$HOME/.local/share/nvim/lazy/lazyvim/lua/lazyvim/config/options`.
+     - `require("lazyvim").setup( opts )` then follows the same process for user's own config:  same for
+       - `require(‘config.autocmd’)`
+       - `require(‘config.keymap’)`
+       - `require(‘config.options’)`
+     - These modules are found in `/lua` directory of user's own config directory,
+       which is always in runtimepath,
+       e.g. `$HOME/.config/nvim/lua/config/options`.
+     - That way, user config for ‘options’, ‘autocmds’, and ‘keymaps’,
+       overwrite lazyvim’s files with same name.
+     - Note: Since we do not use LazyVim, skip their options.
+
+   - `{ import="lazyvim.plugins" }`
+     - Runs `config(plugin, opts)` for every plugin spec,
+       in all modules, at any level, within `$HOME/.local/share/nvim/lazy/lazynvim/lua/plugins`.
+     - Which calls `require("<name>").setup( opts )` for each plugin,
+       where `require("<name>")` resolves to
+       `<runtimepath>/lua/<name>.lua | /<name>/init.lua`,
+       where name should be unique across all plugin directories (added to runtimepath),
+       so it resolves to `$HOME/.local/share/nvim/lazy/<repo>/lua/<name>.lua | /<name>/init.lua`.
+
+   - `{ import="plugins" }`
+     - Runs `config(plugin, opts)` for every plugin spec,
+       in all modules, at any level, within `$HOME/.config/nvim/lua/plugins`.
+     - See steps above.
+
+VeryLazy
+- LazyDone fires after lazy.nvim’s setup is done, i.e. all plugins installed and config(plugin, opts) functions have run, i.e. after calling require(<repo>).setup({ … })
+- VeryLazy autcomd is called when LazyDone autocmd fires, earliest directly after UIEnter, i.e. when all windows and buffers have been created, and nvim startup sequence is done.
+- UIEnter fires after vim UI is ready, directly after VimEnter.
+- VimEnter fires after vim startup is done.
+- VeryLazy autocmd is defined in Util.very_lazy(), called at beginning of lazy.vim’s setup, i.e. at end of Config.setup().
+
+========================
+Looking up plugin modules
+========================
+cache find only finds module in <runtimepath>/lua/*, not in nested folders.
+When looking for plugin foo.bar, find looks for <runtimepath>/lua/bar, and not foo, because <runtimepath> includes the foo directory when foo is <repo>, i.e. plugin name.
+Thus, when running require(‘lazy.core.cache’).find(“foo.bar”), search is done for `<runtimepath>/lua/foo`, and if found, it tries to stat  `<runtimepath>/lua/foo/bar.lua | /bar/init.lua`, i.e. `$HOME/.local/share/nvim/lazy/foo/lua/foo/bar.lua | bar/init.lua`
+With find(“foo”), search is done in `<runtimepath>/lua/foo.lua | foo/init.lua` i.e. `$HOME/.local/share/nvim/lazy/foo/lua/foo.lua | foo/init.lua`.
+This is the same as what require would have done, but use lazy.nvim `find` first to avoid error when require module that does not exist.
+
+
+Problem: I need to load lazyvim > config > init.lua before I load my own plugins, but after lazy.nvim has bootstrapped.
+perhaps just require(config.init).setup(), or M.setup(), after bootstrap before requie(lazy).
