@@ -105,6 +105,14 @@
 source ~/.shrc
 
 # ================================================================
+# Ghostty shell integration for Bash.
+# Must be placed at top of bashrc.
+# ================================================================
+if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
+    builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/bash/ghostty.bash"
+fi
+
+# ================================================================
 # Load Bash-Specific Dotfiles.
 # ================================================================
 [ -r ~/.bash_prompt ] && [ -f ~/.bash_prompt ] && source ~/.bash_prompt

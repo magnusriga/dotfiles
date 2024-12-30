@@ -70,14 +70,13 @@ sudo apt-get install -y \
   libssl-dev \
   fd-find \
   sysstat \
-  python-dev python-pip python3-dev \
-  python3 \
-  python3-pip \
+  python3 python3-dev python3-pip \
   ffmpeg \
   imagemagick \
   glow \
   lua5.4 liblua5.4-dev \
   ninja-build gettext \
+  libgtk-4-dev libadwaita-1-dev \
   libjpeg-dev libpng-dev zlib1g libavcodec-dev libavformat-dev libavfilter-dev \
   libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb \
   libxcb-shape0-dev libxcb-xfixes0-dev libxcb1-dev \

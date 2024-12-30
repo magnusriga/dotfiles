@@ -73,6 +73,7 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf $STOWDIR/$PACKAGE 
 rm /usr/local/bin/stow /usr/local/bin/chkstow 
 mkdir -p "$STOWDIR/$PACKAGE"
+cpan install CPAN
 cpan install Test::Output
 cpan install Test::More
 git clone https://github.com/aspiers/stow.git $TMPDIR/$PACKAGE
@@ -213,4 +214,19 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 cd $CURRENTDIR
 sudo luarocks install luasocket
 lua require "socket"
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+
+
+# Install ghostty from source.
+PACKAGE=ghostty
+sudo rm -rf "$TMPDIR/$PACKAGE" 
+sudo rm -rf "$STOWDIR/$PACKAGE" 
+sudo rm -rf "$HOME/.config/$PACKAGE" 
+mkdir "$TMPDIR/$PACKAGE"
+mkdir "$STOWDIR/$PACKAGE"
+mkdir "$HOME/.config/$PACKAGE"
+git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
+cd "$TMPDIR/$PACKAGE"
+zig build -p $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
+cd $CURRENTDIR
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
