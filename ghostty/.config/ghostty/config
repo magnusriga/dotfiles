@@ -72,9 +72,11 @@
 # font-family = "Monaspace Neon Regular"
 # font-size = 16
 
+font-family="Symbols Nerd Font Mono"
 font-family="JetBrainsMono Nerd Font"
 font-feature = +liga
-font-size = 10
+# font-size = 10
+font-size = 14
 
 adjust-underline-position = 4
 # Wezterm had underline position -2 and thickness 2.
@@ -92,52 +94,294 @@ theme = OneHalfDark
 
 # bold-is-bright = true
 
-# cursor-style = block
-# cursor-color = #FFA500
+# shell-integration is set to avoid automatically
+# turning cursor to bar,
+# thus `cursor-style`, `cursor-color`,
+# and `cursor-invert-fg-bg` applies.
+cursor-style = block
+cursor-style-blink = false
+cursor-color = #FFA500
 cursor-invert-fg-bg = true
 
-# background = 1c2021
+# `1c2021`, i.e. black-grey, goes well with opacity.
+background = 1c2021
 background-opacity = 0.9
 
+# The style of the macOS titlebar. Available values are: "native",
+# "transparent", "tabs", and "hidden".
+#
+# The "native" style uses the native macOS titlebar with zero customization.
+# The titlebar will match your window theme (see `window-theme`).
+#
+# The "transparent" style is the same as "native" but the titlebar will
+# be transparent and allow your window background color to come through.
+# This makes a more seamless window appearance but looks a little less
+# typical for a macOS application and may not work well with all themes.
+#
+# The "transparent" style will also update in real-time to dynamic
+# changes to the window background color, i.e. via OSC 11. To make this
+# more aesthetically pleasing, this only happens if the terminal is
+# a window, tab, or split that borders the top of the window. This
+# avoids a disjointed appearance where the titlebar color changes
+# but all the topmost terminals don't match.
+#
+# The "tabs" style is a completely custom titlebar that integrates the
+# tab bar into the titlebar. This titlebar always matches the background
+# color of the terminal. There are some limitations to this style:
+# On macOS 13 and below, saved window state will not restore tabs correctly.
+# macOS 14 does not have this issue and any other macOS version has not
+# been tested.
+#
+# The "hidden" style hides the titlebar. Unlike `window-decoration = false`,
+# however, it does not remove the frame from the window or cause it to have
+# squared corners. Changing to or from this option at run-time may affect
+# existing windows in buggy ways. The top titlebar area of the window will
+# continue to drag the window around and you will not be able to use
+# the mouse for terminal events in this space.
+#
+# The default value is "transparent". This is an opinionated choice
+# but its one I think is the most aesthetically pleasing and works in
+# most cases.
+#
+# Changing this option at runtime only applies to new windows.
+# Defualt: macos-titlebar-style = transparent
 # macos-titlebar-style = hidden
 
 # -------------------------
 # Window
 # -------------------------
+# If `true`, the Ghostty GTK application will run in single-instance mode:
+# each new `ghostty` process launched will result in a new window if there is
+# already a running process.
+#
+# If `false`, each new ghostty process will launch a separate application.
+#
+# The default value is `desktop` which will default to `true` if Ghostty
+# detects that it was launched from the `.desktop` file such as an app
+# launcher (like Gnome Shell)  or by D-Bus activation. If Ghostty is launched
+# from the command line, it will default to `false`.
+#
+# Note that debug builds of Ghostty have a separate single-instance ID
+# so you can test single instance without conflicting with release builds.
+# Default: gtk-single-instance = desktop
 gtk-single-instance = true
-gtk-tabs-location = bottom
-gtk-wide-tabs = false
 
-window-decoration = false
+# If `true` (default), then the Ghostty GTK tabs will be "wide." Wide tabs
+# are the new typical Gnome style where tabs fill their available space.
+# If you set this to `false` then tabs will only take up space they need,
+# which is the old style.
+# Default: gtk-wide-tabs = true
 
-window-theme = auto
-# window-theme = ghostty
+# Determines the side of the screen that the GTK tab bar will stick to.
+# Top, bottom, left, right, and hidden are supported. The default is top.
+#
+# If this option has value `left` or `right` when using Adwaita, it falls
+# back to `top`. `hidden`, meaning that tabs don't exist, is not supported
+# without using Adwaita, falling back to `top`.
+#
+# When `hidden` is set and Adwaita is enabled, a tab button displaying the
+# number of tabs will appear in the title bar. It has the ability to open a
+# tab overview for displaying tabs. Alternatively, you can use the
+# `toggle_tab_overview` action in a keybind if your window doesn't have a
+# title bar, or you can switch tabs with keybinds.
+# Default: gtk-tabs-location = top
+# gtk-tabs-location = bottom
 
-# window-padding-color = background
-# window-padding-x = 0
-# window-padding-y = 0
-# window-padding-balance = false
+# Show/hide frame, including titlebar.
+# Unlinke `macos-titlebar-style = hidden`, removes frame from window
+# and causes it to have squared corners.
+# Thus, prefer `macos-titlebar-style = hidden`, or keeping frame and titlebar.
+# Default: true
+# window-decoration = false
 
-# window-colorspace = "display-p3"
+# Theme to use for the windows. Valid values:
+#   * `auto` - Determine the theme based on the configured terminal
+#      background color. This has no effect if the "theme" configuration
+#      has separate light and dark themes. In that case, the behavior
+#      of "auto" is equivalent to "system".
+#   * `system` - Use the system theme.
+#   * `light` - Use the light theme regardless of system theme.
+#   * `dark` - Use the dark theme regardless of system theme.
+#   * `ghostty` - Use the background and foreground colors specified in the
+#     Ghostty configuration. This is only supported on Linux builds with
+#     Adwaita and `gtk-adwaita` enabled.
+#
+# On macOS, if `macos-titlebar-style` is "tabs", the window theme will be
+# automatically set based on the luminosity of the terminal background color.
+# This only applies to terminal windows. This setting will still apply to
+# non-terminal windows within Ghostty.
+#
+# Default: auto
+# window-theme = auto
 
+# The color of the padding area of the window. Valid values are:
+#
+# * `background` - The background color specified in `background`.
+# * `extend` - Extend the background color of the nearest grid cell.
+# * `extend-always` - Same as "extend" but always extends without applying
+#   any of the heuristics that disable extending noted below.
+#
+# The "extend" value will be disabled in certain scenarios. On primary
+# screen applications (i.e. not something like Neovim), the color will not
+# be extended vertically if any of the following are true:
+#
+# * The nearest row has any cells that have the default background color.
+#   The thinking is that in this case, the default background color looks
+#   fine as a padding color.
+# * The nearest row is a prompt row (requires shell integration). The
+#   thinking here is that prompts often contain powerline glyphs that
+#   do not look good extended.
+# * The nearest row contains a perfect fit powerline character. These
+#   don't look good extended.
+#
+# Default: window-padding-color = background
+
+# The colorspace to use for the terminal window. The default is `srgb` but
+# this can also be set to `display-p3` to use the Display P3 colorspace.
+#
+# Changing this value at runtime will only affect new windows.
+#
+# This setting is only supported on macOS.
+# Default: window-colorspace = srgb
+window-colorspace = "display-p3"
+
+# All of the configurations behavior adjust various metrics determined by the
+# font. The values can be integers (1, -1, etc.) or a percentage (20%, -15%,
+# etc.). In each case, the values represent the amount to change the original
+# value.
+#
+# For example, a value of `1` increases the value by 1; it does not set it to
+# literally 1. A value of `20%` increases the value by 20%. And so on.
+#
+# There is little to no validation on these values so the wrong values (i.e.
+# `-100%`) can cause the terminal to be unusable. Use with caution and reason.
+#
+# Some values are clamped to minimum or maximum values. This can make it
+# appear that certain values are ignored. For example, many `*-thickness`
+# adjustments cannot go below 1px.
+#
+# `adjust-cell-height` has some additional behaviors to describe:
+#
+#   * The font will be centered vertically in the cell.
+#
+#   * The cursor will remain the same size as the font, but may be
+#     adjusted separately with `adjust-cursor-height`.
+#
+#   * Powerline glyphs will be adjusted along with the cell height so
+#     that things like status lines continue to look aligned.
+# Default: adjust-cell-width =
+# Default: adjust-cell-height =
 # adjust-cell-height = 10%
 
-window-padding-y = 2,0
+# Horizontal window padding. This applies padding between the terminal cells
+# and the left and right window borders. The value is in points, meaning that
+# it will be scaled appropriately for screen DPI.
+#
+# If this value is set too large, the screen will render nothing, because the
+# grid will be completely squished by the padding. It is up to you as the user
+# to pick a reasonable value. If you pick an unreasonable value, a warning
+# will appear in the logs.
+#
+# Changing this configuration at runtime will only affect new terminals, i.e.
+# new windows, tabs, etc.
+#
+# To set a different left and right padding, specify two numerical values
+# separated by a comma. For example, `window-padding-x = 2,4` will set the
+# left padding to 2 and the right padding to 4. If you want to set both
+# paddings to the same value, you can use a single value. For example,
+# Default: `window-padding-x = 2` will set both paddings to 2.
+# window-padding-x = 2
+
+# Vertical window padding. This applies padding between the terminal cells and
+# the top and bottom window borders. The value is in points, meaning that it
+# will be scaled appropriately for screen DPI.
+#
+# If this value is set too large, the screen will render nothing, because the
+# grid will be completely squished by the padding. It is up to you as the user
+# to pick a reasonable value. If you pick an unreasonable value, a warning
+# will appear in the logs.
+#
+# Changing this configuration at runtime will only affect new terminals,
+# i.e. new windows, tabs, etc.
+#
+# To set a different top and bottom padding, specify two numerical values
+# separated by a comma. For example, `window-padding-y = 2,4` will set the
+# top padding to 2 and the bottom padding to 4. If you want to set both
+# paddings to the same value, you can use a single value. For example,
+# Default: `window-padding-y = 2` will set both paddings to 2.
+# window-padding-y = 2,0
+
+# The viewport dimensions are usually not perfectly divisible by the cell
+# size. In this case, some extra padding on the end of a column and the bottom
+# of the final row may exist. If this is `true`, then this extra padding
+# is automatically balanced between all four edges to minimize imbalance on
+# one side. If this is `false`, the top left grid cell will always hug the
+# edge with zero padding other than what may be specified with the other
+# `window-padding` options.
+#
+# If other `window-padding` fields are set and this is `true`, this will still
+# apply. The other padding is applied first and may affect how many grid cells
+# actually exist, and this is applied last in order to balance the padding
+# given a certain viewport size and grid cell size.
+# Default: window-padding-balance = false
 window-padding-balance = true
 
 # -------------------------
 # Clipboard
 # -------------------------
+# Whether to allow programs running in the terminal to read/write to the
+# system clipboard (OSC 52, for googling). The default is to allow clipboard
+# reading after prompting the user and allow writing unconditionally.
+#
+# Valid values are:
+#
+#   * `ask`
+#   * `allow`
+#   * `deny`
+# 
+# Default: read = ask, write = allow
 clipboard-read = allow
 clipboard-write = allow
-clipboard-trim-trailing-spaces = true
+
+# Trims trailing whitespace on data that is copied to the clipboard. This does
+# not affect data sent to the clipboard via `clipboard-write`.
+# Default: clipboard-trim-trailing-spaces = true
+
+# Whether to automatically copy selected text to the clipboard. `true`
+# will prefer to copy to the selection clipboard if supported by the
+# OS, otherwise it will copy to the system clipboard.
+#
+# The value `clipboard` will always copy text to the selection clipboard
+# (for supported systems) as well as the system clipboard. This is sometimes
+# a preferred behavior on Linux.
+#
+# Middle-click paste will always use the selection clipboard on Linux
+# and the system clipboard on macOS. Middle-click paste is always enabled
+# even if this is `false`.
+#
+# The default value is true on Linux and false on macOS. macOS copy on
+# select behavior is not typical for applications so it is disabled by
+# default. On Linux, this is a standard behavior so it is enabled by default.
+copy-on-select = clipboard
+
+# -------------------------
+# shell-integration
+# -------------------------
+# Shell integration features to enable if shell-integration
+# itself is enabled.
+# no-cursor : Prevent shell-integration from automatically setting
+#             cursor to (blinking) bar, i.e. use block instead,
+#             which is useful when using shell in vim mode.
+# sudo      : Set sudo wrapper to preserve terminfo.
+# title     : Set window title via shell integration.
+# Default: cursor,no-sudo,title
+# shell-integration-features = cursor,sudo,no-title
+# shell-integration-features = no-cursor,sudo
+shell-integration-features = no-cursor,sudo,title
 
 # -------------------------
 # Other
 # -------------------------
-copy-on-select = clipboard
-shell-integration-features = cursor,sudo,no-title
-# shell-integration-features = no-cursor,sudo
 
 # -------------------------
 # Keybindings
@@ -145,20 +389,20 @@ shell-integration-features = cursor,sudo,no-title
 # Splits
 # keybind = cmd+s>\=new_split:right
 # keybind = cmd+s>-=new_split:down
-# 
-# keybind = cmd+s>j=goto_split:bottom
-# keybind = cmd+s>k=goto_split:top
-# keybind = cmd+s>h=goto_split:left
-# keybind = cmd+s>l=goto_split:right
-# 
+ 
+keybind = cmd+s>j=goto_split:bottom
+keybind = cmd+s>k=goto_split:top
+keybind = cmd+s>h=goto_split:left
+keybind = cmd+s>l=goto_split:right
+ 
 # keybind = cmd+s>z=toggle_split_zoom
 # keybind = cmd+s>e=equalize_splits
 
-keybind = clear
-keybind = ctrl+h=goto_split:left
-keybind = ctrl+j=goto_split:bottom
-keybind = ctrl+k=goto_split:top
-keybind = ctrl+l=goto_split:right
+#keybind = clear
+# keybind = ctrl+h=goto_split:left
+# keybind = ctrl+j=goto_split:bottom
+# keybind = ctrl+k=goto_split:top
+# keybind = ctrl+l=goto_split:right
 
 # Tabs
 # keybind = super+shift+t=new_tab
