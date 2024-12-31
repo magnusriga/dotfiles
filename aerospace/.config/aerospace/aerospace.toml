@@ -64,24 +64,28 @@ outer.top =        0
 outer.right =      0
 
 [[on-window-detected]]
-if.app-id = 'com.github.wez.wezterm'
-run = 'move-node-to-workspace 1' # Instead of: Mnemonics T - Terminal
+if.app-id = 'com.mitchellh.ghostty'
+run= [ "layout tiling" ]
 
-[[on-window-detected]]
-if.app-id = 'com.google.Chrome'
-run = 'move-node-to-workspace 2' # Instead of: Mnemonics W - Web browser
+# [[on-window-detected]]
+# if.app-id = 'com.github.wez.wezterm'
+# run = 'move-node-to-workspace 1' # Instead of: Mnemonics T - Terminal
 
-[[on-window-detected]]
-if.app-id = 'company.thebrowser.Browser'
-run = 'move-node-to-workspace 2' # Instead of: Mnemonics W - Web browser
+# [[on-window-detected]]
+# if.app-id = 'com.google.Chrome'
+# run = 'move-node-to-workspace 2' # Instead of: Mnemonics W - Web browser
 
-[[on-window-detected]]
-if.app-id = 'com.apple.finder'
-run = 'move-node-to-workspace F' # Mnemonics F - Finder
+# [[on-window-detected]]
+# if.app-id = 'company.thebrowser.Browser'
+# run = 'move-node-to-workspace 2' # Instead of: Mnemonics W - Web browser
 
 [[on-window-detected]]
 if.app-id = 'com.spotify.client'
 run = 'move-node-to-workspace M' # Mnemonics M - Music
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'move-node-to-workspace F' # Mnemonics F - Finder
 
 # 'main' binding mode declaration
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes

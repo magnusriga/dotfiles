@@ -68,15 +68,14 @@
 # font-family-bold = "Fira Code"
 # font-family-italic = "Maple Mono"
 # font-family-bold-italic = "Maple Mono"
-#
 # font-family = "Monaspace Neon Regular"
-# font-size = 16
 
 font-family="Symbols Nerd Font Mono"
 font-family="JetBrainsMono Nerd Font"
 font-feature = +liga
 # font-size = 10
-font-size = 14
+# Default: font-size = 13
+# font-size = 14
 
 # Distance in pixels from the top of the cell to the top of the underline.
 # Increase to move underline DOWN, decrease to move underline UP.
