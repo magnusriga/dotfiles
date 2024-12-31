@@ -78,8 +78,16 @@ font-feature = +liga
 # font-size = 10
 font-size = 14
 
+# Distance in pixels from the top of the cell to the top of the underline.
+# Increase to move underline DOWN, decrease to move underline UP.
+# Wezterm had underline position -2.
+# Default: adjust-underline-position =
 adjust-underline-position = 4
-# Wezterm had underline position -2 and thickness 2.
+
+# Thickness in pixels of the underline.
+# Wezterm had thickness 2.
+# Default: adjust-underline-thickness =
+adjust-underline-thickness = 2
 
 # -------------------------
 # Theme and Colors
@@ -92,7 +100,9 @@ adjust-underline-position = 4
 # theme = dark:catppuccin-mocha,light:catppuccin-latte
 theme = OneHalfDark
 
-# bold-is-bright = true
+# If `true`, the bold text will use the bright color palette.
+# Default: bold-is-bright = false
+bold-is-bright = true
 
 # shell-integration is set to avoid automatically
 # turning cursor to bar,
@@ -387,22 +397,16 @@ shell-integration-features = no-cursor,sudo,title
 # Keybindings
 # -------------------------
 # Splits
-# keybind = cmd+s>\=new_split:right
-# keybind = cmd+s>-=new_split:down
+keybind = cmd+s>\=new_split:right
+keybind = cmd+s>-=new_split:down
  
 keybind = cmd+s>j=goto_split:bottom
 keybind = cmd+s>k=goto_split:top
 keybind = cmd+s>h=goto_split:left
 keybind = cmd+s>l=goto_split:right
  
-# keybind = cmd+s>z=toggle_split_zoom
-# keybind = cmd+s>e=equalize_splits
-
-#keybind = clear
-# keybind = ctrl+h=goto_split:left
-# keybind = ctrl+j=goto_split:bottom
-# keybind = ctrl+k=goto_split:top
-# keybind = ctrl+l=goto_split:right
+keybind = cmd+s>z=toggle_split_zoom
+keybind = cmd+s>e=equalize_splits
 
 # Tabs
 # keybind = super+shift+t=new_tab
