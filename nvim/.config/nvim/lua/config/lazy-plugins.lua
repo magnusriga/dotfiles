@@ -15,6 +15,38 @@ Plugin install location
   where `<repo>` is the name of the GitHub repository: <user>/<repo>.
 
 ---------------------------------------------
+Execution order 
+---------------------------------------------
+- lazy.nvim first collects all spec tables, for each plugin,
+  including each table inside `spec` field of lazy.nvim configuration table,
+  and each table returned from top-level modules inside directories specified
+  in imports: `{ import = "<directory>" }`.
+- After all spec tables have been added to `Config.plugins`,
+  lazy.nvim proceeds to install, e.g. clone, each plugin.
+- Finally, for every plugin in `Config.plugins` table,
+  lazy.nvim executes either user-defined `Config.plugins[name].config(plugins, opts)`,
+  or if that is not defined then it executes `require("<name>").setup(opts)`,
+  where `<name>` is either `spec.name`, which is needed for local plugins,
+  i.e. when source is defined with `dir` instead of spec[1] or `url`,
+  or name of GitHub repository, e.g. `<repo>` in `<user>/<repo>` within spec[1].
+
+---------------------------------------------
+Priorities
+---------------------------------------------
+- When lazy.nvim loads plugins,
+  i.e. executes either user-defined `Config.plugins[name].config(plugins, opts)`,
+  or if it does not exist then `require("<name>").setup(opts)`,
+  lazy.nvim prioritizes the "start" plugins by `spec.priority` field.
+- Default priority is `50`.
+- When priority is not set, i.e. `priority` is 50,
+  then lazy.nvim loads plugins by order of which they appear in spec.
+- Thus, imported specs, i.e. `{ import = <directory> }` can be prioritied,
+  by ordering those specs inside the lazy.nvim configuration's `spec` field.
+- See: `plugins/priorities`, which adds all modules inside `plugins/ordered`
+  to lazy.nvim configuration's `spec` field in specific order,
+  thus ensures some plugins are loaded before others.
+
+---------------------------------------------
 Adding each plugin directory to runtimepath
 ---------------------------------------------
 - After installing plugins, e.g. cloning the GitHub repo into `plugin.dir`,
@@ -26,15 +58,34 @@ Adding each plugin directory to runtimepath
   so ensure `<repo>` is a unique directory or module name across all plugin directories' `/lua` folders.
 
 ---------------------------------------------
-Sourcing imported plugin specs
+`{ import = <directory> }`
 ---------------------------------------------
-- After adding plugin directories to runtimepath,
-  lazy.nvim sources all plugin specifications defined in plugin directory's 'plugin' directory.
-- nvim would have done the same during its standard initialization,
-  since plugin directories are added to runtimepath,
-  but lazy.nvim turns off that initialization step and handles it faster.
-- The above is then also done for all plugin specifications defined in plugin directory's
-  'after/plugin' directory.
+- As noted above, lazy.nvim adds all plugins specs to `Config.plugins` before installing and loading them,
+  i.e. before cloning GitHub repo and executing either user-defined
+  `Config.plugins[name].config(plugins, opts)`, or `require("<name>").setup(opts)`.
+- When adding specs to `Config.plugins`, lazy.nvim adds all specs defined in `spec` field of
+  configuration passed to `require("lazy").setup(<configuration>)`,\
+  within which import specs, such as `{ import = <directory> }`, may occur.
+- For each such import spec, lazy.nvim will immediately executes all top-level modules
+  inside imported `<directory>`, i.e. those defined in `lua/<directory>`,
+  to get spec table each of these modules return.
+- Thus, error when imported module does not return table.
+- Since these modules are executed before installing and loading modules,
+  i.e. before cloning GitHub repo and executing either user-defined
+  `Config.plugins[name].config(plugins, opts)`, or `require("<name>").setup(opts)`,
+  then any direct code inside these modules, will be executed before plugins are installed and loaded.
+
+- Only top-level modules inside import-directory are executed,
+  e.g. only modules dirctly within `lua/plugins`.
+- Imported modules are executed in alphabetical order,
+  i.e. `init.lua` does not get executed first.
+
+- Execution happens in lazy.nvim > plugin.lua: `normalize > import`.
+
+- Thus, place code inside `lua/plugins/init.lua` (name `init.lua` is arbitrary here),
+  before returning spec table, in order to execute that code prior to installing and loading plugins.
+
+- Example: `lazyvim/lua/plugins/init.lua`.
 
 ---------------------------------------------
 Calling `config(plugin, opts)`

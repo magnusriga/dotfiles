@@ -177,11 +177,34 @@ vim.g.maplocalleader = ' '
 -- Nerd Font installed and selected in the terminal.
 vim.g.have_nerd_font = true
 
+
+-- =========================================================================================================
+-- Neovim Setup.
+-- =========================================================================================================
+
 ---------------------------------------------
--- Bootstrap lazy.nvim, plugins, and other modules, in
--- $HOME/.config/nvim/config/init.lua.
+-- Bootstrap lazy.nvim plugin manager. 
+-- 1. Clone repo `lazy.nvim.git` into `lazypath` directory: `$HOME/.local/share/nvim/lazy/lazy.nvim`.
+-- 2. Add `lazypath` to runtimepath, so `require("lazy")` resolves to: `<lazypath>/lua/lazy`.
 ---------------------------------------------
-require("config") 
+require('config.lazy-bootstrap')
+
+---------------------------------------------
+-- Initialization.
+-- Create autocommands to register keybindings
+-- and additional autocommands, which will run
+-- after lazy.nvim is done installing plugins
+-- and running plugins' main `setup()`,
+-- i.e. at VeryLazy event.
+---------------------------------------------
+require('config').setup()
+
+---------------------------------------------
+-- Load all plugins, including those imported
+-- from `lua/plugins` directory.
+-- VeryLazy event is called when done.
+---------------------------------------------
+require('config.lazy-plugins')
 
 ---------------------------------------------
 -- Modeline: `:h modeline`.

@@ -111,9 +111,9 @@ run = 'move-node-to-workspace F' # Mnemonics F - Finder
 # See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
 # You can uncomment the following lines to open up terminal with alt + enter shortcut (like in i3)
 alt-enter = '''exec-and-forget osascript -e '
-tell application "WezTerm"
+tell application "Ghostty"
     activate
-    do shell script "/Applications/WezTerm.app/Contents/MacOS/wezterm-gui"
+    do shell script "/Applications/Ghostty.app/Contents/MacOS/ghostty"
 end tell'
 '''
 
