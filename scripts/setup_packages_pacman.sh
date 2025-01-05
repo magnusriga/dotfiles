@@ -90,34 +90,31 @@ sudo pacman -Syup --noconfirm \
   gnupg \
   lsb-release \
   zsh zsh-completions zsh-doc \
-  iputils-ping \
+  iputils \
   jless \
   vim \
   neovim \
   tmux \
   file \
-  ssh \
+  openssh \
   iproute2 \
   rsync \
-  cron \
-  gpg \
+  cronie \
   bat \
   tree \
-  gh \
-  yazi ffmpeg p7zip jq poppler fd ripgrep fzf zoxide imagemagick \
-  build-essential \
-  libssl-dev \
-  sysstat \
-  python3 python3-dev python3-pip \
-  python-pipx \
   glow \
-  lua5.4 liblua5.4-dev \
-  ninja-build gettext \
-  libgtk-4-dev libadwaita-1-dev \
-  libjpeg-dev libpng-dev zlib1g libavcodec-dev libavformat-dev libavfilter-dev \
-  libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libnss3 libxss1 libxtst6 xauth xvfb \
-  libxcb-shape0-dev libxcb-xfixes0-dev libxcb1-dev \
-  libevent-dev ncurses-dev bison pkg-config
+  github-cli \
+  yazi ffmpeg p7zip jq poppler fd ripgrep fzf zoxide imagemagick \
+  sysstat \
+  python python-pip python-pipx \
+  lua \
+  ninja gettext \
+  gtk4 libadwaita \
+  libjpeg-turbo libpng zlib \
+  mesa libnss_nis libxss libxtst \
+  xorg-xauth xorg-server-xvfb \
+  libxcb \
+  libevent ncurses bison pkgconf
 
 # ==========================================================
 # Clean cache for unused packages and sync databases

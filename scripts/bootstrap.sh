@@ -18,7 +18,7 @@ function doIt() {
 
   # Run install scripts.
   echo 'Sourcing setup_entry.sh...'
-  sudo ./setup_entry.sh
+  source ./setup_entry.sh
 
   # .[.]profile runs .profile, but not .[.]sh_rc,
   # since this will not be an interactive shell.
