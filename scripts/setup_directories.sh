@@ -87,6 +87,25 @@ if [ ! -d "$VIM_SESSIONS" ]; then
   mkdir -p "$VIM_SESSIONS"
 fi
 
+export GNUPGHOME="${GNUPGHOME:-$HOME/.gnupg}"
+if [ ! -d "$GNUPGHOME" ]; then
+  mkdir -p "$GNUPGHOME"
+fi
+
+export BUILD_HOME="${BUILD_HOME=:-$HOME/build}"
+if [ ! -d "$BUILD_HOME" ]; then
+  mkdir -p "$BUILD_HOME/repositories"
+  mkdir -p "$BUILD_HOME/packages"
+  mkdir -p "$BUILD_HOME/sources"
+fi
+
+# For `makepkg` configuration: `$HOME/.config/pacman/makepkg.conf`.
+# Pacman configuration must be placed separately in: `/etc/pacman.conf`.
+export PACMAN_HOME="${PACMAN_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}/pacman}"
+if [ ! -d "$PACMAN_HOME" ]; then
+  mkdir -p "$PACMAN_HOME"
+fi
+
 # For trash-cli completion.
 sudo mkdir -p "/usr/share/zsh/site-functions/"
 sudo chown $(id -u $USERNAME):$(id -g $USERNAME) "/usr/share/zsh/site-functions/"

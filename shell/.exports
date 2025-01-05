@@ -42,6 +42,20 @@ export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
 export XDG_CONFIG_HOME="$HOME/.config"
 
 # ================================================================
+# Directory for build files, i.e. files from `makepkg`.
+# Downloaded repositories (manual, containing e.g. `PKGBUILD`): `$HOME/build/repositories`.
+# Downloaded source files (automatic by `makepkg`)            : `$HOME/build/sources`.
+# Resulting built packages (automatic by `makepkg`)           : `$HOME/build/packages`.
+# ================================================================
+export BUILD_HOME="$HOME/build"
+
+# ================================================================
+# `makepkg` configuration: `$HOME/.config/pacman/makepkg.conf`.
+# Pacman configuration must be placed separately in: `/etc/pacman.conf`.
+# ================================================================
+export PACMAN_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/pacman"
+
+# ================================================================
 # Make Google Chrome Default Browser
 # ================================================================
 export BROWSER=google-chrome
@@ -94,6 +108,12 @@ export LESS_TERMCAP_md="${yellow}";
 # Don’t clear the screen after quitting a manual page.
 # ================================================================
 export MANPAGER='less -X';
+
+# ================================================================
+# Set GnuPG home directory, where GnuPG suite stores its keyrings
+# and private keys, and reads configurations from.
+# ================================================================
+export GNUPGHOME="$HOME/.gnupg";
 
 # ================================================================
 # Avoid issues with `gpg` as installed via Homebrew.

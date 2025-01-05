@@ -66,46 +66,53 @@ mkdir -p $STOWDIR
 sudo chown -R $USER:$USER $TARGETDIR
 sudo chmod -R 755 $TARGETDIR
 
-# Install Stow (needs `autoconf` pre-installed).
-PACKAGE="stow"
-# VERSION works, but not needed when using git curl.
-# VERSION=$(curl -s "https://api.github.com/repos/aspiers/stow/tags" | \grep -Po '"name": *"v\K[^"]*' | head -n 1)
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf $STOWDIR/$PACKAGE 
-rm /usr/local/bin/stow /usr/local/bin/chkstow 
-mkdir -p "$STOWDIR/$PACKAGE"
-cpan install CPAN
-cpan install Test::Output
-cpan install Test::More
-git clone https://github.com/aspiers/stow.git $TMPDIR/$PACKAGE
-cd "$TMPDIR/$PACKAGE"
-[[ ! -f "$TMPDIR/$PACKAGE/configure" ]] && autoreconf -iv
-./configure --prefix=$TARGETDIR && make install prefix=$STOWDIR/$PACKAGE
-# By defualt, stow uses current directory as stow directory,
-# and parent of current directory as target directory,
-# thus change to pre-set stow directory berore running stow command
-# without any command options.
-# Alternatively, use options: `stow -d <stow_dir> -t <target_dir>`.
-cd $STOWDIR
-# stow is not yet added to PATH, thus to stow stow itself,
-# use perl to run stow binary on the `stow` package.
-perl stow/bin/stow -vv stow
-# Revert current directory.
-cd $CURRENTDIR
-# Rebuild shell's command hash table, in case shell has wrong path to stow.
-# https://superuser.com/a/1016137/618317
-hash -r
 
+# ================================================
+# Install Stow (needs `autoconf` pre-installed).
+# Use `pacman -Syu stow` instead.
+# ================================================
+# # VERSION works, but not needed when using git curl.
+# # VERSION=$(curl -s "https://api.github.com/repos/aspiers/stow/tags" | \grep -Po '"name": *"v\K[^"]*' | head -n 1)
+# PACKAGE="stow"
+# sudo rm -rf "$TMPDIR/$PACKAGE" 
+# sudo rm -rf $STOWDIR/$PACKAGE 
+# rm /usr/local/bin/stow /usr/local/bin/chkstow 
+# mkdir -p "$STOWDIR/$PACKAGE"
+# cpan install CPAN
+# cpan install Test::Output
+# cpan install Test::More
+# git clone https://github.com/aspiers/stow.git $TMPDIR/$PACKAGE
+# cd "$TMPDIR/$PACKAGE"
+# [[ ! -f "$TMPDIR/$PACKAGE/configure" ]] && autoreconf -iv
+# ./configure --prefix=$TARGETDIR && make install prefix=$STOWDIR/$PACKAGE
+# # By defualt, stow uses current directory as stow directory,
+# # and parent of current directory as target directory,
+# # thus change to pre-set stow directory berore running stow command
+# # without any command options.
+# # Alternatively, use options: `stow -d <stow_dir> -t <target_dir>`.
+# cd $STOWDIR
+# # stow is not yet added to PATH, thus to stow stow itself,
+# # use perl to run stow binary on the `stow` package.
+# perl stow/bin/stow -vv stow
+# # Revert current directory.
+# cd $CURRENTDIR
+# # Rebuild shell's command hash table, in case shell has wrong path to stow.
+# # https://superuser.com/a/1016137/618317
+# hash -r
+
+# ================================================
 # Install lazygit (Note: Architecture).
-PACKAGE="lazygit"
-VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf "$STOWDIR/$PACKAGE" 
-curl -Lo $TMPDIR/$PACKAGE.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
-# tar'ed file name: lazygit.
-tar xzf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
-sudo install $TMPDIR/$PACKAGE -D -t $STOWDIR/$PACKAGE/bin
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+# Use `pacman -Syu stow` instead.
+# ================================================
+# PACKAGE="lazygit"
+# VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+# sudo rm -rf "$TMPDIR/$PACKAGE" 
+# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# curl -Lo $TMPDIR/$PACKAGE.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
+# # tar'ed file name: lazygit.
+# tar xzf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
+# sudo install $TMPDIR/$PACKAGE -D -t $STOWDIR/$PACKAGE/bin
+# stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # Install todocheck (Note: Architecture).
 PACKAGE="todocheck"
