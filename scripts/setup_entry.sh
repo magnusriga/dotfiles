@@ -68,10 +68,12 @@ fi
 
 # ==========================================================
 # Run remaining setup scripts as new user.
+# Switch manually to new user, before running this file again.
 # ==========================================================
-if [ -f "$SCRIPTPATH/setup_main.sh" ]; then
+if [ $(whoami) == "nfu" && -f "$SCRIPTPATH/setup_main.sh" ]; then
   echo "Running sudo -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh."
-  sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh
+  # sudo -E -u $USERNAME ${SCRIPTPATH:-./}setup_main.sh
+  . ${SCRIPTPATH:-./}setup_main.sh
 fi
 
 # ==========================================================
