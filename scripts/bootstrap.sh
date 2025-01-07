@@ -97,7 +97,10 @@ function doIt() {
   #   being overwritten by install scripts that create e.g. $HOME/.config/eza.
   # - Uses configuration `dotfiles/.stowrc`, which excludes certain directories.
   # ==========================================================
+  # First remove existing dotfiles.
+  rm -rf ~/{.gitconfig,.bash_profile,.bashrc,.profile,.zshrc}
   echo "Running: stow -vv -d $HOME/dotfiles -t $HOME *"
+  cd $SCRIPTPATH/..
   stow -vv -d "$HOME/dotfiles" -t "$HOME" *
 
   # ==========================================================

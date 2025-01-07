@@ -36,9 +36,6 @@ if [ -f "./setup_packages_pacman.sh" ]; then
   alias python=python3
 fi
 
-return
-exit
-
 # ================================================
 # Arch User Repository (AUR): Install packages.
 # ================================================
