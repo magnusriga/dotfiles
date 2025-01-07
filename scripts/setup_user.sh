@@ -27,9 +27,10 @@ fi
 
 # Update sudoers file.
 sudo chmod 755 "/etc/sudoers.d"
-sudo chmod 644 "/etc/sudoers.d/$USERNAME"
+sudo rm -rf "/etc/sudoers.d/$USERNAME"
 if [ ! -e "/etc/sudoers.d/$USERNAME" ] || ! sudo grep -iFq "User_Alias NEW_ADMIN" "/etc/sudoers.d/$USERNAME"; then
-  echo "/etc/sudoers.d/$USERNAME did not exist, or the file did not contain the right alias, adding NEW_ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
+  # echo "/etc/sudoers.d/$USERNAME did not exist, or the file did not contain the right alias, adding NEW_ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
+  echo "Adding User_Alias NEW_ADMIN and NEW_FULLTIMERS to /etc/sudoers.d/$USERNAME, with NOPASSWD: ALL."
   echo -e "User_Alias NEW_ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : NEW_FULLTIMERS = $USERNAME, %$USERNAME\n\
   NEW_ADMIN, NEW_FULLTIMERS ALL = (ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USERNAME" 1> /dev/null
 fi
