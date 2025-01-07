@@ -10,12 +10,12 @@ continuation_prompt = '▶▶ '
 # continuation_prompt = "[▸▹ ](red bold)"
 
 format = """
-[ ](#DA6771)\
-${custom.directory-with-git}\
-${custom.directory-without-git}\
 $username\
 $hostname\
 $localip\
+[ ](#DA6771)\
+${custom.directory-with-git}\
+${custom.directory-without-git}\
 $shlvl\
 $singularity\
 $kubernetes\
@@ -210,6 +210,13 @@ style_root = "bg:#DA6771"
 format = '[$user ]($style)'
 disabled = true
 
+[hostname]
+show_always = true
+style_user = "bg:#DA6771"
+style_root = "bg:#DA6771"
+format = '[$user ]($style)'
+disabled = true
+
 # An alternative to the username module which displays a symbol that
 # represents the current operating system
 [os]
@@ -262,6 +269,8 @@ style = "bold bg:yellow fg:#000000"
 format = '[ $symbol $branch [ ](fg:yellow bg:blue)]($style)'
 disabled = false
 
+# Could use `bg:#399EF4` instead of `bg:blue`.
+
 [git_status]
 conflicted = '🏳'
 ahead = '🏎💨 ${count}'
@@ -275,7 +284,7 @@ staged = '[++\($count\)](bg:blue fg:white)'
 renamed = '👅'
 deleted = '🗑'
 style = "bold bg:blue fg:#000000"
-format = '[($conflicted | )($stashed | )($deleted | )($renamed | )($modified | )($typechanged | )($staged | )($untracked | )$ahead_behind [ ](fg:#399EF4)]($style)'
+format = '[($conflicted | )($stashed | )($deleted | )($renamed | )($modified | )($typechanged | )($staged | )($untracked | )$ahead_behind [ ](fg:blue)]($style)'
 disabled = false
 
 [golang]
