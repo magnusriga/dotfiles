@@ -99,6 +99,7 @@ sudo pacman -Syu --noconfirm \
   iputils \
   libxkbcommon-x11 wayland \
   jless \
+  ghostty ghostty-shell-integration \
   vim \
   neovim \
   tmux \

@@ -118,8 +118,8 @@
 # Ghostty shell integration for Bash.
 # Must be placed at top of bashrc.
 # ================================================================
-if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
-    builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
+if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
+    builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
 fi
 
 # ================================================================

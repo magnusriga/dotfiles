@@ -32,7 +32,7 @@ export WEZTERM_HOME="$HOME/.local/share/wezterm"
 # Export GHOSTTY_RESOURCES_DIR environment variable.
 # Used for shell integrations.
 # ================================================================
-export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
+export GHOSTTY_RESOURCES_DIR="/usr/share/ghostty"
 
 # ================================================================
 # Set XDG_CONFIG_HOME, used by various programs.

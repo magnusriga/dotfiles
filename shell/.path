@@ -50,8 +50,9 @@ fi
 
 # ================================================================
 # Add Homebrew to Path
+# Not using Homebrew on Linux.
 # ================================================================
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # ================================================================
 # Add snap binary directory to PATH.
