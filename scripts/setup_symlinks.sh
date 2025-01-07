@@ -12,20 +12,20 @@ fi
 # ================================================================
 # Remove existing symlinks.
 # ================================================================
-rm ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat
+rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat
 
 # ================================================================
 # Add symlinks.
 # Remember: Add ~/.local/bin to path.
 # ================================================================
-if [ ! -L "$HOME/.local/bin/fd" ]; then
+if [ -n "$(which fdfind 2>/dev/null)" ]; then
   ln -fs $(which fdfind) ~/.local/bin/fd
 fi
 
-if [ ! -L "$HOME/.local/bin/sg" ]; then
+if [ -n "$(which ast-grep 2>/dev/null)" ]; then
   ln -fs $(which ast-grep) ~/.local/bin/sg
 fi
 
-if [ ! -L "$HOME/.local/bin/bat" ]; then
+if [ -n "$(which batcat 2>/dev/null)" ]; then
   ln -fs $(which batcat) ~/.local/bin/bat
 fi

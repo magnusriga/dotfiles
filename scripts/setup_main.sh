@@ -36,6 +36,9 @@ if [ -f "./setup_packages_pacman.sh" ]; then
   alias python=python3
 fi
 
+return
+exit
+
 # ================================================
 # Arch User Repository (AUR): Install packages.
 # ================================================
@@ -129,7 +132,7 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # ================================================
 # Install: `Clipboard`.
-# No need.
+# Not needed, using xclip.
 # ================================================
 # curl -sSL https://github.com/Slackadays/Clipboard/raw/main/install.sh | sh -s -- -y
 
@@ -193,8 +196,9 @@ fi
 
 # ================================================
 # Update: Manual page cache.
+# Many warnings, so make quiet.
 # ================================================
-sudo mandb
+sudo mandb -q
 
 # ================================================
 # Print: Tool versions.
