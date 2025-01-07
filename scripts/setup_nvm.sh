@@ -2,7 +2,7 @@
 
 echo "Running setup_nvm.sh."
 
-NVM_DIR = ${NVM_DIR:-/home/$USERNAME/.nvm}
+NVM_DIR=${NVM_DIR:-$HOME/.nvm}
 
 # Download and install nvm, node, npm.
 # 1) Clone the nvm repository to ~/.nvm.

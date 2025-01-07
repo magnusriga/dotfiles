@@ -47,7 +47,7 @@ fi
  brew install zsh-vi-mode
  brew install glow
  brew install zsh-autosuggestions
-brew install neovim
+ brew install neovim
 
 # These install node via linuxbrew, so do not install them with brew.
 # brew install neonctl

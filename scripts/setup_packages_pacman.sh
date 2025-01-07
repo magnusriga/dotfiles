@@ -3,7 +3,7 @@
 echo "Running setup_packages_pacman.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Stop snapd service if it is running, so it can be upgraded.
-systemctl --quiet is-active snapd.service && sudo service snapd stop
+# systemctl --quiet is-active snapd.service && sudo service snapd stop
 
 # ==========================================================
 # Set locale.
@@ -70,12 +70,16 @@ source /etc/profile.d/locale.sh
 #   - Refresh master packages databases in `/var/lib/pacman/*`,
 #     upgrade all out-of-date installed packages,
 #     and install new packages, with: `pacman -Syu <pkg>`.
-sudo pacman -Syup --noconfirm \
-  base-devel \
+sudo pacman -Syu --noconfirm \
+  base-devel btrfs-progs \
+  devtools postgresql-libs \
+  coreutils \
   sudo \
   curl \
   wget \
   stow \
+  jsoncpp jsoncpp-doc \
+  ninja qt6-base qt6-5compat alsa-lib gettext \
   make \
   cmake \
   unzip zip \
@@ -89,8 +93,11 @@ sudo pacman -Syup --noconfirm \
   ca-certificates \
   gnupg \
   lsb-release \
+  bash \
   zsh zsh-completions zsh-doc \
+  fish \
   iputils \
+  libxkbcommon-x11 wayland \
   jless \
   vim \
   neovim \
@@ -101,16 +108,28 @@ sudo pacman -Syup --noconfirm \
   rsync \
   cronie \
   bat \
+  eza \
   tree \
   glow \
+  docker docker-buildx docker-compose \
   github-cli \
-  yazi ffmpeg p7zip jq poppler fd ripgrep fzf zoxide imagemagick \
-  sysstat \
-  python python-pip python-pipx \
-  lua \
-  ninja gettext \
-  gtk4 libadwaita \
+  ffmpeg p7zip jq poppler poppler-data fd ripgrep fzf zoxide imagemagick chafa yazi \
+  graphite graphite-docs \
+  harfbuzz harfbuzz-utils \
+  dav1d dav1d-doc \
+  rrdtool \
+  vulkan-driver \
+  freeglut \
+  opengl-man-pages \
+  gdk-pixbuf2 gimp java-runtime libwmf libopenraw libavif libheif libjxl librsvg webp-pixbuf-loader \
+  tk gnuplot sysstat \
+  python-setuptools python-keyring python-xdg python python-pip python-pipx \
+  lua luarocks \
+  evince gtk4 libadwaita \
   libjpeg-turbo libpng zlib \
+  intel-media-driver libva-intel-driver libva-mesa-driver libvdpau-va-gl nvidia-utils opencl-driver \
+  intel-media-sdk vpl-gpu-rt \
+  fftw-openmpi libusb libdecor \
   mesa libnss_nis libxss libxtst \
   xorg-xauth xorg-server-xvfb \
   libxcb \
@@ -131,4 +150,29 @@ sudo pacman -Syup --noconfirm \
 #   use two to remove all files from the cache.
 # - In both cases, you will have `yes` | `no` option to remove packages
 #   and/or unused downloaded databases.
-sudo pacman -Sc
+sudo pacman -Sc --noconfirm
+
+# ==========================================================
+# Setup above packages and install related tools.
+# ==========================================================
+# Install luzsocket.
+sudo luarocks install luasocket
+# lua require "socket"
+
+# Install eza theme.
+# eza uses the theme.yml file stored in $EZA_CONFIG_DIR, or if that is not defined then in $XDG_CONFIG_HOME/eza.
+# Download theme repo as reference, but do not symlink $EZA_CONFIG_DIR/theme to it,
+# instead just keep own theme from dotfiles sync.
+rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
+git clone https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
+
+# Install eza completions.
+rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza"
+git clone https://github.com/eza-community/eza.git "${EZA_HOME:-$HOME/.local/share/eza}/eza"
+
+# Manually install tmux plugins, including tmux plugin manager.
+rm -rf "${TMUX_HOME:-$HOME/.config/tmux}/plugins"
+git clone https://github.com/tmux-plugins/tpm "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tpm"
+git clone -b v2.1.1 https://github.com/catppuccin/tmux.git "${TMUX_HOME:-$HOME/.config/tmux}/plugins/catppuccin/tmux"
+git clone https://github.com/tmux-plugins/tmux-battery "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-battery"
+git clone https://github.com/tmux-plugins/tmux-cpu "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-cpu"

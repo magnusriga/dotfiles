@@ -48,6 +48,10 @@
 
 echo "Running setup_git_packages.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
+# ================================================
+# Setup directories and variables needed for
+# manual package builds.
+# ================================================
 # Store the current directory, restored at end of script.
 CURRENTDIR=$(pwd)
 
@@ -66,6 +70,51 @@ mkdir -p $STOWDIR
 sudo chown -R $USER:$USER $TARGETDIR
 sudo chmod -R 755 $TARGETDIR
 
+# ================================================
+# Install todocheck (Note: Architecture).
+# ================================================
+PACKAGE="todocheck"
+VERSION=$(curl -s "https://api.github.com/repos/preslavmihaylov/todocheck/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+sudo rm -rf "$TMPDIR/$PACKAGE" 
+sudo rm -rf "$STOWDIR/$PACKAGE" 
+mkdir $TMPDIR/$PACKAGE
+mkdir -p $STOWDIR/$PACKAGE/bin
+curl -L --output $TMPDIR/$PACKAGE/$PACKAGE https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64 --output $TMPDIR/$PACKAGE/$PACKAGE.sha256 https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256
+if echo "$(cat $TMPDIR/$PACKAGE/$PACKAGE.sha256)" | echo "$(awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status ; then
+  sudo mv $TMPDIR/$PACKAGE/$PACKAGE $STOWDIR/$PACKAGE/bin
+  chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
+  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+fi
+
+# ================================================
+# Install ghostty from source.
+# Use manual build instead of `pacman -Syu ghostty`.
+# ================================================
+# - Prefix sets ghostty's install directory,
+#   including where `theme`, `shell-integration`, etc. is stored,
+#   e.g. `$prefix/share/ghostty/shell-integration`.
+# - Use `PREFIX=/usr/local/stow/ghostty`,
+#   which is symlinked to `/usr/local/ghostty`,
+#   meaning `shell-integration` folder.
+# - Ghostty install adds several directories directly into `$PREFIX/share`,
+#   i.e. not only into `$PREFIX/share/ghostty`,
+#   containing various application configurations for ghostty,
+#   e.g. `bat` folder contains syntax highlighting file for ghostty.
+# - Thus, as always, stow dotfiles into home directory after this file has run,
+#   to ensure symlinks are not overwritten.
+PACKAGE=ghostty
+PREFIX=$STOWDIR/$PACKAGE
+sudo rm -rf "$TMPDIR/$PACKAGE" 
+sudo rm -rf "$STOWDIR/$PACKAGE" 
+sudo rm -rf "$HOME/.config/$PACKAGE" 
+mkdir "$TMPDIR/$PACKAGE"
+mkdir "$STOWDIR/$PACKAGE"
+mkdir "$HOME/.config/$PACKAGE"
+git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
+cd "$TMPDIR/$PACKAGE"
+zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
+cd $CURRENTDIR
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
 # Install Stow (needs `autoconf` pre-installed).
@@ -114,34 +163,28 @@ sudo chmod -R 755 $TARGETDIR
 # sudo install $TMPDIR/$PACKAGE -D -t $STOWDIR/$PACKAGE/bin
 # stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
-# Install todocheck (Note: Architecture).
-PACKAGE="todocheck"
-VERSION=$(curl -s "https://api.github.com/repos/preslavmihaylov/todocheck/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf "$STOWDIR/$PACKAGE" 
-mkdir $TMPDIR/$PACKAGE
-mkdir -p $STOWDIR/$PACKAGE/bin
-curl -L --output $TMPDIR/$PACKAGE/$PACKAGE https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64 --output $TMPDIR/$PACKAGE/$PACKAGE.sha256 https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256
-if echo "$(cat $TMPDIR/$PACKAGE/$PACKAGE.sha256)" | echo "$(awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status ; then
-  sudo mv $TMPDIR/$PACKAGE/$PACKAGE $STOWDIR/$PACKAGE/bin
-  chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
-  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
-fi
-
+# ================================================
 # Install fzf.
-PACKAGE="fzf"
-sudo rm -rf $TMPDIR/$PACKAGE
-mkdir $TMPDIR/$PACKAGE
-git clone --depth 1 https://github.com/junegunn/fzf.git $TMPDIR/$PACKAGE
-$TMPDIR/$PACKAGE/.fzf/install
+# Use `pacman -Syu fzf` instead.
+# ================================================
+# PACKAGE="fzf"
+# sudo rm -rf $TMPDIR/$PACKAGE
+# mkdir $TMPDIR/$PACKAGE
+# git clone --depth 1 https://github.com/junegunn/fzf.git $TMPDIR/$PACKAGE
+# $TMPDIR/$PACKAGE/.fzf/install
 
+# ================================================
 # Install zoxide.
+# Use `pacman -Syu zoxide` instead.
+# ================================================
 # Does not use stow, thus places binary in `$HOME/.local/bin`,
 # and man pages in `$HOME/.local/share/man`.
-curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+# curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
 
+# ================================================
 # Install cmake (needed by e.g. ffmpegthumbnailer).
-# Using apt-get instead.
+# Use `pacman -Syu cmake` instead.
+# ================================================
 # PACKAGE="cmake"
 # VERSION=$(curl -s "https://api.github.com/repos/Kitware/CMake/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
 # sudo rm -rf "$TMPDIR/$PACKAGE-$VERSION" 
@@ -155,99 +198,75 @@ curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh 
 # sudo make install
 # cd $CURRENTDIR
 
+# ================================================
 # Install ffmpegthumbnailer (for yazi).
-PACKAGE="ffmpegthumbnailer"
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-git clone https://github.com/dirkvdb/ffmpegthumbnailer.git $TMPDIR/$PACKAGE
-cd "$TMPDIR/$PACKAGE"
-cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GIO=ON -DENABLE_THUMBNAILER=ON .
-cd $CURRENTDIR
+# Use `pacman -Syu ffmpeg` instead.
+# ================================================
+# PACKAGE="ffmpegthumbnailer"
+# sudo rm -rf "$TMPDIR/$PACKAGE" 
+# git clone https://github.com/dirkvdb/ffmpegthumbnailer.git $TMPDIR/$PACKAGE
+# cd "$TMPDIR/$PACKAGE"
+# cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GIO=ON -DENABLE_THUMBNAILER=ON .
+# cd $CURRENTDIR
 
+# ================================================
 # Install 7zip (Note: Architecture).
-PACKAGE="7zip"
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf "$STOWDIR/$PACKAGE" 
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -LO --output-dir $TMPDIR "https://www.7-zip.org/a/7z2409-linux-arm64.tar.xz"
-tar xf $TMPDIR/7z2409-linux-arm64.tar.xz -C $TMPDIR/$PACKAGE
-sudo mv $TMPDIR/$PACKAGE/7zz $TMPDIR/$PACKAGE/7zzs $STOWDIR/$PACKAGE/bin
-chmod 755 $STOWDIR/$PACKAGE/bin/7zz $STOWDIR/$PACKAGE/bin/7zzs
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+# Use `pacman -Syu 7zip` instead.
+# ================================================
+# PACKAGE="7zip"
+# sudo rm -rf "$TMPDIR/$PACKAGE" 
+# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# mkdir "$TMPDIR/$PACKAGE"
+# mkdir -p "$STOWDIR/$PACKAGE/bin"
+# curl -LO --output-dir $TMPDIR "https://www.7-zip.org/a/7z2409-linux-arm64.tar.xz"
+# tar xf $TMPDIR/7z2409-linux-arm64.tar.xz -C $TMPDIR/$PACKAGE
+# sudo mv $TMPDIR/$PACKAGE/7zz $TMPDIR/$PACKAGE/7zzs $STOWDIR/$PACKAGE/bin
+# chmod 755 $STOWDIR/$PACKAGE/bin/7zz $STOWDIR/$PACKAGE/bin/7zzs
+# stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
-# Install Vi Mode plugin for ZSH.
-# In .zshrc: source ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode/zsh-vi-mode.plugin.zsh
-git clone https://github.com/jeffreytse/zsh-vi-mode.git ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode
+# ================================================
+# Install neovim.
+# Use `pacman -Syu neovim` instead.
+# ================================================
+# PACKAGE=neovim
+# BUILD_TYPE=Release
+# # `$TMPDIR/$PACKAGE/build` holds CMake cache,
+# # which must be cleared before rebuilding.
+# sudo rm -rf "$TMPDIR/$PACKAGE" 
+# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# mkdir "$TMPDIR/$PACKAGE"
+# mkdir "$STOWDIR/$PACKAGE"
+# git clone https://github.com/neovim/neovim "$TMPDIR/$PACKAGE"
+# cd "$TMPDIR/$PACKAGE"
+# # make: Downloads and builds dependencies,
+# # and puts nvim executable in `build/nvim`.
+# make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STOWDIR/$PACKAGE"
+# # After building, nvim executable can be run with
+# # `VIMRUNTIME=runtime ./build/bin/nvim`.
+# # Instead, run `make install`, to copy package files (bin, lib, share, ...),
+# # to install location, set with flag in `make` step,
+# # including copying binary to directory in PATH (e.g. `/usr/local/bin`),
+# # man pages to directory in MANPATH, etc.
+# make install
+# cd $CURRENTDIR
+# stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
-# Install zsh-autosuggestions plugin for ZSH.
-git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions
-
-# Install neovim from source,
-# so it matches machine architecture.
-PACKAGE=neovim
-BUILD_TYPE=Release
-# `$TMPDIR/$PACKAGE/build` holds CMake cache,
-# which must be cleared before rebuilding.
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf "$STOWDIR/$PACKAGE" 
-mkdir "$TMPDIR/$PACKAGE"
-mkdir "$STOWDIR/$PACKAGE"
-git clone https://github.com/neovim/neovim "$TMPDIR/$PACKAGE"
-cd "$TMPDIR/$PACKAGE"
-# make: Downloads and builds dependencies,
-# and puts nvim executable in `build/nvim`.
-make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STOWDIR/$PACKAGE"
-# After building, nvim executable can be run with
-# `VIMRUNTIME=runtime ./build/bin/nvim`.
-# Instead, run `make install`, to copy package files (bin, lib, share, ...),
-# to install location, set with flag in `make` step,
-# including copying binary to directory in PATH (e.g. `/usr/local/bin`),
-# man pages to directory in MANPATH, etc.
-make install
-cd $CURRENTDIR
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
-
+# ================================================
 # Install luarocks, needed by lazyvim.
-PACKAGE="luarocks"
-VERSION=$(curl -L "https://luarocks.org/releases" | grep -Po '(?<=luarocks-)(\d+\.\d+\.\d+)' | head -n 1)
-sudo rm -rf "$STOWDIR/$PACKAGE" 
-mkdir "$STOWDIR/$PACKAGE"
-curl -LO --output-dir $TMPDIR "https://luarocks.org/releases/$PACKAGE-$VERSION.tar.gz"
-tar xzpf $TMPDIR/$PACKAGE-$VERSION.tar.gz -C $TMPDIR
-cd $TMPDIR/$PACKAGE-$VERSION
-./configure --prefix=$STOWDIR/$PACKAGE
-make
-sudo make install
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
-cd $CURRENTDIR
-sudo luarocks install luasocket
-lua require "socket"
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
-
-
-# Install ghostty from source.
-PACKAGE=ghostty
-# - Prefix sets ghostty's install directory,
-#   including where `theme`, `shell-integration`, etc. is stored,
-#   e.g. `$prefix/share/ghostty/shell-integration`.
-# - Use `PREFIX=/usr/local/stow/ghostty`,
-#   which is symlinked to `/usr/local/ghostty`,
-#   meaning `shell-integration` folder.
-# - Ghostty install adds several directories directly into `$PREFIX/share`,
-#   i.e. not only into `$PREFIX/share/ghostty`,
-#   containing various application configurations for ghostty,
-#   e.g. `bat` folder contains syntax highlighting file for ghostty.
-# - Thus, as always, stow dotfiles into home directory after this file has run,
-#   to ensure symlinks are not overwritten.
-PREFIX=$STOWDIR/$PACKAGE
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf "$STOWDIR/$PACKAGE" 
-sudo rm -rf "$HOME/.config/$PACKAGE" 
-mkdir "$TMPDIR/$PACKAGE"
-mkdir "$STOWDIR/$PACKAGE"
-mkdir "$HOME/.config/$PACKAGE"
-git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
-cd "$TMPDIR/$PACKAGE"
-zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
-cd $CURRENTDIR
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+# Use `pacman -Syu luarocks` instead.
+# ================================================
+# PACKAGE="luarocks"
+# VERSION=$(curl -L "https://luarocks.org/releases" | grep -Po '(?<=luarocks-)(\d+\.\d+\.\d+)' | head -n 1)
+# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# mkdir "$STOWDIR/$PACKAGE"
+# curl -LO --output-dir $TMPDIR "https://luarocks.org/releases/$PACKAGE-$VERSION.tar.gz"
+# tar xzpf $TMPDIR/$PACKAGE-$VERSION.tar.gz -C $TMPDIR
+# cd $TMPDIR/$PACKAGE-$VERSION
+# ./configure --prefix=$STOWDIR/$PACKAGE
+# make
+# sudo make install
+# stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+# cd $CURRENTDIR
+# sudo luarocks install luasocket
+# lua require "socket"
+# stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE

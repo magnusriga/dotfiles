@@ -26,6 +26,8 @@ if ! grep -iFq $USERNAME /etc/passwd; then
 fi
 
 # Update sudoers file.
+sudo chmod 755 "/etc/sudoers.d"
+sudo chmod 644 "/etc/sudoers.d/$USERNAME"
 if [ ! -e "/etc/sudoers.d/$USERNAME" ] || ! sudo grep -iFq "User_Alias NEW_ADMIN" "/etc/sudoers.d/$USERNAME"; then
   echo "/etc/sudoers.d/$USERNAME did not exist, or the file did not contain the right alias, adding NEW_ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
   echo -e "User_Alias NEW_ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : NEW_FULLTIMERS = $USERNAME, %$USERNAME\n\

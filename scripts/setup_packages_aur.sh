@@ -2,30 +2,57 @@
 
 echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
+function makeCleanChroot() {
+ sudo rm -rf ~/chroot 
+ mkdir ~/chroot
+ CHROOT=$HOME/chroot
+ mkarchroot $CHROOT/root base-devel
+}
+
+# Create clean root once.
+makeCleanChroot
+
+# Stow `makepkg` configuration into correct folder
+# where `makepkg` will pick it up.
+stow --no-folding -vv -d "$HOME/dotfiles" -t "$HOME" pacman
+
 # ==================================
 # Build and Intstall Package.
 # ==================================
-# Pre-requisite:
+# Pre-requisites:
 # - Manually download `PKGBUILD` file, and other files needed for build.
-# - Done with `git clone <repo>`, using `<repo>` found in e.g. AUR.
-# - Use target directory: `$HOME/build/repositories/<package>`.
-# - Command : `git clone <url> $HOME/build/repositories/$PACKAGE`.
-#
-# 1) Build with `makepkg -srci`:
-#    IMPORTANT: `makepkg` must be run as normal user, NOT as root, i.e. not with `sudo`.
-#    a) `makekpkg` reads `PKGBUILD` to identify url of source files.
-#    b) `makekpkg` downloads source files into `SRCDEST`.
-#    c) `makekpkg` compiles source files into installable `.pkg.tar.zst` package.
+#    - Done with `git clone <repo>`, using `<repo>` found in e.g. AUR.
+#    - Use target directory: `$HOME/build/repositories/<package>`.
+#    - Command : `git clone <url> $HOME/build/repositories/$PACKAGE`.
+# - Create clean chroot.
+#    - Run `makeCleanChroot`, defined above.
+#    - Only run once, as `makechrootpkg -c` will automatically clean chroot folder before building.
+# 
+# Steps:
+# 1) Build inside clean chroot: `makechrootpkg -c -r $CHROOT -- -sc --noconfirm`.
+#    IMPORTANT: `makechrootpkg` must be run as normal user, NOT as root, i.e. not with `sudo`.
+#    a) `makechrootpkg` reads `PKGBUILD` to identify url of source files.
+#    b) `makechrootpkg` downloads source files into `SRCDEST`.
+#    c) `makechrootpkg` compiles source files into installable `.pkg.tar.zst` package.
 #
 # 2) Install:
-#    - Install package with: `makepkg -i | --install` OR `pacman -U <pkgname-pkgver>.pkg.tar.zst`.
-#    - Which moves executable files, man pages, etc., to specific directory.
+#    - Install package with: `pacman -U <pkgname-pkgver>.pkg.tar.zst` OR `makepkg -i | --install`.
+#    - Prefer `pacman`, because it does not install all packages in directory, only those explicitly specified.
+#    - Moves executable files, man pages, etc., to specific directory.
 #    - Alternatively, to skip this step, call `makepkg` with `-i` flag initially.
 #
 # 3) Clean:
 #    - `makepkg -c | --clean` cleans up `$srcdest` directory
 #    - `$srcdest` stores temporary files needed during build.
 #    - `$srcdest` often defined in `PKGBUILD` file.
+#
+# Alternative step (1):
+# 1) Build in current directory: `makepkg -srci`
+#    - Avoid, use clean chroot approach instead.
+#    - IMPORTANT: `makepkg` must be run as normal user, NOT as root, i.e. not with `sudo`.
+#    a) `makekpkg` reads `PKGBUILD` to identify url of source files.
+#    b) `makekpkg` downloads source files into `SRCDEST`.
+#    c) `makekpkg` compiles source files into installable `.pkg.tar.zst` package.
 #
 # ==================================
 # Update Package.
@@ -51,6 +78,24 @@ echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USERNAME $
 #   and installs resulting package.
 #
 # ==================================
+# `makechrootpkg` command.
+# ==================================
+# - Run `makechrootpkg` script in directory containing PKGBUILD, to build a package inside a clean chroot.
+# - Arguments passed to this script after end-of-options marker (--) will be passed to makepkg.
+# - This script reads {SRC,SRCPKG,PKG,LOG}DEST, MAKEFLAGS and PACKAGER from makepkg.conf(5),
+#   if those variables are not part of the environment.
+# - Common `makechrootpkg` options:
+#   - `-c`: Working chroot ($CHROOT/$USER) is cleaned before building, thus no need to recreate $CHROOT directory each time.
+#   - `-r`: Chroot directory to use.
+# - Default arguments passed to `makepkg`:
+#   - `--syncdeps`.
+#   - `--noconfirm`.
+#   - `--log`.
+#   - `--holdver`.
+#   - `--skipinteg`.
+# - Suggested full command: `makechrootpkg -c -r $CHROOT -- -sc --noconfirm`.
+#
+# ==================================
 # Configuration Notes: `makepkg`.
 # ==================================
 # - PKGDEST — directory for storing resulting packages, i.e. `.pkg.tar.zst` created by `makepkg` from `PKGBUILD` files.
@@ -71,8 +116,12 @@ echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USERNAME $
 # Current working directory before running script.
 CWD=$(pwd)
 
+# Where final packages are placed by `makepkg` | `makechrootpkg`
+# to be installed by `pacman -U <pkg>` | `makepkg -i`.
+export BUILD_HOME="${BUILD_HOME:-$HOME/build}"
+
 # Where `PKGBUILD` files are manually placed with `git clone`.
-export BUILD_REPOSITORY="${BUILD_HOME:-$HOME/build}/repository"
+export BUILD_REPOS="${BUILD_HOME:-$HOME/build}/repositories"
 
 # Default: Put built package and cached source in build directory.
 # Below `makepkg` configuration variables are set in `$HOME/.config/pacman/makepkg.conf`,
@@ -102,16 +151,57 @@ export BUILD_REPOSITORY="${BUILD_HOME:-$HOME/build}/repository"
 # GPGKEY=""
 
 # ==================================
+# yay.
+# ==================================
+PACKAGE="yay"
+rm -rf $BUILD_REPOS/$PACKAGE
+git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
+cd $BUILD_REPOS/$PACKAGE
+makechrootpkg -c -r $CHROOT -- -sc --noconfirm
+# makepkg -sci --noconfirm
+cd $BUILD_HOME/packages
+ls | grep -P "$PACKAGE-\d" | sudo pacman -U --noconfirm -
+echo "Installed $PACKAGE version: $($PACKAGE --version)"
+cd $CWD
+
+# ==================================
+# paru.
+# ==================================
+PACKAGE="paru"
+rm -rf $BUILD_REPOS/$PACKAGE
+git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
+cd $BUILD_REPOS/$PACKAGE
+makechrootpkg -c -r $CHROOT -- -sc --noconfirm
+cd $BUILD_HOME/packages
+ls | grep -P "$PACKAGE-\d" | sudo pacman -U --noconfirm -
+echo "Installed $PACKAGE version: $($PACKAGE --version)"
+cd $CWD
+
+# ==================================
 # snapd.
 # ==================================
 PACKAGE="snapd"
-rm -rf $BUILD_REPOSITORY/$PACKAGE
-git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOSITORY/$PACKAGE
-cd $BUILD_REPOSITORY/$PACKAGE
-makepkg -sci --noconfirm
+rm -rf $BUILD_REPOS/$PACKAGE
+git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
+cd $BUILD_REPOS/$PACKAGE
+makechrootpkg -c -r $CHROOT -- -sc --noconfirm
+cd $BUILD_HOME/packages
+ls | grep -P "$PACKAGE-\d" | sudo pacman -U --noconfirm -
+echo "Installed snap version: $(snap --version)"
 # Enable systemd unit that manages main snap communication socket.
 sudo systemctl enable --now snapd.socket
 sudo systemctl enable --now snapd.apparmor.service
-sudo ln -s /var/lib/snapd/snap /snap
+sudo ln -fs /var/lib/snapd/snap /snap
 cd $CWD
 
+# ==================================
+# `yay`: Install AUR packages.
+# ==================================
+# NOTE: Do not use `sudo` with `yay`.
+# `-u`: Ugrade all installed packages, both from official repositories and AUR.
+# `-a`: Ugrade only AUR packages.
+yay -Sua
+
+# ==================================
+# `paru`: Install AUR packages.
+# ==================================
