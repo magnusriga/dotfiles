@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
-echo "Running setup_user.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
-
-SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1 ; pwd -P )/"
-
-echo "SCRIPTPATH is $SCRIPTPATH."
+# =================================================================
+# Create new user.
+# Must be executed from sudoer user, different from new user,
+# as user cannot add itself to sudoers file, if not already there.
+# User must be in sudoers file, to add user to sudoers file,
+# thus it only makes sense for this script to be run by another user than
+# the new user.
+# =================================================================
 
 # New user details.
 export USERNAME="nfu"
@@ -12,6 +15,16 @@ export USER_UID="1000"
 export USER_GID=$USER_UID
 GROUPNAME=$USERNAME
 PASSWORD=$USERNAME
+
+echo "Running setup_user.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+
+if [ $(whoami) == "$USERNAME" ]; then
+  echo "This script should be sourced by sudoer user different from new user, now exiting..."
+  [ ${BASH_SOURCE[0]} == ${0} ] && exit || return
+fi
+
+SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1 ; pwd -P )/"
+echo "SCRIPTPATH is $SCRIPTPATH."
 
 export CURRENT_USER=$(whoami)
 
@@ -31,6 +44,5 @@ sudo rm -rf "/etc/sudoers.d/$USERNAME"
 if [ ! -e "/etc/sudoers.d/$USERNAME" ] || ! sudo grep -iFq "User_Alias NEW_ADMIN" "/etc/sudoers.d/$USERNAME"; then
   # echo "/etc/sudoers.d/$USERNAME did not exist, or the file did not contain the right alias, adding NEW_ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
   echo "Adding User_Alias NEW_ADMIN and NEW_FULLTIMERS to /etc/sudoers.d/$USERNAME, with NOPASSWD: ALL."
-  echo -e "User_Alias NEW_ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : NEW_FULLTIMERS = $USERNAME, %$USERNAME\n\
-  NEW_ADMIN, NEW_FULLTIMERS ALL = (ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USERNAME" 1> /dev/null
+  echo -e "User_Alias NEW_ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : NEW_FULLTIMERS = $USERNAME, %$USERNAME\n\nNEW_ADMIN, NEW_FULLTIMERS ALL = (ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USERNAME" 1> /dev/null
 fi

@@ -82,13 +82,6 @@ function doIt() {
   # [[ $BASH_SOURCE = $0 ]] && exit 1 || return
   
   # ==========================================================
-  # Create new user, if it does not already exist.
-  # ==========================================================
-  if [ -f "./setup_user.sh" ]; then
-    . ./setup_user.sh
-  fi
-  
-  # ==========================================================
   # Run remaining setup scripts as new user.
   # Switch manually to new user, before running this file again.
   # ==========================================================
