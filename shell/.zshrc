@@ -131,13 +131,22 @@ source ~/.shrc
 # ================================================================
 # ZSH Options.
 # ================================================================
+# History file for ZSH, overwrites bash default which is sset to
+# `/commandhistory/.shell_hisotry` in `.shrc`.
+HISTFILE=/commandhistory/.zsh_history
+# setopt APPEND_HISTORY
 setopt INC_APPEND_HISTORY
+# setopt SHARE_HISTORY
 
 # ================================================================
-# Autoload own functions.
+# Autoload functions.
 # ================================================================
 fpath=($HOME/.zfunc $fpath)
 autoload -U rgf
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
 
 # ================================================================
 # Export zsh-syntax-highlighting shell variables here instead of
@@ -177,7 +186,9 @@ eval "$(register-python-argcomplete pipx)"
 # Enable vi mode in zsh (at end of zshrc).
 # ZSH_HOME: ZSH plugin directory.
 # ================================================================
-source ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode/zsh-vi-mode.plugin.zsh
+# bindkey -v
+# Alternative, more bindings:
+# source ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
 # ================================================================
 # Set up fzf key bindings, e.g. <C-T>, <C-R>, <A-C>, and fuzzy completion.
@@ -212,9 +223,13 @@ source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestio
 bindkey '^w' autosuggest-execute
 bindkey '^y' autosuggest-accept
 bindkey '^u' autosuggest-toggle
-bindkey '^L' vi-forward-word
-bindkey '^k' up-line-or-search
-bindkey '^j' down-line-or-search
+# bindkey '^L' vi-forward-word
+
+bindkey '^j' up-line-or-search
+bindkey '^k' down-line-or-search
+
+bindkey '^[[A' up-line-or-beginning-search # Up
+bindkey '^[[B' down-line-or-beginning-search # Down
 
 # ================================================================
 # Run Starship Prompt Configuration.

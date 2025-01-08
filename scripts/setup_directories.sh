@@ -135,5 +135,6 @@ export COMMAND_HISTORY_DIR="/commandhistory"
 if [ ! -d "$COMMAND_HISTORY_DIR" ]; then
   sudo mkdir -p "$COMMAND_HISTORY_DIR"
   sudo touch $COMMAND_HISTORY_DIR/.shell_history
+  sudo touch $COMMAND_HISTORY_DIR/.zsh_history
 fi
 sudo chown -R $USER:$USER $COMMAND_HISTORY_DIR

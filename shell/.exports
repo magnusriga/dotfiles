@@ -74,8 +74,9 @@ HISTFILE="/commandhistory/.shell_history"
 # Avoid duplicates in command history.
 HISTCONTROL=ignoredups:erasedups
 # Allow 32³ entries; the default is 500.
-HISTSIZE='32768';
-HISTFILESIZE="${HISTSIZE}";
+HISTSIZE=32768
+SAVEHIST="${HISTSIZE}"
+HISTFILESIZE="${HISTSIZE}"
 # When shell exits, append to command history file instead of overwriting it.
 # - Set for bash in `.bashrc`: `shopt -s histappend`.
 # - Set for zsh in `.zshrc`: `setopt INC_APPEND_HISTORY`.
