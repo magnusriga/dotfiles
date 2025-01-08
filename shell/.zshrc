@@ -219,7 +219,7 @@ bindkey '^j' down-line-or-search
 # ================================================================
 # Run Starship Prompt Configuration.
 # ===============================================================
-# eval "$(starship init zsh)"
+eval "$(starship init zsh)"
 
 # ================================================================
 # oh-my-zsh settings.
