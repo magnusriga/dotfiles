@@ -115,7 +115,7 @@ echo "Running .profile..."
 # ================================================================
 if [ -f "$HOME/.env" ]; then
   set -a
-  source $HOME/.env
+  . $HOME/.env
   set +a
 fi
 
@@ -123,9 +123,7 @@ fi
 # Source exported environment variables.
 # ================================================================
 if [ -f "$HOME/.exports" ]; then
-  set -a
-  source $HOME/.exports
-  set +a
+  . $HOME/.exports
 fi
 
 # ================================================================

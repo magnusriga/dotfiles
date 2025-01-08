@@ -1,92 +1,92 @@
-# ================================================================================================
-# Due to how vscode and the vim extension works, this file must be place on the
-# host machine, .e.g. under C://Users/<username>/.vimrc
-# ================================================================================================
+" =======================================================================================
+" Due to how vscode and the vim extension works, this file must be place on the
+" host machine, .e.g. under C://Users/<username>/.vimrc
+" =======================================================================================
 
-" Use the Solarized Dark theme
+" Use the Solarized Dark theme.
 set background=dark
 colorscheme solarized
 let g:solarized_termtrans=1
 
-" Make Vim more useful
+" Make Vim more useful.
 set nocompatible
-" Use the OS clipboard by default (on versions compiled with `+clipboard`)
+" Use the OS clipboard by default (on versions compiled with `+clipboard`).
 set clipboard=unnamed
-" Enhance command-line completion
+" Enhance command-line completion.
 set wildmenu
-" Allow cursor keys in insert mode
+" Allow cursor keys in insert mode.
 set esckeys
-" Allow backspace in insert mode
+" Allow backspace in insert mode.
 set backspace=indent,eol,start
-" Optimize for fast terminal connections
+" Optimize for fast terminal connections.
 set ttyfast
-" Add the g flag to search/replace by default
+" Add the g flag to search/replace by default.
 set gdefault
-" Use UTF-8 without BOM
+" Use UTF-8 without BOM.
 set encoding=utf-8 nobomb
-" Change mapleader
+" Change mapleader.
 let mapleader=" "
-" Don’t add empty newlines at the end of files
+" Don’t add empty newlines at the end of files.
 set binary
 set noeol
-" Centralize backups, swapfiles and undo history
+" Centralize backups, swapfiles and undo history.
 set backupdir=~/.vim/backups
 set directory=~/.vim/swaps
 if exists("&undodir")
 	set undodir=~/.vim/undo
 endif
 
-" Don’t create backups when editing files in certain directories
+" Don’t create backups when editing files in certain directories.
 set backupskip=/tmp/*,/private/tmp/*
 
 " Respect modeline in files
 set modeline
 set modelines=4
-" Enable per-directory .vimrc files and disable unsafe commands in them
+" Enable per-directory .vimrc files and disable unsafe commands in them.
 set exrc
 set secure
-" Enable line numbers
+" Enable line numbers.
 set number
-" Enable syntax highlighting
+" Enable syntax highlighting.
 syntax on
-" Highlight current line
+" Highlight current line.
 set cursorline
-" Make tabs as wide as two spaces
+" Make tabs as wide as two spaces.
 set tabstop=2
-" Show “invisible” characters
+" Show “invisible” characters.
 set lcs=tab:▸\ ,trail:·,eol:¬,nbsp:_
 set list
-" Highlight searches
+" Highlight searches.
 set hlsearch
-" Ignore case of searches
+" Ignore case of searches.
 set ignorecase
-" Highlight dynamically as pattern is typed
+" Highlight dynamically as pattern is typed.
 set incsearch
-" Always show status line
+" Always show status line.
 set laststatus=2
-" Enable mouse in all modes
+" Enable mouse in all modes.
 set mouse=a
-" Disable error bells
+" Disable error bells.
 set noerrorbells
 " Don’t reset cursor to start of line when moving around.
 set nostartofline
-" Show the cursor position
+" Show the cursor position.
 set ruler
-" Don’t show the intro message when starting Vim
+" Don’t show the intro message when starting Vim.
 set shortmess=atI
-" Show the current mode
+" Show the current mode.
 set showmode
-" Show the filename in the window titlebar
+" Show the filename in the window titlebar.
 set title
-" Show the (partial) command as it’s being typed
+" Show the (partial) command as it’s being typed.
 set showcmd
-" Use relative line numbers
+" Use relative line numbers.
 if exists("&relativenumber")
 	set relativenumber
 	au BufReadPost * set relativenumber
 endif
-" Start scrolling three lines before the horizontal window border
-set scrolloff=3
+" Start scrolling three lines before the horizontal window border.
+set scrolloff=10
 
 " Strip trailing whitespace function.
 function! StripWhitespace()
@@ -100,7 +100,7 @@ endfunction
 " Strip trailing whitespace.
 noremap <leader>ss :call StripWhitespace()<CR>
 
-" Save a file as root (,W)
+" Save a file as root (,W).
 noremap <leader>W :w !sudo tee % > /dev/null<CR>
 
 " noremap <leader>w :w<CR> <-- Clashed with camelCaseMotion
@@ -157,17 +157,17 @@ noremap <leader>D "_D
 " noremap <leader>o o<Esc>
 " noremap <leader>O O<Esc>
 
-" Remove search highlighting (until next search)
+" Remove search highlighting (until next search).
 noremap <C-n> :nohl<CR>
 
-" On this approach 'x' acts like classic 'delete' key
+" On this approach 'x' acts like classic 'delete' key.
 " nnoremap x "_x
 " vnoremap x "_d
 " noremap X "_X
-" On this approach 'c' does not copy to working registers
+" On this approach 'c' does not copy to working registers.
 " vnoremap c "_c
 " noremap C "_C
-" On this approach 'd' acts like classic 'cut' (i.e. copies to working registers)
+" On this approach 'd' acts like classic 'cut' (i.e. copies to working registers).
 " vnoremap d "*d:let @+=@*<CR>
 " noremap dd "*dd:let @+=@*<CR>
 " noremap D "*D:let @+=@*<CR>
@@ -177,16 +177,15 @@ noremap <C-n> :nohl<CR>
 " noremap yy "*yy:let @+=@*<CR>
 " nnoremap Y "*Y:let @+=@*<CR>
 " vnoremap Y "*y`>:let @+=@*<CR>
-" Re-yank what just got pasted in visual mode
+" Re-yank what just got pasted in visual mode.
 " vnoremap p pgvy
 
-
-" Automatic commands
+" Automatic commands.
 if has("autocmd")
-	" Enable file type detection
+	" Enable file type detection.
 	filetype on
-	" Treat .json files as .js
+	" Treat .json files as .js.
 	autocmd BufNewFile,BufRead *.json setfiletype json syntax=javascript
-	" Treat .md files as Markdown
+	" Treat .md files as Markdown.
 	autocmd BufNewFile,BufRead *.md setlocal filetype=markdown
 endif

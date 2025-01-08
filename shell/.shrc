@@ -114,7 +114,8 @@ echo "Running .shrc..."
 # ================================================================
 # * ~/.path can be used to extend `$PATH`.
 # * ~/.extra can be used for other settings you don’t want to commit.
-for file in ~/.{path,exports,aliases,functions,extra}; do
+# * Could probably exclude `.exports`, `.path`, as those are also run from `.profile`.
+for file in ~/.{exports,path,aliases,functions}; do
   [ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
 unset file
@@ -125,7 +126,7 @@ unset file
 # selecting output of previous commands, etc.
 # PATH is already set up in .zprofile > .profile.
 # ================================================================
-source $WEZTERM_HOME/shell-integration/wezterm.sh
+# source $WEZTERM_HOME/shell-integration/wezterm.sh
 
 # ================================================================
 # Add custom fzf settings.

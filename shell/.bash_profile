@@ -96,6 +96,7 @@
 # Source the environment variables and other login-time settings (e.g. ssh-agent) from .profile.
 # Only runs when a login shell is opened (i.e. the first zsh terminal opened after starting vscdoe).
 # ================================================================
+echo "Running .bash_profile, about to source .profile..."
 source ~/.profile
 
 # ================================================================

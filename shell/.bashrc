@@ -100,11 +100,6 @@
 [[ $- == *i* ]] || [ -n "$PS1" ] || return
 
 # ================================================================
-# Run Generic Interactive Shell Configuration.
-# ================================================================
-source ~/.shrc
-
-# ================================================================
 # Ghostty shell integration for Bash.
 # Must be placed at top of bashrc.
 # ================================================================
@@ -113,9 +108,15 @@ if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
 fi
 
 # ================================================================
+# Run Generic Interactive Shell Configuration.
+# ================================================================
+echo "Running .bashrc, about to source .shrc..."
+source ~/.shrc
+
+# ================================================================
 # Load Bash-Specific Dotfiles.
 # ================================================================
-[ -r ~/.bash_prompt ] && [ -f ~/.bash_prompt ] && source ~/.bash_prompt
+# [ -r ~/.bash_prompt ] && [ -f ~/.bash_prompt ] && source ~/.bash_prompt
 
 # ================================================================
 # Bash-Specific Settings.
@@ -174,3 +175,11 @@ complete -W "NSGlobalDomain" defaults
 
 # Add `killall` tab completion for common apps
 complete -o "nospace" -W "Contacts Calendar Dock Finder Mail Safari iTunes SystemUIServer Terminal Twitter" killall
+
+# pnpm
+export PNPM_HOME="/home/nfu/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

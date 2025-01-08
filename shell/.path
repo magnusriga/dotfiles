@@ -6,14 +6,14 @@ echo "Running .path..."
 # Add User's Private Bin (`~/bin`) to `$PATH`
 # ================================================================
 if [ -d "$HOME/bin" ]; then
-  PATH="$HOME/bin:$PATH"
+  export PATH="$HOME/bin:$PATH"
 fi
 
 # ================================================================
 # Add User's Private .local Bin to Path
 # ================================================================
 if [ -d "$HOME/.local/bin" ]; then
-  PATH="$HOME/.local/bin:$PATH"
+  export PATH="$HOME/.local/bin:$PATH"
 fi
 
 # ================================================================
@@ -29,7 +29,10 @@ export NVM_DIR="$HOME/.nvm"
 # ================================================================
 export PNPM_HOME="$HOME/.local/share/pnpm"
 if [ -d "$HOME/.local/share/pnpm" ]; then
-  PATH="$HOME/.local/share/pnpm:$PATH"
+  case ":$PATH:" in
+    *":$PNPM_HOME:"*) ;;
+    *) export PATH="$PNPM_HOME:$PATH" ;;
+  esac
 fi
 
 # ================================================================
@@ -37,7 +40,7 @@ fi
 # ================================================================
 export BUN_INSTALL="$HOME/.bun"
 if [ -d "$BUN_INSTALL" ]; then
-  PATH="$BUN_INSTALL/bin:$PATH"
+  export PATH="$BUN_INSTALL/bin:$PATH"
 fi
 
 # ================================================================
@@ -45,7 +48,7 @@ fi
 # ================================================================
 export CARGO_HOME="$HOME/.cargo"
 if [ -d "$CARGO_HOME/bin" ]; then
-  PATH="$CARGO_HOME/bin:$PATH"
+  export PATH="$CARGO_HOME/bin:$PATH"
 fi
 
 # ================================================================
@@ -58,12 +61,12 @@ fi
 # Add snap binary directory to PATH.
 # ================================================================
 if [ -d "/snap/bin" ]; then
-  PATH="/snap/bin:$PATH"
+  export PATH="/snap/bin:$PATH"
 fi
 
 # ================================================================
 # Add fzf binary directory to PATH.
 # ================================================================
 if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
-  PATH="${PATH:+${PATH}:}$HOME/.fzf/bin"
+  export PATH="${PATH:+${PATH}:}$HOME/.fzf/bin"
 fi

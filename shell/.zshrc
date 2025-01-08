@@ -123,16 +123,21 @@ if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
 fi
 
 # ================================================================
-# Autoload own functions.
-# ================================================================
-fpath=($HOME/.zfunc $fpath)
-autoload -U rgf
-
-# ================================================================
 # Run Generic Interactive Shell Configuration.
 # ================================================================
 echo "Running .zshrc, about to source .shrc..."
 source ~/.shrc
+
+# ================================================================
+# ZSH Options.
+# ================================================================
+setopt INC_APPEND_HISTORY
+
+# ================================================================
+# Autoload own functions.
+# ================================================================
+fpath=($HOME/.zfunc $fpath)
+autoload -U rgf
 
 # ================================================================
 # Export zsh-syntax-highlighting shell variables here instead of
@@ -205,7 +210,7 @@ source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestio
 # Keybindings.
 # ================================================================
 bindkey '^w' autosuggest-execute
-bindkey '^e' autosuggest-accept
+bindkey '^y' autosuggest-accept
 bindkey '^u' autosuggest-toggle
 bindkey '^L' vi-forward-word
 bindkey '^k' up-line-or-search
@@ -214,7 +219,7 @@ bindkey '^j' down-line-or-search
 # ================================================================
 # Run Starship Prompt Configuration.
 # ===============================================================
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
 
 # ================================================================
 # oh-my-zsh settings.

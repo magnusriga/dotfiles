@@ -66,18 +66,30 @@ export BROWSER=google-chrome
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
 # ================================================================
-# Export variables for shell history persistence.
+# Setup shell history persistence.
+# Consider setting in `.shrc`, so variables are created for interactive shells only. 
 # ================================================================
-export PROMPT_COMMAND=(history -a)
-export HISTFILE="/commandhistory/.shell_history"
-# Omit duplicates and commands that begin with a space from history.
-export HISTCONTROL='ignoreboth';
-
-# ================================================================
-# Increase Bash history size. Allow 32³ entries; the default is 500.
-# ================================================================
-export HISTSIZE='32768';
-export HISTFILESIZE="${HISTSIZE}";
+# Set path to command history file.
+HISTFILE="/commandhistory/.shell_history"
+# Avoid duplicates in command history.
+HISTCONTROL=ignoredups:erasedups
+# Allow 32³ entries; the default is 500.
+HISTSIZE='32768';
+HISTFILESIZE="${HISTSIZE}";
+# When shell exits, append to command history file instead of overwriting it.
+# - Set for bash in `.bashrc`: `shopt -s histappend`.
+# - Set for zsh in `.zshrc`: `setopt INC_APPEND_HISTORY`.
+# - Note: For ZSH, commands are appended right away when entered, not only when shell exits.
+# After each command, append to command history file and reread it.
+# - ghostty, wezterm, and others, modify prompt in shell-integration script,
+#   thus keep their setting just remove duplicates and some stray colon at end.
+# - Consider turning off reloading of history, i.e. `history -r`,
+#   if terminal slows down (should not happen with < 100k entries).
+# sed "s/history -[acr];* *//g" <<< $PROMPT_COMMAND | echo "$(sed "s/://g")"" history -a; history -c; history -r;"
+case "history -a; history -c; history -r" in
+  "$PROMPT_COMMAND") ;;
+  *) PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+esac
 
 # ================================================================
 # Enable persistent REPL history for `node`.
