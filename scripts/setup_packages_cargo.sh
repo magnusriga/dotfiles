@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 
-echo "Running setup_cargo_packages.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_packages_cargo.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
 # Install packages (requires rust toolchain).
 cargo install ast-grep --locked
+cargo install eza
 
 # Installed with pacman instead.
 # cargo install jless

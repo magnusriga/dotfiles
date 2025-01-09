@@ -115,8 +115,8 @@
 [[ $- == *i* ]] || [ -n "$PS1" ] || return
 
 # ================================================================
-# Ghostty shell integration for Bash.
-# Must be placed at top of bashrc.
+# Ghostty Shell Integration for ZSH.
+# Must be Placed at Top of `.zshrc`.
 # ================================================================
 if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
     builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
@@ -134,53 +134,32 @@ source ~/.shrc
 # History file for ZSH, overwrites bash default which is sset to
 # `/commandhistory/.shell_hisotry` in `.shrc`.
 HISTFILE=/commandhistory/.zsh_history
-# setopt APPEND_HISTORY
 setopt INC_APPEND_HISTORY
+# setopt APPEND_HISTORY
 # setopt SHARE_HISTORY
 
 # ================================================================
-# Autoload functions.
+# Autoload Own and Built-In Functions.
 # ================================================================
 fpath=($HOME/.zfunc $fpath)
 autoload -U rgf
-autoload -U up-line-or-beginning-search
-autoload -U down-line-or-beginning-search
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
+# autoload -U up-line-or-beginning-search
+# autoload -U down-line-or-beginning-search
+# zle -N up-line-or-beginning-search
+# zle -N down-line-or-beginning-search
 
 # ================================================================
-# Export zsh-syntax-highlighting shell variables here instead of
-# in .zprofile, because they only apply to interactive shells.
+# ZSH Completetions.
 # ================================================================
-source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# Declare the variable
-typeset -A ZSH_HIGHLIGHT_STYLES
-
-# To differentiate aliases from other command types
-export ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
-
-# To have paths colored instead of underlined
-export ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
-
-# To disable highlighting of globbing expressions
-export ZSH_HIGHLIGHT_STYLES[globbing]='none'
-
-# Command color (git etc.)
-export ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
-
-# Quoted argument color
-export ZSH_HIGHLIGHT_STYLES["single-quoted-argument"]='fg=green'
-export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
-
-# ================================================================
-# Completetions.
-# ================================================================
-source "$HOME/zsh/completion.zsh"
-export EZA_HOME="$HOME/.local/share/eza/eza"
-export FPATH="$EZA_HOME/completions/zsh:$FPATH"
-
-eval "$(register-python-argcomplete pipx)"
+# `zsh-completions` is installed with pacman, no sourcing needed.
+# `eza` completions, where `eza` itself is installed with `cargo`,
+# while `eza` completions is enables by cloning `eza` git repo
+# into `EZA_HOME/eza` and added to `fpath` below.
+export FPATH="${EZA_HOME:-$HOME/.local/share/eza}/eza/completions/zsh:$FPATH"
+# Activate ZSH completion engine.
+autoload -Uz compinit
+# Force rebuild with `zcompdump`.
+rm -f ~/.zcompdump; compinit
 
 # ================================================================
 # Enable vi mode in zsh (at end of zshrc).
@@ -204,6 +183,8 @@ source <(fzf --zsh)
 # Start Zoxide, at end of zshrc, AFTER compinit.
 # Docker desktop should run to avoid error message form compinit.
 # ================================================================
+# WARNING: First command that adds delay,
+# though delay is tiny and worth it.
 eval "$(zoxide init zsh)"
 
 # ================================================================
@@ -215,26 +196,56 @@ eval "$(zoxide init zsh)"
 # ================================================================
 # Enable zsh-autosuggestions (end of zshrc).
 # ================================================================
-source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # ================================================================
 # Keybindings.
 # ================================================================
-bindkey '^w' autosuggest-execute
-bindkey '^y' autosuggest-accept
-bindkey '^u' autosuggest-toggle
-# bindkey '^L' vi-forward-word
-
-bindkey '^j' up-line-or-search
-bindkey '^k' down-line-or-search
-
-bindkey '^[[A' up-line-or-beginning-search # Up
-bindkey '^[[B' down-line-or-beginning-search # Down
+# bindkey '^w' autosuggest-execute
+# bindkey '^y' autosuggest-accept
+# bindkey '^u' autosuggest-toggle
+# # bindkey '^L' vi-forward-word
+#
+bindkey '^j' down-line-or-search
+bindkey '^k' up-line-or-search
+bindkey '^[[A' up-line-or-search
+bindkey '^[[B' down-line-or-search
+# 
+# bindkey '^[[A' up-line-or-beginning-search # Up
+# bindkey '^[[B' down-line-or-beginning-search # Down
 
 # ================================================================
 # Run Starship Prompt Configuration.
 # ===============================================================
-eval "$(starship init zsh)"
+# eval "$(starship init zsh)"
+
+# ================================================================
+# Export zsh-syntax-highlighting shell variables here instead of
+# in .zprofile, because they only apply to interactive shells.
+# IMPORTANT: Sourcing must be done at end of `.zshrc`, even after
+# bindkey statements.
+# ================================================================
+# Declare an associative array variable, to which values are added below.
+typeset -A ZSH_HIGHLIGHT_STYLES
+
+# To differentiate aliases from other command types
+export ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
+
+# To have paths colored instead of underlined
+export ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
+
+# To disable highlighting of globbing expressions
+export ZSH_HIGHLIGHT_STYLES[globbing]='none'
+
+# Command color (git etc.)
+export ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
+
+# Quoted argument color
+export ZSH_HIGHLIGHT_STYLES["single-quoted-argument"]='fg=green'
+export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
+
+# Source script, installed with pacman, as last command in `.zshrc`.
+. /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ================================================================
 # oh-my-zsh settings.

@@ -94,7 +94,8 @@ sudo pacman -Syu --noconfirm \
   gnupg \
   lsb-release \
   bash \
-  zsh zsh-completions zsh-doc \
+  zsh zsh-doc \
+  zsh-completions zsh-syntax-highlighting zsh-autosuggestions \
   fish \
   iputils \
   libxkbcommon-x11 wayland \
@@ -109,7 +110,6 @@ sudo pacman -Syu --noconfirm \
   rsync \
   cronie \
   bat \
-  eza \
   tree \
   glow \
   docker docker-buildx docker-compose \
@@ -168,6 +168,7 @@ rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
 git clone https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
 
 # Install eza completions.
+# `eza` software itself is installed with `cargo`.
 rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza"
 git clone https://github.com/eza-community/eza.git "${EZA_HOME:-$HOME/.local/share/eza}/eza"
 

@@ -25,8 +25,14 @@ fi
 # ================================================================
 # Export WEZTERM_HOME shell variable.
 # Subshells, e.g. non-login shells, inherit login shell's environment.
+# Not using wezterm.
 # ================================================================
-export WEZTERM_HOME="$HOME/.local/share/wezterm"
+# export WEZTERM_HOME="$HOME/.local/share/wezterm"
+
+# ================================================================
+# Export EZA_HOME shell variable.
+# ================================================================
+export EZA_HOME="$HOME/.local/share/eza"
 
 # ================================================================
 # Export GHOSTTY_RESOURCES_DIR environment variable.
