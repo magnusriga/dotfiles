@@ -116,7 +116,7 @@ source ~/.shrc
 # ================================================================
 # Load Bash-Specific Dotfiles.
 # ================================================================
-# [ -r ~/.bash_prompt ] && [ -f ~/.bash_prompt ] && source ~/.bash_prompt
+[ -r ~/.bash_prompt ] && [ -f ~/.bash_prompt ] && source ~/.bash_prompt
 
 # ================================================================
 # Bash-Specific Settings.

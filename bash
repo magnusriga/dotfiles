@@ -118,7 +118,6 @@
 # Ghostty Shell Integration for ZSH.
 # Must be Placed at Top of `.zshrc`.
 # ================================================================
-# WARNING: Adds small delay, slightly more than `zoxide`.
 if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
     builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
 fi
@@ -184,7 +183,7 @@ source <(fzf --zsh)
 # Start Zoxide, at end of zshrc, AFTER compinit.
 # Docker desktop should run to avoid error message form compinit.
 # ================================================================
-# WARNING: Ads tiny delay.
+# WARNING: First command that adds delay, delay is tiny.
 eval "$(zoxide init zsh)"
 
 # ================================================================
@@ -196,7 +195,7 @@ eval "$(zoxide init zsh)"
 # ================================================================
 # Enable zsh-autosuggestions (end of zshrc).
 # ================================================================
-# No delay introduced.
+# Still no delay (except tiny `zoxide` delay).
 # source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
@@ -217,9 +216,29 @@ bindkey '^[[B' down-line-or-search
 # bindkey '^[[B' down-line-or-beginning-search # Down
 
 # ================================================================
-# Source Script for Prompt Configuration.
+# Run Starship Prompt Configuration.
 # ===============================================================
-. ./.zsh_prompt
+# Starship introduces noticable delay.
+# eval "$(starship init zsh)"
+# Fast and simple prompt.
+PS1='%F{blue}%~ %(?.%F{green}.%F{red})%#%f '
+
+# Set the terminal title and prompt.
+PS1="\[\033]0;\W\007\]"; # working directory base name
+PS1+="\[${bold}\]\n"; # newline
+PS1+="\[${userStyle}\]\u"; # username
+PS1+="\[${white}\] at ";
+PS1+="\[${hostStyle}\]\h"; # host
+PS1+="\[${white}\] in ";
+PS1+="\[${green}\]\w"; # working directory full path
+PS1+="\$(prompt_git \"\[${white}\] on \[${violet}\]\" \"\[${blue}\]\")"; # Git repository details
+PS1+="\n";
+PS1+="\[${white}\]\$ \[${reset}\]"; # `$` (and reset color)
+export PS1;
+
+PS2="\[${yellow}\]→ \[${reset}\]";
+export PS2;
+
 
 # ================================================================
 # Export zsh-syntax-highlighting shell variables here instead of
