@@ -5,8 +5,8 @@ echo "Running .zsh_prompt..."
 # eval "$(starship init zsh)"
 
 # Fast and simple prompt.
-# PS1='%F{blue}%~ %(?.%F{green}.%F{red})%#%f '
-PS1=$'\n%F{blue}%~\n%(?.%F{green}.%F{red})%#%f '
+PS1='%F{blue}%~ %(?.%F{green}.%F{red})%#%f '
+# PS1=$'\n%F{blue}%~\n%(?.%F{green}.%F{red})%#%f '
 
 return
 

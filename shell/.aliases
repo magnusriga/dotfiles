@@ -17,6 +17,7 @@ alias p="cd ~/projects"
 alias n="cd ~/nfront"
 
 alias g="git"
+alias ga="git --add"
 alias gc="git add -A && git commit -am"
 alias gp="git push"
 alias gs="git status"
