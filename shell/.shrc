@@ -112,13 +112,14 @@ echo "Running .shrc..."
 # ================================================================
 # Load the Shell Dotfiles, and Then Some
 # ================================================================
-# * ~/.path can be used to extend `$PATH`.
-# * ~/.extra can be used for other settings you don’t want to commit.
-# * Could probably exclude `.exports`, `.path`, as those are also run from `.profile`.
-for file in ~/.{exports,path,aliases,functions}; do
-  [ -r "$file" ] && [ -f "$file" ] && source "$file"
-done
-unset file
+# These have already been sourced in `.profile`, which runs when login
+# shell is opened, and are exported form there, thus they are made available
+# to all sub-shells, i.e. non-login-shells, thus not needed here in `[..]rc`,
+# which runs when any interactive shell starts (login shell or not).
+# for file in ~/.{exports,path,aliases,functions}; do
+#   [ -r "$file" ] && [ -f "$file" ] && source "$file"
+# done
+# unset file
 
 # ================================================================
 # Set up shell integration for Wezterm.
