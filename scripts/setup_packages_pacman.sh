@@ -112,6 +112,7 @@ sudo pacman -Syu --noconfirm \
   bat \
   tree \
   glow \
+  fastfetch neofetch \
   docker docker-buildx docker-compose \
   github-cli \
   ffmpeg p7zip jq poppler poppler-data fd ripgrep fzf zoxide imagemagick chafa yazi \

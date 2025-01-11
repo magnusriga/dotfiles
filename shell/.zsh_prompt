@@ -151,13 +151,14 @@ git_branch_and_status() {
 # Punctuation in eza: `#5c6370`.
 # local gitStatus='$(git_status "${white} on ${violet}" "${blue}")'
 # local gitBranch=$'$(git_branch "${white} on ${red}")'
-# local gitBranch=$'$(git_branch "%F{#5c6370} | ${red}")'
-local gitBranchAndStatus='$(git_branch_and_status "%F{#5c6370} | ${red}" "${yellow}")'
+local gitBranch=$'$(git_branch "%F{#5c6370} | ${red}")'
+# local gitBranchAndStatus='$(git_branch_and_status "%F{#5c6370} | ${red}" "${yellow}")'
 
 # Fast and simple prompt.
 # PS1="%F{blue}%~${gitBranch} %(?.%F{green}.%F{red})%#%f "
 PS1=$'\n'; # Newline.
-PS1+="%F{blue}%~${gitBranchAndStatus} ";
+# PS1+="%F{blue}%~${gitBranchAndStatus}";
+PS1+="%F{blue}%~${gitBranch}";
 PS1+=$'\n%(?.%F{green}.%F{red})%#%f ';
 # PS1=$'\n%F{blue}%~\n%(?.%F{green}.%F{red})%#%f '
 

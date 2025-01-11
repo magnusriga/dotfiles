@@ -16,11 +16,22 @@ export ZSH_HOME="$HOME/.local/share/zsh"
 # Make vim the default editor in ssh sessions,
 # otherwise make nvim the default editor.
 # ================================================================
-if [[ -n $SSH_CONNECTION ]]; then
-  export EDITOR='vim'
-else
-  export EDITOR='nvim'
-fi
+# - Before, `EDITOR` would be set to `ed`, a line-based text editor,
+#   and `VISUAL` assigned to `vi`, a screen-based editor.
+# - `VISUAL` is used by all modern apps and terminals.
+# - Set up VISUAL to a full-screen editor such as vi/vim, emacs, nano, and so on.
+# - On modern Linux and Unix-like systems, set both `VISUAL` and `EDITOR` to same editor,
+#   e.g. vi/vim, emacs, or nano, as some tools only accept `EDITOR` and may not look for `VISUAL`.
+# - Almost all modern apps look for `VISUAL` first, and if not found look for `EDITOR`.
+# - Avoid differentiating on SSH connection, as we normally develop over SSH.
+export EDITOR='nvim'
+export VISUAL=$EDITOR
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+#   export VISUAL='vim'
+# else
+#   export EDITOR='nvim'
+# fi
 
 # ================================================================
 # Export WEZTERM_HOME shell variable.
