@@ -2,6 +2,28 @@
 
 echo "Running .zsh_prompt..."
 
+# ===================================
+# NOTES
+# ===================================
+# Set terminal title and prompt.
+# `\[`         : Begin sequence of non-printing characters,
+#                which could be used to embed terminal control sequence into prompt.
+# `\]`         : End sequence of non-printing characters.
+# `\033`       : Escape sequence, initiated up until, and include, `;`.
+# `\033]0;`    : Initiates string that sets title in titlebar of terminal,
+#                and that string is terminated by `\007` special character.
+# `$'...'`     : Like normal quotes, except escape sequences are interpreted,
+#                like in ZSH `echo` or bash `echo -e`.
+# `%{...%}`    : Like `$'...'`, i.e. escape sequences are handled.
+# `%F122`      : Instead of writing escape codes directly, it is possible to use
+#                `%F<digit>`, where `<digit>` is one of 256 color integers.
+#                See: `man zshmisc`.
+# `color[red]` : Lastly, it is also possible to use user-contributed function
+#                `colors` to access each of 8 basic colors, which just swaps in
+#                ANSI escape sequence, by executing `autoload -U colors && colors`,
+#                then accessing forground color for instance: `fg[red]`.
+#                See docs: `.../User-Contributions.html#Other-Functions`.
+
 # `PROMPT_SUBST <K> <S>`.
 # - If set, parameter expansion, command substitution and
 #   arithmetic expansion are performed in prompts.
@@ -13,7 +35,7 @@ echo "Running .zsh_prompt..."
 setopt PROMPT_SUBST
 
 # Enable `color` convenience method, to get ANSI escape codes for 8 standard colors.
-autoload -U colors && colors
+# autoload -U colors && colors
 
 # ================================================================
 # Manual Prompt, via Terminfo and ANSI Escape Codes.
@@ -162,40 +184,23 @@ PS1+="%F{blue}%~${gitBranch}";
 PS1+=$'\n%(?.%F{green}.%F{red})%#%f ';
 # PS1=$'\n%F{blue}%~\n%(?.%F{green}.%F{red})%#%f '
 
-return
-
-# Set terminal title and prompt.
-# `\[`         : Begin sequence of non-printing characters,
-#                which could be used to embed terminal control sequence into prompt.
-# `\]`         : End sequence of non-printing characters.
-# `\033`       : Escape sequence, initiated up until, and include, `;`.
-# `\033]0;`    : Initiates string that sets title in titlebar of terminal,
-#                and that string is terminated by `\007` special character.
-# `$'...'`     : Like normal quotes, except escape sequences are interpreted,
-#                like in ZSH `echo` or bash `echo -e`.
-# `%{...%}`    : Like `$'...'`, i.e. escape sequences are handled.
-# `%F122`      : Instead of writing escape codes directly, it is possible to use
-#                `%F<digit>`, where `<digit>` is one of 256 color integers.
-#                See: `man zshmisc`.
-# `color[red]` : Lastly, it is also possible to use user-contributed function
-#                `colors` to access each of 8 basic colors, which just swaps in
-#                ANSI escape sequence, by executing `autoload -U colors && colors`,
-#                then accessing forground color for instance: `fg[red]`.
-#                See docs: `.../User-Contributions.html#Other-Functions`.
-PS1=$'\033]0;%~\007'; # Working directory base name in the terminal titlebar.
-PS1+=$'%B\n'; # Set bold and add newline.
-PS1+="${userStyle}%n"; # Username.
-PS1+="${white} at ";
-PS1+="${hostStyle}%m"; # Hostname up to first `.`.
-PS1+="${white} in ";
-PS1+="${green}%~"; # Current working directory, with `$HOME` replaced by `~`.
-# - Nested parameters and command substitutions are supported.
-#   - Quotes themselves are also nested.
-#   - Thus, inner quotes do not interfere with outer quotes.
-PS1+="${gitStatus}"; # Git repository details.
-PS1+=$'\n';
-PS1+="${white}\$ ${reset}"; # `$` and reset color.
-export PS1;
-
-PS2="${yellow}→ ${reset}";
-export PS2;
+# ===================================
+# ALTERNATIVE PROMPT (like bash)
+# ===================================
+# PS1=$'\033]0;%~\007'; # Working directory base name in the terminal titlebar.
+# PS1+=$'%B\n'; # Set bold and add newline.
+# PS1+="${userStyle}%n"; # Username.
+# PS1+="${white} at ";
+# PS1+="${hostStyle}%m"; # Hostname up to first `.`.
+# PS1+="${white} in ";
+# PS1+="${green}%~"; # Current working directory, with `$HOME` replaced by `~`.
+# # - Nested parameters and command substitutions are supported.
+# #   - Quotes themselves are also nested.
+# #   - Thus, inner quotes do not interfere with outer quotes.
+# PS1+="${gitStatus}"; # Git repository details.
+# PS1+=$'\n';
+# PS1+="${white}\$ ${reset}"; # `$` and reset color.
+# export PS1;
+# 
+# PS2="${yellow}→ ${reset}";
+# export PS2;

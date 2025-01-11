@@ -17,14 +17,6 @@ if [ -d "$HOME/.local/bin" ]; then
 fi
 
 # ================================================================
-# Add Node Version Manager (NVM) to Path.
-# Needed for NVM, node, npm to Work in Docker.
-# Make Sure It Maches Path Set for .nvm in Dockerfile.
-# ================================================================
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
-# ================================================================
 # Add the Global pnpm Store (CAS) to Path.
 # ================================================================
 export PNPM_HOME="$HOME/.local/share/pnpm"

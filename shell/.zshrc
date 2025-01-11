@@ -144,10 +144,10 @@ setopt INC_APPEND_HISTORY
 # ================================================================
 fpath=($HOME/.zfunc $fpath)
 autoload -U rgf
-# autoload -U up-line-or-beginning-search
-# autoload -U down-line-or-beginning-search
-# zle -N up-line-or-beginning-search
-# zle -N down-line-or-beginning-search
+autoload -U up-line-or-beginning-search
+autoload -U down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
 
 # ================================================================
 # ZSH Completetions.
@@ -166,8 +166,36 @@ rm -f ~/.zcompdump; compinit
 # Enable vi mode in zsh (at end of zshrc).
 # ZSH_HOME: ZSH plugin directory.
 # ================================================================
+# - ZLE comes with several sets of key bindings, called keymaps.
+#   - `emacs`.
+#   - `viins`.
+#   - `vicmd`.
+#   - `viopp`.
+#   - `visual`.
+# - These keymaps determine what different keys do in ZSH.
+# - `main`.
+#   - Name which holds either `emacs` or `viins`, used as keymap when `ZLE` starts.
+#   - When `EDITOR` | `VISUAL` is set to string containing `vi`, which it is,
+#     `main` is automatically set to `viins`.
+#   - Thus, `bindkey -v` not needed, vi mode is used by default,
+#     since `EDITOR` and `VISUAL` is `nvim`.
+# - Since `main` is `viins`, ZLE starts in Vim Insert mode, not Normal mode.
+# - `bindkey -lL main`: See which mode is linked to `main`, i.e. now used.
+# - `bindkey [key]`: List key bindings in `main` keymap, i.e. `viins`, for <key>.
+#   - Omit <key> to show all bindings in current keymap.
+# - `bindkey -a [key]`: List key binding in `vicmd` keymap, for <key>.
+#   - Omit <key> to show all bindings in `vimcmd` keymap.
+#   - Neither `bindkey -e` for `emacs`, nor `bindkey -v` for `viins`
+#     works to show their bindings, use `-M <keymap>` instead.
+# - `bindkey -M <keymap>`: List key bindings for <keymap>.
+# - When no keymap is given to `bindkey` command, e.g. with options
+#   like `-v` or `-M vicmd`, `main` is used by default.
+# - `KEYTIMEOUT`: Parameter specifying time to wait for another keypress,
+#   when one key is prefix for another. Default: 40 centi-seconds, i.e. 400 ms.
+# - `^[`: ESC, which by default is bound to `vi-cmd-mode`, will undo everyting done in
+#   last insert mode.
 # bindkey -v
-# Alternative, more bindings:
+# Alternative, with more key bindings than default built-in:
 # source ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
 # ================================================================
@@ -198,21 +226,22 @@ eval "$(zoxide init zsh)"
 # ================================================================
 # No delay introduced.
 # source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+. /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # ================================================================
 # Keybindings.
 # ================================================================
+bindkey -M viins '^[' vi-cmd-mode
 # bindkey '^w' autosuggest-execute
 # bindkey '^y' autosuggest-accept
 # bindkey '^u' autosuggest-toggle
 # # bindkey '^L' vi-forward-word
 #
-bindkey '^j' down-line-or-search
 bindkey '^k' up-line-or-search
+bindkey '^j' down-line-or-search
 bindkey '^[[A' up-line-or-search
 bindkey '^[[B' down-line-or-search
-# 
+#
 # bindkey '^[[A' up-line-or-beginning-search # Up
 # bindkey '^[[B' down-line-or-beginning-search # Down
 
@@ -354,7 +383,3 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

@@ -136,6 +136,13 @@ if [ -f "$HOME/.path" ]; then
 fi
 
 # ================================================================
+# Load:`nvm`, `node`, `npm`.
+# ================================================================
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# Load `nvm` bash_completion.
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# ================================================================
 # Start SSH agent to Avoid Typing Github Password
 # ================================================================
 env=~/.ssh/agent.env

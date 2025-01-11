@@ -115,7 +115,10 @@ sudo pacman -Syu --noconfirm \
   fastfetch neofetch \
   docker docker-buildx docker-compose \
   github-cli \
-  ffmpeg p7zip jq poppler poppler-data fd ripgrep fzf zoxide imagemagick chafa yazi \
+  fzf viu \
+  zoxide \
+  fd ripgrep \
+  ffmpeg p7zip jq poppler poppler-data imagemagick chafa yazi \
   graphite graphite-docs \
   harfbuzz harfbuzz-utils \
   dav1d dav1d-doc \
@@ -123,13 +126,15 @@ sudo pacman -Syu --noconfirm \
   vulkan-driver \
   freeglut \
   opengl-man-pages \
-  gdk-pixbuf2 gimp java-runtime libwmf libopenraw libavif libheif libjxl librsvg webp-pixbuf-loader \
+  gdk-pixbuf2 gimp java-runtime \
+  libwmf libopenraw libavif libheif libjxl librsvg webp-pixbuf-loader \
   tk gnuplot sysstat \
   python-setuptools python-keyring python-xdg python python-pip python-pipx \
   lua luarocks \
   evince gtk4 libadwaita \
   libjpeg-turbo libpng zlib \
-  intel-media-driver libva-intel-driver libva-mesa-driver libvdpau-va-gl nvidia-utils opencl-driver \
+  intel-media-driver libva-intel-driver libva-mesa-driver libvdpau-va-gl \
+  nvidia-utils opencl-driver \
   intel-media-sdk vpl-gpu-rt \
   fftw-openmpi libusb libdecor \
   mesa libnss_nis libxss libxtst \
