@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo "Running .zsh_prompt..."
 
 # `PROMPT_SUBST <K> <S>`.
