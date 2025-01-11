@@ -36,3 +36,4 @@ If git clone does not work:
 Other Notes
 ==================================
 - Manually add name and email to `.gitconfig`: `. ~/dotfiles/_unused/setup_git_credentials.sh`.
+- Prompt slightly delayed due to `git_status`, remove git status to avoid.
