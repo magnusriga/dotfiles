@@ -15,7 +15,7 @@ if [ ! -d "$BUN_INSTALL" ]; then
   mkdir -p "$BUN_INSTALL"
 fi
 
-export NVM_DIR="$HOME/.home/$USERNAME"
+export NVM_DIR="$HOME/.nvm"
 if [ ! -d "$NVM_DIR" ]; then
   mkdir -p "$NVM_DIR"
 fi
