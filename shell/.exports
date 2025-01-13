@@ -36,9 +36,8 @@ export VISUAL=$EDITOR
 # ================================================================
 # Export WEZTERM_HOME shell variable.
 # Subshells, e.g. non-login shells, inherit login shell's environment.
-# Not using wezterm.
 # ================================================================
-# export WEZTERM_HOME="$HOME/.local/share/wezterm"
+export WEZTERM_HOME="$HOME/.local/share/wezterm"
 
 # ================================================================
 # Export EZA_HOME shell variable.

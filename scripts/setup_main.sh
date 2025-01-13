@@ -86,10 +86,10 @@ fi
 # fi
 
 # ================================================
-# Not using Wezterm.
+# Setup Wezterm shell integration.
 # ================================================
-# rm -rf "$WEZTERM_HOME/shell-integration"
-# curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https://raw.githubusercontent.com/wez/wezterm/refs/heads/main/assets/shell-integration/wezterm.sh
+rm -rf "$WEZTERM_HOME/shell-integration"
+curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https://raw.githubusercontent.com/wez/wezterm/refs/heads/main/assets/shell-integration/wezterm.sh
 
 # ================================================
 # Setup: `git` credentials.

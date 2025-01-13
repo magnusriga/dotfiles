@@ -40,10 +40,10 @@ if [ ! -d "$AEROSPACE_HOME" ]; then
   mkdir -p "$AEROSPACE_HOME"
 fi
 
-# export WEZTERM_HOME="$HOME/.local/share/wezterm"
-# if [ ! -d "$WEZTERM_HOME" ]; then
-#   mkdir -p "$WEZTERM_HOME"
-# fi
+export WEZTERM_HOME="$HOME/.local/share/wezterm"
+if [ ! -d "$WEZTERM_HOME" ]; then
+  mkdir -p "$WEZTERM_HOME"
+fi
 
 # export NVIM_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
 # Let git make the folder.

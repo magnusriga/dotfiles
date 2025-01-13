@@ -167,7 +167,10 @@ git_branch_and_status() {
 
 
 # Starship introduces noticable delay, thus avoid.
-# eval "$(starship init zsh)"
+# Dealy does not happen on Wezterm, only on Ghostty.
+eval "$(starship init zsh)"
+
+return
 
 # Git variables.
 # Punctuation in eza: `#5c6370`.

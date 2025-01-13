@@ -80,7 +80,7 @@ function doIt() {
   # otherwise, if $0 is e.g. -bash, script is being sourced,
   # i.e. run in current shell's process.
   # [[ $BASH_SOURCE = $0 ]] && exit 1 || return
-  
+
   # ==========================================================
   # Run remaining setup scripts as new user.
   # Switch manually to new user, before running this file again.
@@ -96,8 +96,11 @@ function doIt() {
   #   to avoid symlinked `.config` folders, e.g. $HOME/.config/eza,
   #   being overwritten by install scripts that create e.g. $HOME/.config/eza.
   # - Uses configuration `dotfiles/.stowrc`, which excludes certain directories.
+  # - Stow is not ignoring top-level dotfiles, like `.git` because of this file,
+  #   instead `stow *` expands to all files and directories in folder except hidden ones,
+  #   i.e. those starting at `.`.
   # ==========================================================
-  # First remove existing dotfiles.
+  # First remove existing dotfiles, not created by `stow`.
   rm -rf ~/{.gitconfig,.bash_profile,.bashrc,.profile,.zshrc}
   echo "Running: stow -vv -d $HOME/dotfiles -t $HOME *"
   cd $SCRIPTPATH/..

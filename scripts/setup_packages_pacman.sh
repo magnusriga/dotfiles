@@ -6,6 +6,14 @@ echo "Running setup_packages_pacman.sh as $(whoami), with HOME $HOME and USERNAM
 # systemctl --quiet is-active snapd.service && sudo service snapd stop
 
 # ==========================================================
+# Copy `pacman.conf` to `/etc`, so it is used by `pacman`.
+# Cannot `stow`, it is installed later.
+# ==========================================================
+ROOTPATH="$( cd -- "$(dirname "${BASH_SOURCE}")/.." >/dev/null 2>&1 ; pwd -P )"
+sudo rm -f /etc/pacman.conf
+sudo ln -s "${ROOTPATH}/.system/pacman.conf" /etc
+
+# ==========================================================
 # Set locale.
 # ==========================================================
 sudo localectl set-locale LANG=en_US.UTF-8

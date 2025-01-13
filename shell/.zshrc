@@ -119,9 +119,9 @@
 # Must be Placed at Top of `.zshrc`.
 # ================================================================
 # WARNING: Adds small delay, slightly more than `zoxide`.
-if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
-    builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
-fi
+# if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
+#     builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
+# fi
 
 # ================================================================
 # Run Generic Interactive Shell Configuration.
@@ -180,6 +180,8 @@ rm -f ~/.zcompdump; compinit
 #   - Thus, `bindkey -v` not needed, vi mode is used by default,
 #     since `EDITOR` and `VISUAL` is `nvim`.
 # - Since `main` is `viins`, ZLE starts in Vim Insert mode, not Normal mode.
+# - To start in `vicmd` mode, call `zle -K vicmd` inside `zle-line-init`,
+#   alongside `zle -N zle-line-init`, see docs for example.
 # - `bindkey -lL main`: See which mode is linked to `main`, i.e. now used.
 # - `bindkey [key]`: List key bindings in `main` keymap, i.e. `viins`, for <key>.
 #   - Omit <key> to show all bindings in current keymap.
@@ -231,7 +233,9 @@ eval "$(zoxide init zsh)"
 # ================================================================
 # Keybindings.
 # ================================================================
-bindkey -M viins '^[' vi-cmd-mode
+# TODO: Add fix for ^w and ^h, and for up-search, and for esc.
+# bindkey -rpM viins '^['
+# bindkey -rM viins '^['
 # bindkey '^w' autosuggest-execute
 # bindkey '^y' autosuggest-accept
 # bindkey '^u' autosuggest-toggle
@@ -383,3 +387,10 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# bun completions
+[ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"

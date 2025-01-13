@@ -61,13 +61,13 @@ STOWDIR="/usr/local/stow"
 
 # Where to download build files, like git repositories.
 # TMPDIR="/tmp"
-TMPDIR="$HOME/builds"
+TMPDIR="$HOME/build"
 
 # Create directories.
-mkdir -p $STOWDIR 
+sudo mkdir -p $STOWDIR
 
 # Set permissions.
-sudo chown -R $USER:$USER $TARGETDIR
+sudo chown -R $USER:$USER $TARGETDIR $STOWDIR
 sudo chmod -R 755 $TARGETDIR
 
 # ================================================
@@ -75,12 +75,12 @@ sudo chmod -R 755 $TARGETDIR
 # ================================================
 PACKAGE="todocheck"
 VERSION=$(curl -s "https://api.github.com/repos/preslavmihaylov/todocheck/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf "$STOWDIR/$PACKAGE" 
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir $TMPDIR/$PACKAGE
 mkdir -p $STOWDIR/$PACKAGE/bin
 curl -L --output $TMPDIR/$PACKAGE/$PACKAGE https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64 --output $TMPDIR/$PACKAGE/$PACKAGE.sha256 https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256
-if echo "$(cat $TMPDIR/$PACKAGE/$PACKAGE.sha256)" | echo "$(awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status ; then
+if echo "$(cat $TMPDIR/$PACKAGE/$PACKAGE.sha256 | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status ; then
   sudo mv $TMPDIR/$PACKAGE/$PACKAGE $STOWDIR/$PACKAGE/bin
   chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
   stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
@@ -113,6 +113,8 @@ mkdir "$HOME/.config/$PACKAGE"
 git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
 cd "$TMPDIR/$PACKAGE"
 zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
+cd -- "$(dirname "$BASH_SOURCE")"
+cp ~{/dotfiles,}/.stow-global-ignore
 cd $CURRENTDIR
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
