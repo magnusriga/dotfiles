@@ -196,11 +196,11 @@ bindkey '^L' vi-forward-word
 bindkey '^k' up-line-or-search
 bindkey '^j' down-line-or-search
 
+
 # ================================================================
-# Run Starship Prompt Configuration.
+# Run Prompt Configuration.
 # ===============================================================
-# export STARSHIP_LOG=trace
-eval "$(starship init zsh)"
+. ~/.zsh_prompt
 
 # ================================================================
 # oh-my-zsh settings.

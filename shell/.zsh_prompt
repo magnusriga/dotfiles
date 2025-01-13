@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# export STARSHIP_LOG=trace
+eval "$(starship init zsh)"
