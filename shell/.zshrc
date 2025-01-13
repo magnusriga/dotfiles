@@ -108,147 +108,201 @@
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
 # ================================================================
 
-echo "Running .profile..."
+# ================================================================
+# .[..]rc should generally only run if shell is interactive,
+# but double check here and only procede if shell is interactive.
+# ================================================================
+[[ $- == *i* ]] || [ -n "$PS1" ] || return
 
 # ================================================================
-# Source API Keys.
+# Autoload own functions.
 # ================================================================
-if [ -f "$HOME/.env" ]; then
-  set -a
-  source $HOME/.env
-  set +a
-fi
+fpath=($HOME/.zfunc $fpath)
+autoload -U rgf
 
 # ================================================================
-# Add User's Private Bin (`~/bin`) to `$PATH`
+# Run Generic Interactive Shell Configuration.
 # ================================================================
-if [ -d "$HOME/bin" ]; then
-  PATH="$HOME/bin:$PATH"
-fi
+echo "Running .zshrc, about to source .shrc..."
+source ~/.shrc
 
 # ================================================================
-# Add User's Private .local Bin to Path
+# Export zsh-syntax-highlighting shell variables here instead of
+# in .zprofile, because they only apply to interactive shells.
 # ================================================================
-if [ -d "$HOME/.local/bin" ]; then
-  PATH="$HOME/.local/bin:$PATH"
-fi
+# source $ZSH_HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# Declare the variable
+typeset -A ZSH_HIGHLIGHT_STYLES
+
+# To differentiate aliases from other command types
+export ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
+
+# To have paths colored instead of underlined
+export ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
+
+# To disable highlighting of globbing expressions
+export ZSH_HIGHLIGHT_STYLES[globbing]='none'
+
+# Command color (git etc.)
+export ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
+
+# Quoted argument color
+export ZSH_HIGHLIGHT_STYLES["single-quoted-argument"]='fg=green'
+export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 
 # ================================================================
-# Add Node Version Manager (NVM) to Path.
-# Needed for NVM, node, npm to Work in Docker.
-# Make Sure It Maches Path Set for .nvm in Dockerfile.
+# Completetions.
 # ================================================================
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+# source "$HOME/zsh/completion.zsh"
+# export EZA_HOME="/home/$USERNAME/.local/share/eza/eza"
+# export FPATH="$EZA_HOME/completions/zsh:$FPATH"
 
 # ================================================================
-# Add the Global pnpm Store (CAS) to Path.
+# Enable vi mode in zsh (at end of zshrc).
 # ================================================================
-export PNPM_HOME="$HOME/.local/share/pnpm"
-if [ -d "$HOME/.local/share/pnpm" ]; then
-  PATH="$HOME/.local/share/pnpm:$PATH"
-fi
+# source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
 # ================================================================
-# Set Default Shell to Zsh
+# Set up fzf key bindings, e.g. <C-T>, <C-R>, <A-C>, and fuzzy completion.
+# Must be done after the vi mode settings above.
 # ================================================================
-SHELL=$(which zsh)
+source <(fzf --zsh)
 
 # ================================================================
-# Add Bun to Path
+# Start Zoxide, at end of zshrc, AFTER compinit.
+# Docker desktop should run to avoid error message form compinit.
 # ================================================================
-export BUN_INSTALL="$HOME/.bun"
-if [ -d "$BUN_INSTALL" ]; then
-  PATH="$BUN_INSTALL/bin:$PATH"
-fi
+eval "$(zoxide init zsh)"
 
 # ================================================================
-# Add Cargo to Path
+# Enable zsh-autocomplete.
 # ================================================================
-export CARGO_HOME="$HOME/.cargo"
-if [ -d "$CARGO_HOME/bin" ]; then
-  PATH="$CARGO_HOME/bin:$PATH"
-fi
+# Do not use this, implement own completions.
+# source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autocomplete/zsh-autocomplete.plugin.zsh"
 
 # ================================================================
-# Add Homebrew to Path
+# Enable zsh-autosuggestions (end of zshrc).
 # ================================================================
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # ================================================================
-# Add snap binary directory to PATH.
+# Keybindings.
 # ================================================================
-if [ -d "/snap/bin" ]; then
-  PATH="/snap/bin:$PATH"
-fi
+bindkey '^w' autosuggest-execute
+bindkey '^e' autosuggest-accept
+bindkey '^u' autosuggest-toggle
+bindkey '^L' vi-forward-word
+bindkey '^k' up-line-or-search
+bindkey '^j' down-line-or-search
 
 # ================================================================
-# Export WEZTERM_HOME shell variable.
-# Subshells, e.g. non-login shells, inherit login shell's environment.
-# ================================================================
-export WEZTERM_HOME="$HOME/.local/share/wezterm"
+# Run Starship Prompt Configuration.
+# ===============================================================
+eval "$(starship init zsh)"
 
 # ================================================================
-# Export variables for shell history persistence.
+# oh-my-zsh settings.
+# Not using oh-my-zsh, but keeping the settings here for reference.
 # ================================================================
-export PROMPT_COMMAND=(history -a)
-export HISTFILE="/commandhistory/.shell_history"
+# Path to your Oh My Zsh installation.
+# export ZSH="$ZSH_HOME/oh-my-zsh"
 
-# ================================================================
-# Add symlink to fd, since another program has taken fd name.
-# Add ~/.local/bin, where symlink is placed, to path so fd is found.
-# ================================================================
-if [ ! -d "$HOME/.local/bin" ]; then
-  mkdir "$HOME/.local/bin" ]
-fi
-if [ ! -L "$HOME/.local/bin/fd" ]; then
-  ln -fs $(which fdfind) ~/.local/bin/fd
-fi
-PATH="$HOME/.local/bin:$PATH"
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time Oh My Zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+# ZSH_THEME="robbyrussell"
 
-# ================================================================
-# Make Google Chrome Default Browser
-# ================================================================
-export BROWSER=google-chrome
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
 
-# ================================================================
-# Set Ripgrep Configuration File
-# ================================================================
-export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
 
-# ================================================================
-# Set XDG_CONFIG_HOME, used by nvim.
-# ================================================================
-export XDG_CONFIG_HOME="$HOME/.config"
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
 
-# ================================================================
-# Start SSH agent to Avoid Typing Github Password
-# ================================================================
-env=~/.ssh/agent.env
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+# zstyle ':omz:update' mode auto      # update automatically without asking
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
 
-agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
+# Uncomment the following line to change how often to auto-update (in days).
+# zstyle ':omz:update' frequency 13
 
-agent_start() {
-  (
-    umask 077
-    ssh-agent >|"$env"
-  )
-  . "$env" >|/dev/null
-}
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
 
-agent_load_env
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
 
-# agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
-agent_run_state=$(
-  ssh-add -l >|/dev/null 2>&1
-  echo $?
-)
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
 
-if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
-  agent_start
-  ssh-add
-elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
-  ssh-add
-fi
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
 
-unset env
+# Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+# plugins=(git)
+
+# source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='nvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch $(uname -m)"
+
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"

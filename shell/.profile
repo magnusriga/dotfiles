@@ -108,132 +108,147 @@
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
 # ================================================================
 
-echo "Running .shrc..."
-# ================================================================
-# Load the Shell Dotfiles, and Then Some
-# ================================================================
-# * ~/.path can be used to extend `$PATH`.
-# * ~/.extra can be used for other settings you don’t want to commit.
-for file in ~/.{path,exports,aliases,functions,extra}; do
-  [ -r "$file" ] && [ -f "$file" ] && source "$file"
-done
-unset file
+echo "Running .profile..."
 
 # ================================================================
-# Set up shell integration for Wezterm.
-# Enables scrollback to start of earlier command,
-# selecting output of previous commands, etc.
-# PATH is already set up in .zprofile > .profile.
+# Source API Keys.
 # ================================================================
-source $WEZTERM_HOME/shell-integration/wezterm.sh
+if [ -f "$HOME/.env" ]; then
+  set -a
+  source $HOME/.env
+  set +a
+fi
 
 # ================================================================
-# Add custom fzf settings.
-# Could be set in .profile, since exported shell variables,
-# aka. environment variables, are inherited by non-login shells
-# from login shell, because non-login shells are subshells
-# of parent login shell.
-# Instead, keep them here together with the functions,
-# which need to be here since they are not exported.
-# Note: .[..]rc files are sourced for every interactive shell,
-# both for login and non-login shells.
+# Add User's Private Bin (`~/bin`) to `$PATH`
 # ================================================================
-# FZF_DEFAULT_COMPLETION_OPTIONS is our own environment variable.
-export FD_DEFAULT_OPTIONS=(--hidden --no-ignore --follow
-  --exclude .git
-  --exclude node_modules
-  --exclude .history
-  --exclude .rustup
-  --exclude .cargo
-  --exclude .cache)
-
-export EZA_OPTIONS=(-la --color=always --icons=always --git --git-repos --hyperlink --header --grid --octal-permissions --no-permissions --time-style=relative)
-
-# Always execute nvim when Enter is pressed (will crash on input that is not a file, but OK tradeoff).
-# Do not bind Enter to open in nvim here, because fzf is also used by yazi and others.
-export FZF_DEFAULT_OPTS="--ansi --height=90% --layout=reverse --info=inline --border --margin=1 --padding=1
-  --color \"hl:-1:underline,hl+:-1:underline:reverse\"
-  --tmux 90%,90%
-  --multi
-  --prompt 'All> '
-  --header 'CTRL-T: Files/Directories | CTRL-R: All'
-  --bind 'ctrl-t:transform:[[ {fzf:prompt} =~ Files ]] && echo \"change-prompt(Directories> )+reload(fd $FD_DEFAULT_OPTIONS --type d)+change-preview-window(up,60%,border-bottom)\" || echo \"change-prompt(Files> )+reload(fd $FD_DEFAULT_OPTIONS --type f)+change-preview-window(right,70%,border-left)\"'
-  --bind 'ctrl-r:transform:echo \"change-prompt(All> )+reload(fd $FD_DEFAULT_OPTIONS)\"'
-  --preview '[[ {fzf:prompt} =~ Directories ]] && eza $EZA_OPTIONS {} || bat --color=always {}'
-  --preview-window 'right'
-  "
-
-export FZF_DEFAULT_COMMAND="fd $FD_DEFAULT_OPTIONS"
-# ================================================================
-# Options for fzf in <c-t> | <m-c> | <c-r> mode.
-# FZF_DEFAULT_OPTS also apply here, so overwrite its options if
-# necessary to deviate from general settings.
-# ================================================================
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_CTRL_T_OPTS="
-  --bind 'enter:execute(nvim {+})'"
-# export FZF_ALT_C_COMMAND="fd $FZF_DEFAULT_OPTS --type d"
-export FZF_CTRL_R_OPTS="--prompt 'Commands> ' --header '' --preview ''"
+if [ -d "$HOME/bin" ]; then
+  PATH="$HOME/bin:$PATH"
+fi
 
 # ================================================================
-# Options for fzf in completions mode: **<Tab>.
-# FZF_DEFAULT_OPTS also apply here, so overwrite its options if
-# necessary to deviate from general settings.
+# Add User's Private .local Bin to Path
 # ================================================================
-# Use ~~ as the trigger sequence instead of the default **.
-# export FZF_COMPLETION_TRIGGER='~~'
+if [ -d "$HOME/.local/bin" ]; then
+  PATH="$HOME/.local/bin:$PATH"
+fi
 
-# General options for fzf in completion mode.
-# export FZF_COMPLETION_OPTS='--border --info=inline'
+# ================================================================
+# Add Node Version Manager (NVM) to Path.
+# Needed for NVM, node, npm to Work in Docker.
+# Make Sure It Maches Path Set for .nvm in Dockerfile.
+# ================================================================
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
-# Command run by fzf completion mode when preceding command lists file paths.
-# Example: ls **<Tab>.
-# - The first argument to the function ($1) is the base path to start traversal
-# - See the source code (completion.{bash,zsh}) for the details.
-_fzf_compgen_path() {
-  $FZF_DEFAULT_COMMAND . "$1"
+# ================================================================
+# Add the Global pnpm Store (CAS) to Path.
+# ================================================================
+export PNPM_HOME="$HOME/.local/share/pnpm"
+if [ -d "$HOME/.local/share/pnpm" ]; then
+  PATH="$HOME/.local/share/pnpm:$PATH"
+fi
+
+# ================================================================
+# Set Default Shell to Zsh
+# ================================================================
+SHELL=$(which zsh)
+
+# ================================================================
+# Add Bun to Path
+# ================================================================
+export BUN_INSTALL="$HOME/.bun"
+if [ -d "$BUN_INSTALL" ]; then
+  PATH="$BUN_INSTALL/bin:$PATH"
+fi
+
+# ================================================================
+# Add Cargo to Path
+# ================================================================
+export CARGO_HOME="$HOME/.cargo"
+if [ -d "$CARGO_HOME/bin" ]; then
+  PATH="$CARGO_HOME/bin:$PATH"
+fi
+
+# ================================================================
+# Add Homebrew to Path
+# ================================================================
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# ================================================================
+# Add snap binary directory to PATH.
+# ================================================================
+if [ -d "/snap/bin" ]; then
+  PATH="/snap/bin:$PATH"
+fi
+
+# ================================================================
+# Export WEZTERM_HOME shell variable.
+# Subshells, e.g. non-login shells, inherit login shell's environment.
+# ================================================================
+export WEZTERM_HOME="$HOME/.local/share/wezterm"
+
+# ================================================================
+# Export variables for shell history persistence.
+# ================================================================
+export PROMPT_COMMAND=(history -a)
+export HISTFILE="/commandhistory/.shell_history"
+
+# ================================================================
+# Add symlink to fd, since another program has taken fd name.
+# Add ~/.local/bin, where symlink is placed, to path so fd is found.
+# ================================================================
+if [ ! -d "$HOME/.local/bin" ]; then
+  mkdir "$HOME/.local/bin" ]
+fi
+if [ ! -L "$HOME/.local/bin/fd" ]; then
+  ln -fs $(which fdfind) ~/.local/bin/fd
+fi
+PATH="$HOME/.local/bin:$PATH"
+
+# ================================================================
+# Make Google Chrome Default Browser
+# ================================================================
+export BROWSER=google-chrome
+
+# ================================================================
+# Set Ripgrep Configuration File
+# ================================================================
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+
+# ================================================================
+# Set XDG_CONFIG_HOME, used by nvim.
+# ================================================================
+export XDG_CONFIG_HOME="$HOME/.config"
+
+# ================================================================
+# Start SSH agent to Avoid Typing Github Password
+# ================================================================
+env=~/.ssh/agent.env
+
+agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
+
+agent_start() {
+  (
+    umask 077
+    ssh-agent >|"$env"
+  )
+  . "$env" >|/dev/null
 }
 
-# Command run by fzf completion mode when preceding command lists directories.
-# Example: cd **<Tab>.
-_fzf_compgen_dir() {
-  fd "$FD_DEFAULT_OPTIONS" --type d . "$1"
-}
+agent_load_env
 
-# Cusom list of commands run by fzf completion mode, for different preceding commands.
-# Overwrites compgen functions above.
-# Example: cd **<Tab>.
-_fzf_comprun() {
-  local command=$1
-  shift
+# agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
+agent_run_state=$(
+  ssh-add -l >|/dev/null 2>&1
+  echo $?
+)
 
-  case "$command" in
-  # cd) fzf --preview "eza $EZA_OPTIONS {} | head -200' "$@" ;;
-  cd) fzf --preview "eza $EZA_OPTIONS {}" "$@" ;;
-  export | unset) fzf --preview "eval 'echo \$'{}" "$@" ;;
-  ssh) fzf --preview 'dog {}' "$@" ;;
-  *) fzf --preview 'bat -n --color=always {}' "$@" ;;
-  esac
-}
+if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
+  agent_start
+  ssh-add
+elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
+  ssh-add
+fi
 
-# ================================================================
-# Yazi wrapper script.
-# ================================================================
-function y() {
-  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-  yazi "$@" --cwd-file="$tmp"
-  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-    builtin cd -- "$cwd"
-  fi
-  rm -f -- "$tmp"
-}
-
-# ================================================================
-# Setup Cargo.
-# ================================================================
-source "$HOME/.cargo/env"
-
-# ================================================================
-# Setup and launch tmux (turned off for now, due to lag).
-# ================================================================
-# source "$HOME/scripts/tmux-start.sh"
+unset env

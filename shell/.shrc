@@ -108,201 +108,132 @@
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
 # ================================================================
 
+echo "Running .shrc..."
 # ================================================================
-# .[..]rc should generally only run if shell is interactive,
-# but double check here and only procede if shell is interactive.
+# Load the Shell Dotfiles, and Then Some
 # ================================================================
-[[ $- == *i* ]] || [ -n "$PS1" ] || return
-
-# ================================================================
-# Autoload own functions.
-# ================================================================
-fpath=($HOME/.zfunc $fpath)
-autoload -U rgf
-
-# ================================================================
-# Run Generic Interactive Shell Configuration.
-# ================================================================
-echo "Running .zshrc, about to source .shrc..."
-source ~/.shrc
+# * ~/.path can be used to extend `$PATH`.
+# * ~/.extra can be used for other settings you don’t want to commit.
+for file in ~/.{path,exports,aliases,functions,extra}; do
+  [ -r "$file" ] && [ -f "$file" ] && source "$file"
+done
+unset file
 
 # ================================================================
-# Export zsh-syntax-highlighting shell variables here instead of
-# in .zprofile, because they only apply to interactive shells.
+# Set up shell integration for Wezterm.
+# Enables scrollback to start of earlier command,
+# selecting output of previous commands, etc.
+# PATH is already set up in .zprofile > .profile.
 # ================================================================
-source $ZSH_HOME/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# Declare the variable
-typeset -A ZSH_HIGHLIGHT_STYLES
-
-# To differentiate aliases from other command types
-export ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
-
-# To have paths colored instead of underlined
-export ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
-
-# To disable highlighting of globbing expressions
-export ZSH_HIGHLIGHT_STYLES[globbing]='none'
-
-# Command color (git etc.)
-export ZSH_HIGHLIGHT_STYLES[command]='fg=yellow'
-
-# Quoted argument color
-export ZSH_HIGHLIGHT_STYLES["single-quoted-argument"]='fg=green'
-export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
+# source $WEZTERM_HOME/shell-integration/wezterm.sh
 
 # ================================================================
-# Completetions.
+# Add custom fzf settings.
+# Could be set in .profile, since exported shell variables,
+# aka. environment variables, are inherited by non-login shells
+# from login shell, because non-login shells are subshells
+# of parent login shell.
+# Instead, keep them here together with the functions,
+# which need to be here since they are not exported.
+# Note: .[..]rc files are sourced for every interactive shell,
+# both for login and non-login shells.
 # ================================================================
-source "$HOME/zsh/completion.zsh"
-export EZA_HOME="/home/$USERNAME/.local/share/eza/eza"
-export FPATH="$EZA_HOME/completions/zsh:$FPATH"
+# FZF_DEFAULT_COMPLETION_OPTIONS is our own environment variable.
+export FD_DEFAULT_OPTIONS=(--hidden --no-ignore --follow
+  --exclude .git
+  --exclude node_modules
+  --exclude .history
+  --exclude .rustup
+  --exclude .cargo
+  --exclude .cache)
 
-# ================================================================
-# Enable vi mode in zsh (at end of zshrc).
-# ================================================================
-# source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+export EZA_OPTIONS=(-la --color=always --icons=always --git --git-repos --hyperlink --header --grid --octal-permissions --no-permissions --time-style=relative)
 
-# ================================================================
-# Set up fzf key bindings, e.g. <C-T>, <C-R>, <A-C>, and fuzzy completion.
-# Must be done after the vi mode settings above.
-# ================================================================
-source <(fzf --zsh)
+# Always execute nvim when Enter is pressed (will crash on input that is not a file, but OK tradeoff).
+# Do not bind Enter to open in nvim here, because fzf is also used by yazi and others.
+export FZF_DEFAULT_OPTS="--ansi --height=90% --layout=reverse --info=inline --border --margin=1 --padding=1
+  --color \"hl:-1:underline,hl+:-1:underline:reverse\"
+  --tmux 90%,90%
+  --multi
+  --prompt 'All> '
+  --header 'CTRL-T: Files/Directories | CTRL-R: All'
+  --bind 'ctrl-t:transform:[[ {fzf:prompt} =~ Files ]] && echo \"change-prompt(Directories> )+reload(fd $FD_DEFAULT_OPTIONS --type d)+change-preview-window(up,60%,border-bottom)\" || echo \"change-prompt(Files> )+reload(fd $FD_DEFAULT_OPTIONS --type f)+change-preview-window(right,70%,border-left)\"'
+  --bind 'ctrl-r:transform:echo \"change-prompt(All> )+reload(fd $FD_DEFAULT_OPTIONS)\"'
+  --preview '[[ {fzf:prompt} =~ Directories ]] && eza $EZA_OPTIONS {} || bat --color=always {}'
+  --preview-window 'right'
+  "
 
+export FZF_DEFAULT_COMMAND="fd $FD_DEFAULT_OPTIONS"
 # ================================================================
-# Start Zoxide, at end of zshrc, AFTER compinit.
-# Docker desktop should run to avoid error message form compinit.
+# Options for fzf in <c-t> | <m-c> | <c-r> mode.
+# FZF_DEFAULT_OPTS also apply here, so overwrite its options if
+# necessary to deviate from general settings.
 # ================================================================
-eval "$(zoxide init zsh)"
-
-# ================================================================
-# Enable zsh-autocomplete.
-# ================================================================
-# Do not use this, implement own completions.
-# source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autocomplete/zsh-autocomplete.plugin.zsh"
-
-# ================================================================
-# Enable zsh-autosuggestions (end of zshrc).
-# ================================================================
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-
-# ================================================================
-# Keybindings.
-# ================================================================
-bindkey '^w' autosuggest-execute
-bindkey '^e' autosuggest-accept
-bindkey '^u' autosuggest-toggle
-bindkey '^L' vi-forward-word
-bindkey '^k' up-line-or-search
-bindkey '^j' down-line-or-search
-
-# ================================================================
-# Run Starship Prompt Configuration.
-# ===============================================================
-eval "$(starship init zsh)"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_OPTS="
+  --bind 'enter:execute(nvim {+})'"
+# export FZF_ALT_C_COMMAND="fd $FZF_DEFAULT_OPTS --type d"
+export FZF_CTRL_R_OPTS="--prompt 'Commands> ' --header '' --preview ''"
 
 # ================================================================
-# oh-my-zsh settings.
-# Not using oh-my-zsh, but keeping the settings here for reference.
+# Options for fzf in completions mode: **<Tab>.
+# FZF_DEFAULT_OPTS also apply here, so overwrite its options if
+# necessary to deviate from general settings.
 # ================================================================
-# Path to your Oh My Zsh installation.
-# export ZSH="$ZSH_HOME/oh-my-zsh"
+# Use ~~ as the trigger sequence instead of the default **.
+export FZF_COMPLETION_TRIGGER='~~'
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell"
+# General options for fzf in completion mode.
+export FZF_COMPLETION_OPTS='--border --info=inline'
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+# Command run by fzf completion mode when preceding command lists file paths.
+# Example: ls **<Tab>.
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+_fzf_compgen_path() {
+  $FZF_DEFAULT_COMMAND . "$1"
+}
 
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
+# Command run by fzf completion mode when preceding command lists directories.
+# Example: cd **<Tab>.
+_fzf_compgen_dir() {
+  fd "$FD_DEFAULT_OPTIONS" --type d . "$1"
+}
 
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
+# Cusom list of commands run by fzf completion mode, for different preceding commands.
+# Overwrites compgen functions above.
+# Example: cd **<Tab>.
+_fzf_comprun() {
+  local command=$1
+  shift
 
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+  case "$command" in
+  # cd) fzf --preview "eza $EZA_OPTIONS {} | head -200' "$@" ;;
+  cd) fzf --preview "eza $EZA_OPTIONS {}" "$@" ;;
+  export | unset) fzf --preview "eval 'echo \$'{}" "$@" ;;
+  ssh) fzf --preview 'dog {}' "$@" ;;
+  *) fzf --preview 'bat -n --color=always {}' "$@" ;;
+  esac
+}
 
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
+# ================================================================
+# Yazi wrapper script.
+# ================================================================
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    builtin cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
 
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
+# ================================================================
+# Setup Cargo.
+# ================================================================
+source "$HOME/.cargo/env"
 
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-# plugins=(git)
-
-# source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
-
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+# ================================================================
+# Setup and launch tmux (turned off for now, due to lag).
+# ================================================================
+# source "$HOME/scripts/tmux-start.sh"
