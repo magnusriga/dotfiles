@@ -200,7 +200,8 @@ cd $CWD
 # NOTE: Do not use `sudo` with `yay`.
 # `-u`: Ugrade all installed packages, both from official repositories and AUR.
 # `-a`: Ugrade only AUR packages.
-yay -Sua
+echo 'done with aur installs, executing: yay -Sua'
+# yay -Sua
 
 # ==================================
 # `paru`: Install AUR packages.
