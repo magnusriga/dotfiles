@@ -13,7 +13,7 @@ Setup Linux.
 ==================================
 01. Create new arch amd machine, named `arch`, which will get default user `magnus`.
 02. Host: `orb -u root`, `passwd magnus`, and set password to `magnus`.
-03. `sudo pacman-key init && sudo pacman-key --populate && sudo pacman -Sy archlinux-keyring && pacman -Syu —noconfirm openssh vim git`, then modify config, `sudo vim /etc/ssh/sshd_config`, to listen to port 2222 (see: `dotfiles/_unused/etc/ssh/sshd_config`).
+03. `sudo pacman-key init && sudo pacman-key --populate && sudo pacman -Sy archlinux-keyring && pacman -Syu —noconfirm which openssh vim git`, then modify config, `sudo vim /etc/ssh/sshd_config`, to listen to port 2222 (see: `dotfiles/_unused/etc/ssh/sshd_config`).
 04. `sudo systemctl start sshd && sudo systemctl enable sshd`, and `sudo systemctl reload sshd` every time `/etc/ssh/sshd_config` changes.
 05. Host: `ssh-copy-id -i ~/.ssh/nfu_ed25519.pub magnus@nfu`, type password to remote user `magnus`, as set above.
 06. `ssh magnus@nfu`. If it fails, log in to server with `orb`, and check that `~/.ssh` has permissions 700, and `~/.ssh/authorization_keys` has 600.

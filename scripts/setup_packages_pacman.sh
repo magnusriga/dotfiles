@@ -82,6 +82,7 @@ sudo pacman -Syu --noconfirm \
   base-devel btrfs-progs \
   devtools postgresql-libs \
   coreutils \
+  which \
   sudo \
   curl \
   wget \
