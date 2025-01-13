@@ -199,7 +199,7 @@ bindkey '^j' down-line-or-search
 # ================================================================
 # Run Starship Prompt Configuration.
 # ===============================================================
-export STARSHIP_LOG=trace
+# export STARSHIP_LOG=trace
 eval "$(starship init zsh)"
 
 # ================================================================
