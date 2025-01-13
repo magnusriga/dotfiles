@@ -252,7 +252,7 @@ bindkey '^[[B' down-line-or-search
 # ================================================================
 # Source Script for Prompt Configuration.
 # ===============================================================
-. ./.zsh_prompt
+source ~/.zsh_prompt
 
 # ================================================================
 # Export zsh-syntax-highlighting shell variables here instead of
