@@ -119,7 +119,8 @@
 # Must be Placed at Top of `.zshrc`.
 # ================================================================
 # WARNING: Adds small delay, slightly more than `zoxide`.
-if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
+if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ] && ! uname -a | grep -q WSL; then
+    echo "Sourcing Ghostty shell integration."
     builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
 fi
 

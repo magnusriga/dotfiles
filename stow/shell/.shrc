@@ -127,8 +127,12 @@ echo "Running .shrc..."
 # selecting output of previous commands, etc.
 # PATH is already set up in .zprofile > .profile.
 # WARNING: Adds small noticable delay.
+# Only source if 
 # ================================================================
-# source $WEZTERM_HOME/shell-integration/wezterm.sh
+if uname -a | grep -q WSL; then
+  echo "Sourcing Wezterm shell integration"
+  source $WEZTERM_HOME/shell-integration/wezterm.sh
+fi
 
 # ================================================================
 # Add custom fzf settings.
