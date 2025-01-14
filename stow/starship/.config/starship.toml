@@ -176,7 +176,7 @@ style = "bold fg:green"
 command = 'echo ${${PWD##*/}:-/}' # shows output of command
 # format = '[$output](bg:red)[](fg:red)'
 shell = ['zsh']
-format = '[ $output ](bold bg:red fg:#000000)[](fg:red bg:yellow)'
+format = '[ $output ](bold bg:#DA6771 fg:#000000)[](fg:#DA6771 bg:yellow)'
 when = """
 if git rev-parse --git-dir > /dev/null 2>&1; then
   return 0
@@ -188,7 +188,7 @@ fi
 [custom.directory-without-git]
 command = 'echo ${${PWD##*/}:-/}' # shows output of command
 shell = ['zsh']
-format = '[ $output ](bold bg:red fg:#000000)[ ](fg:red)'
+format = '[ $output ](bold bg:#DA6771 fg:#000000)[ ](fg:#DA6771)'
 when = """
 if git rev-parse --git-dir > /dev/null 2>&1; then
   return 1
@@ -224,7 +224,7 @@ style = "bg:#9A348E"
 disabled = true      # Disabled by default
 
 [directory]
-style = "bold bg:red fg:#000000"
+style = "bold bg:#DA6771 fg:#000000"
 format = "[ $path  ]($style)"
 truncation_length = 1
 # truncation_symbol = "…/"
