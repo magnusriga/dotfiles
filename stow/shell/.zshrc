@@ -119,9 +119,9 @@
 # Must be Placed at Top of `.zshrc`.
 # ================================================================
 # WARNING: Adds small delay, slightly more than `zoxide`.
-# if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
-#     builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
-# fi
+if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ]; then
+    builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
+fi
 
 # ================================================================
 # Run Generic Interactive Shell Configuration.

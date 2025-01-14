@@ -92,6 +92,14 @@ rm -rf "$WEZTERM_HOME/shell-integration"
 curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https://raw.githubusercontent.com/wez/wezterm/refs/heads/main/assets/shell-integration/wezterm.sh
 
 # ================================================
+# Setup Ghostty shell integration.
+# ================================================
+rm -rf "${GHOSTTY_HOME}"
+rm -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
+git clone git@github.com:ghostty-org/ghostty.git "$GHOSTTY_HOME"
+ln -s "${BUILD_HOME:-$HOME/build}/repositories/ghostty/src" "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
+
+# ================================================
 # Setup: `git` credentials.
 # Use `.gitconfig` from dotfiles instead.
 # ================================================
