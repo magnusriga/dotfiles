@@ -143,6 +143,11 @@ fi
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # ================================================================
+# Bun completions.
+# ================================================================
+[ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
+
+# ================================================================
 # Start SSH agent to Avoid Typing Github Password
 # ================================================================
 env=~/.ssh/agent.env
