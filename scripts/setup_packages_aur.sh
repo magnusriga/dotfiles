@@ -8,8 +8,8 @@ echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USERNAME $
 export CHROOT=$HOME/chroot
 
 function makeCleanChroot() {
- sudo rm -rf ~/chroot 
- mkdir ~/chroot
+ sudo rm -rf $CHROOT 
+ mkdir $CHROOT
  LC_ALL=C.UTF-8 mkarchroot $CHROOT/root base-devel
 }
 
@@ -27,20 +27,22 @@ stow --no-folding -vv -d "$HOME/dotfiles/stow" -t "$HOME" pacman
 # ==================================
 # Adjust mirrorlist in `$CHROOT/root/etc/pacman.d/mirrorlist`,
 # to allow `makechrootpkg` to install from those repositories.
+# Only necessary on `aarch64`, i.e. ARM, because on `x86_64`
+# `arch-nspawn` handles it automatically.
 # ==================================
-echo 'Server = http://mirror.archlinuxarm.org/$arch/$repo/' | sudo tee $CHROOT/root/etc/pacman.d/mirrorlist 1>/dev/null
+[[ $(uname -m) == "aarch64" ]] && echo 'Server = http://mirror.archlinuxarm.org/$arch/$repo/' | sudo tee $CHROOT/root/etc/pacman.d/mirrorlist 1>/dev/null
 
 # ==================================
-# Stow updated `arch-nspawn` that does not overwrite
-# `$CHROOT/root/etc/pacman.d/mirrorlist`.
+# For ARM architecture, `stow` updated `arch-nspawn` that does not overwrite
+# `$CHROOT/root/etc/pacman.d/mirrorlist`
 # ==================================
 sudo rm -f "/usr/local/bin/arch-nspawn"
-sudo stow --no-folding -vv -d "$HOME/dotfiles" -t /usr/local pacman
+[[ $(uname -m) == "aarch64" ]] && sudo stow --no-folding -vv -d "$HOME/dotfiles" -t /usr/local pacman
 
 # ==================================
 # Ensure base chroot ($CHROOT/root) is up to date.
 # ==================================
-arch-nspawn $CHROOT/root pacman -Sy
+arch-nspawn $CHROOT/root pacman -Syy
 
 # ==================================
 # Build and Intstall Package.
@@ -180,6 +182,7 @@ export BUILD_REPOS="${BUILD_HOME:-$HOME/build}/repositories"
 # yay.
 # ==================================
 PACKAGE="yay"
+echo "Installing $PACKAGE"
 echo $BUILD_REPOS/$PACKAGE
 rm -rf $BUILD_REPOS/$PACKAGE
 git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
@@ -197,6 +200,7 @@ cd $CWD
 # paru.
 # ==================================
 PACKAGE="paru-git"
+echo "Installing $PACKAGE"
 rm -rf $BUILD_REPOS/$PACKAGE
 git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
 cd $BUILD_REPOS/$PACKAGE
@@ -210,6 +214,7 @@ cd $CWD
 # snapd.
 # ==================================
 PACKAGE="snapd"
+echo "Installing $PACKAGE"
 rm -rf $BUILD_REPOS/$PACKAGE
 git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
 cd $BUILD_REPOS/$PACKAGE

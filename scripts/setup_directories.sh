@@ -45,11 +45,12 @@ if [ ! -d "$WEZTERM_HOME" ]; then
   mkdir -p "$WEZTERM_HOME"
 fi
 
-# export NVIM_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+export GHOSTTY_RESOURCES_DIR="$HOME/.local/share/ghostty"
+export GHOSTTY_HOME="${BUILD_HOME:-$HOME/build}/repositories/ghostty"
 # Let git make the folder.
-# if [ ! -d "$NVIM_HOME" ]; then
-#   mkdir -p "$NVIM_HOME"
-# fi
+
+export NVIM_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/nvim"
+# Let git make the folder.
 
 export YAZI_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
 if [ ! -d "$YAZI_HOME" ]; then
