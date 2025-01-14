@@ -104,4 +104,3 @@ source ~/.profile
 # Shell, is Interactive, Which Ensures Interactive Login Shells Get All the Setup They Need.
 # ================================================================
 [[ $- == *i* ]] && [ -n "$PS1" ] && source ~/.bashrc
-. "$HOME/.cargo/env"
