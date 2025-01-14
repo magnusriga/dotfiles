@@ -15,7 +15,7 @@ fi
 rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat
 
 # ================================================================
-# Add symlinks.
+# Add software symlinks.
 # Remember: Add ~/.local/bin to path.
 # ================================================================
 if [ -n "$(which fdfind 2>/dev/null)" ]; then

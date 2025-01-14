@@ -2,19 +2,45 @@
 
 echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
+# ==================================
+# Set chroot path.
+# ==================================
+export CHROOT=$HOME/chroot
+
 function makeCleanChroot() {
  sudo rm -rf ~/chroot 
  mkdir ~/chroot
- CHROOT=$HOME/chroot
- mkarchroot $CHROOT/root base-devel
+ LC_ALL=C.UTF-8 mkarchroot $CHROOT/root base-devel
 }
 
+# ==================================
 # Create clean root once.
+# ==================================
 makeCleanChroot
 
+# ==================================
 # Stow `makepkg` configuration into correct folder
 # where `makepkg` will pick it up.
-stow --no-folding -vv -d "$HOME/dotfiles" -t "$HOME" pacman
+# ==================================
+stow --no-folding -vv -d "$HOME/dotfiles/stow" -t "$HOME" pacman
+
+# ==================================
+# Adjust mirrorlist in `$CHROOT/root/etc/pacman.d/mirrorlist`,
+# to allow `makechrootpkg` to install from those repositories.
+# ==================================
+echo 'Server = http://mirror.archlinuxarm.org/$arch/$repo/' | sudo tee $CHROOT/root/etc/pacman.d/mirrorlist 1>/dev/null
+
+# ==================================
+# Stow updated `arch-nspawn` that does not overwrite
+# `$CHROOT/root/etc/pacman.d/mirrorlist`.
+# ==================================
+sudo rm -f "/usr/local/bin/arch-nspawn"
+sudo stow --no-folding -vv -d "$HOME/dotfiles" -t /usr/local pacman
+
+# ==================================
+# Ensure base chroot ($CHROOT/root) is up to date.
+# ==================================
+arch-nspawn $CHROOT/root pacman -Sy
 
 # ==================================
 # Build and Intstall Package.
@@ -154,8 +180,11 @@ export BUILD_REPOS="${BUILD_HOME:-$HOME/build}/repositories"
 # yay.
 # ==================================
 PACKAGE="yay"
+echo $BUILD_REPOS/$PACKAGE
 rm -rf $BUILD_REPOS/$PACKAGE
 git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
+ls -la $BUILD_REPOS/$PACKAGE
+ls -la $BUILD_REPOS/$PACKAGE
 cd $BUILD_REPOS/$PACKAGE
 makechrootpkg -c -r $CHROOT -- -sc --noconfirm
 # makepkg -sci --noconfirm
@@ -167,14 +196,14 @@ cd $CWD
 # ==================================
 # paru.
 # ==================================
-PACKAGE="paru"
+PACKAGE="paru-git"
 rm -rf $BUILD_REPOS/$PACKAGE
 git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
 cd $BUILD_REPOS/$PACKAGE
 makechrootpkg -c -r $CHROOT -- -sc --noconfirm
 cd $BUILD_HOME/packages
 ls | grep -P "$PACKAGE-\d" | sudo pacman -U --noconfirm -
-echo "Installed $PACKAGE version: $($PACKAGE --version)"
+echo "Installed $PACKAGE version: $(paru --version)"
 cd $CWD
 
 # ==================================
@@ -200,7 +229,8 @@ cd $CWD
 # NOTE: Do not use `sudo` with `yay`.
 # `-u`: Ugrade all installed packages, both from official repositories and AUR.
 # `-a`: Ugrade only AUR packages.
-echo 'done with aur installs, executing: yay -Sua'
+echo 'Done with aur installs.'
+# echo 'done with aur installs, executing: yay -Sua'
 # yay -Sua
 
 # ==================================

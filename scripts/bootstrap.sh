@@ -40,6 +40,12 @@ echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME.
 # ==========================================================
 
 # ==========================================================
+# Exit if not run from Bash, since script relies on
+# environment variable `BASH_SOURCE`.
+# ==========================================================
+[[ ! -n ${BASH_SOURCE} ]] && echo "Please re-run from bash, exiting..." && return
+
+# ==========================================================
 # Get Script Path.
 # ==========================================================
 # $0 only works when script is run with shell, e.g. bash foo.sh,
@@ -54,7 +60,6 @@ SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1 ; pwd -P )/"
 # to execute other scripts with relative path.
 # ==========================================================
 echo "cd to SCRIPTPATH: $SCRIPTPATH"
-# cd "$(dirname "${BASH_SOURCE}")"
 cd $SCRIPTPATH
 
 # ==========================================================
@@ -63,15 +68,6 @@ cd $SCRIPTPATH
 git pull origin main
 
 function doIt() {
-#  echo 'About to rsync files...'
-#  rsync --exclude ".git/" \
-#    --exclude ".DS_Store" \
-#    --exclude ".osx" \
-#    --exclude "bootstrap.sh" \
-#    --exclude "README.md" \
-#    --exclude "LICENSE-MIT.txt" \
-#    -avh --no-perms . ~
-
   # ==========================================================
   # Check if Scripts is Sourced or Executed.
   # ==========================================================
@@ -80,6 +76,30 @@ function doIt() {
   # otherwise, if $0 is e.g. -bash, script is being sourced,
   # i.e. run in current shell's process.
   # [[ $BASH_SOURCE = $0 ]] && exit 1 || return
+
+  # ==========================================================
+  # Save top-level `dotfiles` path.
+  # ==========================================================
+  ROOTPATH="$( cd -- "$(dirname "${BASH_SOURCE}")/.." >/dev/null 2>&1 ; pwd -P )"
+
+  # ==========================================================
+  # Setup manual symlinks needed during installation,
+  # as `stow` is not yet installed.
+  # ==========================================================
+  # Link `pacman.conf`, used by `pacman`.
+  sudo rm -f /etc/pacman.conf
+  sudo ln -s "${ROOTPATH}/etc/pacman.conf" /etc
+
+  # Link `.stow-global-ignore`, used by `stow`.
+  sudo rm -f $HOME/.stow-global-ignore
+  sudo ln -s "${ROOTPATH}/stow/.stow-global-ignore" $HOME
+
+  # ==========================================================
+  # Set locale.
+  # ==========================================================
+  sudo localectl set-locale LANG=en_US.UTF-8
+  unset LANG
+  source /etc/profile.d/locale.sh
 
   # ==========================================================
   # Run remaining setup scripts as new user.
@@ -91,7 +111,14 @@ function doIt() {
   fi
 
   # ==========================================================
-  # `stow`: Place selected dotfiles into $HOME.
+  # `stow` system-level files.
+  # ==========================================================
+  # `sshd_config`, used when ssh'ing into this machine.
+  sudo rm -f /etc/ssh/sshd_config
+  sudo stow -vv -d ~/dotfiles/etc -t /etc/ssh ssh
+
+  # ==========================================================
+  # `stow` user-level files.
   # - Run `stow -d "$HOME/dotfiles" -t "$HOME"` after installing packages,
   #   to avoid symlinked `.config` folders, e.g. $HOME/.config/eza,
   #   being overwritten by install scripts that create e.g. $HOME/.config/eza.
@@ -101,17 +128,24 @@ function doIt() {
   #   i.e. those starting at `.`.
   # ==========================================================
   # First remove existing dotfiles, not created by `stow`.
-  rm -rf ~/{.gitconfig,.bash_profile,.bashrc,.profile,.zshrc}
-  echo "Running: stow -vv -d $HOME/dotfiles -t $HOME *"
-  cd $SCRIPTPATH/..
-  stow -vv -d "$HOME/dotfiles" -t "$HOME" *
+  rm -rf ~/{.gitconfig,.bash*,.profile,.zshrc}
+  echo "Running: stow -vv -d $SCRIPTPATH/../stow -t $HOME *"
+  cd $SCRIPTPATH/../stow
+  stow -vv -d "$SCRIPTPATH/../stow" -t "$HOME" *
 
   # ==========================================================
   # Set ZSH as default shell.
   # ==========================================================
   echo 'Setting ZSH as default shell for current user...'
-  sudo chsh -s "$(which zsh)" "$USER"
-  
+  # local which_zsh=$(which zsh)
+  # Force ZSH verison from pacman.
+  local which_zsh="/usr/bin/zsh"
+  sudo cat /etc/shells | grep -q ${which_zsh} || \
+  echo "Adding ${which_zsh} to /etc/shells." && \
+  echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
+  sudo chsh -s "${which_zsh}" "$USER"
+  unset which_zsh
+
   # ==========================================================
   # Delete old user.
   # ==========================================================
@@ -124,8 +158,13 @@ function doIt() {
   # Do not run zsh scripts from here, as the Zsh commands are
   # not reccognized by bash.
   # ==========================================================
+  
+  # ==========================================================
+  # Success messages and changing directory to $HOME.
+  # ==========================================================
   echo "Installations and setup now done, restart shell to start using ZSH."
   echo "Manually delete existing user and its home folder, if desired."
+  cd $HOME
 }
 
 # ==========================================================

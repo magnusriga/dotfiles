@@ -89,6 +89,10 @@ AuthorizedKeysFile      .ssh/authorized_keys
 # and KbdInteractiveAuthentication to 'no'.
 #UsePAM no
 
+# Allow client to forward certain environment variables when ssh'ing
+# into this machine.
+AcceptEnv LANG LC_*
+
 #AllowAgentForwarding yes
 #AllowTcpForwarding yes
 #GatewayPorts no

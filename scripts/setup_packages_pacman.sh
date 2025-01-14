@@ -6,21 +6,6 @@ echo "Running setup_packages_pacman.sh as $(whoami), with HOME $HOME and USERNAM
 # systemctl --quiet is-active snapd.service && sudo service snapd stop
 
 # ==========================================================
-# Copy `pacman.conf` to `/etc`, so it is used by `pacman`.
-# Cannot `stow`, it is installed later.
-# ==========================================================
-ROOTPATH="$( cd -- "$(dirname "${BASH_SOURCE}")/.." >/dev/null 2>&1 ; pwd -P )"
-sudo rm -f /etc/pacman.conf
-sudo ln -s "${ROOTPATH}/.system/pacman.conf" /etc
-
-# ==========================================================
-# Set locale.
-# ==========================================================
-sudo localectl set-locale LANG=en_US.UTF-8
-unset LANG
-source /etc/profile.d/locale.sh
-
-# ==========================================================
 # Add repositories to apt.
 # ==========================================================
 # Create public key directory.
@@ -109,7 +94,6 @@ sudo pacman -Syu --noconfirm \
   iputils \
   libxkbcommon-x11 wayland \
   jless \
-  ghostty ghostty-shell-integration \
   vim \
   neovim \
   tmux \
@@ -142,15 +126,18 @@ sudo pacman -Syu --noconfirm \
   lua luarocks \
   evince gtk4 libadwaita \
   libjpeg-turbo libpng zlib \
-  intel-media-driver libva-intel-driver libva-mesa-driver libvdpau-va-gl \
-  nvidia-utils opencl-driver \
-  intel-media-sdk vpl-gpu-rt \
+  libva-mesa-driver libvdpau-va-gl \
+  opencl-driver \
   fftw-openmpi libusb libdecor \
   mesa libnss_nis libxss libxtst \
   xorg-xauth xorg-server-xvfb \
   libxcb \
   libevent ncurses bison pkgconf
 
+  # ghostty ghostty-shell-integration \
+  # intel-media-driver libva-intel-driver \
+  # intel-media-sdk vpl-gpu-rt \
+  # nvidia-utils \
 # ==========================================================
 # Clean cache for unused packages and sync databases
 # ==========================================================
