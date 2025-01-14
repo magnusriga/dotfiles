@@ -111,29 +111,12 @@
 echo "Running .profile..."
 
 # ================================================================
-# Source API Keys.
+# Source exported API Keys, environment variables, and PATH.
 # ================================================================
-if [ -f "$HOME/.env" ]; then
-  set -a
-  . $HOME/.env
-  set +a
-fi
-
-# ================================================================
-# Source exported environment variables.
-# ================================================================
-if [ -f "$HOME/.exports" ]; then
-  . $HOME/.exports
-fi
-
-# ================================================================
-# Setup and source the PATH environment variable.
-# ================================================================
-if [ -f "$HOME/.path" ]; then
-  set -a
-  source $HOME/.path
-  set +a
-fi
+for file in $HOME/.{env,exports,path,functions}; do
+  [ -r "$file" ] && [ -f "$file" ] && source "$file"
+done
+unset file
 
 # ================================================================
 # Load:`nvm`, `node`, `npm`.
@@ -178,3 +161,4 @@ elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
 fi
 
 unset env
+. "$HOME/.cargo/env"

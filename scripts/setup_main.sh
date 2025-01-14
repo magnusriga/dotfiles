@@ -67,8 +67,8 @@ rustup update
 # ================================================
 # `cargo`: Install packages (requires rust toolchain).
 # ================================================
-if [ -f "./setup_cargo_packages.sh" ]; then
-  . ./setup_cargo_packages.sh
+if [ -f "./setup_packages_cargo.sh" ]; then
+  . ./setup_packages_cargo.sh
 fi
 
 # ================================================
