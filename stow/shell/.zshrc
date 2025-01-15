@@ -119,9 +119,10 @@
 # Must be Placed at Top of `.zshrc`.
 # ================================================================
 # WARNING: Adds small delay, slightly more than `zoxide`.
-if [ -n "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}" ] && ! uname -a | grep -q WSL; then
-    echo "Sourcing Ghostty shell integration."
-    builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/share/ghostty}/shell-integration/zsh/ghostty-integration"
+if [[ -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration" && \
+${TERM_PROGRAM} == ghostty ]]; then
+    echo "Sourcing Ghostty shell integration..."
+    builtin source "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration"
 fi
 
 # ================================================================
@@ -388,10 +389,3 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# bun completions
-[ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"

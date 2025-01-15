@@ -128,8 +128,10 @@ echo "Running .shrc..."
 # WARNING: Adds small noticable delay.
 # Only source if 
 # ================================================================
-if uname -a | grep -q WSL; then
-  echo "Sourcing Wezterm shell integration"
+# if uname -a | grep -q WSL; then
+if [[ -f $WEZTERM_HOME/shell-integration/wezterm.sh && \
+${TERM_PROGRAM} == WezTerm ]]; then
+  echo "Sourcing Wezterm shell integration..."
   source $WEZTERM_HOME/shell-integration/wezterm.sh
 fi
 
