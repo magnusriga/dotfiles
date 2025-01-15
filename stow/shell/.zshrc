@@ -146,10 +146,6 @@ setopt INC_APPEND_HISTORY
 # ================================================================
 fpath=($HOME/.zfunc $fpath)
 autoload -U rgf
-autoload -U up-line-or-beginning-search
-autoload -U down-line-or-beginning-search
-zle -N up-line-or-beginning-search
-zle -N down-line-or-beginning-search
 
 # ================================================================
 # ZSH Completetions.
@@ -229,25 +225,85 @@ eval "$(zoxide init zsh)"
 # Enable zsh-autosuggestions (end of zshrc).
 # ================================================================
 # No delay introduced.
-# source ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Set suggestion strategy.
+# - `history`: Most recent match from history.
+# - `completion`: Uses tab-completion suggestion.
+# - Can be combined in array, in which case next entry is tried if no match in first entry.
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+
+# Set suggestion highlight style.
+# - Can be 256-color ANSII escape sequence digit, e.g. `fg=8`,
+#   or hexadecimal value.
+# - See: `man zshzle` > Character Highlighting.
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#ff00ff,bg=cyan,bold,underline"
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=243"
+
+# Activate `zsh-autosuggestions`.
 . /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
+# Use key bindings similar to Neovim completion mode,
+# where `^y` is accept match, and `^e` is stop completion and
+# go back to old text.
+bindkey '^ ' autosuggest-accept
+bindkey '^y' autosuggest-execute
+bindkey '^e' autosuggest-clear
+
 # ================================================================
-# Keybindings.
+# Keybindings: Built-In.
 # ================================================================
-# TODO: Add fix for ^w and ^h, and for up-search, and for esc.
+# Note: Delay when typing `^[`, i.e. escape.
+# - When key is prefix in any key binding, that key get `KEYTIMEOUT`
+#   delay after typing, before its standalone binding is used.
+# - Done to ensure enough time to type full sequence.
+# - It is possible to remove all key bindings in `viins` keymap beginning
+#   with `^[`, i.e. escape character, including most likely cursor keys,
+#   but leaving binding for `^[` itself, which maps to `vi-cmd-mode` widget.
+# - Result: No delay when typing `^[`.
+# - BUT, these default keybindings are lost:
+#   - "^[" vi-cmd-mode
+#   - "^[," _history-complete-newer
+#   - "^[/" _history-complete-older
+#   - "^[OA" up-line-or-history
+#   - "^[OB" down-line-or-history
+#   - "^[OC" vi-forward-char
+#   - "^[OD" vi-backward-char
+#   - "^[[200~" bracketed-paste
+#   - "^[[A" up-line-or-history <-- Up arrow.
+#   - "^[[B" down-line-or-history <-- Down arrow.
+#   - "^[[C" vi-forward-char <-- Right arrow.
+#   - "^[[D" vi-backward-char <-- Left arrow.
+#   - "^[c" fzf-cd-widget
+#   - "^[~" _bash_complete-word
+# - Accepting suggestions from `zsh-autosuggest` is done
+#   with right arrow in `viins` or `vicmd` mode, or `l` in `vicmd` mode,
+#   both mapping to `[vi-]forward-char`, and `$` in `vicmd` mode,
+#   i.e. `[vi-]end-of-line`, thus loose default bindind to accept suggestion
+#   from `viins` mode.
+# - Since ghostty maps `Ctrl+[` to '^[[91;5u', and not to `^[`,
+#   it is better to just map that to `vi-cmd-mode`, instead of forcing
+#   ghostty to send `^[` and removing all key bindings that start with `^[`.
 # bindkey -rpM viins '^['
-# bindkey -rM viins '^['
-# bindkey '^w' autosuggest-execute
-# bindkey '^y' autosuggest-accept
-# bindkey '^u' autosuggest-toggle
-# # bindkey '^L' vi-forward-word
-#
-bindkey '^k' up-line-or-search
-bindkey '^j' down-line-or-search
-bindkey '^[[A' up-line-or-search
-bindkey '^[[B' down-line-or-search
-#
+
+# Bind sequence sent by ghostty for `Ctrl+[`, i.e. `^[[91;5u`,
+# to `vi-cmd-mode`, with added benefit of no `KEYTIMEOUT` delay.
+bindkey -M viins '^[[91;5u' vi-cmd-mode
+
+# Ensure `^w` and `^h` deletes past last insert.
+bindkey -M viins '^h' backward-delete-char
+bindkey -M viins '^w' backward-kill-word
+
+# Search command history for line starting with current line up to cursor.
+# If line is empty, moves to next/previous event in history list.
+# Overwrites default `self-insert` in mode `viins`.
+# Overwrites default `down-history` in mode `vicmd`.
+bindkey '^P' history-beginning-search-backward
+bindkey '^N' history-beginning-search-forward
+
+# bindkey '^k' up-line-or-search
+# bindkey '^j' down-line-or-search
+# bindkey '^[[A' up-line-or-search
+# bindkey '^[[B' down-line-or-search
+
 # bindkey '^[[A' up-line-or-beginning-search # Up
 # bindkey '^[[B' down-line-or-beginning-search # Down
 
