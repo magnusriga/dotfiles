@@ -23,7 +23,7 @@ local prettier_supported = {
 ---@param ctx ConformCtx
 function M.has_config(ctx)
   local config_path = vim.fn.system({ "prettier", "--find-config-path", ctx.filename })
-  vim.print('prettier config path: ', config_path)
+  vim.print("prettier config path: ", config_path)
   return vim.v.shell_error == 0
 end
 
@@ -65,10 +65,10 @@ end
 return {
   {
     "stevearc/conform.nvim",
-    dependencies = { 
+    dependencies = {
       {
         "mason.nvim",
-         opts = { ensure_installed = { "prettier" } },
+        opts = { ensure_installed = { "prettier" } },
       },
     },
     -- Only load this plugin when `require('conform')`,
@@ -104,10 +104,10 @@ return {
           priority = 100,
           primary = true,
           format = function(buf)
-	    -- Since conform is `lazy=true`,
-	    -- the conform plugin is only loaded when this format function runs,
-	    -- which happens on every formatting keybinding and when running `formatexr()`.
-	    -- Require return values are cached, so it will only be "slow" on first format.
+            -- Since conform is `lazy=true`,
+            -- the conform plugin is only loaded when this format function runs,
+            -- which happens on every formatting keybinding and when running `formatexr()`.
+            -- Require return values are cached, so it will only be "slow" on first format.
             require("conform").format({ bufnr = buf })
           end,
           sources = function(buf)
@@ -140,11 +140,11 @@ return {
         ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
         formatters = {
           injected = { options = { ignore_errors = true } },
-	  prettier = {
+          prettier = {
             condition = function(_, ctx)
               return M.has_parser(ctx) and (vim.g.myvim_prettier_needs_config ~= true or M.has_config(ctx))
             end,
-	  }
+          },
           -- # Example of using dprint only when a dprint.json file is present
           -- dprint = {
           --   condition = function(ctx)
@@ -159,13 +159,14 @@ return {
         },
       }
 
-      for _, ft in ipairs(support_prettier) do
+      for _, ft in ipairs(prettier_supported) do
         opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
-	table.insert(opts.formatters_by_ft[ft], 'prettierd', 'prettier')
+        table.insert(opts.formatters_by_ft[ft], "prettierd")
+        table.insert(opts.formatters_by_ft[ft], "prettier")
       end
 
       return opts
     end,
-    config = M.setup
+    config = M.setup,
   },
 }
