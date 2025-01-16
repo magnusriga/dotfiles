@@ -2,9 +2,14 @@
 
 echo "Running setup_yazi.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
-# Install Yazi plugins from source.
-rm -rf $(find ~/.config/yazi/plugins -maxdepth 1 -type d | grep -v -e 'arrow.yazi' -e 'folder-rules.yazi' -e 'system-clipboard.yazi' -e 'plugins$' -e 'flavors$' -)
+# Delete existing plugins and flavors before re-installing.
+# - Not necessary to exclude the symlinked plugins `arrow.yazi`, etc.
+# - Keep it as is in case changing from symlinks in future.
+rm -rf $(find ~/.config/yazi/plugins -maxdepth 1 -type d | grep -v -e 'arrow.yazi' -e 'folder-rules.yazi' -e 'system-clipboard.yazi' -e 'plugins$' -)
+rm -rf "${YAZI_HOME:-$HOME/.config/yazi}/flavors"
 rm "${YAZI_HOME:-$HOME/.config/yazi}/package.toml"
+
+# Install Yazi plugins from source.
 git clone https://github.com/sharklasers996/eza-preview.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/eza-preview.yazi"
 git clone https://github.com/boydaihungst/restore.yazi "${YAZI_HOME:-$HOME/.config/yazi}/plugins/restore.yazi"
 git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.config/yazi}/flavors/onedark.yazi"

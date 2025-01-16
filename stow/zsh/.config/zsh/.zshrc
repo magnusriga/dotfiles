@@ -451,3 +451,6 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# bun completions
+[ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
