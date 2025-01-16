@@ -72,6 +72,13 @@ if [ -f "./setup_packages_cargo.sh" ]; then
 fi
 
 # ================================================
+# Install: Manual packages built from source.
+# ================================================
+if [ -f "./setup_packages_manual.sh" ]; then
+  . ./setup_packages_manual.sh
+fi
+
+# ================================================
 # `pip`: Install packages, currently none.
 # ================================================
 # if [ -f "./setup_pip_packages.sh" ]; then

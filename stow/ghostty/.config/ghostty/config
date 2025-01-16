@@ -86,7 +86,7 @@ adjust-underline-position = 4
 # Thickness in pixels of the underline.
 # Wezterm had thickness 2.
 # Default: adjust-underline-thickness =
-adjust-underline-thickness = 2
+adjust-underline-thickness = 1
 
 # -------------------------
 # Theme and Colors

@@ -231,7 +231,7 @@ return {
       -- thus `opts.servers` contain one field named `<lsp_server_name>`,
       -- for every LSP server defined across all `nvim_lspconfig` specs.
       local servers = opts.servers
-      
+
       -- Create table with all Neovim's built-in capabilities,
       -- combined with completion capabilities from `blink`,
       -- which will later be passed to LSP server so it knows

@@ -95,7 +95,6 @@ sudo pacman -Syu --noconfirm \
   libxkbcommon-x11 wayland \
   jless \
   vim \
-  neovim \
   tmux \
   file \
   openssh \

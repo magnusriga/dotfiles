@@ -40,7 +40,17 @@ local act = wezterm.action
 -- This will hold the configuration.
 local config = wezterm.config_builder()
 
--- This is where you actually apply your config choices
+-- This is where you actually apply your config choices.
+
+-- Ensure TERM is set to `wezterm`,
+-- to enable colored underline and undercurl.
+config.term = 'wezterm'
+
+-- Honor kitty keyboard protocol escape sequences that modify keyboard encoding.
+-- https://wezfurlong.org/wezterm/config/key-encoding.html
+-- https://sw.kovidgoyal.net/kitty/keyboard-protocol
+-- Enabling it, as that is what ghostty does by default.
+-- config.enable_kitty_keyboard = true
 
 -- Remember to install all the fonts in the chosen family, in OS.
 config.font = wezterm.font("JetBrainsMono Nerd Font")

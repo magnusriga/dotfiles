@@ -2,7 +2,7 @@ _G.MyVim = require("util")
 
 local M = {}
 
-MyVim.config = M 
+MyVim.config = M
 
 local defaults = {
   -- Colorscheme can be a string like `catppuccin` or a function that will load the colorscheme.
@@ -261,7 +261,7 @@ function M.init()
   MyVim.lazy_notify()
 
   -- Load options here, before lazy.nvim installs and loads plugins,
-  -- i.e. before cloning from GitHub and subsequently running 
+  -- i.e. before cloning from GitHub and subsequently running
   -- `require(<name>)`.setup(opts)`,
   -- see `lazy-plugins.lua` for details.
   -- Needed to make sure options are correctly applied
@@ -270,6 +270,7 @@ function M.init()
 
   -- Defer built-in clipboard handling,
   -- as "xsel" and "pbcopy" can be slow.
+  -- TODO: Check if we want to do this.
   neovim_clipboard = vim.opt.clipboard
   vim.opt.clipboard = ""
 
