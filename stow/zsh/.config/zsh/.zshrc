@@ -137,9 +137,9 @@ source "$HOME/.shrc"
 # History file for ZSH, overwrites bash default which is sset to
 # `/commandhistory/.shell_hisotry` in `.shrc`.
 HISTFILE=/commandhistory/.zsh_history
-setopt INC_APPEND_HISTORY
 # setopt APPEND_HISTORY
-# setopt SHARE_HISTORY
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
 
 # ================================================================
 # Autoload Own and Built-In Functions.
