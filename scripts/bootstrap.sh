@@ -10,7 +10,7 @@ echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME.
 # ----------------------------------------------------------
 # print_versions
 # setup_brew
-# 
+#
 # ----------------------------------------------------------
 # Files needing sudo.
 # ----------------------------------------------------------
@@ -18,7 +18,7 @@ echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME.
 # setup_apt-get_packages
 # setup_docker
 # setup_entry
-# 
+#
 # ----------------------------------------------------------
 # Files needing to be run by new user,
 # because it uses $HOME, $USERNAME,
@@ -115,7 +115,7 @@ function doIt() {
   # ==========================================================
   # `sshd_config`, used when ssh'ing into this machine.
   sudo rm -f /etc/ssh/sshd_config
-  sudo stow -vv -d ~/dotfiles/etc -t /etc/ssh ssh
+  sudo stow --no-folding -vv -d $SCRIPTPATH/../etc -t /etc/ssh ssh
 
   # ==========================================================
   # `stow` user-level files.

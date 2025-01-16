@@ -89,7 +89,7 @@ sudo pacman -Syu --noconfirm \
   lsb-release \
   bash \
   zsh zsh-doc \
-  zsh-completions zsh-syntax-highlighting zsh-autosuggestions \
+  zsh-syntax-highlighting zsh-autosuggestions \
   fish \
   iputils \
   libxkbcommon-x11 wayland \

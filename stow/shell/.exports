@@ -3,7 +3,14 @@
 echo "Running .exports..."
 
 # ================================================================
-# Set Default Shell to Zsh
+# Set XDG_CONFIG_HOME, used by various programs.
+# `$HOME/.config` is defualt in most program, but set it
+# explicitly in case some programs use a different default.
+# ================================================================
+export XDG_CONFIG_HOME=$HOME/.config
+
+# ================================================================
+# Set default shell to ZSH
 # ================================================================
 SHELL=$(which zsh)
 
@@ -34,6 +41,12 @@ export VISUAL=$EDITOR
 # fi
 
 # ================================================================
+# Directories for vim backups, swaps, colors, syntax, undo, etc.
+# ================================================================
+export VIM_HOME="$HOME/.vim"
+export VIM_SESSIONS="$HOME/.vim/sessions"
+
+# ================================================================
 # Export WEZTERM_HOME shell variable.
 # Subshells, e.g. non-login shells, inherit login shell's environment.
 # ================================================================
@@ -50,13 +63,6 @@ export GHOSTTY_RESOURCES_DIR="$HOME/.local/share/ghostty"
 # Export EZA_HOME shell variable.
 # ================================================================
 export EZA_HOME="$HOME/.local/share/eza"
-
-# ================================================================
-# Set XDG_CONFIG_HOME, used by various programs.
-# `$HOME/.config` is defualt in most program, but set it
-# explicitly in case some programs use a different default.
-# ================================================================
-export XDG_CONFIG_HOME="$HOME/.config"
 
 # ================================================================
 # Directory for build files, i.e. files from `makepkg`.

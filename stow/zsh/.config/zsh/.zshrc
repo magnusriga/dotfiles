@@ -129,7 +129,7 @@ fi
 # Run Generic Interactive Shell Configuration.
 # ================================================================
 echo "Running .zshrc, about to source .shrc..."
-source ~/.shrc
+source "$HOME/.shrc"
 
 # ================================================================
 # ZSH Options.
@@ -144,21 +144,27 @@ setopt INC_APPEND_HISTORY
 # ================================================================
 # Autoload Own and Built-In Functions.
 # ================================================================
-fpath=($HOME/.zfunc $fpath)
+fpath=(${ZDOTDIR:-$HOME}/.zfunc $fpath)
 autoload -U rgf
 
 # ================================================================
 # ZSH Completetions.
 # ================================================================
-# `zsh-completions` is installed with pacman, no sourcing needed.
-# `eza` completions, where `eza` itself is installed with `cargo`,
-# while `eza` completions is enables by cloning `eza` git repo
-# into `EZA_HOME/eza` and added to `fpath` below.
+# `zsh-completions`.
+# - Manually cloned into ZSH_HOME, not installed with pacman.
+fpath=("${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-completions/src" $fpath)
+
+# `eza` completions`.
+# - `eza` itself is installed with `cargo`.
+# - `eza` completions are enabled by cloning `eza` git repo
+#   into `EZA_HOME/eza` then adding it to `fpath` below.
 export FPATH="${EZA_HOME:-$HOME/.local/share/eza}/eza/completions/zsh:$FPATH"
+
 # Activate ZSH completion engine.
 autoload -Uz compinit
-# Force rebuild with `zcompdump`.
-rm -f ~/.zcompdump; compinit
+
+# Force rebuild of `.zcompdump`.
+rm -f "${ZDOTDIR}/.zcompdump"; compinit
 
 # ================================================================
 # Enable vi mode in zsh (at end of zshrc).
@@ -310,7 +316,7 @@ bindkey '^N' history-beginning-search-forward
 # ================================================================
 # Source Script for Prompt Configuration.
 # ===============================================================
-source ~/.zsh_prompt
+. ${ZDOTDIR:-$HOME}/.zsh_prompt
 
 # ================================================================
 # Export zsh-syntax-highlighting shell variables here instead of

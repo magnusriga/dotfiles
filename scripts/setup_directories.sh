@@ -30,11 +30,6 @@ if [ ! -d "$FONT_HOME" ]; then
   mkdir -p "$FONT_HOME"
 fi
 
-export STARSHIP_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/starship"
-if [ ! -d "$STARSHIP_HOME" ]; then
-  mkdir -p "$STARSHIP_HOME"
-fi
-
 export AEROSPACE_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/aerospace"
 if [ ! -d "$AEROSPACE_HOME" ]; then
   mkdir -p "$AEROSPACE_HOME"
@@ -83,6 +78,7 @@ if [ ! -d "$TRASH_HOME" ]; then
   mkdir -p "$TRASH_HOME"
 fi
 
+export VIM_HOME="$HOME/.vim"
 export VIM_SESSIONS="$HOME/.vim/sessions"
 if [ ! -d "$VIM_SESSIONS" ]; then
   mkdir -p "$VIM_SESSIONS"
