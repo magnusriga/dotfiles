@@ -60,7 +60,7 @@ sudo systemctl enable docker.service
 # ================================================
 # Setup: Rust toolchain via `rustup`, and add it to path.
 # ================================================
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
 . $HOME/.cargo/env
 rustup update
 
