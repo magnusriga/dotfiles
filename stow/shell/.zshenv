@@ -4,4 +4,3 @@
 # and thus load other startup files.
 # ================================================================
 export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh
-. "$HOME/.cargo/env"
