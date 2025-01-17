@@ -137,9 +137,17 @@ source "$HOME/.shrc"
 # History file for ZSH, overwrites bash default which is sset to
 # `/commandhistory/.shell_hisotry` in `.shrc`.
 HISTFILE=/commandhistory/.zsh_history
-# setopt APPEND_HISTORY
-setopt INC_APPEND_HISTORY
+# Turn off `INC_APPEND_HISTORY` when `SHARE_HISTORY` is set,
+# as `SHARE_HISTORY` also makes ZSH append every command to history file,
+# when command is typed, just like `INC_APPEND_HISTORY`.
 setopt SHARE_HISTORY
+# For some reason, when exiting `tmux` with `EOF` on stdin,
+# i.e. `ctrl+d`, history timing was deleted and it was not possible
+# to read history without restarting shell.
+# `EXTENDED_HISTORY` fixes it, by keeping timing information in history.
+# Note: It is necessary to hit ENTER, or run any other command,
+# for history file to be read again, SIGINT, i.e. `ctrl-c`, is insufficient.
+setopt EXTENDED_HISTORY
 
 # ================================================================
 # Autoload Own and Built-In Functions.
@@ -292,7 +300,8 @@ bindkey '^e' autosuggest-clear
 
 # Bind sequence sent by ghostty for `Ctrl+[`, i.e. `^[[91;5u`,
 # to `vi-cmd-mode`, with added benefit of no `KEYTIMEOUT` delay.
-bindkey -M viins '^[[91;5u' vi-cmd-mode
+# bindkey -M viins '^[' self-insert
+# bindkey -M viins '^[[91;5u' vi-cmd-mode
 
 # Ensure `^w` and `^h` deletes past last insert.
 bindkey -M viins '^h' backward-delete-char
