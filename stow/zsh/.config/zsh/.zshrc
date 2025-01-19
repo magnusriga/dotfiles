@@ -120,9 +120,18 @@
 # ================================================================
 # WARNING: Adds small delay, slightly more than `zoxide`.
 if [[ -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration" && \
-${TERM_PROGRAM} == ghostty ]]; then
-    echo "Sourcing Ghostty shell integration..."
-    builtin source "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration"
+${TERM} == xterm-ghostty ]]; then
+  echo "Sourcing Ghostty shell integration..."
+  builtin source "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration"
+fi
+
+# ================================================================
+# iTerm2 Shell Integration for ZSH.
+# ================================================================
+if [[ -e "${ZDOTDIR}/.iterm2_shell_integration.zsh" && \
+${TERM} == xterm-256color ]]; then
+  echo "Sourcing iTerm shell integration..."
+  source "${ZDOTDIR}/.iterm2_shell_integration.zsh"
 fi
 
 # ================================================================
@@ -296,12 +305,31 @@ bindkey '^e' autosuggest-clear
 # - Since ghostty maps `Ctrl+[` to '^[[91;5u', and not to `^[`,
 #   it is better to just map that to `vi-cmd-mode`, instead of forcing
 #   ghostty to send `^[` and removing all key bindings that start with `^[`.
-# bindkey -rpM viins '^['
 
-# Bind sequence sent by ghostty for `Ctrl+[`, i.e. `^[[91;5u`,
-# to `vi-cmd-mode`, with added benefit of no `KEYTIMEOUT` delay.
+# ================================================================
+# Set 10ms delay after pressing Escape or `^[`.
+# ================================================================
+# Better to remove all bindings starting with `^[`, as `KEYTIMEOUT`
+# might be used for other bindings besides those starting with `Escape`,
+# like all the motion commands.
+# Set 10ms delay after pressing Escape or `^[`.
+# export KEYTIMEOUT=1
+bindkey -rpM viins '^['
+
+# Bind sequence sent by terminal, when `fixterm` is enabled,
+# for `Ctrl+[`, i.e. `^[[91;5u`,to `vi-cmd-mode`,
+# with added benefit of no `KEYTIMEOUT` delay.
+# ZSH deletes line if `Escape` is hit in `vicmd` mode,
+# not sure why.
+# Only for ghostty, as other terminals do not use `fixterm` by default.
+# bindkey '^[' self-insert
+[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && bindkey '^[[91;5u' vi-cmd-mode
+
 # bindkey -M viins '^[' self-insert
-# bindkey -M viins '^[[91;5u' vi-cmd-mode
+# bindkey -M viins '^1' self-insert
+# bindkey -M viins '^2' self-insert
+# bindkey -M viins '^i' self-insert
+# bindkey -M viins '^m' self-insert
 
 # Ensure `^w` and `^h` deletes past last insert.
 bindkey -M viins '^h' backward-delete-char
@@ -460,6 +488,3 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-# bun completions
-[ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
