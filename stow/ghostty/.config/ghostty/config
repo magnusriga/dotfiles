@@ -63,19 +63,30 @@
 # -------------------------
 # Fonts
 # -------------------------
+# font-family.
+# Top-most family prevails.
+# Subsequent fonts only used if former not found.
+# Specific variants can be set, which otherwise would
+# be chosen from within family.
 # font-family = "Symbols Nerd Font Mono"
+# font-family = "Monaspace Neon Regular"
 # font-family = "Fira Code"
 # font-family-bold = "Fira Code"
 # font-family-italic = "Maple Mono"
 # font-family-bold-italic = "Maple Mono"
-# font-family = "Monaspace Neon Regular"
+font-family = ""
+font-family = "JetBrainsMono Nerd Font"
 
-font-family="Symbols Nerd Font Mono"
-font-family="JetBrainsMono Nerd Font"
-font-feature = +liga
-# font-size = 10
-# Default: font-size = 13
-# font-size = 14
+# font-feature.
+# Ligatures: Feature of typography where two separate letters
+# are merged into single shape, like the equality signs.
+# `calt`: Ligature used in programming fonts, i.e. equality signs. 
+# `liga`: Not sure what it is, so keeping it commented.
+# font-feature = +liga
+
+# font-size.
+# Default: 13 
+font-size = 11
 
 # Distance in pixels from the top of the cell to the top of the underline.
 # Increase to move underline DOWN, decrease to move underline UP.
@@ -88,6 +99,39 @@ adjust-underline-position = 4
 # Default: adjust-underline-thickness =
 adjust-underline-thickness = 1
 
+# All of the configurations behavior adjust various metrics determined by the
+# font. The values can be integers (1, -1, etc.) or a percentage (20%, -15%,
+# etc.). In each case, the values represent the amount to change the original
+# value.
+#
+# For example, a value of `1` increases the value by 1; it does not set it to
+# literally 1. A value of `20%` increases the value by 20%. And so on.
+#
+# There is little to no validation on these values so the wrong values (i.e.
+# `-100%`) can cause the terminal to be unusable. Use with caution and reason.
+#
+# Some values are clamped to minimum or maximum values. This can make it
+# appear that certain values are ignored. For example, many `*-thickness`
+# adjustments cannot go below 1px.
+#
+# `adjust-cell-height` has some additional behaviors to describe:
+#
+#   * The font will be centered vertically in the cell.
+#
+#   * The cursor will remain the same size as the font, but may be
+#     adjusted separately with `adjust-cursor-height`.
+#
+#   * Powerline glyphs will be adjusted along with the cell height so
+#     that things like status lines continue to look aligned.
+# Default: adjust-cell-width =
+# Default: adjust-cell-height =
+# `adjust-cell-height = 5%` matches WezTerm.
+adjust-cell-height = 5%
+
+# Thickness in pixels or percentage adjustment of box drawing characters.
+# Seems to have no effect.
+# adjust-box-thickness = 20%
+
 # -------------------------
 # Theme and Colors
 # -------------------------
@@ -99,9 +143,9 @@ adjust-underline-thickness = 1
 # theme = dark:catppuccin-mocha,light:catppuccin-latte
 theme = OneHalfDark
 
-# If `true`, the bold text will use the bright color palette.
+# If `true`, bold text will use the bright color palette.
 # Default: bold-is-bright = false
-bold-is-bright = true
+# bold-is-bright = true
 
 # shell-integration is set to avoid automatically
 # turning cursor to bar,
@@ -113,8 +157,8 @@ cursor-color = #FFA500
 cursor-invert-fg-bg = true
 
 # `1c2021`, i.e. black-grey, goes well with opacity.
-background = 1c2021
-background-opacity = 0.9
+# background = 1c2021
+# background-opacity = 0.9
 
 # The style of the macOS titlebar. Available values are: "native",
 # "transparent", "tabs", and "hidden".
@@ -244,6 +288,7 @@ gtk-single-instance = true
 #   don't look good extended.
 #
 # Default: window-padding-color = background
+window-padding-color = extend
 
 # The colorspace to use for the terminal window. The default is `srgb` but
 # this can also be set to `display-p3` to use the Display P3 colorspace.
@@ -253,34 +298,6 @@ gtk-single-instance = true
 # This setting is only supported on macOS.
 # Default: window-colorspace = srgb
 window-colorspace = "display-p3"
-
-# All of the configurations behavior adjust various metrics determined by the
-# font. The values can be integers (1, -1, etc.) or a percentage (20%, -15%,
-# etc.). In each case, the values represent the amount to change the original
-# value.
-#
-# For example, a value of `1` increases the value by 1; it does not set it to
-# literally 1. A value of `20%` increases the value by 20%. And so on.
-#
-# There is little to no validation on these values so the wrong values (i.e.
-# `-100%`) can cause the terminal to be unusable. Use with caution and reason.
-#
-# Some values are clamped to minimum or maximum values. This can make it
-# appear that certain values are ignored. For example, many `*-thickness`
-# adjustments cannot go below 1px.
-#
-# `adjust-cell-height` has some additional behaviors to describe:
-#
-#   * The font will be centered vertically in the cell.
-#
-#   * The cursor will remain the same size as the font, but may be
-#     adjusted separately with `adjust-cursor-height`.
-#
-#   * Powerline glyphs will be adjusted along with the cell height so
-#     that things like status lines continue to look aligned.
-# Default: adjust-cell-width =
-# Default: adjust-cell-height =
-# adjust-cell-height = 10%
 
 # Horizontal window padding. This applies padding between the terminal cells
 # and the left and right window borders. The value is in points, meaning that
@@ -299,7 +316,8 @@ window-colorspace = "display-p3"
 # left padding to 2 and the right padding to 4. If you want to set both
 # paddings to the same value, you can use a single value. For example,
 # Default: `window-padding-x = 2` will set both paddings to 2.
-# window-padding-x = 2
+# Matches WezTerm: `window-padding-x = 7`.
+window-padding-x = 7
 
 # Vertical window padding. This applies padding between the terminal cells and
 # the top and bottom window borders. The value is in points, meaning that it
@@ -318,7 +336,8 @@ window-colorspace = "display-p3"
 # top padding to 2 and the bottom padding to 4. If you want to set both
 # paddings to the same value, you can use a single value. For example,
 # Default: `window-padding-y = 2` will set both paddings to 2.
-# window-padding-y = 2,0
+# Matches WezTerm: `window-padding-y = 4,10`.
+window-padding-y = 4,10
 
 # The viewport dimensions are usually not perfectly divisible by the cell
 # size. In this case, some extra padding on the end of a column and the bottom
@@ -333,7 +352,7 @@ window-colorspace = "display-p3"
 # actually exist, and this is applied last in order to balance the padding
 # given a certain viewport size and grid cell size.
 # Default: window-padding-balance = false
-window-padding-balance = true
+# window-padding-balance = true
 
 # -------------------------
 # Clipboard
@@ -406,6 +425,10 @@ keybind = cmd+s>l=goto_split:right
  
 keybind = cmd+s>z=toggle_split_zoom
 keybind = cmd+s>e=equalize_splits
+
+# keybind = ctrl+[=text:\x1b
+# keybind = ctrl+a=csi:>1u
+# keybind = ctrl+b=csi:1u
 
 # Tabs
 # keybind = super+shift+t=new_tab

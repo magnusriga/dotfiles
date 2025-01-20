@@ -51,6 +51,7 @@ config.term = 'wezterm'
 -- https://sw.kovidgoyal.net/kitty/keyboard-protocol
 -- Enabling it, as that is what ghostty does by default.
 -- config.enable_kitty_keyboard = true
+config.enable_csi_u_key_encoding = true
 
 -- Remember to install all the fonts in the chosen family, in OS.
 config.font = wezterm.font("JetBrainsMono Nerd Font")
@@ -58,8 +59,9 @@ config.font = wezterm.font("JetBrainsMono Nerd Font")
 -- config.font = wezterm.font("Hack Nerd Font")
 -- config.font = wezterm.font_with_fallback("Hack Nerd Font")
 
--- vscode uses 14px (11pt) by default.
-config.font_size = 10
+-- vscode uses 14px (12pt) by default.
+-- 12 in WezTerm corresponds to 11 in Ghostty.
+config.font_size = 12
 
 -- Changing the color scheme.
 -- config.color_scheme = 'Batman'
@@ -111,5 +113,13 @@ wezterm.on("user-var-changed", function(window, pane, name, value)
   window:set_config_overrides(overrides)
 end)
 
--- and finally, return the configuration to wezterm
+-- true (default): Tab bar is rendered in native style with proportional fonts.
+-- false: Tab bar is rendered using retro aesthetic using main terminal
+config.use_fancy_tab_bar = true
+
+-- RESIZE: Disable title bar, but enable resizable border.
+-- TTLE | RESIZE (default): Enable titlebar and border.
+config.window_decorations = "RESIZE"
+
+-- Finally, return the configuration to wezterm.
 return config
