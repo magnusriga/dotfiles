@@ -198,7 +198,12 @@ cursor-invert-fg-bg = true
 #
 # Changing this option at runtime only applies to new windows.
 # Defualt: macos-titlebar-style = transparent
-# macos-titlebar-style = hidden
+macos-titlebar-style = hidden
+
+# Background color for the window titlebar.
+# Only takes effect if window-theme is set to `ghostty`.
+# Currently only supported in the GTK app runtime.
+# window-titlebar-background
 
 # -------------------------
 # Window
@@ -288,7 +293,9 @@ gtk-single-instance = true
 #   don't look good extended.
 #
 # Default: window-padding-color = background
-window-padding-color = extend
+# OneDarkPro background color: `#16161d`.
+# `nvim` background color: `#282C34`.
+window-padding-color = "extend"
 
 # The colorspace to use for the terminal window. The default is `srgb` but
 # this can also be set to `display-p3` to use the Display P3 colorspace.
@@ -337,7 +344,7 @@ window-padding-x = 7
 # paddings to the same value, you can use a single value. For example,
 # Default: `window-padding-y = 2` will set both paddings to 2.
 # Matches WezTerm: `window-padding-y = 4,10`.
-window-padding-y = 4,10
+window-padding-y = 7,2
 
 # The viewport dimensions are usually not perfectly divisible by the cell
 # size. In this case, some extra padding on the end of a column and the bottom

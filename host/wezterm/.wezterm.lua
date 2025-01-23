@@ -51,7 +51,7 @@ config.term = 'wezterm'
 -- https://sw.kovidgoyal.net/kitty/keyboard-protocol
 -- Enabling it, as that is what ghostty does by default.
 -- config.enable_kitty_keyboard = true
-config.enable_csi_u_key_encoding = true
+-- config.enable_csi_u_key_encoding = true
 
 -- Remember to install all the fonts in the chosen family, in OS.
 config.font = wezterm.font("JetBrainsMono Nerd Font")

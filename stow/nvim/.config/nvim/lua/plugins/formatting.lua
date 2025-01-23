@@ -93,7 +93,6 @@ return {
       -- `eslint` LSP formatter overwrites that with priority 200.
       -- Thus, in lua files, conform is first invoked with LSP formatter, which has priority 1,
       -- i.e. `vim.lsp.buf.format`, then conform runs formatter registered below, which has priority 100,
-      --
       -- with formatters from `formatter_by_ft` runs first,
       -- then `eslint` formatter runs.
       -- gq always uses `require('conform').formatexpr()`, which uses formatters_by_ft,
@@ -108,6 +107,7 @@ return {
             -- the conform plugin is only loaded when this format function runs,
             -- which happens on every formatting keybinding and when running `formatexr()`.
             -- Require return values are cached, so it will only be "slow" on first format.
+            vim.notify("formatting with conform")
             require("conform").format({ bufnr = buf })
           end,
           sources = function(buf)
