@@ -88,14 +88,19 @@ return {
     },
     init = function()
       -- Register conform formatter on VeryLazy event,
-      -- i.e. after all plugins have been installed and loaded.
-      -- LSP formatter has priority 1 by defualt,
-      -- `eslint` LSP formatter overwrites that with priority 200.
-      -- Thus, in lua files, conform is first invoked with LSP formatter, which has priority 1,
-      -- i.e. `vim.lsp.buf.format`, then conform runs formatter registered below, which has priority 100,
-      -- with formatters from `formatter_by_ft` runs first,
-      -- then `eslint` formatter runs.
-      -- gq always uses `require('conform').formatexpr()`, which uses formatters_by_ft,
+      -- i.e. after all plugins have been installed and loaded, as `primary` formatter.
+      --
+      -- LSP formatter registered in `plugins/lsp/init.lua` via `util/lsp.lua`,
+      -- is also `primary` formatter, but has priority 1, thus it never runs,
+      -- as only one `primary` formatter is permitted, and one with highest priority is used.
+      --
+      -- Certain other LSPs, like `eslint`, register new non-`primary` formatters,
+      -- with even higher priority, e.g. 200, thus these run first,
+      -- following which conform using `formatter_by_ft` runs.
+      --
+      -- `eslint`'s formatter just does ESLintFixAll, before prettier runs via conform.
+      --
+      -- `gq` always uses `require('conform').formatexpr()`, which uses formatters_by_ft,
       -- without setting `opts.formatters` to nil (which makes conform use LSP formatter).
       MyVim.on_very_lazy(function()
         MyVim.format.register({

@@ -1,5 +1,13 @@
 return {
-  -- Search/replace in multiple files.
+  -- Search/replace in multiple files, using `rg` (default) and `ast-grep`,
+  -- via interface launched with `GrugFar`.
+  -- `<leader>sr`: Execute `GrugFar`.
+  -- Inside `GrugFar`:
+  -- - `<leader>j|k`: Apply next|previous repeat.
+  -- - `$1`: Search string, usable in Replace section.
+  -- - `<leader>i`: Show preview of line.
+  -- - `<leader>t`: Show searches from history, for easy repeat.
+  -- - `<leader>c`: Close, prefer over `bd` as former asks to confirm Abort if needed.
   {
     "MagicDuck/grug-far.nvim",
     opts = { headerMaxWidth = 80 },
@@ -23,25 +31,92 @@ return {
     },
   },
 
-  -- `flash` enhances built-in search functionality by showing labels
-  -- at end of each match, allowing quick jumps to a specific location.
+  -- Adds jump labels:
+  -- - `/`      : Optional, default off, toggle with `require("flash").toggle(boolean?)`.
+  --              Keep disabled, regular search is good enough.
+  -- - `f|F|t|T`: Optional, default off.
+  --
+  -- Adds shortcuts:
+  -- - `s`  : Standalone jump with jump labels, like standard search with jump labels.
+  --          Disable, as regular search without labels is good enough.
+  -- - `S`  : Incremental Treesitter selection.
+  -- - `r|R`: Motions with jump labels.
+  --
+  -- Upgrades `f|F|t|T`:
+  -- - Go past current line, i.e. multi-line.
+  -- - Repeat with same character, but `;` | `,` already repeats forward | backward.
   {
     "folke/flash.nvim",
     event = "VeryLazy",
-    vscode = true,
     ---@type Flash.Config
-    opts = {},
+    opts = {
+      highlight = {
+        -- Show backdrop with `hl FlashBackdrop`, e.g. making
+        -- font gray from cursor forward, `true` by default.
+        backdrop = false,
+        -- Highlight search matches, `true` by default.
+        -- Same as `Search` and `IncSearch` highlight groups,
+        -- i.e. gray bacground and orang font.
+        -- Bring pink box is lables, not matches.
+        matches = true,
+        -- Extmark priority.
+        priority = 5000,
+        groups = {
+          match = "FlashMatch",
+          current = "FlashCurrent",
+          backdrop = "FlashBackdrop",
+          label = "FlashLabel",
+        },
+      },
+      modes = {
+        search = {
+          -- `true`: `flash` activate by default for regular search.
+          -- Toggle on/off: `require("flash").toggle()`.
+          enabled = false,
+        },
+        -- `char`: Options when `flash` is activated through
+        -- `f`, `F`, `t`, `T`, `;`, `,` motions.
+        char = {
+          -- enabled = false,
+          jump_labels = true,
+          highlight = {
+            backdrop = false,
+            groups = {
+              -- Pink highlight too disturbing in this mode.
+              label = "IncSearch",
+            },
+          },
+        },
+      },
+    },
     -- stylua: ignore
     keys = {
-      { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
-      { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+      -- Search forward|backwards, like regular search with jump labels.
+      -- Disable, clashes with built-in substitute binding `s`.
+      -- { "s", mode = { "n", "o", "x" }, function() require("flash").jump() end, desc = "Flash" },
+
+      -- Visually select forward|backward with labels.
+      -- Expand|contract selection with `;`|`,`.
+      -- Prefer increment|decrement with: `^Space`|`Backspace`, see `treesitter.lua`.
+      -- { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+
+      -- `r` in operator pending mode (`o`) to use jump labels as operator for motion.
+      -- Labels use same character for start and end of selection.
       { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+
+      -- `R` in operator pending mode (`o`) and visual mode (`x`) to use jump labels as operator for motion.
+      -- Type full search after `R`.
+      -- Thus, possible to yank|delete|select upwards|downwards, not just next match.
+      -- Example: `yRa` then choose jump target to yank text inside label.
       { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-      { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+
+      -- `C-s` in command mode (`c`), to toggle flash search on/off for regular (`/`) search.
+      -- Disbaled, interferes with `tmux`.
+      -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
   },
 
-  -- `which-key` helps remember key bindings by showing popup
+  -- Helps remember key bindings by showing popup
   -- with active keybindings of command you started typing.
   {
     "folke/which-key.nvim",
@@ -76,15 +151,16 @@ return {
               return require("which-key.extras").expand.buf()
             end,
           },
-          {
-            "<leader>w",
-            group = "windows",
-            proxy = "<c-w>",
-            expand = function()
-              return require("which-key.extras").expand.win()
-            end,
-          },
-          -- better descriptions
+          -- Use built-in `^w`.
+          -- {
+          --   "<leader>w",
+          --   group = "windows",
+          --   proxy = "<c-w>",
+          --   expand = function()
+          --     return require("which-key.extras").expand.win()
+          --   end,
+          -- },
+          -- Better descriptions.
           { "gx", desc = "Open with system app" },
         },
       },
@@ -108,15 +184,18 @@ return {
     config = function(_, opts)
       local wk = require("which-key")
       wk.setup(opts)
-      if not vim.tbl_isempty(opts.defaults) then
-        MyVim.warn("which-key: opts.defaults is deprecated. Please use opts.spec instead.")
-        wk.register(opts.defaults)
-      end
     end,
   },
 
-  -- `gitsigns` highlights text that has changed since last git commit,
-  -- and allows interactive stage & unstage hunks in commit.
+  -- Adds per-hunk abilities:
+  -- - In-margin git status: Unstaged: Dark line | Staged: Dimmed line | Commited: No sign.
+  -- - Goto, stage, unstage, reset.
+  -- - Status bar integration.
+  --
+  -- Preview:
+  -- - File diff from Index|HEAD, using Neovim's `diff` mode: `Gitsigns diffthis`.
+  -- - File diff from HEAD, inline|popup: `Gitsigns preview_hunk[_inline]`.
+  -- - Blame lines.
   {
     "lewis6991/gitsigns.nvim",
     event = "LazyFile",
@@ -129,6 +208,7 @@ return {
         changedelete = { text = "▎" },
         untracked = { text = "▎" },
       },
+      -- Dimmed version of above signs.
       signs_staged = {
         add = { text = "▎" },
         change = { text = "▎" },
@@ -143,7 +223,9 @@ return {
           vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
         end
 
-        -- stylua: ignore start
+        -- Navigate to next hunk:
+        -- - Normal mode: `]h`.
+        -- - Diff mode: `]c`.
         map("n", "]h", function()
           if vim.wo.diff then
             vim.cmd.normal({ "]c", bang = true })
@@ -151,6 +233,10 @@ return {
             gs.nav_hunk("next")
           end
         end, "Next Hunk")
+
+        -- Navigate to previous hunk:
+        -- - Normal mode: `[h`.
+        -- - Diff mode: `[c`.
         map("n", "[h", function()
           if vim.wo.diff then
             vim.cmd.normal({ "[c", bang = true })
@@ -158,26 +244,62 @@ return {
             gs.nav_hunk("prev")
           end
         end, "Prev Hunk")
-        map("n", "]H", function() gs.nav_hunk("last") end, "Last Hunk")
-        map("n", "[H", function() gs.nav_hunk("first") end, "First Hunk")
+
+        -- Navigate to last hunk.
+        map("n", "]H", function()
+          gs.nav_hunk("last")
+        end, "Last Hunk")
+
+        -- Navigate to first hunk.
+        map("n", "[H", function()
+          gs.nav_hunk("first")
+        end, "First Hunk")
+
+        -- Stage hunk and undo.
         map({ "n", "v" }, "<leader>ghs", ":Gitsigns stage_hunk<CR>", "Stage Hunk")
-        map({ "n", "v" }, "<leader>ghr", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
-        map("n", "<leader>ghS", gs.stage_buffer, "Stage Buffer")
         map("n", "<leader>ghu", gs.undo_stage_hunk, "Undo Stage Hunk")
+
+        -- Stage full buffer.
+        map("n", "<leader>ghS", gs.stage_buffer, "Stage Buffer")
+
+        -- Reset hunk from working tree to HEAD.
+        map({ "n", "v" }, "<leader>ghr", ":Gitsigns reset_hunk<CR>", "Reset Hunk")
         map("n", "<leader>ghR", gs.reset_buffer, "Reset Buffer")
+
+        -- Preview hunk diff inline.
         map("n", "<leader>ghp", gs.preview_hunk_inline, "Preview Hunk Inline")
-        map("n", "<leader>ghb", function() gs.blame_line({ full = true }) end, "Blame Line")
-        map("n", "<leader>ghB", function() gs.blame() end, "Blame Buffer")
+
+        -- Show single-line blame.
+        map("n", "<leader>ghb", function()
+          gs.blame_line({ full = true })
+        end, "Blame Line")
+
+        -- Show blame for all lines in buffer.
+        map("n", "<leader>ghB", function()
+          gs.blame()
+        end, "Blame Buffer")
+
+        -- Show diff from from Index to working tree, in Neovim diff mode.
         map("n", "<leader>ghd", gs.diffthis, "Diff This")
-        map("n", "<leader>ghD", function() gs.diffthis("~") end, "Diff This ~")
+
+        -- Show diff from from HEAD to working tree, in Neovim diff mode.
+        map("n", "<leader>ghD", function()
+          gs.diffthis("~")
+        end, "Diff This ~")
+
         map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "GitSigns Select Hunk")
       end,
     },
   },
+
+  -- NOTE:
+  -- When adding same plugin source multiple times, spec `opts` are merged into one.
+  -- Directory name can be used as source, since `gitsigns.nvim` was installed,
+  -- added to runtimepath, and loaded, above.
+
   {
-    -- Directory name can be used as source,
-    -- since `gitsigns.nvim` was added installed,
-    -- added to runtimepath, and loaded, above.
+    -- Adds keymap to toggle Gitsigns sign column, i.e. signs in margin, via `snacks.nvim`.
+    -- `plugins/init.lua`: List of all `snacks.nvim` specs and usages.
     "gitsigns.nvim",
     opts = function()
       Snacks.toggle({
@@ -204,12 +326,28 @@ return {
       },
     },
     keys = {
+      -- View diagnostics accross all open buffers.
       { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
+
+      -- View diagnostics for current buffer.
       { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+
+      -- View symbols in current buffer, from Treesitter.
       { "<leader>cs", "<cmd>Trouble symbols toggle<cr>", desc = "Symbols (Trouble)" },
+
+      -- View references and definitions for word under cursor, using LSP.
+      -- Use built-in `gr` and `gd` instead?
       { "<leader>cS", "<cmd>Trouble lsp toggle<cr>", desc = "LSP references/definitions/... (Trouble)" },
+
+      -- Toggle location list.
       { "<leader>xL", "<cmd>Trouble loclist toggle<cr>", desc = "Location List (Trouble)" },
+
+      -- Toggle quickfix list.
       { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
+
+      -- Next trouble | quickfix entry in buffer.
+      -- Jumps to next Treesitter symbol, not next diagnostic,
+      -- when quickfix list is empty.
       {
         "[q",
         function()
@@ -224,6 +362,9 @@ return {
         end,
         desc = "Previous Trouble/Quickfix Item",
       },
+
+      -- Previous trouble | quickfix entry in buffer.
+      -- See notes above.
       {
         "]q",
         function()

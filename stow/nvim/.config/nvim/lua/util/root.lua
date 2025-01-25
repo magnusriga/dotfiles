@@ -149,16 +149,21 @@ function M.info()
   return roots[1] and roots[1].paths[1] or vim.uv.cwd()
 end
 
+-- Cache containing root paths for buffer,
+-- indexed by buffer number.
 ---@type table<number, string>
 M.cache = {}
 
+-- Create usercommand to get root of buffer,
+-- and autocommand to delete cache of buffer root paths.
+-- TODO: Delete if not used.
 function M.setup()
   vim.api.nvim_create_user_command("MyRoot", function()
     MyVim.root.info()
   end, { desc = "MyVim roots for the current buffer" })
 
   -- FIX: Doesn't properly clear cache in neo-tree `set_root` (which should happen presumably on `DirChanged`),
-  -- probably because the event is triggered in the neo-tree buffer, therefore add `BufEnter`
+  -- probably because the event is triggered in the neo-tree buffer, therefore add `BufEnter`.
   -- Maybe this is too frequent on `BufEnter` and something else should be done instead??
   vim.api.nvim_create_autocmd({ "LspAttach", "BufWritePost", "DirChanged", "BufEnter" }, {
     group = vim.api.nvim_create_augroup("myvim_root_cache", { clear = true }),

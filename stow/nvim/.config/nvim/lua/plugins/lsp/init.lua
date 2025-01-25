@@ -1,5 +1,5 @@
 return {
-  -- nvim-lspconfig is a data-only repository of LSP server configurations.
+  -- nvim-lspconfig is data-only repository of LSP server configurations.
   {
     "neovim/nvim-lspconfig",
     event = "LazyFile",
@@ -7,6 +7,8 @@ return {
       "mason.nvim",
       { "williamboman/mason-lspconfig.nvim", config = function() end },
     },
+    -- Done as function without arguments, thus does not merge
+    -- with other specs from same plugin source, if any.
     opts = function()
       ---@class PluginLspOpts
       local ret = {
@@ -35,22 +37,22 @@ return {
         },
         -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0.
         -- Remember to configure LSP server to provide inlay hints.
-	-- Only used internally, not passed to LSP server.
+        -- Only used internally, not passed to LSP server.
         inlay_hints = {
           enabled = true,
           exclude = { "vue" }, -- Filetypes for which to not enable inlay hints.
         },
         -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0.
         -- Remember to configure LSP server to provide the code lenses.
-	-- Only used internally, not passed to LSP server.
+        -- Only used internally, not passed to LSP server.
         codelens = {
           enabled = false,
         },
         -- Add global capabilities to built-in Neovim LSP client.
-	-- Only used internally, when it is combined with built-in capabilities,
-	-- and capabilities from completion engine, into new table which is sent
-	-- to LSP server so it knows that Neovim's built-in LSP client can now
-	-- do rename operations on all files across entire workspace, in one go.
+        -- Only used internally, when it is combined with built-in capabilities,
+        -- and capabilities from completion engine, into new table which is sent
+        -- to LSP server so it knows that Neovim's built-in LSP client can now
+        -- do rename operations on all files across entire workspace, in one go.
         capabilities = {
           workspace = {
             fileOperations = {
@@ -60,9 +62,9 @@ return {
           },
         },
         -- Options for `vim.lsp.buf.format`.
-	-- Conform is used for formatting, also when formatter is LSP.
-	-- `vim.lsp.format` arguments `filter` and `bufnr` are defined when registering LSP formatter,
-	-- thus no need to specify those arguments here.
+        -- Conform is used for formatting, also when formatter is LSP.
+        -- `vim.lsp.format` arguments `filter` and `bufnr` are defined when registering LSP formatter,
+        -- thus no need to specify those arguments here.
         format = {
           formatting_options = nil,
           timeout_ms = nil,
@@ -103,8 +105,8 @@ return {
         },
         -- Additional LSP server setup.
         -- Return true to prevent server setup with lspconfig,
-	-- as this function will then handle the setup without lspconfig.
-	-- Will get all `server_opts` passed in, just like `lspconfig` would.
+        -- as this function will then handle the setup without lspconfig.
+        -- Will get all `server_opts` passed in, just like `lspconfig` would.
         ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
         setup = {
           -- Example setup with typescript.nvim:
@@ -123,7 +125,20 @@ return {
       -- Register LSP formatter, which uses Conform under the hood,
       -- with `opt.formatters = nil`, which makes Conform fallback
       -- to using this LSP formatter.
-      -- Runs last, after invoking Conform with `stylua` formatter.
+      --
+      -- Conform formatter registered in `plugins/formatting.lua`, is primary formatter
+      -- with priority 100.
+      --
+      -- LSP formatter registered in `plugins/lsp/init.lua` via `util/lsp.lua`,
+      -- is also `primary` formatter, but has priority 1, thus it never runs,
+      -- since only one `primary` formatter is permitted, and one with highest priority is used.
+      --
+      -- Certain other LSPs, like `eslint`, register new non-`primary` formatters,
+      -- with even higher priority, e.g. 200, thus these run first,
+      -- following which conform using `formatter_by_ft` runs.
+      -- `eslint`'s formatter just does ESLintFixAll, before prettier runs via conform.
+      --
+      -- Thus, below regstering has no effect as long as `conform.nvim` is installed.
       MyVim.format.register(MyVim.lsp.formatter())
 
       -- Setup keymaps when any `client` attaches to any `buffer`,
@@ -162,16 +177,16 @@ return {
       if vim.fn.has("nvim-0.10") == 1 then
         -- Inlay hints.
         if opts.inlay_hints.enabled then
-	  -- This function runs when client attaches to buffer,
-	  -- and when registring new capability on client,
-	  -- for every client, and buffer the client is attached to, that
-	  -- supports "textDocument/inlayHint" method.
-	  -- Thus, when client attaches to buffer, and when registring new capability on client,
-	  -- enable inlay hints in Neovim's built-in LSP client.
-	  -- Note: Function below only runs once for a given method-client-buffer combination,
-	  -- following which method-client-buffer is registered in `_supported_methods`,
-	  -- after which function will not run again, whether it was supported or not by
-	  -- client and buffer being attached to, or buffers already attached to in case of capability registration.
+          -- This function runs when client attaches to buffer,
+          -- and when registring new capability on client,
+          -- for every client, and buffer the client is attached to, that
+          -- supports "textDocument/inlayHint" method.
+          -- Thus, when client attaches to buffer, and when registring new capability on client,
+          -- enable inlay hints in Neovim's built-in LSP client.
+          -- Note: Function below only runs once for a given method-client-buffer combination,
+          -- following which method-client-buffer is registered in `_supported_methods`,
+          -- after which function will not run again, whether it was supported or not by
+          -- client and buffer being attached to, or buffers already attached to in case of capability registration.
           MyVim.lsp.on_supports_method("textDocument/inlayHint", function(client, buffer)
             if
               vim.api.nvim_buf_is_valid(buffer)
@@ -185,18 +200,18 @@ return {
 
         -- Code lens.
         if opts.codelens.enabled and vim.lsp.codelens then
-	  -- This function runs when client attaches to buffer,
-	  -- and when registring new capability on client,
-	  -- for every client, and buffer the client is attached to, that
-	  -- supports "textDocument/codeLens" method.
-	  -- Thus, when client attaches to buffer, and when registring new capability on client,
-	  -- refresh codelens list from LSP, and create autocmd that refreshes codelens list
-	  -- whenever (re)-entering buffer, when no key has been pressed for 4 seconds (`opt.updatetime`),
-	  -- and when leaving insert mode.
-	  -- Note: Function below only runs once for a given method-client-buffer combination,
-	  -- following which method-client-buffer is registered in `_supported_methods`,
-	  -- after which function will not run again, whether it was supported or not by
-	  -- client and buffer being attached to, or buffers already attached to in case of capability registration.
+          -- This function runs when client attaches to buffer,
+          -- and when registring new capability on client,
+          -- for every client, and buffer the client is attached to, that
+          -- supports "textDocument/codeLens" method.
+          -- Thus, when client attaches to buffer, and when registring new capability on client,
+          -- refresh codelens list from LSP, and create autocmd that refreshes codelens list
+          -- whenever (re)-entering buffer, when no key has been pressed for 4 seconds (`opt.updatetime`),
+          -- and when leaving insert mode.
+          -- Note: Function below only runs once for a given method-client-buffer combination,
+          -- following which method-client-buffer is registered in `_supported_methods`,
+          -- after which function will not run again, whether it was supported or not by
+          -- client and buffer being attached to, or buffers already attached to in case of capability registration.
           MyVim.lsp.on_supports_method("textDocument/codeLens", function(client, buffer)
             vim.lsp.codelens.refresh()
             vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
@@ -267,30 +282,30 @@ return {
         end
 
         -- If `opts.setup[server]` is a defined function which returns `true`,
-	-- see top of this file for an example, then do not setup server,
-	-- because that `setup` function will then handle the setup without using
-	-- `nvim_lspconfig`, as it is executed below with `server_opts` passed in.
+        -- see top of this file for an example, then do not setup server,
+        -- because that `setup` function will then handle the setup without using
+        -- `nvim_lspconfig`, as it is executed below with `server_opts` passed in.
         if opts.setup[server] then
           if opts.setup[server](server, server_opts) then
             return
           end
-	-- If `opts.setup` contains catch-all setup, then execute that and
-	-- do not proceed to `lspconfig` server setup.
+        -- If `opts.setup` contains catch-all setup, then execute that and
+        -- do not proceed to `lspconfig` server setup.
         elseif opts.setup["*"] then
           if opts.setup["*"](server, server_opts) then
             return
           end
         end
 
-	-- Finally, execute LSP server's setup function.
-	--
-	-- `require("lspconfig")[server]` returns table with server-specific
-	-- `setup` function that already has access to `default_config` from `nvim_lspconfig`
-	-- repository for specific `server` (closure), which it combines with `server_opts` defined above,
-	-- referred to as `user_config`, where `user_config` takes presedence in case of conflict.
-	--
-	-- `lsp_config` then starts LSP server when opening buffer with `filetype` matching one of those
-	-- listed in `default_config` from `nvim_lspconfig` repository for specific `server`.
+        -- Finally, execute LSP server's setup function.
+        --
+        -- `require("lspconfig")[server]` returns table with server-specific
+        -- `setup` function that already has access to `default_config` from `nvim_lspconfig`
+        -- repository for specific `server` (closure), which it combines with `server_opts` defined above,
+        -- referred to as `user_config`, where `user_config` takes presedence in case of conflict.
+        --
+        -- `lsp_config` then starts LSP server when opening buffer with `filetype` matching one of those
+        -- listed in `default_config` from `nvim_lspconfig` repository for specific `server`.
         require("lspconfig")[server].setup(server_opts)
       end
 

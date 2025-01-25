@@ -22,7 +22,7 @@ function M.get_clients(opts)
 end
 
 -- Create autocmd that executes `on_attach(client, buffer)` callback,
--- when LSP client `client` attaches to buffer `buffer`. 
+-- when LSP client `client` attaches to buffer `buffer`.
 ---@param on_attach fun(client:vim.lsp.Client, buffer)
 ---@param name? string
 function M.on_attach(on_attach, name)
@@ -179,6 +179,19 @@ function M.disable(server, cond)
   end)
 end
 
+-- Run when registering LSP formatter, from `plugins/lsp/init.lua` to `util/format.lua`.
+--
+-- Conform formatter registered in `plugins/formatting.lua`, is primary formatter
+-- with priority 100.
+--
+-- LSP formatter registered in `plugins/lsp/init.lua` via `util/lsp.lua`,
+-- is also `primary` formatter, but has priority 1, thus it never runs,
+-- since only one `primary` formatter is permitted, and one with highest priority is used.
+--
+-- Certain other LSPs, like `eslint`, register new non-`primary` formatters,
+-- with even higher priority, e.g. 200, thus these run first,
+-- following which conform using `formatter_by_ft` runs.
+-- `eslint`'s formatter just does ESLintFixAll, before prettier runs via conform.
 ---@param opts? MyFormatter| {filter?: (string|lsp.Client.filter)}
 function M.formatter(opts)
   opts = opts or {}
@@ -193,6 +206,10 @@ function M.formatter(opts)
     format = function(buf)
       M.format(MyVim.merge({}, filter, { bufnr = buf }))
     end,
+    -- `sources` is table containing name of every LSP client attached to buffer trying to run `util/format.lua > format()`,
+    -- assuming LSP client has `formatting` | `rangeFormatting` capabilities.
+    -- All attached LSP clients with those capabilities are used for formatting,
+    -- run by `conform.nvim` or built-in `vim.lsp.buf.format` if `conform.nvim` not installed.
     sources = function(buf)
       local clients = M.get_clients(MyVim.merge({}, filter, { bufnr = buf }))
       ---@param client vim.lsp.Client
@@ -225,11 +242,14 @@ function M.format(opts)
   -- since it has better format diffing.
   -- Since `opts.formatters` is emptied,
   -- and `lsp_format` is set to `fallback`,
-  -- conform will indeed use `eslint` to run this `format`.
+  -- conform will indeed use LSP client's formatter
+  -- to run this `format`, e.g. `eslint`.
   if ok then
     opts.formatters = {}
     conform.format(opts)
   else
+    -- If `conform.nvim` is not installed, use built-in LSP format function,
+    -- which formats buffer with all attached LSP clients, in arbitrary order.
     vim.lsp.buf.format(opts)
   end
 end

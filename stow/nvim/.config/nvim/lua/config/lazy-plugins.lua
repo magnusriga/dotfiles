@@ -15,7 +15,7 @@ Plugin install location
   where `<repo>` is the name of the GitHub repository: <user>/<repo>.
 
 ---------------------------------------------
-Execution order 
+Execution order
 ---------------------------------------------
 - lazy.nvim first collects all spec tables, for each plugin,
   including each table inside `spec` field of lazy.nvim configuration table,
@@ -108,7 +108,7 @@ Notes:
   i.e. plugin’s <repo> name, and since all plugin directories are added to runtimepath,
   each plugin directory must contain top-level `/lua/<repo>`,
   in order for `require(<name>)` to work.
- 
+
 ---------------------------------------------
 Source plugins from original runtimepath
 ---------------------------------------------
@@ -161,7 +161,7 @@ For each plugin:
 
 For each start plugin:
 (do below steps for plugin's dependencies, then for plugin itself)
-1. Add plugin directory to runtimepath. 
+1. Add plugin directory to runtimepath.
 2. Source each `.lua` module in each plugin’s top-level `/plugin` and `/after/plugin` directories.
    - lazyvim does not contain top-level `/plugin` or `/after/plugin` directory.
    - Other plugin directories might.
@@ -181,7 +181,7 @@ For each start plugin:
      - These modules are found in `/lua` directory of lazyvim plugin directory,
        which was added to runtimepath by lazy.nvim,
        e.g. `$HOME/.local/share/nvim/lazy/lazyvim/lua/lazyvim/config/options`.
-     - `require("lazyvim").setup( opts )` then follows the same process for user's own config:  same for 
+     - `require("lazyvim").setup( opts )` then follows the same process for user's own config:  same for
        - `require(‘config.autocmd’)`
        - `require(‘config.keymap’)`
        - `require(‘config.options’)`
@@ -240,11 +240,11 @@ VeryLazy
   - If specified, default `config` function runs when plugin loads,
     which calls `require(MAIN).setup(opts)` passing in `opt` table.
 
-- `init=<function>`: 
+- `init=<function>`:
   - Executed during nvim startup.
   - Useful for setting Vim plugin configurations, e.g. `vim.g.*`.
 
-- `import=<import>`: 
+- `import=<import>`:
   - Syntax: `{ '<user>/<repo>', `import: 'plugin' }`.
   - If `<import>` is directory:
     - Executes `require(<module>.<file>)` for every top-level `<file>.lua` in `runtimepath/lua/<module>`.
@@ -275,7 +275,7 @@ VeryLazy
 ---------------------------------------------
 Plugin loading events (set in `spec`)
 ---------------------------------------------
-- InsertEnter : Plugin loads when entering Insert mode. 
+- InsertEnter : Plugin loads when entering Insert mode.
 - VeryLazy    : Plugin loads later, not immediately at startup.
 
 ---------------------------------------------
@@ -335,7 +335,7 @@ Useful commands
 =============================================
 --]]
 
-require('lazy').setup({
+require("lazy").setup({
   spec = {
     -- Runs `require` on all modules, i.e. `.lua` files,
     -- in `$HOME/.config/nvim/lua/plugins`.
@@ -357,7 +357,7 @@ require('lazy').setup({
   },
   -- Try to load one of these colorschemes when starting a plugin installation during nvim startup.
   install = {
-    colorscheme = { "tokyonight", "habamax" }
+    colorscheme = { "tokyonight", "habamax" },
   },
   ui = {
     -- a number <1 is a percentage., >1 is a fixed size
@@ -374,30 +374,29 @@ require('lazy').setup({
     -- If using a Nerd Font, set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table.
     icons = vim.g.have_nerd_font and {} or {
-      cmd = '⌘',
-      config = '🛠',
-      event = '📅',
+      cmd = "⌘",
+      config = "🛠",
+      event = "📅",
       favorite = " ",
-      ft = '📂',
-      init = '⚙',
+      ft = "📂",
+      init = "⚙",
       import = " ",
-      keys = '🗝',
+      keys = "🗝",
       lazy = "󰒲 ",
       loaded = "●",
       not_loaded = "○",
-      plugin = '🔌',
-      runtime = '💻',
-      require = '🌙',
-      source = '📄',
-      start = '🚀',
-      task = '📌',
+      plugin = "🔌",
+      runtime = "💻",
+      require = "🌙",
+      source = "📄",
+      start = "🚀",
+      task = "📌",
       list = {
         "●",
         "➜",
         "★",
         "‒",
       },
-      lazy = '💤 ',
     },
     -- Default:
     -- icons = {
@@ -461,7 +460,7 @@ require('lazy').setup({
         desc = "Open terminal in plugin dir",
       },
     },
-  }, 
+  },
   diff = {
     -- diff command <d> can be one of:
     -- * browser: opens the github compare view. Note that this is always mapped to <K> as well,
@@ -470,7 +469,7 @@ require('lazy').setup({
     -- * terminal_git: will open a pseudo terminal with git diff
     -- * diffview.nvim: will open Diffview to show the diff
     cmd = "git",
-  }, 
+  },
   -- Automatically check for plugin updates.
   checker = {
     enabled = true, -- Check for plugin updates periodically.

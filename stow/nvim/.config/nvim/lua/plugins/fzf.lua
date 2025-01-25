@@ -18,6 +18,7 @@ local picker = {
     return require("fzf-lua")[command](opts)
   end,
 }
+
 if not MyVim.pick.register(picker) then
   return {}
 end

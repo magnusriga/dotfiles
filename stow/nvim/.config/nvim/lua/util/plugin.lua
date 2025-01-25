@@ -4,7 +4,7 @@ local Plugin = require("lazy.core.plugin")
 local M = {}
 
 ---@type string[]
-M.core_imports = {} 
+M.core_imports = {}
 
 M.lazy_file_events = { "BufReadPost", "BufNewFile", "BufWritePre" }
 
@@ -19,12 +19,15 @@ function M.save_core()
   M.core_imports = vim.deepcopy(require("lazy.core.config").spec.modules)
 end
 
+-- Creates `LazyFile` events.
 function M.setup()
   M.lazy_file()
 end
 
+-- Create `LazyFile` events, mapping to built-in buffer read|write events:
+-- - `LazyFile`     : `BufReadPost` | `BufNewFile` | `BufWritePre`.
+-- - `User LazyFile`: `LazyFile`.
 function M.lazy_file()
-  -- Add support for the LazyFile event.
   local Event = require("lazy.core.handler.event")
 
   Event.mappings.LazyFile = { id = "LazyFile", event = M.lazy_file_events }

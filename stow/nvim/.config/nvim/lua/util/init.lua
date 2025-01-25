@@ -48,8 +48,14 @@ function M.opts(name)
   return Plugin.values(plugin, "opts", false)
 end
 
--- Delay notifications until `vim.notify` was replaced, or after 500ms.
--- This function takes all normal notifications and adds them to a list, `notifs`,
+-- Pause all notifications until `vim.notify` has been replaced,
+-- by continously checking in separate thread, every turn of event loop,
+-- if `vim.notify` is different from original.
+--
+-- Once replacement has happened, or 500ms has passed, run all delayed notifications,
+-- either using new `vim.notify`, or original `vim.notify` if replacement did not happen.
+--
+-- This function takes all normal notifications and adds them to list, `notifs`,
 -- then once `vim.notify` has been replaced with own notification function,
 -- re-run all previous notifications with that new `vim.notify` function.
 function M.lazy_notify()
@@ -81,16 +87,16 @@ function M.lazy_notify()
   -- Callback passed to `start` runs once on every iteration of event loop,
   -- which constantly checks for IO opterations,
   -- right after polling for IO opteration.
-  -- Once `vim.notify` has been replaced,
-  -- done by lazy.nvim plugin,
+  -- Once `vim.notify` has been replaced, done by `snacks.nvim` | `notice.nvim`,
   -- re-run all previous notifications with new `vim.notify`.
   check:start(function()
     if vim.notify ~= temp then
       replay()
     end
   end)
-  -- If it took more than 500ms, something went wrong,
-  -- thus just call reply, which then will use original `vim.notify` function.
+
+  -- If replacement has not happened in 500ms, something went wrong,
+  -- thus call replay, which will use original `vim.notify` function.
   timer:start(500, 0, replay)
 end
 
@@ -117,20 +123,23 @@ function M.on_load(name, fn)
   end
 end
 
--- Wrapper around vim.keymap.set that will
--- not create a keymap if a lazy.nvim key handler exists.
--- It will also set `silent` to true by default.
+-- Wrapper around `vim.keymap.set` that will create keymap,
+-- unless `lazy.nvim` key handler for same binding already exists.
+-- Also sets `silent = true`.
 function M.safe_keymap_set(mode, lhs, rhs, opts)
   local keys = require("lazy.core.handler").handlers.keys
+
   ---@cast keys MyKeysHandler
   local modes = type(mode) == "string" and { mode } or mode
 
+  -- Filter out modes, e.g. `n`, for which `lazy.nvim` key handler already exists.
   ---@param m string
   modes = vim.tbl_filter(function(m)
     return not (keys.have and keys:have(lhs, m))
   end, modes)
 
-  -- Do not create the keymap if a lazy keys handler exists.
+  -- If length of `modes` table > 0, then `lazy.nvim` did not have
+  -- key handler for given keys, i.e. `lhs`, and `modes`, e.g. `n`.
   if #modes > 0 then
     opts = opts or {}
     opts.silent = opts.silent ~= false
@@ -161,6 +170,7 @@ end
 -- like `has_config` which runs `prettier --find-config-path <filename>`.
 -- Thus, cache result, with key equal to arguments passed to function when first called.
 local cache = {} ---@type table<(fun()), table<string, any>>
+
 ---@generic T: fun()
 ---@param fn T
 ---@return T

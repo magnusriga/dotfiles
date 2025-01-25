@@ -45,6 +45,30 @@ function M.formatexpr()
   return vim.lsp.formatexpr({ timeout_ms = 3000 })
 end
 
+-- Returns tables containing `{ active = <boolean>, resolved = <sources> }`,
+-- and formatter as metatable `__index`, for all formatters.
+--
+-- `sources`, and thus `resolved`, has value if `conform`, or LSP formatter,
+-- has formatter for buffer, which depends on e.g. `conform.nvim` configuration,
+-- often set when registering formatter.
+--
+-- See: `plugins/formatting.lua`.
+--
+-- Conform formatter registered in `plugins/formatting.lua`, is primary formatter
+-- with priority 100.
+--
+-- LSP formatter registered in `plugins/lsp/init.lua` via `util/lsp.lua`,
+-- is also `primary` formatter, but has priority 1, thus it never runs,
+-- as only one `primary` formatter is permitted, and one with highest priority is used.
+--
+-- Certain other LSPs, like `eslint`, register new non-`primary` formatters,
+-- with even higher priority, e.g. 200, thus these run first,
+-- following which conform using `formatter_by_ft` runs.
+--
+-- `eslint`'s formatter just does ESLintFixAll, before prettier runs via conform.
+--
+-- Thus, using all registered formatters where `conform.nvim` has filetype
+-- mathcing buffer doing format, and any extra non-primary formatters like `eslint`.
 function M.resolve(buf)
   buf = buf or vim.api.nvim_get_current_buf()
   -- There can only be one `primary` formatter.
@@ -107,6 +131,9 @@ function M.info(buf)
   )
 end
 
+-- Check if automatic formatting on save is enabled,
+-- either globally or for buffer being formatted,
+-- via `vim.b|g.autoformat`.
 ---@param buf? number
 function M.enabled(buf)
   buf = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
@@ -127,6 +154,17 @@ function M.toggle(buf)
   M.enable(not M.enabled(), buf)
 end
 
+-- Enable or disable automatic formatting on save,
+-- either globally or for buffer being formatted,
+-- by setting `vim.b|g.autoformat`.
+--
+-- Called via e.g. keymap running: `snacks.nvim` toggle > `MyVim.format.snacks_toggle()` > `MyVim.format.enable()`.
+--
+-- Note: Manual formatting with usercommand `Format` uses `opts.force = true`,
+-- thus disabling formatting, either globally or for buffer being formatted,
+-- only applies to automatic formatting on save.
+-- Called by e.g. `snacks.nvim`'s toggle > `Myvim.format.enable()`,
+-- to toggle formatting on|off.
 ---@param enable? boolean
 ---@param buf? boolean
 function M.enable(enable, buf)
@@ -142,9 +180,32 @@ function M.enable(enable, buf)
   M.info()
 end
 
+-- Format using all registered formatters where `conform.nvim` has filetype
+-- mathcing buffer doing format.
+--
+-- Conform formatter registered in `plugins/formatting.lua`, is primary formatter
+-- with priority 100.
+--
+-- LSP formatter registered in `plugins/lsp/init.lua` via `util/lsp.lua`,
+-- is also `primary` formatter, but has priority 1, thus it never runs,
+-- as only one `primary` formatter is permitted, and one with highest priority is used.
+--
+-- Certain other LSPs, like `eslint`, register new non-`primary` formatters,
+-- with even higher priority, e.g. 200, thus these run first,
+-- following which conform using `formatter_by_ft` runs.
+--
+-- `eslint`'s formatter just does ESLintFixAll, before prettier runs via conform.
 function M.format(opts)
   opts = opts or {}
   local buf = opts.buf or vim.api.nvim_get_current_buf()
+
+  -- If formatting is disabled, either globally or for buffer being formatted,
+  -- checked via `vim.b|g.autoformat`, which is toggled
+  -- e.g. with keymap running `snacks.nvim` toggle > `MyVim.format.snacks_toggle()` > `MyVim.format.enable()`,
+  -- then do not format.
+  -- Note: Manual formatting with usercommand `Format` uses `opts.force = true`,
+  -- thus disabling formatting, either globally or for buffer being formatted,
+  -- only applies to automatic formatting on save.
   if not ((opts and opts.force) or M.enabled(buf)) then
     return
   end
@@ -154,7 +215,7 @@ function M.format(opts)
     if formatter.active then
       done = true
       MyVim.try(function()
-        MyVim.info("Formatting now")
+        MyVim.info("Formatting now with " .. formatter.name)
         return formatter.format(buf)
       end, { msg = "Formatter `" .. formatter.name .. "` failed" })
     end
@@ -165,8 +226,13 @@ function M.format(opts)
   end
 end
 
+-- Create autocommand and usercommand to format buffer,
+-- using registered formatter, i.e. conform by filetype,
+-- and any other registered non-primary formatters, like `eslint`.
 function M.setup()
-  -- Autoformat autocmd.
+  -- Autocmd to automatically format on save.
+  -- Disable with `MyVim.format.enable()`,
+  -- e.g. with keymap running `snacks.nvim` toggle > `MyVim.format.snacks_toggle()` > `MyVim.format.enable()`.
   vim.api.nvim_create_autocmd("BufWritePre", {
     group = vim.api.nvim_create_augroup("Format", {}),
     callback = function(event)
@@ -174,7 +240,8 @@ function M.setup()
     end,
   })
 
-  -- Manual format.
+  -- Manual format, using `force = true`, thus formats even if formatting disabled,
+  -- e.g. with keymap running `snacks.nvim` toggle > `MyVim.format.snacks_toggle()` > `MyVim.format.enable()`.
   vim.api.nvim_create_user_command("Format", function()
     M.format({ force = true })
   end, { desc = "Format selection or buffer." })

@@ -30,13 +30,13 @@ Keymaps
 -- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- Diagnostic keymaps and settings.
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('n', '<Leader>e', vim.diagnostic.open_float, { desc = 'Open diagnostic float, twice to focus' })
-vim.diagnostic.config { virtual_text = false, severity_sort = true }
+-- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+-- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open diagnostic float, twice to focus" })
+-- vim.diagnostic.config({ virtual_text = false, severity_sort = true })
 
 -- Clear highlights on search when pressing <Esc> in normal mode.
 -- See `:help hlsearch`.
-vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+-- vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 
 ---------------------------------------------
 -- Modeline: `:h modeline`.
