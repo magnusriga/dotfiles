@@ -185,4 +185,11 @@ function M.memoize(fn)
   end
 end
 
+-- Use "blink.cmp" as default completion engine.
+-- To change to `nvim.cmp`: Set `vim.g.lazyvim_cmp` to `nvim-cmp`, in `config/options.lua`.
+---@return "nvim-cmp" | "blink.cmp"
+function M.cmp_engine()
+  return vim.g.lazyvim_cmp or "blink-cmp"
+end
+
 return M

@@ -95,20 +95,28 @@ return {
   --   - Implemented.
   --
   -- ==================================================================
-  -- - Snacks sub-plugins enabled by default, without explicit enabling.
+  -- Snacks sub-plugins enabled by default, without explicit enabling.
   -- ==================================================================
   --   - `Snacks.notify(..)      : Utility functions for built-in `vim.notify`.
   --   - `Snacks.toggle(..)`     : Toggle commands, i.e. turn features on|off, used with keymaps.
   --   - `Snacks.bufdelete(..)`  : Delete buffers without closing window splits.
   --   - `Snacks.profiler(..)`   : Profiler, for `.lua` files only.
-  --   - `Snacks.util(..)`       : Utility functions, like `color` to get highlight group color.
   --   - `Snacks.win(..)`        : Create and manage floating windows.
   --   - `Snacks.zen(..)`        : Zen mode.
   --   - `Snacks.terminal(..)    : Create and toggle floating|split terminal windows.
-  --   - `Snacks.scratch(..)     : Scratch buffers with persistent file.
-  --   - `Snacks.rename(..)      : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`. No need, using `yazi`, thus skip keymaps.
-  --   - `Snacks.notifier(..)    : Pretty `vim.notify`, does NOT replace `vim.notify`, unlike `noice.nvim`. Must use own command, not `vim.notify`?
+  --
+  --   - `Snacks.scratch(..)     : Scratch buffers with persistent file???????????????????????????????????
+  --
+  --   - `Snacks.util(..)`       : Utility functions, like `color` to get highlight group color.
   --   - `Snacks.notify(..)      : Utility functions for built-in `vim.notify`.
+  --   - `Snacks.picker(..)      : Only used for `git log` commands by default, e.g. `Snacks.picker.git_log_files()`.
+  --   - `Snacks.words(..)       : Disabled by default, but if enabled then highlights, and allows jumping to,
+  --                               symbols matching word under cursor, in same file only, more info below.
+  --                               No need to enable this in `snacks.nvim` spec,
+  --                               but must execute `Snacks.words` to enable.
+  --
+  --   - `Snacks.rename(..)      : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`. No need, using `yazi`, thus skip keymaps.
+  --
   --   - `Snacks.lazygit(..)     : Open LazyGit in float, auto-configure colorscheme and integration with Neovim.
   --   - `Snacks.layout(..)      : Window layouts.
   --   - `Snacks.indent(..)      : Indent guides and scopes.
@@ -119,21 +127,33 @@ return {
   --   - `Snacks.animate(..)     : Efficient animations, including over 45 easing functions (library).
   --
   -- ==================================================================
-  -- - Good sub-plugins, requiring setup:
+  -- Snacks sub-plugins requiring explicit enabling.
+  -- ==================================================================
+  --   - `Snacks.notifier(..)    : Pretty `vim.notify`, does NOT replace `vim.notify`, unlike `noice.nvim`. Must use own command, not `vim.notify`?
+  --
+  -- ==================================================================
+  -- Good sub-plugins, requiring setup:
   -- ==================================================================
   --   -
   --
   --
   -- ==================================================================
-  -- - Unused sub-plugins:
+  -- Unused sub-plugins:
   -- ==================================================================
   --   - `Snacks.profiler(..)`   : Profiler, for `.lua` files only.
   --   - `Snacks.rename(..)      : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`. No need, using `yazi`, thus skip keymaps.
   --   - `Snacks.notifier(..)    : Pretty `vim.notify`, does NOT replace `vim.notify`, unlike `noice.nvim`. Must use own command, not `vim.notify`?
   --
+  -- ==================================================================
+  -- `Snacks.toggle.<..>`.
+  -- ==================================================================
+  -- - Modules, e.g. `Snacks.toggle.diagnostics()`, does not itself toggle.
+  -- - Must call method `toggle`: `Snacks.toggle.diagnostics():toggle()`.
+  -- - Which is what `Toggle:map` does: `Snacks.toggle.diagnostics():map(<lhs>, <opts>)`.
+  -- - `Toggle:map` also adds to key binding to `which-key.nvim`.
   --
   -- ==================================================================
-  -- - `Snacks.notifier`.
+  -- `Snacks.notifier`.
   -- ==================================================================
   --   - Replaces `vim.notify`:
   --       vim.notify = function(msg, level, o)
@@ -143,6 +163,51 @@ return {
   --   - In: `require('snacks').setup(..)`.
   --   - Thus, disable `Snacks.notifier` if using `noice.nvim`.
   --
+  -- ==================================================================
+  -- `Snacks.picker`.
+  -- ==================================================================
+  -- - Picker, e.g. `fzf.lua` | `telescope.lua` `snacks_picker.lua`,
+  --   is registered when running spec file during import, i.e. before installing and loading plugins.
+  -- - Spec files in `LazyNvim`: `plugins/extras/editor/fzf.lua | snacks_picker.lua | telescope.lua`.
+  -- - Only one picker can be registered.
+  -- - In MyVim, `plugins/fzf.lua` registers `fzf-lua` as only picker.
+  -- - Picker, i.e. `fzf-lua`, is used in keybindings inside:
+  --   - LazyVim: `plugins/extras/editor/fzf.lua | snacks_picker.lua | telescope.lua`
+  --   - MyVim  : `plugins/fzf.lua`
+  -- - Example: `{ "<leader>ff", MyVim.pick("files"), desc = "Find Files (Root Dir)" }`.
+  -- - Calling `MyVim.pick("files")`, runs `MyVim/pick` > `open("files")`,
+  --   which uses sole registered picker to open e.g. file list.
+  -- - Thus, key bindings using `MyVim.pick` uses sole registered picker, regardless which it is.
+  -- - `snacks_picker.lua` is not registered picker, in MyVim | LazyVim.
+  -- - `Snacks.picker` still used by MyVim and LazyVim, but only for key bindings in `config/keymaps`, running `git log` commands:
+  --   - `map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Current File History" })`.
+  --   - `map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = LazyVim.root.git() }) end, { desc = "Git Log" })`.
+  --   - `map("n", "<leader>gL", function() Snacks.picker.git_log() end, { desc = "Git Log (cwd)" })`.
+  --
+  -- ==========================
+  -- `Snacks.words`.
+  -- ==========================
+  -- - `vim.lsp.buf.document_highlight()`: Adds extmarks AND highlights for all symbols matching word under cursor, in current file only.
+  -- - Symbols are defined by language, so e.g. cursor on `then` will highlight `if` and `end`.
+  -- - `vim.lsp.buf.clear_references()`: Removes BOTH extmarks AND highlights for all symbols matching word under cursor, in current file.
+  -- - `Snacks.words.enable()`: Schedules `vim.lsp.buf.document_highlight()` to run on `CursorMoved` | `CursorMovedI` | `ModeChanged`,
+  --   debounced to not run more often than every 200 ms, immediately followed by `vim.lsp.buf.clear_references()`.
+  -- - Result: `Snacks.words` highlight references within same file automatically when cursor moves, via `vim.lsp.buf.document_highlight()`,
+  --   and allows jumping to those references using key bindings mapping to `Snacks.words.jump(<count>, [<cycle>])`.
+  -- - `config.notify_jump` is `false` by default, set to `true` to run `vim.notify` at jump.
+  --
+  -- - `Snacks.words` is disabled by default, enable with: `Snacks.words.enable()`.
+  -- - All usage of `Snacks.words`:
+  --   - { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
+  --     desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
+  --   - { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",
+  --     desc = "Prev Reference", cond = function() return Snacks.words.is_enabled() end },
+  --   - { "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight",
+  --     desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
+  --   - { "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, has = "documentHighlight",
+  --     desc = "Prev Reference", cond = function() return Snacks.words.is_enabled() end },
+  -- - If `Snacks.words` not enabled, keybindings above follow built-in behavior.
+  -- - Thus, OK to leave keybindings as is.
   --
   -- ==================================================================
   -- `lazy.nvim`: How it handles multiple specs with same source.
@@ -163,11 +228,14 @@ return {
   -- - As recursion reverses back up metatable chain, `ret` equals `opts` from deeper spec,
   --   which is then merged with `opts` from current spec, all way to top spec, when
   --   `_values` returns tables of all spec's `opts`, for same plugin source, merged.
-  -- - Important: If `opts` is function, it is passed currently merged `opts` up to
-  --   this point, as well as root plugin table, i.e. `values(root, ret)`, and `opts` function
-  --   can choose if it merges parent `ret` into new options and returns new options,
-  --   whatever options it returns becomes new options, which in turn will be merged with
-  --   `opts` higher up reecursion chain.
+  --
+  -- - If `opts` is function:
+  --   - Functions is called during spec resolution, i.e. before installing and loading plugins.
+  --   - Function is passed `plugin` as first parameter, and `opts` merged up to this point, as second paramter.
+  --   - If function returns value, then this value will be new `opts` table, so remember merging with second passed-in argument.
+  --   - If function does NOT return value, currently merged `opts` up to this point is
+  --     used as basis for further `opts`-merging.
+  --   - Thus, when `opts`-function does NOT return value, only effect is that function is called.
   --
   -- - `opts_extend`:
   --   - Used to add`opts_extends` fields to list, aka. tabled with integer index,

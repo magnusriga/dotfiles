@@ -52,12 +52,30 @@ return {
       config.defaults.keymap.builtin["<c-f>"] = "preview-page-down"
       config.defaults.keymap.builtin["<c-b>"] = "preview-page-up"
 
-      -- Trouble
+      -- Change from these defaults:
+      -- fzf = {
+      --  ["ctrl-z"]         = "abort",
+      --  ["ctrl-u"]         = "unix-line-discard",
+      --  ["ctrl-f"]         = "half-page-down",
+      --  ["ctrl-b"]         = "half-page-up",
+      --  ["ctrl-a"]         = "beginning-of-line",
+      --  ["ctrl-e"]         = "end-of-line",
+      --  ["alt-a"]          = "toggle-all",
+      --  ["alt-g"]          = "first",
+      --  ["alt-G"]          = "last",
+      --  -- Only valid with fzf previewers (bat/cat/git/etc)
+      --  ["f3"]             = "toggle-preview-wrap",
+      --  ["f4"]             = "toggle-preview",
+      --  ["shift-down"]     = "preview-page-down",
+      --  ["shift-up"]       = "preview-page-up",
+      --  ["alt-shift-down"] = "preview-down",
+      --  ["alt-shift-up"]   = "preview-up",
+      -- },
       if MyVim.has("trouble.nvim") then
         config.defaults.actions.files["ctrl-t"] = require("trouble.sources.fzf").actions.open
       end
 
-      -- Toggle root dir / cwd
+      -- Toggle root dir / cwd.
       config.defaults.actions.files["ctrl-r"] = function(_, ctx)
         local o = vim.deepcopy(ctx.__call_opts)
         o.root = o.root == false

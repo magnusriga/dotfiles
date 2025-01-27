@@ -312,7 +312,7 @@ window-padding-color = "extend"
 #
 # This setting is only supported on macOS.
 # Default: window-colorspace = srgb
-window-colorspace = "display-p3"
+# window-colorspace = "display-p3"
 
 # Horizontal window padding. This applies padding between the terminal cells
 # and the left and right window borders. The value is in points, meaning that

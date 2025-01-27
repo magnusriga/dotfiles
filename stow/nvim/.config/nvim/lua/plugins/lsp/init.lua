@@ -1,3 +1,23 @@
+-- ========================================================
+-- Notes on `lspconfig`.
+-- ========================================================
+-- - `require('lua_ls')`:
+--   1. `local default_config = tbl_deep_extend('keep', config_def.default_config, util.default_config)``
+--      - `config_def`: Object returned from `configs/lua_ls.lua`, containing e.g. `default_config`.
+--      - `util.default_config`: Object returned from `configs/lua_ls.lua`.
+--      - The two `default_config`s are merged, so `setup` function can merge that with `user_config`.
+--   2. `config.lua_ls =  { setup = function (user_config) {..} }`.
+--      - Meaning, `config` table gets new `lua_ls` object, which contains `setup` function.
+--      - `user_config`: Table passed to `setup` function, amending and overwriting `default_config`.
+--      - `setup` function is closure, with access to newly created `default_config`.
+--   3. Return: `config` table.
+--      - `config` table now contains `setup` function.
+--
+-- - `require('lua_ls').setup(<user_config>)`:
+--    - `user_config` is merged with previously created `default_config`,
+--      containing fields from both `configs/lua_ls.lua` > `default_config`, and `util.default_config`.
+-- ========================================================
+
 return {
   -- nvim-lspconfig is data-only repository of LSP server configurations.
   {
@@ -69,8 +89,7 @@ return {
           formatting_options = nil,
           timeout_ms = nil,
         },
-        -- LSP Server Settings
-        ---@type lspconfig.options
+        -- LSP Server Settings.
         servers = {
           lua_ls = {
             -- mason = false, -- Set to false if you don't want this server to be installed with mason.
@@ -107,7 +126,7 @@ return {
         -- Return true to prevent server setup with lspconfig,
         -- as this function will then handle the setup without lspconfig.
         -- Will get all `server_opts` passed in, just like `lspconfig` would.
-        ---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
+        ---@type table<string, fun(server:string, opts:unknown):boolean?>
         setup = {
           -- Example setup with typescript.nvim:
           -- tsserver = function(_, opts)
@@ -346,6 +365,7 @@ return {
       -- containing specific server configuration, e.g. capabilities, etc.
       if have_mason then
         mlsp.setup({
+          automatic_installation = true,
           ensure_installed = vim.tbl_deep_extend(
             "force",
             ensure_installed,

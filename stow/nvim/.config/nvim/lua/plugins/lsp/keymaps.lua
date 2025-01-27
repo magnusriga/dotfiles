@@ -28,6 +28,33 @@ function M.get()
       { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File", mode ={"n"}, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
       { "<leader>cr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
       { "<leader>cA", MyVim.lsp.action.source, desc = "Source Action", has = "codeAction" },
+
+      -- ==========================
+      -- `Snacks.words`.
+      -- ==========================
+      -- - `vim.lsp.buf.document_highlight()`: Adds extmarks AND highlights for all symbols matching word under cursor, in current file only.
+      -- - Symbols are defined by language, so e.g. cursor on `then` will highlight `if` and `end`.
+      -- - `vim.lsp.buf.clear_references()`: Removes BOTH extmarks AND highlights for all symbols matching word under cursor, in current file.
+      -- - `Snacks.words.enable()`: Schedules `vim.lsp.buf.document_highlight()` to run on `CursorMoved` | `CursorMovedI` | `ModeChanged`,
+      --   debounced to not run more often than every 200 ms, immediately followed by `vim.lsp.buf.clear_references()`.
+      -- - Result: `Snacks.words` highlight references within same file automatically when cursor moves, via `vim.lsp.buf.document_highlight()`,
+      --   and allows jumping to those references using key bindings mapping to `Snacks.words.jump(<count>, [<cycle>])`.
+      -- - `config.notify_jump` is `false` by default, set to `true` to run `vim.notify` at jump.
+      --
+      -- - `Snacks.words` is disabled by default, enable with: `Snacks.words.enable()`.
+      --
+      -- - All usage of `Snacks.words`:
+      --   - { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
+      --     desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
+      --   - { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",
+      --     desc = "Prev Reference", cond = function() return Snacks.words.is_enabled() end },
+      --   - { "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight",
+      --     desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
+      --   - { "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, has = "documentHighlight",
+      --     desc = "Prev Reference", cond = function() return Snacks.words.is_enabled() end },
+      -- - If `Snacks.words` not enabled, keybindings above follow built-in behavior.
+      --
+      -- - Thus, OK to leave `Snacks.words` keybindings as is.
       { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
         desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
       { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",
@@ -89,8 +116,7 @@ end
 -- and if `cond` returns `true`.
 -- If so, save all fields on keymaps above into new `opts`, keeping only those fields whose key is not a number,
 -- and skipping `{ mode = true, id = true, ft = true, rhs = true, lhs = true }`,
--- then create keymap passing in `opts`, with current buffer added to `opts`,
--- and `opts.mode` defaulting to `n`.
+-- then create keymap passing in `opts`, with current buffer added to `opts`, and `opts.mode` defaulting to `n`.
 function M.on_attach(_, buffer)
   local Keys = require("lazy.core.handler.keys")
   local keymaps = M.resolve(buffer)

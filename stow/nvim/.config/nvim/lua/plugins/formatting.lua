@@ -20,7 +20,7 @@ local prettier_supported = {
 }
 
 --- Checks if a Prettier config file exists for the given context
----@param ctx ConformCtx
+---@param ctx conform.Context`
 function M.has_config(ctx)
   local config_path = vim.fn.system({ "prettier", "--find-config-path", ctx.filename })
   vim.print("prettier config path: ", config_path)
@@ -30,7 +30,7 @@ end
 --- Checks if a parser can be inferred for the given context:
 --- * If the filetype is in the supported list, return true.
 --- * Otherwise, check if a parser can be inferred.
----@param ctx ConformCtx
+---@param ctx conform.Context
 function M.has_parser(ctx)
   local ft = vim.bo[ctx.buf].filetype --[[@as string]]
   -- Default filetypes are always supported.
@@ -112,7 +112,6 @@ return {
             -- the conform plugin is only loaded when this format function runs,
             -- which happens on every formatting keybinding and when running `formatexr()`.
             -- Require return values are cached, so it will only be "slow" on first format.
-            vim.notify("formatting with conform")
             require("conform").format({ bufnr = buf })
           end,
           sources = function(buf)

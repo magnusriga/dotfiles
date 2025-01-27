@@ -79,6 +79,7 @@ sudo pacman -Syu --noconfirm \
   unzip zip \
   git \
   lazygit \
+  git-delta \
   gawk \
   xclip \
   autoconf \
