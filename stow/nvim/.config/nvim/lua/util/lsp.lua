@@ -155,7 +155,6 @@ function M.on_supports_method(method, fn)
   })
 end
 
----@return _.lspconfig.options
 function M.get_config(server)
   local configs = require("lspconfig.configs")
   return rawget(configs, server)
@@ -254,6 +253,8 @@ function M.format(opts)
   end
 end
 
+-- `MyVim.lsp.action.<action>`:
+-- - Execute `<action>` with `vim.lsp.buf.code_action(..)`.
 M.action = setmetatable({}, {
   __index = function(_, action)
     return function()
@@ -267,5 +268,58 @@ M.action = setmetatable({}, {
     end
   end,
 })
+
+---@class LspCommand: lsp.ExecuteCommandParams
+---@field open? boolean
+---@field handler? lsp.Handler
+
+-- =================================================================
+-- `workspace/executeCommand`.
+-- =================================================================
+-- 1. Client method `workspace/executeCommand` is request sent from client to server,
+--    to trigger command execution on server.
+-- 2. Server creates `WorkspaceEdit` structure.
+-- 3. Server sends request back to client to apply edits, with server method `workspace/applyEdit`.
+-- =================================================================
+
+-- =================================================================
+-- Code Action Request: Example of using `workspace/executeCommand`.
+-- =================================================================
+-- Code action request uses client method `workspace/executeCommand` under hood, with following flow:
+-- 1. Client sends `textDocument/codeAction` request to server, making server compute code action commands
+--    for given text document and range, typically code fixes to either fix problems or to beautify/refactor code.
+-- 2. Server computes array of Command literals, and sends these back to client.
+-- 3. Commands are presented in user interface, allowing user to choose action.
+-- 4. User chooses command, which either:
+--    1. Makes client execute command directly, if command is present in `client.commands` table.
+--    2. Makes client execute client method `workspace/executeCommand`,
+--       if command is not present in `client.commands` table,
+--       which sends user-chosen command back to server, where server executes given command.
+-- 5. If server executes command, and command results in edits to codebase,
+--    server executes server method `workspace/applyEdit`, which is request from server to client,
+--    to make client apply edits.
+--
+-- Command:
+-- - Command, e.g. chosen via code action, should be executed by server, not by client.
+-- =================================================================
+
+-- Make client execute client method `workspace/executeCommand`,
+-- in which client sends request to server to execute given workspace-wide command, with given arguments.
+-- If `opts.open` is set, open `trouble.nvim` buffer to show result of passed in `lsp.command`?
+---@param opts LspCommand
+function M.execute(opts)
+  local params = {
+    command = opts.command,
+    arguments = opts.arguments,
+  }
+  if opts.open then
+    require("trouble").open({
+      mode = "lsp_command",
+      params = params,
+    })
+  else
+    return vim.lsp.buf_request(0, "workspace/executeCommand", params, opts.handler)
+  end
+end
 
 return M

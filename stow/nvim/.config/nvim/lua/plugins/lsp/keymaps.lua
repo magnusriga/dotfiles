@@ -3,8 +3,8 @@ local M = {}
 ---@type MyKeysLspSpec[]|nil
 M._keys = nil
 
----@alias MyKeysLspSpec MyKeysSpec|{has?:string|string[], cond?:fun():boolean}
----@alias MyKeysLsp MyKeys|{has?:string|string[], cond?:fun():boolean}
+---@alias MyKeysLspSpec LazyKeysSpec|{has?:string|string[], cond?:fun():boolean}
+---@alias MyKeysLsp LazyKeys|{has?:string|string[], cond?:fun():boolean}
 
 ---@return MyKeysLspSpec[]
 function M.get()
@@ -14,10 +14,13 @@ function M.get()
     -- stylua: ignore
     M._keys =  {
       { "<leader>cl", "<cmd>LspInfo<cr>", desc = "Lsp Info" },
+
+      -- These four are overwritten in `plugins/fzf.lua`.
       { "gd", vim.lsp.buf.definition, desc = "Goto Definition", has = "definition" },
       { "gr", vim.lsp.buf.references, desc = "References", nowait = true },
       { "gI", vim.lsp.buf.implementation, desc = "Goto Implementation" },
       { "gy", vim.lsp.buf.type_definition, desc = "Goto T[y]pe Definition" },
+
       { "gD", vim.lsp.buf.declaration, desc = "Goto Declaration" },
       { "K", function() return vim.lsp.buf.hover() end, desc = "Hover" },
       { "gK", function() return vim.lsp.buf.signature_help() end, desc = "Signature Help", has = "signatureHelp" },
@@ -81,7 +84,7 @@ function M.has(buffer, method)
   method = method:find("/") and method or "textDocument/" .. method
   local clients = MyVim.lsp.get_clients({ bufnr = buffer })
   for _, client in ipairs(clients) do
-    if client.supports_method(method) then
+    if client:supports_method(method) then
       return true
     end
   end

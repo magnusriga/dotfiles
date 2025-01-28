@@ -1,4 +1,4 @@
----@class FzfLuaOpts: util.pick.Opts
+---@class FzfLuaOpts: myvim.util.pick.Opts
 ---@field cmd string?
 
 ---@type MyPicker
@@ -42,40 +42,79 @@ return {
       local config = require("fzf-lua.config")
       local actions = require("fzf-lua.actions")
 
-      -- Quickfix
+      -- Change from these defaults:
+      -- fzf = {
+      --   ["ctrl-z"]         = "abort",
+      --   ["ctrl-u"]         = "unix-line-discard",
+      --   ["ctrl-f"]         = "half-page-down",
+      --   ["ctrl-b"]         = "half-page-up",
+      --   ["ctrl-a"]         = "beginning-of-line",
+      --   ["ctrl-e"]         = "end-of-line",
+      --   ["alt-a"]          = "toggle-all",
+      --   ["alt-g"]          = "first",
+      --   ["alt-G"]          = "last",
+      --   -- Only valid with fzf previewers (bat/cat/git/etc)
+      --   ["f3"]             = "toggle-preview-wrap",
+      --   ["f4"]             = "toggle-preview",
+      --   ["shift-down"]     = "preview-page-down",
+      --   ["shift-up"]       = "preview-page-up",
+      --   ["alt-shift-down"] = "preview-down",
+      --   ["alt-shift-up"]   = "preview-up",
+      -- },
       config.defaults.keymap.fzf["ctrl-q"] = "select-all+accept"
+
+      -- Vim-style bindings.
       config.defaults.keymap.fzf["ctrl-u"] = "half-page-up"
       config.defaults.keymap.fzf["ctrl-d"] = "half-page-down"
+
+      -- Jump to label in list.
       config.defaults.keymap.fzf["ctrl-x"] = "jump"
+
+      -- Preview page navigation.
       config.defaults.keymap.fzf["ctrl-f"] = "preview-page-down"
       config.defaults.keymap.fzf["ctrl-b"] = "preview-page-up"
       config.defaults.keymap.builtin["<c-f>"] = "preview-page-down"
       config.defaults.keymap.builtin["<c-b>"] = "preview-page-up"
 
-      -- Change from these defaults:
-      -- fzf = {
-      --  ["ctrl-z"]         = "abort",
-      --  ["ctrl-u"]         = "unix-line-discard",
-      --  ["ctrl-f"]         = "half-page-down",
-      --  ["ctrl-b"]         = "half-page-up",
-      --  ["ctrl-a"]         = "beginning-of-line",
-      --  ["ctrl-e"]         = "end-of-line",
-      --  ["alt-a"]          = "toggle-all",
-      --  ["alt-g"]          = "first",
-      --  ["alt-G"]          = "last",
-      --  -- Only valid with fzf previewers (bat/cat/git/etc)
-      --  ["f3"]             = "toggle-preview-wrap",
-      --  ["f4"]             = "toggle-preview",
-      --  ["shift-down"]     = "preview-page-down",
-      --  ["shift-up"]       = "preview-page-up",
-      --  ["alt-shift-down"] = "preview-down",
-      --  ["alt-shift-up"]   = "preview-up",
-      -- },
+      -- ==============================================
+      -- `files` command.
+      -- ==============================================
+      -- - Run `fd --hidden --type f --type l | fzf` i.e. find files and links, then fuzzy search them.
+      -- - `fzf` allows searching through all those lines from `fd`, thus it enables
+      --   fuzzy-search on directory names as well, only initial list will not contain empty directories.
+      -- - Hidden files are included by default.
+
+      -- ==============================================
+      -- Default keymaps, i.e. `actions.files`.
+      -- ==============================================
+      -- - Pickers inheriting these actions: files, git_files, git_status, grep, lsp, oldfiles, quickfix, loclist,
+      --   tags, btags, args, buffers, tabs, lines, blines.
+      -- - `file_edit_or_qf` opens single selection or sends multiple selection to quickfix.
+      -- - Replace `enter` with `file_edit` to open all files/bufs whether single or multiple.
+      -- - Replace `enter` with `file_switch_or_edit` to attempt a switch in current tab first
+      --
+      -- - Default keymaps:
+      --   ["enter"]       = actions.file_edit_or_qf,
+      --   ["ctrl-s"]      = actions.file_split,
+      --   ["ctrl-v"]      = actions.file_vsplit,
+      --   ["ctrl-t"]      = actions.file_tabedit,
+      --   ["alt-q"]       = actions.file_sel_to_qf,
+      --   ["alt-Q"]       = actions.file_sel_to_ll,
+      --   ["alt-i"]       = actions.toggle_ignore,
+      --   ["alt-h"]       = actions.toggle_hidden,
+      --   ["alt-f"]       = actions.toggle_follow,
+      --
+      -- - Additional grep keymaps:
+      -- ["ctrl-g"]        = actions.grep_lgrep, toggles between 'grep' and 'live_grep'.
+      --
+      -- - Other pickers have other keymaps, like buffers, tabs, git.status, etc.
+
       if MyVim.has("trouble.nvim") then
+        -- Move fzf list into `trouble.nvim` buffer.
         config.defaults.actions.files["ctrl-t"] = require("trouble.sources.fzf").actions.open
       end
 
-      -- Toggle root dir / cwd.
+      -- Toggle where to search from: Root directory | current working directory.
       config.defaults.actions.files["ctrl-r"] = function(_, ctx)
         local o = vim.deepcopy(ctx.__call_opts)
         o.root = o.root == false
@@ -83,7 +122,10 @@ return {
         o.buf = ctx.__CTX.bufnr
         MyVim.pick.open(ctx.__INFO.cmd, o)
       end
+
+      -- `alt-c`: Same as `ctrl-r`.
       config.defaults.actions.files["alt-c"] = config.defaults.actions.files["ctrl-r"]
+
       config.set_action_helpstr(config.defaults.actions.files["ctrl-r"], "toggle-root-dir")
 
       local img_previewer ---@type string[]?
@@ -120,7 +162,8 @@ return {
             ueberzug_scaler = "fit_contain",
           },
         },
-        -- Custom option to configure vim.ui.select.
+        -- Overwrite `vim.ui.select`, i.e. interactive select menu.
+        -- Actual replacement is done below, via VeryLazy autocmd.
         ui_select = function(fzf_opts, items)
           return vim.tbl_deep_extend("force", fzf_opts, {
             prompt = " ",
@@ -131,7 +174,7 @@ return {
           }, fzf_opts.kind == "codeaction" and {
             winopts = {
               layout = "vertical",
-              -- height is number of items minus 15 lines for the preview, with a max of 80% screen height
+              -- Height is number of items minus 15 lines for the preview, with a max of 80% screen height.
               height = math.floor(math.min(vim.o.lines * 0.8 - 16, #items + 2) + 0.5) + 16,
               width = 0.5,
               preview = not vim.tbl_isempty(MyVim.lsp.get_clients({ bufnr = 0, name = "vtsls" })) and {
@@ -146,7 +189,7 @@ return {
           } or {
             winopts = {
               width = 0.5,
-              -- height is number of items, with a max of 80% screen height
+              -- Height is number of items, with a max of 80% screen height.
               height = math.floor(math.min(vim.o.lines * 0.8, #items + 2) + 0.5),
             },
           })
@@ -192,7 +235,7 @@ return {
     config = function(_, opts)
       if opts[1] == "default-title" then
         -- Use same prompt for all pickers for profile `default-title` and
-        -- profiles that use `default-title` as base profile
+        -- profiles that use `default-title` as base profile.
         local function fix(t)
           t.prompt = t.prompt ~= nil and " " or nil
           for _, v in pairs(t) do
@@ -209,6 +252,8 @@ return {
     end,
     init = function()
       MyVim.on_very_lazy(function()
+        -- Overwrite `vim.ui.select`, i.e. interactive select menu, with `opt.ui_select`,
+        -- when `lazy.nvim` is done installing and loading plugins.
         vim.ui.select = function(...)
           require("lazy").load({ plugins = { "fzf-lua" } })
           local opts = MyVim.opts("fzf-lua") or {}
@@ -295,6 +340,14 @@ return {
 
   {
     "neovim/nvim-lspconfig",
+
+    -- - Overwrite `plugins.lsp.keymaps._keys`, so `fzf-lua` is used for LSP commands that could return,
+    --   list of multiple results from language server.
+    -- - `opts` as function, so this just executes right before `opts` is passed to `config`
+    --   function, during `opts` merging.
+    -- - Since below function extends `Keys`, it extends reference to `plugins.lsp.keymaps._keys` table in memory,
+    --   thus it does not matter that this is executed before `nvim-lspconfig` config-function,
+    --   which is where autocmd is set up that creates key bindings from `plugins.lsp.keymaps._keys`.
     opts = function()
       local Keys = require("plugins.lsp.keymaps").get()
       -- stylua: ignore

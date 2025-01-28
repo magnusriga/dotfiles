@@ -1,10 +1,19 @@
+---@class myvim.util.format
+---@overload fun(opts?: {force?:boolean})
 local M = setmetatable({}, {
   __call = function(m, ...)
     return m.format(...)
   end,
 })
 
-M.formatters = {}
+---@class MyFormatter
+---@field name string
+---@field primary? boolean
+---@field format fun(bufnr:number)
+---@field sources fun(bufnr:number):string[]
+---@field priority number
+
+M.formatters = {} ---@type MyFormatter[]
 
 -- Register new formatter, where formatters with higher `priority`
 -- are invoked *before* formatters with lower `priority`.
@@ -31,6 +40,7 @@ M.formatters = {}
 -- which formats buffer using conform with `prettierd` formatter,
 -- then `tsserver` LSP formatter is invoked, i.e. formatter with `priority = 1`,
 -- which formats buffer using conform with fallback `tsserver` LSP formatter.
+---@param formatter MyFormatter
 function M.register(formatter)
   M.formatters[#M.formatters + 1] = formatter
   table.sort(M.formatters, function(a, b)
@@ -69,6 +79,8 @@ end
 --
 -- Thus, using all registered formatters where `conform.nvim` has filetype
 -- mathcing buffer doing format, and any extra non-primary formatters like `eslint`.
+---@param buf? number
+---@return (MyFormatter|{active:boolean,resolved:string[]})[]
 function M.resolve(buf)
   buf = buf or vim.api.nvim_get_current_buf()
   -- There can only be one `primary` formatter.
@@ -195,6 +207,7 @@ end
 -- following which conform using `formatter_by_ft` runs.
 --
 -- `eslint`'s formatter just does ESLintFixAll, before prettier runs via conform.
+---@param opts? {force?:boolean, buf?:number}
 function M.format(opts)
   opts = opts or {}
   local buf = opts.buf or vim.api.nvim_get_current_buf()
@@ -250,6 +263,24 @@ function M.setup()
   vim.api.nvim_create_user_command("FormatInfo", function()
     M.info()
   end, { desc = "Show info about the formatters for the current buffer." })
+end
+
+-- Toggle automatic formatting on save on|off.
+-- Bind to keymap, see: `config/keymaps.lua`.
+---@param buf? boolean
+function M.snacks_toggle(buf)
+  return Snacks.toggle({
+    name = "Auto Format (" .. (buf and "Buffer" or "Global") .. ")",
+    get = function()
+      if not buf then
+        return vim.g.autoformat == nil or vim.g.autoformat
+      end
+      return MyVim.format.enabled()
+    end,
+    set = function(state)
+      MyVim.format.enable(state, buf)
+    end,
+  })
 end
 
 return M

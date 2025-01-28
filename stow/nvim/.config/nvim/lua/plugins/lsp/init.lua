@@ -19,16 +19,30 @@
 -- ========================================================
 
 return {
-  -- nvim-lspconfig is data-only repository of LSP server configurations.
+  -- `nvim-lspconfig` is data-only repository of configuration
+  -- tables of Neovim's built-in LSP client, allowing it to automatically launch third-party
+  -- language servers, and specify configuration for them
   {
     "neovim/nvim-lspconfig",
     event = "LazyFile",
     dependencies = {
       "mason.nvim",
       { "williamboman/mason-lspconfig.nvim", config = function() end },
+
+      -- Ensure `blink.cmp` is loaded before `nvim-lspconfig`,
+      -- so capabilites from `blink.cmp` are available.
+      -- TODO: Remove once this is merged: https://github.com/neovim/nvim-lspconfig/issues/3494
+      { "saghen/blink.cmp" },
     },
-    -- Done as function without arguments, thus does not merge
-    -- with other specs from same plugin source, if any.
+
+    -- Done as function without arguments, but returning table,
+    -- which means it overwrites `opts` from other `nvim-lspconfig` specs in `plugins` directory
+    -- appearing in files with filename earlier in alphabetical order,
+    -- since plugins get `opts` merged, and `opts`-function run, in order specs for same plugin
+    -- appear from top-level spec and forward, with imported specs loaded in alphabetical order of filenames.
+    --
+    -- BUG: Overwrites: `plugins/lang/typescript.lua`???
+    --
     opts = function()
       ---@class PluginLspOpts
       local ret = {
@@ -89,13 +103,31 @@ return {
           formatting_options = nil,
           timeout_ms = nil,
         },
-        -- LSP Server Settings.
+        -- - User config for built-in Neovim LSP client, which `nvim-lspconfig` combines with
+        --   own built-in config, and its `util/config.lua`, for servers included in `servers` list.
+        -- - Allows built-in Neovim LSP client to run specific third-party language servers automatically,
+        --   when opening specific file types, with desired configuration.
         servers = {
           lua_ls = {
-            -- mason = false, -- Set to false if you don't want this server to be installed with mason.
-            -- Add keymaps for specific lsp servers.
+            -- Set to false if you don't want this server to be installed with mason.
+            -- mason = false,
+
+            -- =======================================
+            -- Key Bindings.
+            -- =======================================
+            -- - Most generic LSP-related key bindings are explicitly defined in `plugins/lsp/keymaps.lua`,
+            --   e.g. vim.lsp.buf.references()`.
+            -- - Language-server specific bindings are defined in `nvim-lspconfig` specs' `opts.keys`.
+            -- - `plugins/lsp/keymaps.lua` is loaded when client attaches to buffer,
+            --   combining language-server specific key bindings from `opts.servers[client.name]`,
+            --   with those explicitly defined in `plugins/lsp/keymaps.lua`.
+            -- - That `LspAttach` autocmd is created from:
+            --   `plugins/lsp/init.lua` > `nvim-lspconfig` spec > `config`-function.
+
+            -- - Add key bindings for specific lsp servers.
             -- ---@type MyKeysSpec[]
             -- keys = {},
+
             settings = {
               Lua = {
                 workspace = {
@@ -162,8 +194,7 @@ return {
 
       -- Setup keymaps when any `client` attaches to any `buffer`,
       -- which combines all keymaps registered on all `nvim_lspconfig` plugins'
-      -- `opts.servers[client.name]`,
-      -- with all keymaps defined in `plugins.lsp.keymaps`.
+      -- `opts.servers[client.name]`, with all keymaps defined in `plugins.lsp.keymaps`.
       -- `client` is only used to ensure any LSP client is actually
       -- attached to buffer when running autocmd to setup keymaps,
       -- whereas `buffer` is used to get all clients attached to that `buffer`,
@@ -221,8 +252,8 @@ return {
         if opts.codelens.enabled and vim.lsp.codelens then
           -- This function runs when client attaches to buffer,
           -- and when registring new capability on client,
-          -- for every client, and buffer the client is attached to, that
-          -- supports "textDocument/codeLens" method.
+          -- for every client, and buffer the client is attached to,
+          -- that supports "textDocument/codeLens" method.
           -- Thus, when client attaches to buffer, and when registring new capability on client,
           -- refresh codelens list from LSP, and create autocmd that refreshes codelens list
           -- whenever (re)-entering buffer, when no key has been pressed for 4 seconds (`opt.updatetime`),
@@ -260,10 +291,10 @@ return {
       -- setup above, into `vim.diagnostic.config`.
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-      -- All `opts` in all `nvim_lspconfig` plugin specs,
-      -- are merged before this `config` function is called by `lazy.nvim`,
-      -- thus `opts.servers` contain one field named `<lsp_server_name>`,
-      -- for every LSP server defined across all `nvim_lspconfig` specs.
+      -- All `opts` in all `nvim-lspconfig` plugin specs are merged
+      -- before this `config` function is called by `lazy.nvim`,
+      -- thus `opts.servers` contain entries for every server defined
+      -- accross all `nvim-lspconfig` specs.
       local servers = opts.servers
 
       -- Create table with all Neovim's built-in capabilities,
@@ -271,13 +302,11 @@ return {
       -- which will later be passed to LSP server so it knows
       -- that LSP client should receive completion suggestions.
       -- Used for all servers.
-      local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
       local has_blink, blink = pcall(require, "blink.cmp")
       local capabilities = vim.tbl_deep_extend(
         "force",
         {},
         vim.lsp.protocol.make_client_capabilities(),
-        has_cmp and cmp_nvim_lsp.default_capabilities() or {},
         has_blink and blink.get_lsp_capabilities() or {},
         opts.capabilities or {}
       )
@@ -286,7 +315,7 @@ return {
       -- which calls `require("lspconfig")[server].setup(server_opts)`,
       -- where `server_opts` is table containing all options for given `server`,
       -- including server-specific capabilities merged with global capabilities,
-      -- i.e. for all servers, defined above.
+      -- from all `nvim-lspconfig` specs with given `server` in `opts.servers`.
       local function setup(server)
         -- Remember, all `opts` in all `nvim_lspconfig` plugin specs,
         -- are merged before this `config` function is called by `lazy.nvim`,
@@ -300,6 +329,11 @@ return {
           return
         end
 
+        -- If `opts.setup[server]` contains server-entry with function value,
+        -- run function before loading LSP with `lspconfig`.
+        -- Same `server_opts` is passed in, as is passed to `lspconfig`,
+        -- so remember to merge `opts`, from all `lspconfig` specs, appropriately.
+        --
         -- If `opts.setup[server]` is a defined function which returns `true`,
         -- see top of this file for an example, then do not setup server,
         -- because that `setup` function will then handle the setup without using
@@ -337,9 +371,8 @@ return {
         all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
       end
 
-      -- Add every server key, from ever field in every `opts.servers`,
-      -- across all `nvim_lspconfig` specs, to `esure_installed`,
-      -- which are same names used by `mason-lspconfig`.
+      -- Add every server key, from `opts.servers` in every `nvim-lspconfig` spec,
+      -- to `esure_installed`, which are same names used by `mason-lspconfig`.
       local ensure_installed = {} ---@type string[]
       for server, server_opts in pairs(servers) do
         if server_opts then

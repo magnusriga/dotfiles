@@ -1,9 +1,11 @@
 _G.MyVim = require("util")
 
+---@class MyVimConfig: MyVimOptions
 local M = {}
 
 MyVim.config = M
 
+---@class MyVimOptions
 local defaults = {
   -- Colorscheme can be a string like `catppuccin` or a function that will load the colorscheme.
   ---@type string|fun()
@@ -249,9 +251,7 @@ M.did_init = false
 -- =============================================================================================
 -- Program Flow.
 -- =============================================================================================
--- 1. Top-level `init.lua` runs `config/init.lua > setup()`.
---
--- 2. `config/init.lua > setup()`:
+-- 1. Top-level `init.lua` runs: `config/init.lua > setup()`.
 --    - Load own `config/autocmd` immediately, if `nvim <file>...`, i.e. with arguments.
 --    - Creates `VeryLazy` autocmd to:
 --      - Load own `config/autocmd` and `config/keymaps`.
@@ -259,17 +259,19 @@ M.did_init = false
 --    - Activates default colorscheme.
 --      - Used before `lazy.nvim` installs and loads new colorscheme(s).
 --
--- 3. `lazy.nvim` stores all specs, by running files in `plugins` directory.
+-- 3. Top-level `init.lua` runs: `require('config.lazy-plugins')`.
+--    - `lazy.nvim` stores all specs, by running files in `plugins` directory. Order matters?
+--    - When importing `plugins/init.lua`, call: `require('config).init()`.
 --
--- 4. `plugins/init.lua`:
+-- 4. `require('config).init()`: See below.
 --
 -- 5. `lazy.nvim`:
 --    - Installs plugins.
 --    - Merges all `opts`, `keys`, `ft`, `events`, for plugins from same source.
 --    - Loads plugins, i.e. runs `config` function passing in merged `opts`
 --
--- Important:
--- - `plugins/init.lua`: Runs before own autocmds and keymaps have been added,
+-- Result:
+-- - `plugins/init.lua` and `init()` below: Run before own autocmds and keymaps have been added,
 --   which is before plugins are installed and loaded.
 --
 -- =============================================================================================

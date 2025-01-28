@@ -1,6 +1,4 @@
-local Plugin = require("lazy.core.plugin")
-
----@class lazyvim.util.plugin
+---@class myvim.util.plugin
 local M = {}
 
 ---@type string[]

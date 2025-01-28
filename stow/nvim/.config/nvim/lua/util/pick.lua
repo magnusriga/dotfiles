@@ -1,12 +1,12 @@
----@class util.pick
----@overload fun(command:string, opts?:util.pick.Opts): fun()
+---@class myvim.util.pick
+---@overload fun(command:string, opts?:myvim.util.pick.Opts): fun()
 local M = setmetatable({}, {
   __call = function(m, ...)
     return m.wrap(...)
   end,
 })
 
----@class util.pick.Opts: table<string, any>
+---@class myvim.util.pick.Opts: table<string, any>
 ---@field root? boolean
 ---@field cwd? string
 ---@field buf? number
@@ -14,7 +14,7 @@ local M = setmetatable({}, {
 
 ---@class MyPicker
 ---@field name string
----@field open fun(command:string, opts?:util.pick.Opts)
+---@field open fun(command:string, opts?:myvim.util.pick.Opts)
 ---@field commands table<string, string>
 
 ---@type MyPicker?
@@ -44,7 +44,7 @@ function M.want()
 end
 
 ---@param command? string
----@param opts? util.pick.Opts
+---@param opts? myvim.util.pick.Opts
 function M.open(command, opts)
   if not M.picker then
     return MyVim.error("MyVim.pick: picker not set")
@@ -69,7 +69,7 @@ function M.open(command, opts)
 end
 
 ---@param command? string
----@param opts? util.pick.Opts
+---@param opts? myvim.util.pick.Opts
 function M.wrap(command, opts)
   opts = opts or {}
   return function()

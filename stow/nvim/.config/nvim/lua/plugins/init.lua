@@ -229,8 +229,21 @@ return {
   --   which is then merged with `opts` from current spec, all way to top spec, when
   --   `_values` returns tables of all spec's `opts`, for same plugin source, merged.
   --
+  --   Spec-adding order:
+  --   - Specs are added in order they appear in top-level spec list.
+  --   - Imported specs are added in alphabetical order of filenames they appear in, within e.g. `plugins` directory.
+  --   - Thus, `opts` for given plugin are merged, and `opts` functions run, in order they
+  --     appear in spec, and if imported then by alphabetical order of file|directory name they appear in.
+  --
   -- - If `opts` is function:
-  --   - Functions is called during spec resolution, i.e. before installing and loading plugins.
+  --   - Function is called AFTER plugins are installed, but right BEFORE current plugin is loaded, i.e. before calling `config` function.
+  --   - Plugins with HIGHER priority get their `opts` and `config` functions, which run right after each other,
+  --     run before those with lower priority.
+  --   - However, within one plugin, `opts`-functions from specs for that specific plugin run in order they appear from top-level spec,
+  --     with each imported spec added in alphabetical order of file|directory name they appear in.
+  --   - Example: `lspconfig` `opts`-function, since it returns table, overwrites `opts` specified by other `lspconfig` specs,
+  --     if `lspconfig` spec with `opts`-function appear AFTER other `lspconfig` specs, and in `plugins` directory file with name
+  --     sorted alphabetically after other specs.
   --   - Function is passed `plugin` as first parameter, and `opts` merged up to this point, as second paramter.
   --   - If function returns value, then this value will be new `opts` table, so remember merging with second passed-in argument.
   --   - If function does NOT return value, currently merged `opts` up to this point is

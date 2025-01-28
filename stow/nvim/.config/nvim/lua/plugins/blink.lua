@@ -1,12 +1,21 @@
+-- ====================================
+-- Order.
+-- ====================================
+-- - `nvim-lspconfig` config-function must run *after* `blink.cmp` config-function.
+-- - Enables getting `blink.cmp` capabilities, and adding them to Neovim's built-in
+--   LSP client config, so those capabilities are communicated to every used language server.
+-- - See: `https://cmp.saghen.dev/installation`.
+-- - Enabled by adding `blink.cmp` to `dependencies` of `nvim-lspconfig`: `plugins/lsp/init.lua`.
+-- ====================================
 return {
   {
     "saghen/blink.cmp",
 
     -- Use release tag to download pre-built binaries.
-    version = not vim.g.lazyvim_blink_main and "*",
+    version = not vim.g.myvim_blink_main and "*",
 
     -- If not using release tag, build from source.
-    build = vim.g.lazyvim_blink_main and "cargo build --release",
+    build = vim.g.myvim_blink_main and "cargo build --release",
 
     -- Ensure nested field `sources` is actually extended, and not overwritten,
     -- when other `blink.cmp` specs define same field.
@@ -27,7 +36,7 @@ return {
     ---@type blink.cmp.Config
     opts = {
       snippets = {
-        expand = function(snippet, _)
+        expand = function(snippet)
           return MyVim.cmp.expand(snippet)
         end,
       },
@@ -70,13 +79,20 @@ return {
       -- Experimental signature help support.
       -- signature = { enabled = true },
 
+      -- List of enabled providers.
+      -- Extendable through other `blink.cmp` specs, due to `opts_extend`,
+      -- e.g. below for `lazydev` provider.
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
         cmdline = {},
       },
 
       keymap = {
-        preset = "enter",
+        -- 'default': Mappings similar to built-in completion.
+        -- 'super-tab': Mappings similar to vscode (tab to accept, arrow keys to navigate).
+        -- 'enter': Mappings similar to 'super-tab' but with 'enter' to accept.
+        -- preset = "enter",
+        preset = "default",
         ["<C-y>"] = { "select_and_accept" },
       },
     },
@@ -97,7 +113,7 @@ return {
             MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
             "fallback",
           }
-        -- Other presets, e.g. `enter`.
+        -- Other presets, e.g. `default` | `enter`.
         else
           opts.keymap["<Tab>"] = {
             MyVim.cmp.map({ "snippet_forward", "ai_accept" }),

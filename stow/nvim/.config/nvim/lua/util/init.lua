@@ -1,5 +1,22 @@
 local LazyUtil = require("lazy.core.util")
 
+-- ---@field ui lazyvim.util.ui
+-- ---@field terminal lazyvim.util.terminal
+-- ---@field extras lazyvim.util.extras
+-- ---@field inject lazyvim.util.inject
+-- ---@field news lazyvim.util.news
+-- ---@field json lazyvim.util.json
+-- ---@field lualine lazyvim.util.lualine
+
+---@class myvim.util: LazyUtilCore
+---@field config MyVimConfig
+---@field lsp myvim.util.lsp
+---@field root myvim.util.root
+---@field format myvim.util.format
+---@field plugin myvim.util.plugin
+---@field mini myvim.util.mini
+---@field pick myvim.util.pick
+---@field cmp myvim.util.cmp
 local M = {}
 
 setmetatable(M, {
@@ -129,7 +146,7 @@ end
 function M.safe_keymap_set(mode, lhs, rhs, opts)
   local keys = require("lazy.core.handler").handlers.keys
 
-  ---@cast keys MyKeysHandler
+  ---@cast keys LazyKeysHandler
   local modes = type(mode) == "string" and { mode } or mode
 
   -- Filter out modes, e.g. `n`, for which `lazy.nvim` key handler already exists.
@@ -162,6 +179,27 @@ function M.dedup(list)
       table.insert(ret, v)
       seen[v] = true
     end
+  end
+  return ret
+end
+
+--- Gets a path to a package in the Mason registry.
+--- Prefer this to `get_package`, since the package might not always be
+--- available yet and trigger errors.
+---@param pkg string
+---@param path? string
+---@param opts? { warn?: boolean }
+function M.get_pkg_path(pkg, path, opts)
+  pcall(require, "mason") -- make sure Mason is loaded. Will fail when generating docs
+  local root = vim.env.MASON or (vim.fn.stdpath("data") .. "/mason")
+  opts = opts or {}
+  opts.warn = opts.warn == nil and true or opts.warn
+  path = path or ""
+  local ret = root .. "/packages/" .. pkg .. "/" .. path
+  if opts.warn and not vim.loop.fs_stat(ret) and not require("lazy.core.config").headless() then
+    M.warn(
+      ("Mason package path not found for **%s**:\n- `%s`\nYou may need to force update the package."):format(pkg, path)
+    )
   end
   return ret
 end

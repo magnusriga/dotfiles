@@ -340,6 +340,10 @@ require("lazy").setup({
     -- Runs `require` on all modules, i.e. `.lua` files,
     -- in `$HOME/.config/nvim/lua/plugins`.
     { import = "plugins" },
+    -- Import other plugins, from sub-folders.
+    -- Order matters.
+    { import = "plugins/dap" },
+    { import = "plugins/lang" },
   },
   -- Directory where plugins will be installed,
   -- i.e. GitHub repository, `<user>/<repo>`, is cloned into `<repo>` in
