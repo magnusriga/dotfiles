@@ -6,17 +6,17 @@ local LazyUtil = require("lazy.core.util")
 -- ---@field inject lazyvim.util.inject
 -- ---@field news lazyvim.util.news
 -- ---@field json lazyvim.util.json
--- ---@field lualine lazyvim.util.lualine
 
 ---@class myvim.util: LazyUtilCore
+---@field cmp myvim.util.cmp
 ---@field config MyVimConfig
----@field lsp myvim.util.lsp
----@field root myvim.util.root
 ---@field format myvim.util.format
----@field plugin myvim.util.plugin
+---@field lualine myvim.util.lualine
+---@field lsp myvim.util.lsp
 ---@field mini myvim.util.mini
 ---@field pick myvim.util.pick
----@field cmp myvim.util.cmp
+---@field plugin myvim.util.plugin
+---@field root myvim.util.root
 local M = {}
 
 setmetatable(M, {

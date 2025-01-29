@@ -14,18 +14,74 @@ return {
   -- ==================================================================
   -- `snacks.nvim`: Main spec.
   -- ==================================================================
-  -- Not enabling any sub-plugins, but defining `config` function.
+  -- This file is not enabling any sub-plugins, only defining `config` function.
   --
-  -- Other `snacks.nvim` specs, enabling sub-plugins,
-  -- are defined piecemeal throughout project.
+  -- Other `snacks.nvim` specs are enabling sub-plugins,
+  -- defined piecemeal throughout project.
   --
   -- `priority = 1000`, thus executed before `config` functions of:
   -- - Other lower priority specs, e.g. other `snacks.nvim` specs'.
   -- - `noice.nvim`.
   --
-  -- To enable sub-plugin, either:
+  -- - Snacks sub-plugins load, i.e. `setup()` is called, wh
+  --
+  -- ==================================================================
+  -- Enabling sub-plugins.
+  -- ==================================================================
+  -- - Generally NOT necessary to enable sub-plugins.
+  -- - Most `Snacks.<commands>` are available out of box, without setup.
+  --
+  -- - `Snacks.<commands>` not requiring enabling:
+  --   - scratch   : No setup function, opened automatically when called, regardless of `opts.scratch`,
+  --                 using default options, merged with `opts.scratch`, if any.
+  --
+  --   - lazygit   : No setup function, opened automatically when called, regardless of `opts.lazygit`,
+  --                 using default options, merged with `opts.lazygit`, if any.
+  --
+  --   - bufdelete : No setup function, deletes buffer when `bufdelete(opts)` is called, where `opts` sets buffer to delete.
+  --                 No `opts.bufdelete`, `opts` is passed directly into function, where no `opts` means current buffer.
+  --
+  -- - `Snacks.<commands>` requiring manual enabling in config:
+  --   - Load manually:
+  --     -
+  --
+  --   - Load immediately when `snacks.nvim` loads, which is first plugin that loads after Neovim starts:
+  --     - notifier.
+  --     - statuscolumn    : `setup(..)` function called if `opts.statuscolumn.enabled = true`, or other `opts.statuscolumn` is passed,
+  --                         which starts refreshing statuscolumn every 50ms, but possible to manually open by calling `Snacks.statuscolumn()`,
+  --                         which also calls `setup()`. Note: `statusline` built-in option must be set for `statuscolumn` to work.
+  --
+  --   - Load on event `BufReadPre`, `BufReadPost`, `LspAttach`, `UIEnter`:
+  --     - bigfile.      <-- `BufReadPre` : Before reading file into buffer.
+  --     - quickfile.    <-- `BufReadPost`: After reading file into buffer.
+  --     - indent.       <-- `BufReadPost`.
+  --     - words.        <-- `LspAttach`  : When `opts.words.enabled = true`, or any other `opts.words` is passed,
+  --                                        `Snacks.words.enable()` is called, which enables `words`.
+  --     - dashboard.    <-- `UIEnter`    : When `opts.dashboard.enabled = true`, or any other `opts.dashboard` is passed,
+  --                                        `setup()` is called when opening Neovim to determin if dashboard should be opened.
+  --                                        Alternatively, dashboard can be opened manually by calling `Snacks.dashboard.open()`, closed with Escape.
+  --     - scroll.       <-- `UIEnter`.
+  --     - input.        <-- `UIEnter`.
+  --     - scope.        <-- `UIEnter`.
+  --     - picker.       <-- `UIEnter`.
+  --
+  -- - `Snacks.<commands>` requiring other manual enabling:
+  --     - words: Does not need enabling in config, but without calling `Snacks.words.enable`, `words` will not work.
+  --
+  -- Enable sub-plugin, either:
   -- - Specify sub-plugin configuration: `terminal = { <config> }`.
   -- - Use sub-plugin default configuration: `notifier = { enabled = true }`.
+  --
+  -- ==================================================================
+  -- Scratch.
+  -- ==================================================================
+  -- - Unique key for scratch file is based on:
+  --   * name: File name.
+  --   * ft: File type.
+  --   * vim.v.count1: Count given in keymap, default to 1.
+  --   * cwd: Current working directory.
+  --   * branch: Current branch name.
+  -- - Thus, new scratch file created when scratch is opened from another file.
   --
   -- ==================================================================
   -- Snacks sub-plugins enabled in:
@@ -105,7 +161,7 @@ return {
   --   - `Snacks.zen(..)`        : Zen mode.
   --   - `Snacks.terminal(..)    : Create and toggle floating|split terminal windows.
   --
-  --   - `Snacks.scratch(..)     : Scratch buffers with persistent file???????????????????????????????????
+  --   - `Snacks.scratch(..)     : Scratch buffers with persistent file.
   --
   --   - `Snacks.util(..)`       : Utility functions, like `color` to get highlight group color.
   --   - `Snacks.notify(..)      : Utility functions for built-in `vim.notify`.
@@ -115,9 +171,12 @@ return {
   --                               No need to enable this in `snacks.nvim` spec,
   --                               but must execute `Snacks.words` to enable.
   --
-  --   - `Snacks.rename(..)      : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`. No need, using `yazi`, thus skip keymaps.
+  --   - `Snacks.rename(..)      : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`.
+  --                               No need, using `yazi`, thus skip keymaps.
   --
   --   - `Snacks.lazygit(..)     : Open LazyGit in float, auto-configure colorscheme and integration with Neovim.
+  --                               No need to enable, `Snacks.lazygit()` works regardless.
+  --
   --   - `Snacks.layout(..)      : Window layouts.
   --   - `Snacks.indent(..)      : Indent guides and scopes.
   --   - `Snacks.gitbrowse(..)   : Open current file, branch, commit, or repo in browser (e.g. GitHub, GitLab, Bitbucket).
@@ -125,6 +184,25 @@ return {
   --   - `Snacks.dim(..)         : Focus on active scope by dimming rest.
   --   - `Snacks.debug(..)       : Pretty inspect and backtraces, for debugging.
   --   - `Snacks.animate(..)     : Efficient animations, including over 45 easing functions (library).
+  --
+  --   - input                   : Replaces `vim.fn.input` with prettier prompt.
+  --
+  --   - scope                   : Creates scopes based on indent and treesitter elements.
+  --                               Adds operators to target scopes:
+  --                               - `ii`: Inner scope.
+  --                               - `ai`: Full scope.
+  --                               Adds key bindings to target scopes:
+  --                               - `[i`: Top edge of scope.
+  --                               - `]i`: Bottom edge of scope.
+  --   - scroll                   : Smooth scrolling for Neovim, properly handles scrolloff and mouse scrolling.
+  --
+  --   statuscolumn = { enabled = false }, -- we set this in options.lua
+
+  -- `toggle`:
+  -- - Saves state of any function that can be toggled on|off, allowing easy toggling.
+  -- - Manual usage: `Snacks.toggle.inlay_hints():toggle()`.
+  -- - Keymap usage: `Snacks.toggle.inlay_hints():map("<leader>uh")`.
+  -- - Works without config here, but set `config` to specify new `map` function.
   --
   -- ==================================================================
   -- Snacks sub-plugins requiring explicit enabling.
@@ -237,13 +315,14 @@ return {
   --
   -- - If `opts` is function:
   --   - Function is called AFTER plugins are installed, but right BEFORE current plugin is loaded, i.e. before calling `config` function.
-  --   - Plugins with HIGHER priority get their `opts` and `config` functions, which run right after each other,
+  --   - Plugins with higher priority get their `opts` and `config` functions, which run right after each other,
   --     run before those with lower priority.
   --   - However, within one plugin, `opts`-functions from specs for that specific plugin run in order they appear from top-level spec,
   --     with each imported spec added in alphabetical order of file|directory name they appear in.
-  --   - Example: `lspconfig` `opts`-function, since it returns table, overwrites `opts` specified by other `lspconfig` specs,
-  --     if `lspconfig` spec with `opts`-function appear AFTER other `lspconfig` specs, and in `plugins` directory file with name
-  --     sorted alphabetically after other specs.
+  --   - Example: `nvim-lspconfig` `opts`-function, since it returns table, overwrites `opts` specified by other `lspconfig` specs,
+  --     if `nvim-lspconfig` spec with `opts`-function appear AFTER other `nvim-lspconfig` specs,
+  --     either by being below another `nvim-lspconfig` spec within one file,
+  --     or by being after another imported spec file in alphabetically sorted list of file|directory names from import directory.
   --   - Function is passed `plugin` as first parameter, and `opts` merged up to this point, as second paramter.
   --   - If function returns value, then this value will be new `opts` table, so remember merging with second passed-in argument.
   --   - If function does NOT return value, currently merged `opts` up to this point is
