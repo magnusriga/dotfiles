@@ -1,3 +1,6 @@
+-- ==================================================================
+-- Execution order.
+-- ==================================================================
 -- This file runs during spec parsing, in `lazy.nvim` > `Loader.imports`.
 -- Files in `plugins` folder run in alphabetical order.
 --
@@ -6,8 +9,8 @@
 -- into fragments, at this stage.
 -- Later, plugins are installed, and `config` functions are run.
 --
--- `config > init.lua > init()` executed here,
--- `config > init.lua > setup()` was previously executed from entrypoint, `init.lua`.
+-- `config > init.lua > setup()` previously executed from entrypoint, `init.lua`.
+-- `config > init.lua > init()` executed here.
 require("config").init()
 
 return {
@@ -26,24 +29,47 @@ return {
   -- - Snacks sub-plugins load, i.e. `setup()` is called, wh
   --
   -- ==================================================================
+  -- `opts`.
+  -- ==================================================================
+  -- - When `snacks.nvim` > `setup(opts)` runs, i.e. first plugin loaded by `lazy.nvim`,
+  --   `Snacks.config` table is filled with user-provided `opts`,
+  --   thus e.g. `Snacks.opts[indent]` holds sub-plugin configuration.
+  -- - When sub-plugin loads, which happens either when `snacks.nvim` loads | on event |  manually,
+  --   `Snacks.config[indent]` is merged with defaults from within sub-plugin.
+  --
+  -- ==================================================================
   -- Enabling sub-plugins.
   -- ==================================================================
   -- - Generally NOT necessary to enable sub-plugins.
   -- - Most `Snacks.<commands>` are available out of box, without setup.
   --
-  -- - `Snacks.<commands>` not requiring enabling:
-  --   - scratch   : No setup function, opened automatically when called, regardless of `opts.scratch`,
-  --                 using default options, merged with `opts.scratch`, if any.
   --
-  --   - lazygit   : No setup function, opened automatically when called, regardless of `opts.lazygit`,
-  --                 using default options, merged with `opts.lazygit`, if any.
+  -- ------------------------------------------------------------------
+  -- - `Snacks.<commands>` not requiring enabling.
+  -- ------------------------------------------------------------------
+  --   - scratch   : No setup function, opened automatically when called, regardless of `opts.scratch`,
+  --                 using default options merged with `opts.scratch`, if any.
+  --
+  --   - lazygit   : No setup function, opened automatically calling `Snacks.lazygit()`, regardless of `opts.lazygit`,
+  --                 using default options merged with `opts.lazygit`, if any.
   --
   --   - bufdelete : No setup function, deletes buffer when `bufdelete(opts)` is called, where `opts` sets buffer to delete.
   --                 No `opts.bufdelete`, `opts` is passed directly into function, where no `opts` means current buffer.
   --
-  -- - `Snacks.<commands>` requiring manual enabling in config:
-  --   - Load manually:
-  --     -
+  --   - debug     : No setup function, enabled manually by calling `Snacks.debug(..)`, which calls `Snacks.debug.inspect(..)`.
+  --
+  --   - dim       : No setup function called, enabled manually by calling `Snacks.dim()`, which calls `Snacks.dim.enable(..)`.
+  --
+  --   - git       : No setup function, enabled manually by calling `Snacks.git.blame_line() | get_root()`.
+  --
+  --   - gitbrowse : No setup function, enabled manually by calling `Snacks.gitbrowse()`, which calls `Snacks.gitbrowse.open(..)`.
+  --
+  --   - health    : No setup function, enabled manually by calling `Snacks.health.check()`. If any other key is used, it calls `vim.health.<key>`.
+
+  -- ------------------------------------------------------------------
+  -- - `Snacks.<commands>` requiring manual enabling in config.
+  -- ------------------------------------------------------------------
+  --   - Load manually by calling Snacks.<sub-plugin>`:
   --
   --   - Load immediately when `snacks.nvim` loads, which is first plugin that loads after Neovim starts:
   --     - notifier.
@@ -180,9 +206,14 @@ return {
   --   - `Snacks.layout(..)      : Window layouts.
   --   - `Snacks.indent(..)      : Indent guides and scopes.
   --   - `Snacks.gitbrowse(..)   : Open current file, branch, commit, or repo in browser (e.g. GitHub, GitLab, Bitbucket).
-  --   - `Snacks.git(..)         : `git` utilities.
+  --
+  --   - `Snacks.git(..)         : Show git blame line and root of buffer | path, defualting to current buffer.
+  --
   --   - `Snacks.dim(..)         : Focus on active scope by dimming rest.
-  --   - `Snacks.debug(..)       : Pretty inspect and backtraces, for debugging.
+  --
+  --   - `Snacks.debug(..)`      : Helper functions for `lua` files, pretty printing objects and backtraces.
+  --                               Always active, not used.
+  --
   --   - `Snacks.animate(..)     : Efficient animations, including over 45 easing functions (library).
   --
   --   - input                   : Replaces `vim.fn.input` with prettier prompt.

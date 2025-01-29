@@ -112,6 +112,7 @@ sudo pacman -Syu --noconfirm \
   zoxide \
   fd ripgrep \
   ffmpeg p7zip jq poppler poppler-data imagemagick chafa yazi \
+  ueberzugpp \
   graphite graphite-docs \
   harfbuzz harfbuzz-utils \
   dav1d dav1d-doc \

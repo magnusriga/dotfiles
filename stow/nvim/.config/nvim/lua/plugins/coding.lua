@@ -161,7 +161,9 @@ return {
         -- It can also be a table with trigger words / mods:
 
         -- { path = "LazyVim", words = { "LazyVim" } },
-        -- { path = "lazy.nvim", words = { "LazyVim" } },
+
+        -- Load lazy.nvim when file has MyVim, because `MyVim` inherits from `lazy.nvim`.
+        { path = "lazy.nvim", words = { "MyVim" } },
 
         -- Only load luvit types when the `vim.uv` word is found.
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },

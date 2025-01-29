@@ -19,7 +19,7 @@ local prettier_supported = {
   "yaml",
 }
 
---- Checks if a Prettier config file exists for the given context
+--- Checks if a Prettier config file exists for the given context.
 ---@param ctx conform.Context`
 function M.has_config(ctx)
   local config_path = vim.fn.system({ "prettier", "--find-config-path", ctx.filename })
@@ -62,13 +62,17 @@ function M.setup(_, opts)
   require("conform").setup(opts)
 end
 
+local prettier_condition = function(_, ctx)
+  return M.has_parser(ctx) and (vim.g.myvim_prettier_needs_config ~= true or M.has_config(ctx))
+end
+
 return {
   {
     "stevearc/conform.nvim",
     dependencies = {
       {
         "mason.nvim",
-        opts = { ensure_installed = { "prettier" } },
+        opts = { ensure_installed = { "prettier", "prettierd" } },
       },
     },
     -- Only load this plugin when `require('conform')`,
@@ -145,9 +149,7 @@ return {
         formatters = {
           injected = { options = { ignore_errors = true } },
           prettier = {
-            condition = function(_, ctx)
-              return M.has_parser(ctx) and (vim.g.myvim_prettier_needs_config ~= true or M.has_config(ctx))
-            end,
+            condition = prettier_condition,
           },
           -- # Example of using dprint only when a dprint.json file is present
           -- dprint = {
@@ -164,9 +166,10 @@ return {
       }
 
       for _, ft in ipairs(prettier_supported) do
-        opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
-        table.insert(opts.formatters_by_ft[ft], "prettierd")
-        table.insert(opts.formatters_by_ft[ft], "prettier")
+        opts.formatters_by_ft[ft] = { "prettierd", "prettier" }
+        -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+        -- table.insert(opts.formatters_by_ft[ft], "prettierd")
+        -- table.insert(opts.formatters_by_ft[ft], "prettier")
       end
 
       return opts

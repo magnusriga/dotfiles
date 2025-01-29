@@ -161,22 +161,47 @@ return {
     "snacks.nvim",
     opts = {
       -- Show indent guides and scopes, based on treesitter.
-      indent = { enabled = true },
+      indent = {
+        indent = {},
+        animate = {
+          enabled = false,
+        },
+        scope = {
+          -- Enable (default) or disable highlight of line indicating scope.
+          -- enabled = false,
+
+          -- Add different colors for different scopes.
+          hl = {
+            "SnacksIndent1",
+            "SnacksIndent2",
+            "SnacksIndent3",
+            "SnacksIndent4",
+            "SnacksIndent5",
+            "SnacksIndent6",
+            "SnacksIndent7",
+            "SnacksIndent8",
+          },
+        },
+      },
 
       -- Replaces `vim.fn.input` with prettier prompt.
       input = { enabled = true },
 
       -- Creates scopes based on indent and treesitter elements.
-      -- Adds operators to target scopes: `ii`: Inner scope, `ai`: Full scope.
-      -- Adds key bindings to target scopes: `[i`: Top edge of scope, `]i`: Bottom edge of scope.
+      -- Adds operators to target scopes:
+      -- - `ii`: Inner scope.
+      -- - `ai`: Full scope.
+      -- Adds key bindings to target scopes:
+      -- - `[i`: Top edge of scope.
+      -- - `]i`: Bottom edge of scope.
       scope = { enabled = true },
 
-      -- Smooth scrolling for Neovim.
-      -- Properly handles scrolloff and mouse scrolling.
+      -- Smooth scrolling for Neovim, handles scrolloff and mouse scrolling.
       -- Unecessary overhead.
       -- scroll = { enabled = true },
 
-      --   statuscolumn = { enabled = false }, -- we set this in options.lua
+      -- `statuscolumn` is set in `config/options.lua`.
+      -- statuscolumn = { enabled = false },
 
       -- `toggle`:
       -- - Saves state of any function that can be toggled on|off, allowing easy toggling.
@@ -189,8 +214,9 @@ return {
         map = MyVim.safe_keymap_set,
       },
 
-      -- No need for `notifier`,
-      -- use built-in `vim.notify`, or `noice.nvim` for custom notifications.
+      -- Replaces `vim.notify`.
+      -- No need for `Snacks.notifier`, use built-in `vim.notify` instead,
+      -- or `noice.nvim` for custom notifications.
       -- notifier = { enabled = true },
 
       -- ==========================
@@ -221,12 +247,57 @@ return {
       -- words = { enabled = true },
     },
 
-    -- No need for `notifier`,
-    -- use built-in `vim.notify`, or `noice.nvim` for custom notifications.
+    -- No need for `Snacks.notifier`, use built-in `vim.notify` instead,
+    -- or `noice.nvim` for custom notifications.
     -- stylua: ignore
     -- keys = {
-    --   { "<leader>n", function() Snacks.notifier.show_history() end, desc = "Notification History" },
+    --   { "<leader>n", function()
+    --     if Snacks.config.picker and Snacks.config.picker.enabled then
+    --       Snacks.picker.notifications()
+    --     else
+    --       Snacks.notifier.show_history()
+    --     end
+    --   end, desc = "Notification History" },
     --   { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
-    -- },
+    -- },-
+  },
+
+  -- `snacks.nvim` dashboard.
+  -- - `persistance.nvim` running under hood to save state, load with `s`.
+  -- - Dashboard loaded automatically on startup due to below,
+  --   otherwise it could be loaded `Snacks.dashboard()`.
+  -- - `Snacks.dashboard.pick(..)`: Uses `fzf-lua`, since `Snacks.picker` is not enabled.
+  {
+    "snacks.nvim",
+    opts = {
+      dashboard = {
+        preset = {
+          pick = function(cmd, opts)
+            return MyVim.pick(cmd, opts)()
+          end,
+          header = [[
+          ███╗   ███╗██╗   ██╗██╗   ██╗██╗███╗   ███╗          M
+          ████╗ ████║╚██╗ ██╔╝██║   ██║██║████╗ ████║      M    
+          ██╔████╔██║ ╚████╔╝ ██║   ██║██║██╔████╔██║   m       
+          ██║╚██╔╝██║  ╚██╔╝  ╚██╗ ██╔╝██║██║╚██╔╝██║ m         
+          ██║ ╚═╝ ██║   ██║    ╚████╔╝ ██║██║ ╚═╝ ██║           
+          ╚═╝     ╚═╝   ╚═╝     ╚═══╝  ╚═╝╚═╝     ╚═╝           
+   ]],
+          -- stylua: ignore
+          ---@type snacks.dashboard.Item[]
+          keys = {
+            { icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
+            { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+            { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.dashboard.pick('live_grep')" },
+            { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')" },
+            { icon = " ", key = "c", desc = "Config", action = ":lua Snacks.dashboard.pick('files', {cwd = vim.fn.stdpath('config')})" },
+            { icon = " ", key = "s", desc = "Restore Session", section = "session" },
+            -- { icon = " ", key = "x", desc = "Lazy Extras", action = ":LazyExtras" },
+            { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
+            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          },
+        },
+      },
+    },
   },
 }
