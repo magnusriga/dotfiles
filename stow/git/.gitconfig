@@ -137,9 +137,12 @@
 
 [delta]
 
+  # true-color = always
+
   # Theme, must be set first.
-  # features = collared-trogon
   # Do not use quotes.
+  features = colorscheme
+  # features = collared-trogon
   # features = mellow-barbet
 
   # use n and N to move between diff sections
@@ -156,21 +159,24 @@
   # side-by-side = true
 
   # Follows `bat`, but set explicitly to be certain.
-#  syntax-theme = OneHalfDark
+  # Set syntax highlighting theme,
+  # which is different from diff highlight theme,
+  # which is set with `features`.
+  syntax-theme = OneHalfDark
 
 #  paging=always
 
   # Use quotes for style settings.
-  minus-style = "syntax #450a15"
-  minus-emph-style = "syntax #61afef"
-
-  plus-style = "syntax #98c379"
-  plus-emph-style = "syntax #61afef"
-
-#  minus-style = "#282c34 #450a15"
-#  minus-emph-style = "#282c34 #61afef"
 #  plus-style = "#282c34 #98c379"
 #  plus-emph-style = "#282c34 #61afef"
+#  minus-style = "syntax #450a15"
+##  minus-style = "#282c34 #450a15"
+#  minus-emph-style = "#282c34 #61afef"
+
+#  plus-style = "syntax #98c379"
+#  plus-emph-style = "syntax #61afef"
+#  minus-style = "syntax #450a15"
+#  minus-emph-style = "syntax #61afef"
 
   # highlight DiffAdd guifg=#282c34 guibg=#98c379
   # highlight DiffChange guifg=#282c34 guibg=#e5c07b
@@ -189,10 +195,115 @@
 #  line-numbers-left-format = "{nm:^4} "
 #  line-numbers-right-format = "{np:^4} "
 
+[delta "colorscheme"]
+
+
+  # Github light:
+  #   Green     : #D9FDD4
+  #   Green emph: #9DCC88
+  #   Red       : #FAE1E0
+  #   Red emph  : #E4A3A3
+
+  # Github dark:
+  #   Green     : #152A1F
+  #   Green emph: #205D2D
+  #   Red       : #2D191D
+  #   Red emph  : #86322F
+
+  #   Green marg: #204C2A
+  #   Red marg  : #602727
+
+  # Style string for commit hash line.
+  # Default: `raw`.
+  commit-style                  = raw
+
+  # `ol`: Overline.
+  # Also: `box` | `ul` | `ul ol`.
+  commit-decorations-style      = blue ol
+
+  # Style string for file section.
+  file-style                    = omit
+
+  # Style string for hunk-header.
+  # Default: line-number syntax.
+  # `file`: File path.
+  # `line-number`: Number of first hunk line.
+  hunk-header-style             = file line-number
+
+  hunk-header-decoration-style  = blue box
+  hunk-header-file-style        = red
+  hunk-header-line-number-style = red
+
+  minus-style                   = "syntax bold #2D191D"
+  minus-non-emph-style          = "syntax #2D191D"
+  minus-emph-style              = "syntax bold #86322F"
+  minus-empty-line-marker-style = "syntax strike #86322F"
+
+  # zero-style                    = normal
+  zero-style                    = syntax
+
+  plus-style                    = "syntax bold #152A1F"
+  plus-non-emph-style           = "syntax #152A1F"
+  plus-emph-style               = "syntax bold #205D2D"
+  plus-empty-line-marker-style  = "syntax #205D2D"
+
+  whitespace-error-style        = reverse purple
+
+  true-color = always
+
+  # Better without this.
+  # line-numbers-zero-style       = normal dim normal
+
+  line-numbers-minus-style      = "normal #602727"
+  line-numbers-plus-style       = "normal #204C2A"
+
+  # line-numbers-minus-style      = red
+  # line-numbers-plus-style       = green
+
+  # line-numbers-left-style       = blue
+  # line-numbers-right-style      = blue
+
+# This is pretty good,
+# but prefer background color only,
+# so syntax highlighting is kept.
+[delta "colorscheme-fg"]
+  commit-style                  = raw
+  commit-decorations-style      = blue ol
+  file-style                    = omit
+  hunk-header-style             = file line-number
+  hunk-header-decoration-style  = blue box
+  hunk-header-file-style        = red
+  hunk-header-line-number-style = red
+  minus-style                   = bold red
+  minus-non-emph-style          = red
+  minus-emph-style              = bold black red
+  minus-empty-line-marker-style = normal strike red
+  # zero-style                    = normal
+  zero-style                    = syntax
+  plus-style                    = bold green
+  plus-non-emph-style           = green
+  plus-emph-style               = bold black green
+  plus-empty-line-marker-style  = normal green
+  whitespace-error-style        = reverse purple
+  true-color                    = always
+  line-numbers-zero-style       = dim normal
+  line-numbers-minus-style      = red
+  line-numbers-plus-style       = green
+  line-numbers-left-style       = blue
+  line-numbers-right-style      = blue
+
+[delta "interactive"]
+  features = colorscheme
+  keep-plus-minus-markers = false
+
 [diff]
+
+  colorMoved = default
 
   # Detect copies as well as renames.
   renames = copies
+
+  submodule = log
 
   # Use vimdiff as diff tool.
   tool = nvimdiff
@@ -219,7 +330,7 @@
 [interactive]
 
   # Setup for delta.
-  diffFilter = delta --color-only
+  diffFilter = delta --color-only --features=interactive
 
 [merge]
 
@@ -231,6 +342,7 @@
 
   # Setup for delta.
   conflictstyle = zdiff3
+  # conflictstyle = diff3
 
 [mergetool]
 
@@ -241,6 +353,12 @@
 [mergetool "nvimdiff"]
 
   layout = "LOCAL,BASE,REMOTE / MERGED"
+
+[pager]
+  blame  = delta
+  diff   = delta
+  reflog = delta
+  show   = delta
 
 [push]
 
