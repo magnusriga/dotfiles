@@ -137,27 +137,54 @@
 
 [delta]
 
+  # Theme, must be set first.
+  # features = collared-trogon
+  # Do not use quotes.
+  # features = mellow-barbet
+
   # use n and N to move between diff sections
   navigate = true
 
   # Set default colors, or omit for auto-detection.
   # Manual setting needed for e.g. lazygit.
-  dark = true
+  # dark = true
 
   # Always use line-numbers.
   line-numbers = true
 
+  # Always use side-by-side (automatic when merging).
+  # side-by-side = true
+
+  # Follows `bat`, but set explicitly to be certain.
+#  syntax-theme = OneHalfDark
+
 #  paging=always
-#  syntax-theme = TwoDark
+
+  # Use quotes for style settings.
+  minus-style = "syntax #450a15"
+  minus-emph-style = "syntax #61afef"
+
+  plus-style = "syntax #98c379"
+  plus-emph-style = "syntax #61afef"
+
+#  minus-style = "#282c34 #450a15"
+#  minus-emph-style = "#282c34 #61afef"
+#  plus-style = "#282c34 #98c379"
+#  plus-emph-style = "#282c34 #61afef"
+
+  # highlight DiffAdd guifg=#282c34 guibg=#98c379
+  # highlight DiffChange guifg=#282c34 guibg=#e5c07b
+  # highlight DiffDelete guifg=#282c34 guibg=#e06c75
+  # highlight DiffText guifg=#282c34 guibg=#61afef
+
 #  width = 1
-#  minus-style = syntax "#450a15"
-#  minus-emph-style = syntax "#600818"
-#  plus-style = syntax "#0b4820"
-#  plus-emph-style = syntax "#175c2e"
+
 #  hunk-header-style = syntax bold
 #  hunk-header-decoration-style = omit
+
 #  file-style = yellow italic
 #  file-decoration-style = yellow ul
+
 #  line-numbers-zero-style = "#4b5263"
 #  line-numbers-left-format = "{nm:^4} "
 #  line-numbers-right-format = "{np:^4} "
@@ -183,6 +210,11 @@
 
   # Automatically correct and execute mistyped commands.
   autocorrect = 1
+
+[include]
+
+  # Path to `delta` themes.
+  path = ~/.config/delta/themes.gitconfig
 
 [interactive]
 

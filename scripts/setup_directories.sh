@@ -59,6 +59,13 @@ if [ ! -d "$BAT_HOME" ]; then
   mkdir -p "${BAT_HOME}/themes"
 fi
 
+# Directory for delta repo, with themes.
+# No need, let git clone create directory.
+# export DELTA_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/delta"
+# if [ ! -d "$DELTA_HOME" ]; then
+#   mkdir -p "${DELTA_HOME}"
+# fi
+
 export ZSH_HOME="$HOME/.local/share/zsh"
 if [ ! -d "$ZSH_HOME" ]; then
   mkdir -p "$ZSH_HOME"

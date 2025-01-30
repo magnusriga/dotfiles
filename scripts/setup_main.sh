@@ -107,6 +107,12 @@ git clone git@github.com:ghostty-org/ghostty.git "$GHOSTTY_HOME"
 ln -s "${BUILD_HOME:-$HOME/build}/repositories/ghostty/src" "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
 
 # ================================================
+# Clone `delta` repo for themes.
+# ================================================
+rm -rf "$HOME/.config/delta"
+git clone https://github.com/dandavison/delta.git "$HOME/.config/delta"
+
+# ================================================
 # Setup: `git` credentials.
 # Use `.gitconfig` from dotfiles instead.
 # ================================================
