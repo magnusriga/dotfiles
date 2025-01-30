@@ -1,28 +1,27 @@
 return {
-
-  -- onedarkpro
+  -- onedarkpro.
   {
-    'olimorris/onedarkpro.nvim',
+    "olimorris/onedarkpro.nvim",
     lazy = false,
     priority = 1000, -- Ensure it loads first
     opts = {
       colors = {
-        onedark = { bg = '#16161D' }, -- yellow
+        onedark = { bg = "#16161D" }, -- yellow
         -- onedark = { bg = '#1F1F28' }, -- yellow
       },
     },
     config = function(_, opts)
-      require('onedarkpro').setup(opts)
-      vim.cmd.colorscheme 'onedark'
+      require("onedarkpro").setup(opts)
+      vim.cmd.colorscheme("onedark")
       -- Other custom highlight settings.
       -- vim.cmd [[ highlight DiagnosticUnderlineError cterm=undercurl gui=undercurl guifg=NONE guisp=#ef596f guibg=#181818 ]]
       -- vim.cmd [[ highlight DiagnosticUnderlineWarn cterm=undercurl gui=undercurl guifg=NONE guisp=yellow guibg=#3e3e3e ]]
-      vim.cmd [[ highlight DiagnosticUnderlineError cterm=undercurl gui=undercurl guifg=NONE guisp=red guibg=#3e3e3e ]]
-      vim.cmd [[ highlight DiagnosticUnderlineWarn cterm=undercurl gui=undercurl guifg=NONE guisp=yellow ]]
-      vim.cmd [[ highlight DiagnosticUnderlineInfo cterm=undercurl gui=undercurl guifg=NONE guisp=LightBlue ]]
-      vim.cmd [[ highlight DiagnosticUnderlineHint cterm=undercurl gui=undercurl guifg=NONE guisp=#2bbac5 ]]
+      vim.cmd([[ highlight DiagnosticUnderlineError cterm=undercurl gui=undercurl guifg=NONE guisp=red guibg=#3e3e3e ]])
+      vim.cmd([[ highlight DiagnosticUnderlineWarn cterm=undercurl gui=undercurl guifg=NONE guisp=yellow ]])
+      vim.cmd([[ highlight DiagnosticUnderlineInfo cterm=undercurl gui=undercurl guifg=NONE guisp=LightBlue ]])
+      vim.cmd([[ highlight DiagnosticUnderlineHint cterm=undercurl gui=undercurl guifg=NONE guisp=#2bbac5 ]])
       -- DiagnosticUnnecessary is used for unused variables, but links to highlightgroup Comment, by default.
-      vim.cmd [[ highlight DiagnosticUnnecessary guifg=#495162 ]]
+      vim.cmd([[ highlight DiagnosticUnnecessary guifg=#495162 ]])
     end,
   },
 

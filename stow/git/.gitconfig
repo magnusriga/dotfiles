@@ -140,13 +140,39 @@
   # use n and N to move between diff sections
   navigate = true
 
-  # or light = true, or omit for auto-detection
+  # Set default colors, or omit for auto-detection.
+  # Manual setting needed for e.g. lazygit.
   dark = true
+
+  # Always use line-numbers.
+  line-numbers = true
+
+#  paging=always
+#  syntax-theme = TwoDark
+#  width = 1
+#  minus-style = syntax "#450a15"
+#  minus-emph-style = syntax "#600818"
+#  plus-style = syntax "#0b4820"
+#  plus-emph-style = syntax "#175c2e"
+#  hunk-header-style = syntax bold
+#  hunk-header-decoration-style = omit
+#  file-style = yellow italic
+#  file-decoration-style = yellow ul
+#  line-numbers-zero-style = "#4b5263"
+#  line-numbers-left-format = "{nm:^4} "
+#  line-numbers-right-format = "{np:^4} "
 
 [diff]
 
   # Detect copies as well as renames.
   renames = copies
+
+  # Use vimdiff as diff tool.
+  tool = nvimdiff
+
+[difftool]
+
+  prompt = false
 
 [diff "bin"]
 
@@ -165,11 +191,24 @@
 
 [merge]
 
+  # Use vimdiff as tool for merges.
+  tool = nvimdiff
+
   # Include summaries of merged commits in newly created merge commit messages
   log = true
 
   # Setup for delta.
   conflictstyle = zdiff3
+
+[mergetool]
+
+  prompt = false
+
+  keepBackup = false
+
+[mergetool "nvimdiff"]
+
+  layout = "LOCAL,BASE,REMOTE / MERGED"
 
 [push]
 

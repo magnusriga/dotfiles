@@ -50,9 +50,6 @@ return {
   --   - scratch   : No setup function, opened automatically when called, regardless of `opts.scratch`,
   --                 using default options merged with `opts.scratch`, if any.
   --
-  --   - lazygit   : No setup function, opened automatically calling `Snacks.lazygit()`, regardless of `opts.lazygit`,
-  --                 using default options merged with `opts.lazygit`, if any.
-  --
   --   - bufdelete : No setup function, deletes buffer when `bufdelete(opts)` is called, where `opts` sets buffer to delete.
   --                 No `opts.bufdelete`, `opts` is passed directly into function, where no `opts` means current buffer.
   --
@@ -65,7 +62,12 @@ return {
   --   - gitbrowse : No setup function, enabled manually by calling `Snacks.gitbrowse()`, which calls `Snacks.gitbrowse.open(..)`.
   --
   --   - health    : No setup function, enabled manually by calling `Snacks.health.check()`. If any other key is used, it calls `vim.health.<key>`.
-
+  --
+  --   - layout    : No setup function, just various helper functions to create windows.
+  --
+  --   - lazygit   : No setup function, opened manually by calling `Snacks.lazygit()`, regardless of `opts.lazygit`,
+  --                 using default options merged with `opts.lazygit`, if any.
+  --
   -- ------------------------------------------------------------------
   -- - `Snacks.<commands>` requiring manual enabling in config.
   -- ------------------------------------------------------------------
@@ -225,6 +227,7 @@ return {
   --                               Adds key bindings to target scopes:
   --                               - `[i`: Top edge of scope.
   --                               - `]i`: Bottom edge of scope.
+  --
   --   - scroll                   : Smooth scrolling for Neovim, properly handles scrolloff and mouse scrolling.
   --
   --   statuscolumn = { enabled = false }, -- we set this in options.lua

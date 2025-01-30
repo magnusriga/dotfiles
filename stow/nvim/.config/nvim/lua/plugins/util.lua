@@ -30,6 +30,22 @@ return {
       -- On `nvim <file>...`, render <file> before loading plugins.
       quickfile = { enabled = true },
 
+      -- `Snacks.lazygit` does not require enabling with config, but done here to change colors.
+      lazygit = {
+        theme = {
+          -- [241] = { fg = "LazygitMain" },
+          activeBorderColor = { fg = "LazygitActiveBorderColor", bold = true },
+          -- cherryPickedCommitBgColor = { fg = "LazygitCherryPickedCommitBgColor" },
+          -- cherryPickedCommitFgColor = { fg = "LazygitCherryPickedCommitFgColor" },
+          -- defaultFgColor = { fg = "LazygitDefaultFgColor" },
+          -- inactiveBorderColor = { fg = "LazygitInactiveBorderColor" },
+          -- optionsTextColor = { fg = "LazygitOptionsTextColor" },
+          -- searchingActiveBorderColor = { fg = "LazygitSearchingActiveBorderColor", bold = true },
+          -- selectedLineBgColor = { bg = "LazygitSelectedLineBgColor" }, -- Set to `default` to have no background color.
+          -- unstagedChangesColor = { fg = "LazygitUnstagedChangesColor" },
+        },
+      },
+
       -- Configuration for Snack's ability to toggle floating | split terminal windows.
       -- - No cmd: Bottom split, with winbar containing terminal title.
       -- - Cmd: Floating.

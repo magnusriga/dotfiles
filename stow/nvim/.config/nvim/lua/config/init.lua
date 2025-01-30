@@ -129,6 +129,45 @@ local defaults = {
   },
 }
 
+---@param buf? number
+---@return string[]?
+function M.get_kind_filter(buf)
+  buf = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
+  local ft = vim.bo[buf].filetype
+  if M.kind_filter == false then
+    return
+  end
+  if M.kind_filter[ft] == false then
+    return
+  end
+  if type(M.kind_filter[ft]) == "table" then
+    return M.kind_filter[ft]
+  end
+  ---@diagnostic disable-next-line: return-type-mismatch
+  return type(M.kind_filter) == "table" and type(M.kind_filter.default) == "table" and M.kind_filter.default or nil
+end
+
+---@param name "autocmds" | "options" | "keymaps"  | "hlgroups"
+function M.load(name)
+  local function _load(mod)
+    if require("lazy.core.cache").find(mod)[1] then
+      MyVim.try(function()
+        require(mod)
+      end, { msg = "Failed loading " .. mod })
+    end
+  end
+  local pattern = "MyVim" .. name:sub(1, 1):upper() .. name:sub(2)
+  -- if M.defaults[name] or name == "options" then
+  --   _load("other.config." .. name)
+  --   vim.api.nvim_exec_autocmds("User", { pattern = pattern .. "Defaults", modeline = false })
+  -- end
+
+  -- Load file.
+  _load("config." .. name)
+
+  vim.api.nvim_exec_autocmds("User", { pattern = pattern, modeline = false })
+end
+
 local options
 local neovim_clipboard
 
@@ -180,8 +219,10 @@ function M.setup(opts)
 
       -- Create usercommand to get root of buffer,
       -- and autocommand to delete cache of buffer root paths.
-      -- TODO: Delete if not used.
       MyVim.root.setup()
+
+      -- Load highlight groups.
+      M.load("hlgroups")
 
       vim.api.nvim_create_user_command("MyHealth", function()
         vim.cmd([[Lazy! load all]])
@@ -208,42 +249,6 @@ function M.setup(opts)
       vim.cmd.colorscheme("habamax")
     end,
   })
-end
-
----@param buf? number
----@return string[]?
-function M.get_kind_filter(buf)
-  buf = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
-  local ft = vim.bo[buf].filetype
-  if M.kind_filter == false then
-    return
-  end
-  if M.kind_filter[ft] == false then
-    return
-  end
-  if type(M.kind_filter[ft]) == "table" then
-    return M.kind_filter[ft]
-  end
-  ---@diagnostic disable-next-line: return-type-mismatch
-  return type(M.kind_filter) == "table" and type(M.kind_filter.default) == "table" and M.kind_filter.default or nil
-end
-
----@param name "autocmds" | "options" | "keymaps"
-function M.load(name)
-  local function _load(mod)
-    if require("lazy.core.cache").find(mod)[1] then
-      MyVim.try(function()
-        require(mod)
-      end, { msg = "Failed loading " .. mod })
-    end
-  end
-  local pattern = "Neovim" .. name:sub(1, 1):upper() .. name:sub(2)
-  -- if M.defaults[name] or name == "options" then
-  --   _load("other.config." .. name)
-  --   vim.api.nvim_exec_autocmds("User", { pattern = pattern .. "Defaults", modeline = false })
-  -- end
-  _load("config." .. name)
-  vim.api.nvim_exec_autocmds("User", { pattern = pattern, modeline = false })
 end
 
 M.did_init = false

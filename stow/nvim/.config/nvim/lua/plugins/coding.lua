@@ -103,7 +103,7 @@ return {
             "^().*()$",
           },
 
-          -- Entier buffer.
+          -- Entire buffer.
           g = MyVim.mini.ai_buffer,
 
           -- Alias for function call.

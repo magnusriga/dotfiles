@@ -52,6 +52,13 @@ if [ ! -d "$YAZI_HOME" ]; then
   mkdir -p "$YAZI_HOME"
 fi
 
+export BAT_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/bat"
+if [ ! -d "$BAT_HOME" ]; then
+  # `config`: `${XDG_CONFIG_HOME}/bat`.
+  # themes  : `${XDG_CONFIG_HOME}/themes`.
+  mkdir -p "${BAT_HOME}/themes"
+fi
+
 export ZSH_HOME="$HOME/.local/share/zsh"
 if [ ! -d "$ZSH_HOME" ]; then
   mkdir -p "$ZSH_HOME"
