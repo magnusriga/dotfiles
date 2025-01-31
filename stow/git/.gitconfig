@@ -137,7 +137,7 @@
 
 [delta]
 
-  # true-color = always
+  true-color = always
 
   # Theme, must be set first.
   # Do not use quotes.
@@ -158,45 +158,21 @@
   # Always use side-by-side (automatic when merging).
   # side-by-side = true
 
-  # Follows `bat`, but set explicitly to be certain.
   # Set syntax highlighting theme,
   # which is different from diff highlight theme,
   # which is set with `features`.
+  # Follows `bat`, but set explicitly to be certain.
   syntax-theme = OneHalfDark
+#  syntax-theme = TwoDark
 
 #  paging=always
-
-  # Use quotes for style settings.
-#  plus-style = "#282c34 #98c379"
-#  plus-emph-style = "#282c34 #61afef"
-#  minus-style = "syntax #450a15"
-##  minus-style = "#282c34 #450a15"
-#  minus-emph-style = "#282c34 #61afef"
-
-#  plus-style = "syntax #98c379"
-#  plus-emph-style = "syntax #61afef"
-#  minus-style = "syntax #450a15"
-#  minus-emph-style = "syntax #61afef"
 
   # highlight DiffAdd guifg=#282c34 guibg=#98c379
   # highlight DiffChange guifg=#282c34 guibg=#e5c07b
   # highlight DiffDelete guifg=#282c34 guibg=#e06c75
   # highlight DiffText guifg=#282c34 guibg=#61afef
 
-#  width = 1
-
-#  hunk-header-style = syntax bold
-#  hunk-header-decoration-style = omit
-
-#  file-style = yellow italic
-#  file-decoration-style = yellow ul
-
-#  line-numbers-zero-style = "#4b5263"
-#  line-numbers-left-format = "{nm:^4} "
-#  line-numbers-right-format = "{np:^4} "
-
 [delta "colorscheme"]
-
 
   # Github light:
   #   Green     : #D9FDD4
@@ -217,22 +193,31 @@
   # Default: `raw`.
   commit-style                  = raw
 
-  # `ol`: Overline.
-  # Also: `box` | `ul` | `ul ol`.
+  # Options: `box` | `ul` | `ol`, `ul ol`.
+  # Overline and underline span page width.
   commit-decorations-style      = blue ol
 
   # Style string for file section.
-  file-style                    = omit
+  # Default: `blue`.
+  file-style                    = blue box
 
   # Style string for hunk-header.
-  # Default: line-number syntax.
-  # `file`: File path.
-  # `line-number`: Number of first hunk line.
-  hunk-header-style             = file line-number
+  # `syntax`: Foreground color.
+  # `file`: Include file path in hunk header.
+  # `line-number`: Include number of first hunk line, in hunk header.
+  # Default: `line-number syntax`.
+  hunk-header-style             = file line-number syntax
 
-  hunk-header-decoration-style  = blue box
-  hunk-header-file-style        = red
-  hunk-header-line-number-style = red
+  # Style string for the hunk-header decoration.
+  # Default: `blue box`.
+  hunk-header-decoration-style  = green ul
+
+  # Style string for the file path part of the hunk-header.
+  # Default: `blue`.
+  hunk-header-file-style        = green
+
+  # Style string for the line number part of the hunk-header.
+  hunk-header-line-number-style = green
 
   minus-style                   = "syntax bold #2D191D"
   minus-non-emph-style          = "syntax #2D191D"
