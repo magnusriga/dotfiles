@@ -10,7 +10,12 @@ echo "Running .exports..."
 export XDG_CONFIG_HOME=$HOME/.config
 
 # ================================================================
-# Set default shell to ZSH
+# Used by some programs, like `delta`.
+# ================================================================
+COLORTERM="truecolor"
+
+# ================================================================
+# Set default shell to ZSH.
 # ================================================================
 SHELL=$(which zsh)
 
