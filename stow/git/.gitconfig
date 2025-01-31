@@ -247,7 +247,10 @@
   plus-emph-style               = "syntax bold #205D2D"
   plus-empty-line-marker-style  = "syntax #205D2D"
 
-  whitespace-error-style        = reverse purple
+  # Style string for whitespace errors.
+  # Defaults to `color.diff.whitespace` if set in `.gitconfig`,
+  # or else 'magenta reverse'.
+  whitespace-error-style        = magenta reverse
 
   true-color = always
 
