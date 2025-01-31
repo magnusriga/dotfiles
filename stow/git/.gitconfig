@@ -194,7 +194,7 @@
   commit-style                  = raw
 
   # Options: `box` | `ul` | `ol`, `ul ol`.
-  # Overline and underline span page width.
+  # `ul` | `ol`: Underline | overline, both cover width of screen.
   commit-decorations-style      = blue ol
 
   # Style string for file section.
@@ -202,22 +202,29 @@
   file-style                    = blue box
 
   # Style string for hunk-header.
-  # `syntax`: Foreground color.
-  # `file`: Include file path in hunk header.
-  # `line-number`: Include number of first hunk line, in hunk header.
+  # `syntax`: First line of hunk scope is always shown, this setting controls its foreground color.
+  # `file`: Includes file path in hunk header.
+  # `line-number`: Includes number of first hunk line in hunk header, default on.
   # Default: `line-number syntax`.
   hunk-header-style             = file line-number syntax
 
   # Style string for the hunk-header decoration.
   # Default: `blue box`.
   hunk-header-decoration-style  = green ul
+  # hunk-header-decoration-style  = yellow ul
+  # hunk-header-decoration-style  = "#5c6370" ul
+  # hunk-header-decoration-style  = gray ul
 
   # Style string for the file path part of the hunk-header.
   # Default: `blue`.
   hunk-header-file-style        = green
+  # hunk-header-file-style        = "#5c6370"
+  # hunk-header-file-style        = yellow
 
   # Style string for the line number part of the hunk-header.
   hunk-header-line-number-style = green
+  # hunk-header-line-number-style = "#5c6370"
+  # hunk-header-line-number-style = red
 
   minus-style                   = "syntax bold #2D191D"
   minus-non-emph-style          = "syntax #2D191D"
