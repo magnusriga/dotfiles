@@ -23,7 +23,7 @@
 --
 -- - `foldclosed({lnum})`.
 --   - Line number of first line in closed fold, if line `lnum` is part of closed fold.
---   - `foldclosed({lnum})`: Line number of last line in closed fold.
+--   - `foldclosedend({lnum})`: Line number of last line in closed fold.
 --   - If line `lnum` is not part of closed fold, -1 is returned.
 --
 -- - `foldlevel({lnum})`.
@@ -40,27 +40,13 @@ local M = {}
 local colors =
   { "#caa6f7", "#c1a6f1", "#b9a5ea", "#b1a4e4", "#aba3dc", "#a5a2d4", "#9fa0cc", "#9b9ec4", "#979cbc", "#949ab3" }
 
-M.set_hl = function()
+function M.set_hl()
+  -- Thick line, i.e. background filled.
+  vim.api.nvim_set_hl(0, "StatusColumnBorder", { fg = "#ff9e64", bg = "#ff9e64" })
+
   for i, color in ipairs(colors) do
     vim.api.nvim_set_hl(0, "Gradient_" .. i, { fg = color })
   end
-end
-
--- On current line, border is pushed to right,
--- as relative number is larger than relative number.
-M.border = function()
-  -- For line close to current line, use gradient up to final color,
-  -- then for lines further out use last color,
-  -- which gives gradient appearance across entire border.
-  if vim.v.relnum <= 9 then
-    -- NOTE: Lua tables start at 1, but relnum starts at 0, so add 1 to get highlight group.
-    local hl = "%#Gradient_" .. (vim.v.relnum + 1) .. "#│"
-    return hl
-    -- return "%#LazygitActiveBorderColor#│"
-  else
-    return "%#Gradient_10#│"
-  end
-  -- return "%#MyStatusColumnBorder#│"
 end
 
 function M.number(user_config)
@@ -77,7 +63,8 @@ function M.number(user_config)
 
   -- Merge default options with user options.
   local config = vim.tbl_extend("keep", user_config or {}, {
-    colors = colors,
+    -- Pass in `user_config.colors` if needed.
+    colors = nil,
     mode = "normal",
   })
 
@@ -92,29 +79,180 @@ function M.number(user_config)
       end
     end
 
-    -- if vim.v.relnum <= 9 then
-    --   -- NOTE: Lua tables start at 1, but relnum starts at 0, so add 1 to get highlight group.
-    --   -- return "%#LazygitActiveBorderColor#│"
-    -- else
-    --       text = "%#" .. "Gradient_10" .. "#"
-    -- end
-
     -- If string is still empty, i.e. when `relnum` was higher than `#config.colors`,
     -- use last color, thus yielding gradient effect.
     if text == "" then
       text = "%#" .. "Gradient_" .. #config.colors .. "#"
     end
+  else
+    if vim.v.relnum == 0 then
+      -- text = "%#LazygitActiveBorderColor#"
+    end
   end
 
   if config.mode == "normal" then
-    text = text .. vim.v.lnum
+    text = text .. "%=" .. vim.v.lnum
   elseif config.mode == "relative" then
-    text = text .. vim.v.relnum
+    text = text .. "%=" .. vim.v.relnum
   elseif config.mode == "hybrid" then
     -- If relative number for line is 0, cursor is on that line,
     -- thus show line number instead of relative line number.
-    return vim.v.relnum == 0 and text .. vim.v.lnum or text .. vim.v.relnum
+
+    -- `%=`: Right-align what comes after, within column, see: `:h statuscolumn`.
+    -- return vim.v.relnum == 0 and text .. "%=" .. vim.v.lnum or text .. "%=" .. vim.v.relnum
+
+    -- Use new `statuscolumn` item instead, which handles alignment without layout shift.
+    return text .. "%l"
   end
+end
+
+-- On current line, border is pushed to right,
+-- as relative number is larger than relative number.
+function M.border(user_config)
+  local text = ""
+
+  -- Merge default options with user options.
+  local config = vim.tbl_extend("keep", user_config or {}, {
+    -- Pass in `user_config.colors` if needed.
+    colors = nil,
+    mode = "normal",
+  })
+
+  -- For line close to current line, use gradient up to final color,
+  -- then for lines further out use last color,
+  -- which gives gradient appearance across entire border.
+  if config.colors ~= nil then
+    if vim.v.relnum <= 9 then
+      -- NOTE: Lua tables start at 1, but relnum starts at 0, so add 1 to get highlight group.
+      text = "%#Gradient_" .. (vim.v.relnum + 1) .. "#"
+    -- return "%#LazygitActiveBorderColor#│"
+    else
+      text = "%#Gradient_10#"
+    end
+  else
+    -- Add border color on current line only.
+    if vim.v.relnum == 0 then
+      -- text = "%#LazygitActiveBorderColor#"
+    end
+  end
+
+  return text .. "│"
+end
+
+M.folds = function()
+  -- Foldlevel of fold, if any, at current line, deepest level if nested.
+  -- `0` if no fold at current line.
+  local foldlevel = vim.fn.foldlevel(vim.v.lnum)
+
+  -- Foldlevel of fold, if any, at line directly above current line.
+  -- If smaller than current line's foldlevel, current line is first line of fold, potentially nested.
+  local foldlevel_before = vim.fn.foldlevel((vim.v.lnum - 1) >= 1 and vim.v.lnum - 1 or 1)
+
+  -- Foldlevel of fold, if any, at line directly below current line.
+  -- If smaller than current line's foldlevel, current line is last line of fold, potentially nested.
+  local foldlevel_after =
+    vim.fn.foldlevel((vim.v.lnum + 1) <= vim.fn.line("$") and (vim.v.lnum + 1) or vim.fn.line("$"))
+
+  -- Line number of first line of closed fold if line is part of fold, otherwise `-1`.
+  local foldclosed = vim.fn.foldclosed(vim.v.lnum)
+
+  -- Line not in fold, thus skip return whitespace to put in statuscolumn.
+  if foldlevel == 0 then
+    return "     "
+  end
+
+  -- Line is on closed fold, second condition might be unnecessary.
+  if foldclosed ~= -1 and foldclosed == vim.v.lnum then
+    -- return "▶"
+    return "%#LazygitActiveBorderColor#   %#StatusColumnBorder#│"
+  end
+
+  -- Not using `~=`, as nested fold would not be able to have lower level than parent fold.
+  if foldlevel > foldlevel_before then
+    -- return "▽"
+    return "    "
+    -- return " "
+  end
+
+  -- Line is last line of fold, potentially nested.
+  if foldlevel > foldlevel_after then
+    -- return "╰"
+    return "     "
+  end
+
+  -- Line is in middle of open fold.
+  -- return "╎"
+  return "     "
+end
+
+-- - Namespaces for extmarks:
+--   - Normal: `gitsigns_signs_`.
+--   - Staged: `gitsigns_signs_staged`.
+--   - Deleted: `gitsigns_removed`.
+-- - Deleted:
+--   - Uses `virt_lines`: Virtual line to add above|below mark.
+--   - Sets `virt_lines_above`: Virtual line should be above `virt_line`.
+-- - `gitsigns.manager` > `Signs.new(cfg, name)`:
+--   - Creates two new Signs, one for normal changes and one for stages changes.
+--   - `signs.namespace` of extmarks for lines with normal changes: `gitsigns_signs_`.
+--   - `signs.namespace` of extmarks for lines with stages changes: `gitsigns_signs_staged`.
+-- - New `signs` table for normal and staged changes also has fields:
+--   - `hls` normal | staged: `{ add = { hl = GitSigns[Staged]Add, text = '|', .. }, change = {..}, ..}`.
+--   - `name`.
+--   - `group`.
+--   - `config`.
+--   - `ns`: `gitsigns_signs_` | `gitsigns_signs_staged` | ...
+-- - These two `signs` tables are created and stored in `manager`:
+--   - `signs_normal`.
+--   - `signs_staged`.
+-- - When toggling signs in signcolumn off: `manager.reset` > `signs_[normal and staged].reset()`.
+--   - Clears all namespaced objects, i.e. highlights, extmarks, and virtual text, from current file,
+--     with: `vim.api.nvim_buf_clear_namespace(bufnr, self.ns, 0, -1)`,
+--   - Done once for each buffer, found with: `vim.api.nvim_list_bufs`, which includes
+--     unloaded/deleted buffers, like calling `ls!`.
+--   - Goes through all hunks in file, and if signs toggle is ON then creates extmarks for all hunks in buffers,
+--     both normal and staged.
+--   - When extmark is created, `opt.sign_text` and `opt.sign_hl_group` specify if/how
+--     extmark is added to `signcolumn`, i.e. `%s`.
+-- - Get extmark:
+--   - `vim.api.nvim_buf_get_extmarks(0, <namespace>, 0, -1, { details = true })`
+--   - Returns: List of `[ extmarkid, row, col, details ]` tuples, in traversal order.
+function M.gitsigns()
+  local text = ""
+  local namespaces = vim.api.nvim_get_namespaces()
+  local gitsigns_signs_ = namespaces["gitsigns_signs_"]
+  local gitsigns_signs_staged = namespaces["gitsigns_signs_staged"]
+  local gitsigns_removed = namespaces["gitsigns_removed"]
+
+  local extmarks_normal = vim.api.nvim_buf_get_extmarks(0, gitsigns_signs_, 0, -1, { details = true })
+  local extmarks_staged = vim.api.nvim_buf_get_extmarks(0, gitsigns_signs_staged, 0, -1, { details = true })
+  local extmarks_removed = vim.api.nvim_buf_get_extmarks(0, gitsigns_removed, 0, -1, { details = true })
+
+  -- Normal, i.e. unstaged changes, including: Add, change, delete.
+  for _, extmark in ipairs(extmarks_normal) do
+    -- vim.print(extmark[1])
+    -- Lua tables are 1-indexed.
+    -- `extmark[2]` holds row number, but 0-indexed, so add `1`.
+    if extmark[2] + 1 == vim.v.lnum then
+      text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+    end
+  end
+
+  -- Normal, i.e. staged changes, including: Add, change, delete.
+  for _, extmark in ipairs(extmarks_staged) do
+    if extmark[2] + 1 == vim.v.lnum then
+      text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+    end
+  end
+
+  -- Removals, whatever that is.
+  for _, extmark in ipairs(extmarks_removed) do
+    if extmark[2] + 1 == vim.v.lnum then
+      text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+    end
+  end
+
+  return text
 end
 
 function M.get()
@@ -125,10 +263,8 @@ function M.get()
 
   -- 0 is namespace, which is default namespace.
   vim.api.nvim_set_hl(0, "MyStatusColumn", {
-    -- When `link` is present, other keys are ignored.
-    link = "Comment",
-    --fg = "#FFFFFF",
-    --bg = "#1E1E2E",
+    fg = "#FFFFFF",
+    bg = "#1E1E2E",
   })
 
   vim.api.nvim_set_hl(0, "MyStatusColumnBorder", {
@@ -139,43 +275,15 @@ function M.get()
 
   -- Alternative: `text = text .. M.brorder`.
   text = table.concat({
+    M.gitsigns(),
     M.number({ mode = "hybrid" }),
     M.border(),
+    M.folds(),
   })
 
-  return text
-end
-
-M.folds = function()
-  local foldlevel = vim.fn.foldlevel(vim.v.lnum)
-  local foldlevel_before = vim.fn.foldlevel((vim.v.lnum - 1) >= 1 and vim.v.lnum - 1 or 1)
-  local foldlevel_after =
-    vim.fn.foldlevel((vim.v.lnum + 1) <= vim.fn.line("$") and (vim.v.lnum + 1) or vim.fn.line("$"))
-
-  local foldclosed = vim.fn.foldclosed(vim.v.lnum)
-
-  -- Line has nothing to do with folds so we will skip it
-  if foldlevel == 0 then
-    return " "
-  end
-
-  -- Line is a closed fold(I know second condition feels unnecessary but I will still add it)
-  if foldclosed ~= -1 and foldclosed == vim.v.lnum then
-    return "▶"
-  end
-
-  -- I didn't use ~= because it couldn't make a nested fold have a lower level than it's parent fold and it's not something I would use
-  if foldlevel > foldlevel_before then
-    return "▽"
-  end
-
-  -- The line is the last line in the fold
-  if foldlevel > foldlevel_after then
-    return "╰"
-  end
-
-  -- Line is in the middle of an open fold
-  return "╎"
+  -- return text
+  return "%s" .. text
+  -- return "%C%s%l│" .. M.folds()
 end
 
 return M
