@@ -1,3 +1,12 @@
+-- vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+--   callback = function()
+--     -- Set when entering buffer.
+--     vim.cmd([[
+--       highlight Cursor guifg=red guibg=yellow
+--     ]])
+--   end,
+-- })
+
 -- Lazygit.
 vim.cmd([[
   highlight LazygitMain guifg=#2ac3de
@@ -21,4 +30,14 @@ vim.cmd([[
   highlight DiffChange guifg=#282c34 guibg=#e5c07b
   highlight DiffDelete guifg=#282c34 guibg=#e06c75
   highlight DiffText guifg=#282c34 guibg=#61afef
+]])
+
+-- FzfLua.
+-- Other color settings in `fzf-lua.nvim`.
+-- `TermCursor`: Used by `fzf-lua`.
+vim.cmd([[
+  highlight link FzfLuaHeaderBind Function
+  highlight link FzfLuaHeaderText Comment
+  highlight link FzfLuaCursor lCursor
+  highlight TermCursor guifg=bg guibg=fg
 ]])

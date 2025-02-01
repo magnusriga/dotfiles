@@ -33,6 +33,21 @@ return {
       -- `Snacks.lazygit` does not require enabling with config, but done here to change colors.
       lazygit = {
         theme = {
+          -- =======================================================================
+          -- Defaults, from `snacks.nvim`.
+          -- =======================================================================
+          -- [241]                      = { fg = "Special" },
+          -- activeBorderColor          = { fg = "MatchParen", bold = true },
+          -- cherryPickedCommitBgColor  = { fg = "Identifier" },
+          -- cherryPickedCommitFgColor  = { fg = "Function" },
+          -- defaultFgColor             = { fg = "Normal" },
+          -- inactiveBorderColor        = { fg = "FloatBorder" },
+          -- optionsTextColor           = { fg = "Function" },
+          -- searchingActiveBorderColor = { fg = "MatchParen", bold = true },
+          -- selectedLineBgColor        = { bg = "Visual" }, -- set to `default` to have no background colour
+          -- unstagedChangesColor       = { fg = "DiagnosticError" },
+          -- =======================================================================
+
           -- [241] = { fg = "LazygitMain" },
           activeBorderColor = { fg = "LazygitActiveBorderColor", bold = true },
           -- cherryPickedCommitBgColor = { fg = "LazygitCherryPickedCommitBgColor" },

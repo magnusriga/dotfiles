@@ -142,7 +142,122 @@ return {
 
       return {
         "default-title",
-        fzf_colors = true,
+
+        -- Highlights, alternative to `fzf_colors`.
+        -- Works in additon to `fzf_colors`.
+        -- Docs: `https://github.com/ibhagwan/fzf-lua/blob/main/OPTIONS.md`.
+        hls = {
+          -- Main fzf (terminal) window normal (text/bg) highlight group.
+          -- Same as `fg` in `fzf-colors`.
+          -- normal = "Normal",
+
+          -- Main fzf (terminal) window border highlight group.
+          -- `FloatBorder`, to match `lazygit` from `snacks.nvim`.
+          border = "FloatBorder",
+          preview_border = "FloatBorder",
+
+          -- Perhaps bug, but this is query text in live search, not prompt.
+          live_prompt = "@property",
+          -- live_prompt = "LazygitMain",
+
+          -- Similar to `fzf_group` below.
+          -- Prefer `fzf_group`, as it offer more customizing with `fg`, `bg`, etc.
+          fzf = {
+            -- Match of fuzzy search, while typing.
+            -- Does not work as `fzf_colors` property.
+            -- match = "LazygitActiveBorderColor",
+            match = "LazygitMain",
+
+            -- Highlight group for fzf's query, by default links to `FzfLuaNormal` and sets text to regular (non-bold).
+            -- Text typed in query field.
+            -- For some reason only applies to file search, grep has another color.
+            query = "LazygitMain",
+            -- Highlight group for fzf's separator, by default links to `FzfLuaFzfBorder`.
+            -- Line between search filed and matches.
+            -- separator = "LazygitActiveBorderColor",
+          },
+        },
+
+        -- Fzf `--color` specification.
+        --
+        -- Set to `true` to automatically generate an fzf's colorscheme from
+        -- Neovim's current colorscheme:
+        -- fzf_colors       = true,
+        --
+        -- Building a custom colorscheme, has the below specifications:
+        -- If rhs is of type "string" rhs will be passed raw, e.g.:
+        --   `["fg"] = "underline"` will be translated to `--color fg:underline`
+        -- If rhs is of type "table", the following convention is used:
+        --   [1] "what" field to extract from the hlgroup, i.e "fg", "bg", etc.
+        --   [2] Neovim highlight group(s), can be either "string" or "table"
+        --       when type is "table" the first existing highlight group is used
+        --   [3+] any additional fields are passed raw to fzf's command line args
+        -- Example of a "fully loaded" color option:
+        --   `["fg"] = { "fg", { "NonExistentHl", "Comment" }, "underline", "bold" }`
+        -- Assuming `Comment.fg=#010101` the resulting fzf command line will be:
+        --   `--color fg:#010101:underline:bold`
+        -- NOTE: To pass raw arguments: `fzf_opts["--color"]` or `fzf_args`.
+        fzf_colors = {
+          -- Inherit fzf colors not specified below from auto-generated theme,
+          -- similar to `fzf_colors=true`.
+          true,
+
+          -- Filename, in non-selected lines.
+          -- White, e.g. `CursorLine`, is OK.
+          -- ["fg"] = { "fg", "CursorLine" },
+
+          -- Highlight group for fzf's separator, by default links to `FzfLuaFzfBorder`.
+          -- Line between search filed and matches.
+          ["separator"] = { "fg", "LazygitActiveBorderColor" },
+
+          -- Unsure what this does.
+          -- ["bg"] = { "bg", "Normal" },
+
+          -- Unsure.
+          -- ["hl"] = { "fg", "Comment" },
+
+          -- Filename, in selected line.
+          -- `Visual` matches `lazygit`.
+          -- ["fg+"] = { "fg", "LazygitActiveBorderColor", "underline" },
+          -- ["fg+"] = { "fg", "Normal", "underline" },
+          -- ["fg+"] = { "fg", "Normal", "underline" },
+          ["fg+"] = { "fg", "Visual" },
+
+          -- Background of selected line.
+          -- `Visual` matches `lazygit`.
+          -- ["bg+"] = { "bg", { "CursorLine", "Normal" } },
+          ["bg+"] = { "bg", "Visual" },
+
+          -- Color of fzf matches, after typing.
+          -- ["hl+"] = { "fg", "Statement" },
+
+          -- Match count.
+          -- ["info"] = { "fg", "PreProc" },
+
+          -- Prompt text, e.g. `All>`.
+          ["prompt"] = { "fg", "LazygitActiveBorderColor" },
+          -- ["prompt"] = { "fg", "Conditional" },
+
+          -- Bar to left of selected line.
+          ["pointer"] = { "fg", "LazygitMain" },
+          -- ["pointer"] = { "fg", "LazygitActiveBorderColor" },
+          -- ["pointer"] = { "fg", "Exception" },
+
+          -- Unsure, does not change color of bar to left of selected line.
+          -- ["marker"] = { "fg", "Keyword" },
+
+          -- Perhaps spinner when waiting for matches.
+          -- ["spinner"] = { "fg", "Label" },
+
+          -- Punctuation in line with information of key bindings, i.e. header.
+          -- Not top search field.
+          -- Thus, gray `Comment` is OK.
+          ["header"] = { "fg", "Comment" },
+
+          -- Gutter to left of non-selected lines.
+          -- `-1`: No color.
+          -- ["gutter"] = "-1",
+        },
         fzf_opts = {
           ["--no-scrollbar"] = true,
         },

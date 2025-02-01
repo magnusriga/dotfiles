@@ -47,15 +47,15 @@ return {
   -- ------------------------------------------------------------------
   -- - `Snacks.<commands>` not requiring enabling.
   -- ------------------------------------------------------------------
-  --   - scratch   : No setup function, opened automatically when called, regardless of `opts.scratch`,
-  --                 using default options merged with `opts.scratch`, if any.
-  --
   --   - bufdelete : No setup function, deletes buffer when `bufdelete(opts)` is called, where `opts` sets buffer to delete.
   --                 No `opts.bufdelete`, `opts` is passed directly into function, where no `opts` means current buffer.
   --
   --   - debug     : No setup function, enabled manually by calling `Snacks.debug(..)`, which calls `Snacks.debug.inspect(..)`.
   --
   --   - dim       : No setup function called, enabled manually by calling `Snacks.dim()`, which calls `Snacks.dim.enable(..)`.
+  --
+  --   - explorer  : Setup function exists, which will disable `netrw`, but not needed.
+  --                 Explorer opened manually by calling `Snacks.explorer()`.
   --
   --   - git       : No setup function, enabled manually by calling `Snacks.git.blame_line() | get_root()`.
   --
@@ -68,13 +68,24 @@ return {
   --   - lazygit   : No setup function, opened manually by calling `Snacks.lazygit()`, regardless of `opts.lazygit`,
   --                 using default options merged with `opts.lazygit`, if any.
   --
+  --   - notify    : No setup function, used manually by calling `Snacks.notify()`, which calls `vim.notify` | `vim.notify_once`,
+  --                 after replacing title with `Snacks`, and allowing tables as message, which will be concatenated.
+  --
+  --   - rename    : No setup function, used manually by calling `Snacks.rename.rename_file()`, which interactively renames file
+  --                 and triggers LSP to modify all references accordingly. Done by `yazi`, thus no need.
+  --
+  --   - scratch   : No setup function, opened automatically when called, regardless of `opts.scratch`,
+  --                 using default options merged with `opts.scratch`, if any.
+  --
+  --
   -- ------------------------------------------------------------------
   -- - `Snacks.<commands>` requiring manual enabling in config.
   -- ------------------------------------------------------------------
   --   - Load manually by calling Snacks.<sub-plugin>`:
   --
   --   - Load immediately when `snacks.nvim` loads, which is first plugin that loads after Neovim starts:
-  --     - notifier.
+  --     - notifier        : When called without setup runs `vim.notify`, via `Snacks.notify`, but setup needed to replace `vim.notify`.
+  --
   --     - statuscolumn    : `setup(..)` function called if `opts.statuscolumn.enabled = true`, or other `opts.statuscolumn` is passed,
   --                         which starts refreshing statuscolumn every 50ms, but possible to manually open by calling `Snacks.statuscolumn()`,
   --                         which also calls `setup()`. Note: `statusline` built-in option must be set for `statuscolumn` to work.

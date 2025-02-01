@@ -21,7 +21,9 @@ return {
       vim.cmd([[ highlight DiagnosticUnderlineInfo cterm=undercurl gui=undercurl guifg=NONE guisp=LightBlue ]])
       vim.cmd([[ highlight DiagnosticUnderlineHint cterm=undercurl gui=undercurl guifg=NONE guisp=#2bbac5 ]])
       -- DiagnosticUnnecessary is used for unused variables, but links to highlightgroup Comment, by default.
-      vim.cmd([[ highlight DiagnosticUnnecessary guifg=#495162 ]])
+      -- vim.cmd([[ highlight DiagnosticUnnecessary guifg=#495162 ]])
+      -- vim.cmd([[ highlight Folded guifg=#C678dd guibg=#353B50 ]])
+      vim.cmd([[ highlight Folded guibg=#353B50 ]])
     end,
   },
 

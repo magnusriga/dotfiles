@@ -9,12 +9,6 @@ Setting options
 =============================================
 --]]
 
--- Show line numbers.
-vim.opt.number = true
-
--- Relative line numbers, to help with jumping.
-vim.opt.relativenumber = true
-
 -- Enable mouse mode, for resizing splits.
 -- vim.opt.mouse = 'a'
 
@@ -25,11 +19,73 @@ vim.opt.showmode = false
 -- Schedule the setting after `UiEnter` because it can increase startup-time.
 -- See `:help 'clipboard'`.
 vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
+  vim.opt.clipboard = "unnamedplus"
 end)
 
 -- Enable break indent.
 vim.opt.breakindent = true
+
+-- Snacks `statuscolumn`, i.e. margin to left containing:
+-- Gitsigns (or other signs), line numbers, fold icons, border line, padding, etc.
+-- from left to right, i.e. multiple columns.
+-- Works, but too high cost? Fold should be shown anyways.
+-- vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
+-- vim.opt.statuscolumn = "%s%l%C│"
+-- vim.opt.statuscolumn = "%C"
+vim.opt.statuscolumn = [[%!v:lua.require("util.statuscolumn").get()]]
+
+-- Keep signcolumn on by default.
+-- vim.opt.signcolumn = "yes"
+
+-- Show line numbers.
+-- Forces statuscolum to show when set,
+-- but without "%l" in `opt.statuscolum` nothing is shown.
+vim.opt.number = true
+
+-- Relative line numbers, to help with jumping.
+-- Forces statuscolum to show when set,
+-- but without "%l" in `opt.statuscolum` nothing is shown.
+vim.opt.relativenumber = true
+
+-- Characters to fill statusline, statuscolumn, and other specia lines.
+-- Omitted falls back to default.
+vim.opt.fillchars = {
+  -- Mark beginning of fold, in status column.
+  foldopen = "",
+
+  -- Show a closed fold.
+  foldclose = "",
+
+  -- Filling remaining empty part of `foldtext`.
+  -- Default: '·' or '-'.
+  fold = " ",
+
+  -- Open fold middle character.
+  -- Default: '│' or '|'.
+  foldsep = " ",
+
+  -- Fill characters in deleted lines of `diff` option.
+  -- Default: '-'.
+  diff = "╱",
+
+  -- Fill characters of empty lines below end of buffer.
+  eob = " ",
+}
+
+-- Allow indents to define folds automatically.
+-- Start with all folds open.
+-- foldlevelstart is ignored in diff mode, where all folds are closed by default.
+-- vim.opt.foldlevelstart = 99
+-- vim.opt.foldmethod = "indent"
+
+vim.opt.foldlevel = 99
+
+vim.opt.smoothscroll = true
+
+vim.opt.foldexpr = "v:lua.require'util'.ui.foldexpr()"
+vim.opt.foldmethod = "expr"
+-- vim.opt.foldtext = ""
+-- vim.opt.foldtext = "v:lua.require'util'.ui.foldtext()"
 
 -- Save undo history.
 vim.opt.undofile = true
@@ -37,9 +93,6 @@ vim.opt.undofile = true
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term.
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
-
--- Keep signcolumn on by default.
-vim.opt.signcolumn = 'yes'
 
 -- Decrease update time.
 vim.opt.updatetime = 250
@@ -56,12 +109,13 @@ vim.opt.splitbelow = true
 -- See `:help 'list'`.
 -- See `.:help 'listchars'`.
 vim.opt.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 
 -- Preview substitutions live, during typing.
-vim.opt.inccommand = 'split'
+vim.opt.inccommand = "split"
 
 -- Show which line the cursor is on.
+-- Highlights e.g. relative line number.
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
@@ -82,7 +136,7 @@ vim.opt.gdefault = true
 -- Wildcards, e.g. when used in {file}, should not expand into node_moduels.
 -- **/node_modules/** works for all leves.
 -- Dotfiles and folders are excluded from wildcard expansion list by default, but will be auto-completed if file starts with dot: .<tab>.
-vim.opt.wildignore:append { '**/node_modules/**' }
+vim.opt.wildignore:append({ "**/node_modules/**" })
 
 -- Ignore case when completing file names and directories.
 -- Has no effect when 'fileignorecase' is set.
@@ -92,16 +146,10 @@ vim.opt.wildignorecase = true
 -- :find will start its search from path.
 -- Default path value is .,, which means folder of current file, and current working directory (cwd, print with: pwd).
 -- vim.opt.path:append { '**' }
-vim.opt.path = '.,,**'
-
--- Allow indents to define folds automatically.
--- Start with all folds open.
--- foldlevelstart is ignored in diff mode, where all folds are closed by default.
-vim.opt.foldlevelstart = 99
-vim.opt.foldmethod = 'indent'
+vim.opt.path = ".,,**"
 
 -- Make vim diff windows vertical by default.
-vim.opt.diffopt:append { 'vertical' }
+vim.opt.diffopt:append({ "vertical" })
 
 -- Set absoute width of lines, similar to wrapmargin.
 -- Wrapmargin is relative to screen width, whereas textwidth is absolute.
@@ -125,7 +173,7 @@ vim.opt.textwidth = 90
 --    when they are already longer than textwidth when starting insert mode.
 -- n: When formatting text (also comments), lists are recognized using opt.formatlistpat,
 --    so indent is applied to next list matching indent of text on first list line.
-vim.opt.formatoptions = 'cqjroln'
+vim.opt.formatoptions = "cqjroln"
 
 -- Use literal string to avoid having to escape all parts of string, and escape special
 -- characters in formatlistpat.
@@ -151,9 +199,7 @@ vim.opt.laststatus = 3
 -- then executes all `.lua` and `.vim` files within those `plugin` folders.
 -- Thus, when the `fzf` folder is added to runtime path, `fzf/plugins/fzf.vim` is executed,
 -- which runs the fzf shell command inside vim, I think?
-vim.opt.rtp:append '/home/linuxbrew/.linuxbrew/opt/fzf'
-
--- TODO: Replace with fzf-lua.
+-- vim.opt.rtp:append("/home/linuxbrew/.linuxbrew/opt/fzf")
 
 ---------------------------------------------
 -- Modeline: `:h modeline`.

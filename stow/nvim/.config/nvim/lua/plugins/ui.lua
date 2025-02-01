@@ -200,8 +200,8 @@ return {
       -- Unecessary overhead.
       -- scroll = { enabled = true },
 
-      -- `statuscolumn` is set in `config/options.lua`.
-      -- statuscolumn = { enabled = false },
+      -- `statuscolumn` is enabled in `config/options.lua`.
+      statuscolumn = { enabled = false },
 
       -- `toggle`:
       -- - Saves state of any function that can be toggled on|off, allowing easy toggling.
