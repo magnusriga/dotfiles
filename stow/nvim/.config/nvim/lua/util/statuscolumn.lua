@@ -218,7 +218,7 @@ end
 --   - `vim.api.nvim_buf_get_extmarks(0, <namespace>, 0, -1, { details = true })`
 --   - Returns: List of `[ extmarkid, row, col, details ]` tuples, in traversal order.
 function M.gitsigns()
-  local text = ""
+  local text = "  "
   local namespaces = vim.api.nvim_get_namespaces()
   local gitsigns_signs_ = namespaces["gitsigns_signs_"]
   local gitsigns_signs_staged = namespaces["gitsigns_signs_staged"]
@@ -255,6 +255,24 @@ function M.gitsigns()
   return text
 end
 
+function M.todosigns()
+  local text = "    "
+  local namespaces = vim.api.nvim_get_namespaces()
+  local todo_signs = namespaces["todo-signs"]
+
+  if todo_signs ~= nil then
+    local extmarks_todo_signs = vim.api.nvim_buf_get_extmarks(0, todo_signs, 0, -1, { details = true })
+
+    for _, extmark in ipairs(extmarks_todo_signs) do
+      if extmark[2] + 1 == vim.v.lnum then
+        text = " %#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%* "
+      end
+    end
+  end
+
+  return text
+end
+
 function M.get()
   -- Setup highlight groups.
   M.set_hl()
@@ -276,14 +294,17 @@ function M.get()
   -- Alternative: `text = text .. M.brorder`.
   text = table.concat({
     M.gitsigns(),
+    M.todosigns(),
     M.number({ mode = "hybrid" }),
     M.border(),
     M.folds(),
   })
 
-  -- return text
-  return "%s" .. text
+  -- To include signcolumn, to compare with, include `%s`.
+  -- return "%s" .. text
   -- return "%C%s%l│" .. M.folds()
+  -- NOTE:
+  return text
 end
 
 return M

@@ -34,8 +34,10 @@ vim.opt.breakindent = true
 -- vim.opt.statuscolumn = "%C"
 vim.opt.statuscolumn = [[%!v:lua.require("util.statuscolumn").get()]]
 
--- Keep signcolumn on by default.
--- vim.opt.signcolumn = "yes"
+-- Created own statuscolumn, including column with gitsigns.
+-- See: `util/signcolumn.lua`.
+-- No need to use this setting, exclude signcolumn manually from statuscolumn.
+-- vim.opt.signcolumn = "yes:2"
 
 -- Show line numbers.
 -- Forces statuscolum to show when set,
