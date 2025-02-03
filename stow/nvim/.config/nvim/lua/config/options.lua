@@ -2,9 +2,8 @@
 =============================================
 Setting options
 =============================================
-
--- See `:help vim.opt`.
--- Option list: `:help option-list`.
+- See `:help vim.opt`.
+- Option list: `:help option-list`.
 
 =============================================
 --]]
@@ -12,7 +11,7 @@ Setting options
 -- Enable mouse mode, for resizing splits.
 -- vim.opt.mouse = 'a'
 
--- Don't show the mode, since it is already in the status line.
+-- Don't show the mo de, since it is already in the status line.
 vim.opt.showmode = false
 
 -- Sync clipboard between OS and Neovim.
@@ -87,6 +86,7 @@ vim.opt.smoothscroll = true
 vim.opt.foldexpr = "v:lua.require'util'.ui.foldexpr()"
 vim.opt.foldmethod = "expr"
 -- vim.opt.foldtext = ""
+vim.opt.foldtext = "v:lua.require'util.ui'.foldtext()"
 -- vim.opt.foldtext = "v:lua.require'util'.ui.foldtext()"
 
 -- Save undo history.

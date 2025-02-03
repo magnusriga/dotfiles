@@ -12,14 +12,19 @@
 -- - `opt.statuscolumn` is evaluated once for every line, on every cursor movement when
 --   `opt.relativenumber` is set, thus expensive calculations will hurt performance.
 --
--- Folds:
--- - `lnum`.
---   - Represents current line.
---   - `vim.v.lnum`: Line number of current line, when used in `opt.statuscolum` | `opt.foldexpr`
---     and others, see: `:h v:lnum`, empty when not in one of those expressions.
---   - `vim.fn.getline()`: Generally get line number when not in one of above expressions.
---     - `.`: Current line.
---     - `m`: Mark "m".
+-- ----------------------------------
+-- Folds.
+-- ----------------------------------
+-- - `[l|r]num`: Evaluated for every line, when used in e.g. `foldexpr`.
+--
+-- - `vim.v.lnum`:
+--   - Read-only number of current line.
+--   - Numbeer while `foldexpr`, `statuscolumn`, etc., are sandbox evaluated, otherwise zero.
+--
+-- - `vim.v.relnum`:
+--   - Same as `lnum`, but for relative number to current cursor line.
+-- - `%l`: Evaluates to line number inside `opt.statuscolumn`.
+-- - `%r`: Same as `%l`, but for relative line number.
 --
 -- - `foldclosed({lnum})`.
 --   - Line number of first line in closed fold, if line `lnum` is part of closed fold.
@@ -33,6 +38,44 @@
 --   - Irrelevant if fold is open or closed.
 --   - If used in `foldexpr`, `1` returned for lines where folds are still to be updated.
 --   - `lnum` is first line of fold when `foldlevel` of current mismatches previous line.
+--
+-- - `%=`: Right-align what comes after, within column, see: `:h statuscolumn`.
+--
+-- ----------------------------------
+-- Extmarks and signs.
+-- ----------------------------------
+-- - Namespaces for extmarks:
+--   - Normal: `gitsigns_signs_`.
+--   - Staged: `gitsigns_signs_staged`.
+--   - Deleted: `gitsigns_removed`.
+-- - Deleted:
+--   - Uses `virt_lines`: Virtual line to add above|below mark.
+--   - Sets `virt_lines_above`: Virtual line should be above `virt_line`.
+-- - `gitsigns.manager` > `Signs.new(cfg, name)`:
+--   - Creates two new Signs, one for normal changes and one for stages changes.
+--   - `signs.namespace` of extmarks for lines with normal changes: `gitsigns_signs_`.
+--   - `signs.namespace` of extmarks for lines with stages changes: `gitsigns_signs_staged`.
+-- - New `signs` table for normal and staged changes also has fields:
+--   - `hls` normal | staged: `{ add = { hl = GitSigns[Staged]Add, text = '|', .. }, change = {..}, ..}`.
+--   - `name`.
+--   - `group`.
+--   - `config`.
+--   - `ns`: `gitsigns_signs_` | `gitsigns_signs_staged` | ...
+-- - These two `signs` tables are created and stored in `manager`:
+--   - `signs_normal`.
+--   - `signs_staged`.
+-- - When toggling signs in signcolumn off: `manager.reset` > `signs_[normal and staged].reset()`.
+--   - Clears all namespaced objects, i.e. highlights, extmarks, and virtual text, from current file,
+--     with: `vim.api.nvim_buf_clear_namespace(bufnr, self.ns, 0, -1)`,
+--   - Done once for each buffer, found with: `vim.api.nvim_list_bufs`, which includes
+--     unloaded/deleted buffers, like calling `ls!`.
+--   - Goes through all hunks in file, and if signs toggle is ON then creates extmarks for all hunks in buffers,
+--     both normal and staged.
+--   - When extmark is created, `opt.sign_text` and `opt.sign_hl_group` specify if/how
+--     extmark is added to `signcolumn`, i.e. `%s`.
+-- - Get extmark:
+--   - `vim.api.nvim_buf_get_extmarks(0, <namespace>, 0, -1, { details = true })`
+--   - Returns: List of `[ extmarkid, row, col, details ]` tuples, in traversal order.
 --
 -- ==================================
 local M = {}
@@ -50,15 +93,6 @@ function M.set_hl()
 end
 
 function M.number(user_config)
-  -- - `[l|r]num`: Evaluated for every line, when used in e.g. `foldexpr`.
-  -- - `vim.v.lnum`:
-  --   - Read-only line number.
-  --   - Available while `foldexpr`, and some other functions, are evaluated, i.e. in sandbox.
-  -- - `vim.v.relnum`:
-  --   - Same as `lnum`, but for relative number to current cursor line.
-  -- - `%l`: Evaluates to line number inside `opt.statuscolumn`.
-  -- - `%r`: Same as `%l`, but for relative line number.
-
   local text = ""
 
   -- Merge default options with user options.
@@ -69,9 +103,8 @@ function M.number(user_config)
   })
 
   if config.colors ~= nil and vim.islist(config.colors) == true then
-    for rel_num, hl in ipairs(config.colors) do
-      -- Assign one highlight group to each line,
-      -- avoiding all using an undefined highlight group, i.e. large number.
+    for rel_num, _ in ipairs(config.colors) do
+      -- Avoid all lines using undefined highlight group, i.e. large number.
       -- Relative lines further out than 10 still has undefined.
       if (vim.v.relnum + 1) == rel_num then
         text = "%#" .. "Gradient_" .. (vim.v.relnum + 1) .. "#"
@@ -84,10 +117,6 @@ function M.number(user_config)
     if text == "" then
       text = "%#" .. "Gradient_" .. #config.colors .. "#"
     end
-  else
-    if vim.v.relnum == 0 then
-      -- text = "%#LazygitActiveBorderColor#"
-    end
   end
 
   if config.mode == "normal" then
@@ -95,44 +124,29 @@ function M.number(user_config)
   elseif config.mode == "relative" then
     text = text .. "%=" .. vim.v.relnum
   elseif config.mode == "hybrid" then
-    -- If relative number for line is 0, cursor is on that line,
-    -- thus show line number instead of relative line number.
-
-    -- `%=`: Right-align what comes after, within column, see: `:h statuscolumn`.
     -- return vim.v.relnum == 0 and text .. "%=" .. vim.v.lnum or text .. "%=" .. vim.v.relnum
-
-    -- Use new `statuscolumn` item instead, which handles alignment without layout shift.
+    -- Use new `statuscolumn` item instead of composing with `[l|r]num` and `"%="`, to avoid layout shift.
     return text .. "%l"
   end
 end
 
--- On current line, border is pushed to right,
--- as relative number is larger than relative number.
 function M.border(user_config)
   local text = ""
 
   -- Merge default options with user options.
   local config = vim.tbl_extend("keep", user_config or {}, {
-    -- Pass in `user_config.colors` if needed.
     colors = nil,
     mode = "normal",
   })
 
   -- For line close to current line, use gradient up to final color,
-  -- then for lines further out use last color,
-  -- which gives gradient appearance across entire border.
+  -- then for lines further out use last color, for gradient appearance.
   if config.colors ~= nil then
     if vim.v.relnum <= 9 then
       -- NOTE: Lua tables start at 1, but relnum starts at 0, so add 1 to get highlight group.
       text = "%#Gradient_" .. (vim.v.relnum + 1) .. "#"
-    -- return "%#LazygitActiveBorderColor#│"
     else
       text = "%#Gradient_10#"
-    end
-  else
-    -- Add border color on current line only.
-    if vim.v.relnum == 0 then
-      -- text = "%#LazygitActiveBorderColor#"
     end
   end
 
@@ -185,38 +199,6 @@ M.folds = function()
   return "     "
 end
 
--- - Namespaces for extmarks:
---   - Normal: `gitsigns_signs_`.
---   - Staged: `gitsigns_signs_staged`.
---   - Deleted: `gitsigns_removed`.
--- - Deleted:
---   - Uses `virt_lines`: Virtual line to add above|below mark.
---   - Sets `virt_lines_above`: Virtual line should be above `virt_line`.
--- - `gitsigns.manager` > `Signs.new(cfg, name)`:
---   - Creates two new Signs, one for normal changes and one for stages changes.
---   - `signs.namespace` of extmarks for lines with normal changes: `gitsigns_signs_`.
---   - `signs.namespace` of extmarks for lines with stages changes: `gitsigns_signs_staged`.
--- - New `signs` table for normal and staged changes also has fields:
---   - `hls` normal | staged: `{ add = { hl = GitSigns[Staged]Add, text = '|', .. }, change = {..}, ..}`.
---   - `name`.
---   - `group`.
---   - `config`.
---   - `ns`: `gitsigns_signs_` | `gitsigns_signs_staged` | ...
--- - These two `signs` tables are created and stored in `manager`:
---   - `signs_normal`.
---   - `signs_staged`.
--- - When toggling signs in signcolumn off: `manager.reset` > `signs_[normal and staged].reset()`.
---   - Clears all namespaced objects, i.e. highlights, extmarks, and virtual text, from current file,
---     with: `vim.api.nvim_buf_clear_namespace(bufnr, self.ns, 0, -1)`,
---   - Done once for each buffer, found with: `vim.api.nvim_list_bufs`, which includes
---     unloaded/deleted buffers, like calling `ls!`.
---   - Goes through all hunks in file, and if signs toggle is ON then creates extmarks for all hunks in buffers,
---     both normal and staged.
---   - When extmark is created, `opt.sign_text` and `opt.sign_hl_group` specify if/how
---     extmark is added to `signcolumn`, i.e. `%s`.
--- - Get extmark:
---   - `vim.api.nvim_buf_get_extmarks(0, <namespace>, 0, -1, { details = true })`
---   - Returns: List of `[ extmarkid, row, col, details ]` tuples, in traversal order.
 function M.gitsigns()
   local text = "  "
   local namespaces = vim.api.nvim_get_namespaces()
@@ -230,7 +212,6 @@ function M.gitsigns()
 
   -- Normal, i.e. unstaged changes, including: Add, change, delete.
   for _, extmark in ipairs(extmarks_normal) do
-    -- vim.print(extmark[1])
     -- Lua tables are 1-indexed.
     -- `extmark[2]` holds row number, but 0-indexed, so add `1`.
     if extmark[2] + 1 == vim.v.lnum then
@@ -255,9 +236,17 @@ function M.gitsigns()
   return text
 end
 
-function M.todosigns()
+-- Diagnostic -and todo signs.
+function M.customsigns()
   local text = "    "
   local namespaces = vim.api.nvim_get_namespaces()
+  local diagnostic_signs = nil
+  for ns_name, ns_number in pairs(namespaces) do
+    if ns_name:match("diagnostic%.signs$") then
+      diagnostic_signs = ns_number
+    end
+  end
+
   local todo_signs = namespaces["todo-signs"]
 
   if todo_signs ~= nil then
@@ -265,6 +254,23 @@ function M.todosigns()
 
     for _, extmark in ipairs(extmarks_todo_signs) do
       if extmark[2] + 1 == vim.v.lnum then
+        text = " %#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%* "
+      end
+    end
+  end
+
+  -- Diagnostic signs overwrite todo signs.
+  if diagnostic_signs ~= nil then
+    local extmarks_diagnostic_signs = vim.api.nvim_buf_get_extmarks(0, diagnostic_signs, 0, -1, { details = true })
+
+    -- Sort diagnostic extmarks by priority, so e.g. error is sorted after warning.
+    table.sort(extmarks_diagnostic_signs, function(ta, tb)
+      return ta[4].priority < tb[4].priority
+    end)
+
+    for _, extmark in ipairs(extmarks_diagnostic_signs) do
+      local extmark_lnum = extmark[2] + 1
+      if extmark_lnum == vim.v.lnum then
         text = " %#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%* "
       end
     end
@@ -288,22 +294,18 @@ function M.get()
   vim.api.nvim_set_hl(0, "MyStatusColumnBorder", {
     -- When `link` is present, other keys are ignored.
     link = "LineNr",
-    -- fg = "#CBA6F7",
   })
 
-  -- Alternative: `text = text .. M.brorder`.
   text = table.concat({
     M.gitsigns(),
-    M.todosigns(),
+    M.customsigns(),
     M.number({ mode = "hybrid" }),
     M.border(),
     M.folds(),
   })
 
-  -- To include signcolumn, to compare with, include `%s`.
-  -- return "%s" .. text
-  -- return "%C%s%l│" .. M.folds()
-  -- NOTE:
+  -- To compare with built-in signcolumn, include `%s`.
+  -- return "%C%s%l│" .. text
   return text
 end
 

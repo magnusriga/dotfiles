@@ -23,7 +23,8 @@ return {
       -- DiagnosticUnnecessary is used for unused variables, but links to highlightgroup Comment, by default.
       -- vim.cmd([[ highlight DiagnosticUnnecessary guifg=#495162 ]])
       -- vim.cmd([[ highlight Folded guifg=#C678dd guibg=#353B50 ]])
-      vim.cmd([[ highlight Folded guibg=#353B50 ]])
+      vim.cmd([[ highlight Folded guifg=NONE guibg=#353B50 ]])
+      vim.cmd([[ highlight FoldedSep guifg=#495162 guibg=#353B50 ]])
     end,
   },
 

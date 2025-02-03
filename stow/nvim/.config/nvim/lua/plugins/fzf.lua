@@ -446,6 +446,7 @@ return {
 
   {
     "folke/todo-comments.nvim",
+    -- Overwrites Telescope key bingings in `plugins/editor.lua`.
     -- stylua: ignore
     keys = {
       { "<leader>st", function() require("todo-comments.fzf").todo() end, desc = "Todo" },
