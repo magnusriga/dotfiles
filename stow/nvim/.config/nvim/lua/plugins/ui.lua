@@ -7,15 +7,15 @@ return {
     init = function()
       vim.g.lualine_laststatus = vim.o.laststatus
       if vim.fn.argc(-1) > 0 then
-        -- set an empty statusline till lualine loads
+        -- Set empty statusline until `lualine` loads.
         vim.o.statusline = " "
       else
-        -- hide the statusline on the starter page
+        -- Hide statusline on starter page.
         vim.o.laststatus = 0
       end
     end,
     opts = function()
-      -- PERF: Do not need this lualine require madness 🤷.
+      -- PERF: Skip this lualine require madness 🤷.
       local lualine_require = require("lualine_require")
       lualine_require.require = require
 
@@ -125,6 +125,8 @@ return {
         })
       end
 
+      -- These `opts` are returned and thus used as basis for merging
+      -- with other `lualine.nvim` spec `opts`.
       return opts
     end,
   },

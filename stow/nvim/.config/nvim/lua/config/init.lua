@@ -7,7 +7,7 @@ MyVim.config = M
 
 ---@class MyVimOptions
 local defaults = {
-  -- Colorscheme can be a string like `catppuccin` or a function that will load the colorscheme.
+  -- Colorscheme can be string like `catppuccin` or function that will load colorscheme.
   ---@type string|fun()
   colorscheme = function()
     require("tokyonight").load()
@@ -16,8 +16,8 @@ local defaults = {
   defaults = {
     autocmds = true,
     keymaps = true,
-    -- config.options can't be configured here since that is loaded via import `plugins`,
-    -- whose modules run before the autocmds herein.
+    -- `config.options` cannot be configured here, since it is loaded via import `plugins`,
+    -- whose modules run before autocmds herein.
   },
   -- Icons used by plugins.
   -- stylua: ignore
@@ -89,8 +89,7 @@ local defaults = {
       Variable      = "󰀫 ",
     },
   },
-  -- `kind_filter` is used to choose symbol types,
-  -- for LSP symbol search.
+  -- `kind_filter`: Used in LSP symbol search.
   ---@type table<string, string[]|boolean>?
   kind_filter = {
     default = {
@@ -130,7 +129,7 @@ local defaults = {
 }
 
 ---@param buf? number
----@return string[]?
+---@return string[]|boolean?
 function M.get_kind_filter(buf)
   buf = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
   local ft = vim.bo[buf].filetype
@@ -157,10 +156,6 @@ function M.load(name)
     end
   end
   local pattern = "MyVim" .. name:sub(1, 1):upper() .. name:sub(2)
-  -- if M.defaults[name] or name == "options" then
-  --   _load("other.config." .. name)
-  --   vim.api.nvim_exec_autocmds("User", { pattern = pattern .. "Defaults", modeline = false })
-  -- end
 
   -- Load file.
   _load("config." .. name)

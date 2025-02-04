@@ -77,6 +77,8 @@ return {
   --   - scratch   : No setup function, opened automatically when called, regardless of `opts.scratch`,
   --                 using default options merged with `opts.scratch`, if any.
   --
+  --   - terminal  : No setup function, opened automatically when called, regardless of `opts.terminal`,
+  --                 using default options merged with `opts.terminal`, if any.
   --
   -- ------------------------------------------------------------------
   -- - `Snacks.<commands>` requiring manual enabling in config.

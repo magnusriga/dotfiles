@@ -336,15 +336,6 @@ Useful commands
 --]]
 
 require("lazy").setup({
-  spec = {
-    -- Runs `require` on all modules, i.e. `.lua` files,
-    -- in `$HOME/.config/nvim/lua/plugins`.
-    { import = "plugins" },
-    -- Import other plugins, from sub-folders.
-    -- Order matters.
-    { import = "plugins/dap" },
-    { import = "plugins/lang" },
-  },
   -- Directory where plugins will be installed,
   -- i.e. GitHub repository, `<user>/<repo>`, is cloned into `<repo>` in
   -- `$HOME/.local/share/nvim/lazy`, then entire path is added to runtimepath:
@@ -353,30 +344,105 @@ require("lazy").setup({
   defaults = {
     -- Keep `lazy=false` and set inidividual options to lazy-load if appropriate.
     lazy = false,
-    -- Keep `version=false`, since several plugins that support versioning have outdated releases,
-    -- which may break Neovim install.
-    version = false, -- always use the latest git commit.
-    -- Could instead install latest stable version, for plugins that support semver.
-    -- version = "*"
+    -- `version=false`: Use latest git version of plugin.
+    -- Keep `false`, since several plugins that support versioning have outdated releases.
+    -- `*`: Latest stable release.
+    version = false,
+    -- Globally disable plugins with condition, e.g. when running inside vscode.
+    cond = nil, ---@type boolean|fun(self:LazyPlugin):boolean|nil
   },
-  -- Try to load one of these colorschemes when starting a plugin installation during nvim startup.
+  spec = {
+    -- - Import: Runs `require` on all modules, i.e. `.lua` files, in `$HOME/.config/nvim/lua/plugins`.
+    -- - Specs in `plugins` must load before specs in `plugins/addosn`,
+    --   as some specs use `opts` from other specs,
+    --   e.g. `plugins/addons/ai.lua > lualine.nvim` use `opts` from `plugins/ui.lua > lualine.nvim`.
+    { import = "plugins" },
+    -- Import other plugins, from sub-folders.
+    { import = "plugins/addons" },
+    { import = "plugins/addons/dap" },
+    { import = "plugins/addons/lang" },
+  },
+  -- Load Project specific `.lazy.lua` spec files, always added at end of spec.
+  local_spec = true,
+  -- Lockfile generated after running update.
+  lockfile = vim.fn.stdpath("config") .. "/lazy-lock.json",
+  git = {
+    -- Show last 8 commits with `Lazy log`.
+    -- Show last 3 days of commits: `{ "--since=3 days ago" }`.
+    log = { "-8" },
+    -- Kill processes that take more than 2 minutes.
+    timeout = 120,
+    -- Used to expand shorturls in specs.
+    url_format = "https://github.com/%s.git",
+    -- `lazy.nvim` requires git >=2.19.0.
+    filter = true,
+    -- Rate of network related git operations (clone, fetch, checkout).
+    throttle = {
+      -- Not enabled by default.
+      enabled = false,
+      -- Max 2 ops every 5 seconds.
+      rate = 2,
+      -- Throttle duration in ms.
+      duration = 5 * 1000,
+    },
+    -- Time in seconds to wait before running fetch again for a plugin.
+    -- Repeated update/check operations will not run again until this
+    -- cooldown period has passed.
+    cooldown = 0,
+  },
+  pkg = {
+    enabled = true,
+    cache = vim.fn.stdpath("state") .. "/lazy/pkg-cache.lua",
+    -- First package source that is found for plugin will be used.
+    sources = {
+      "lazy",
+      "rockspec", -- Only used when `rocks.enabled = true`.
+      "packspec",
+    },
+  },
+  rocks = {
+    enabled = true,
+    root = vim.fn.stdpath("data") .. "/lazy-rocks",
+    server = "https://nvim-neorocks.github.io/rocks-binaries/",
+    -- `nil`: Use `hererocks` when `luarocks` is not found.
+    -- `true`: Always use `hererocks`.
+    -- `false`: Always use `luarocks`.
+    hererocks = nil,
+  },
+  dev = {
+    -- Directory for local plugin projects.
+    -- If function is used, plugin directory (e.g. `~/projects/plugin-name`) must be returned.
+    ---@type string | fun(plugin: LazyPlugin): string
+    path = "~/projects",
+    ---@type string[] Plugins that match these patterns will use local versions instead of being fetched from GitHub, e.g. `nfront`.
+    patterns = {},
+    -- Fallback to git when local plugin does not exist.
+    fallback = false,
+  },
   install = {
+    -- Install missing plugins on startup, does not increase startup time.
+    missing = true,
+    -- Try to load one of these colorschemes when starting plugin installation during Neovim startup.
     colorscheme = { "tokyonight", "habamax" },
   },
   ui = {
-    -- a number <1 is a percentage., >1 is a fixed size
+    -- Number <1 is percentage, >1 is fixed size.
     size = { width = 0.8, height = 0.8 },
-    wrap = true, -- wrap the lines in the ui
-    -- Border to use for UI window. Accepts same border values as nvim_open_win().
+    -- Wrap lines in ui.
+    wrap = true,
+    -- Border to use for UI window, accepts same border values as `nvim_open_win()`.
     border = "none",
-    -- Backdrop opacity. 0 is fully opaque, 100 is fully transparent.
+    -- Backdrop opacity, 0 is fully opaque, 100 is fully transparent.
     backdrop = 60,
-    title = nil, ---@type string only works when border is not "none".
-    title_pos = "center", ---@type "center" | "left" | "right".
-    -- Show pills on top of the Lazy window.
-    pills = true, ---@type boolean.
-    -- If using a Nerd Font, set icons to an empty table which will use the
-    -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table.
+    ---@type string only works when border is not "none".
+    title = nil,
+    ---@type "center" | "left" | "right".
+    title_pos = "center",
+    -- Show pills on top of `Lazy` window.
+    pills = true, ---@type boolean
+    -- Icons used in `lazy.nvim` ui.
+    -- If using Nerd Font, set icons to empty table, to use default `lazy.nvim` defined Nerd Font icons,
+    -- otherwise define unicode icons table.
     icons = vim.g.have_nerd_font and {} or {
       cmd = "⌘",
       config = "🛠",
@@ -428,14 +494,15 @@ require("lazy").setup({
     --     "‒",
     --   },
     -- },
-    -- leave nil, to automatically select a browser depending on your OS.
-    -- If you want to use a specific browser, you can define it here
-    browser = nil, ---@type string?
-    throttle = 1000 / 30, -- how frequently should the ui process render events
+    -- Leave `nil` to automatically select browser depending on OS.
+    ---@type string?
+    browser = nil,
+    -- Frequency ui process renders events.
+    throttle = 1000 / 30,
+    -- Custom key maps for use in `Lazy` ui, description will show in help menu.
+    -- To disable default, set it to `false`.
     custom_keys = {
-      -- Define custom key maps here.
-      -- If present, description will be shown in help menu.
-      -- To disable one of the defaults, set it to false.
+      -- Open lazygit.
       ["<localleader>l"] = {
         function(plugin)
           require("lazy.util").float_term({ "lazygit", "log" }, {
@@ -445,9 +512,10 @@ require("lazy").setup({
         desc = "Open lazygit log",
       },
 
+      -- Inspect plugin.
       ["<localleader>i"] = {
         function(plugin)
-          Util.notify(vim.inspect(plugin), {
+          require("lazy.util").notify(vim.inspect(plugin), {
             title = "Inspect " .. plugin.name,
             lang = "lua",
           })
@@ -455,6 +523,7 @@ require("lazy").setup({
         desc = "Inspect Plugin",
       },
 
+      -- Open terminal.
       ["<localleader>t"] = {
         function(plugin)
           require("lazy.util").float_term(nil, {
@@ -465,28 +534,57 @@ require("lazy").setup({
       },
     },
   },
+  -- Output options for headless mode
+  headless = {
+    -- Show output from process commands like `git`.
+    process = true,
+    -- Show log messages.
+    log = true,
+    -- Show task start/end.
+    task = true,
+    -- Use ansi colors.
+    colors = true,
+  },
   diff = {
-    -- diff command <d> can be one of:
-    -- * browser: opens the github compare view. Note that this is always mapped to <K> as well,
-    --   so you can have a different command for diff <d>
-    -- * git: will run git diff and open a buffer with filetype git
-    -- * terminal_git: will open a pseudo terminal with git diff
-    -- * diffview.nvim: will open Diffview to show the diff
+    -- Diff command `<d>`, used in `Lazy` ui:
+    -- * `browser`: Opens github compare view, always mapped to <K> as well.
+    -- * `git`: Run `git diff` and open buffer with filetype `git`.
+    -- * `terminal_git`: Opens pseudo terminal with `git diff`.
+    -- * `diffview.nvim`: Opens `Diffview` to show diff.
     cmd = "git",
   },
   -- Automatically check for plugin updates.
   checker = {
-    enabled = true, -- Check for plugin updates periodically.
-    notify = false, -- Notify on update.
+    -- Automatically check for plugin updates.
+    enabled = true,
+    ---@type number? Set to 1 to check for updates slowly.
+    concurrency = nil,
+    -- Get notification when new updates are found.
+    notify = true,
+    -- Check for updates every hour.
+    frequency = 3600,
+    -- Check for pinned packages that cannot be updated.
+    check_pinned = false,
   },
   -- Automatically check for config file changes and reload the ui.
   change_detection = {
     enabled = true,
-    notify = true, -- get a notification when changes are found
+    -- Get notification when changes are found.
+    notify = true,
   },
   performance = {
+    cache = {
+      enabled = true,
+    },
+    -- Reset package path to improve startup time.
+    reset_packpath = true,
     rtp = {
-      -- disable some rtp plugins
+      -- Reset runtime path to `$VIMRUNTIME` and config directory.
+      reset = true,
+      -- Add custom paths to includes in runtimepath.
+      ---@type string[]
+      paths = {},
+      ---@type string[] List plugins to disable.
       disabled_plugins = {
         "gzip",
         -- "matchit",
@@ -499,9 +597,26 @@ require("lazy").setup({
       },
     },
   },
+  -- Generate helptags from headings in markdown readme files,
+  -- so `:help` works for plugins that do no have vim docs.
+  readme = {
+    enabled = true,
+    root = vim.fn.stdpath("state") .. "/lazy/readme",
+    files = { "README.md", "lua/**/README.md" },
+    -- Only generate markdown helptags for plugins that do not have docs.
+    skip_if_doc_exists = true,
+  },
+  -- State info for checker and other things.
+  state = vim.fn.stdpath("state") .. "/lazy/state.json",
+  -- Disable debug mode.
+  debug = false,
+  -- Enable profiling of `lazy.nvim`.
+  -- Will add some overhead, so only enable when debugging `lazy.nvim`.
+  profiling = {
+    -- Enables extra stats on debug tab, related to loader cache.
+    -- Additionally gathers stats about all `package.loaders`.
+    loader = false,
+    -- Track each new require in `Lazy` profiling tab.
+    require = false,
+  },
 })
-
----------------------------------------------
--- Modeline: `:h modeline`.
----------------------------------------------
--- vim: ts=2 sts=2 sw=2 et

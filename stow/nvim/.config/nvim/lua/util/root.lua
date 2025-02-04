@@ -52,13 +52,27 @@ end
 function M.detectors.pattern(buf, patterns)
   patterns = type(patterns) == "string" and { patterns } or patterns
   local path = M.bufpath(buf) or vim.uv.cwd()
+
+  local function check(pattern, name)
+    if name == patterns then
+      return true
+    end
+    if pattern:sub(1, 1) == "*" and name:find(vim.pesc(pattern:sub(2)) .. "$") then
+      return true
+    end
+    return false
+  end
+
   local pattern = vim.fs.find(function(name)
-    for _, p in ipairs(patterns) do
-      if name == p then
+    if type(patterns) == "string" then
+      if check(patterns, name) then
         return true
       end
-      if p:sub(1, 1) == "*" and name:find(vim.pesc(p:sub(2)) .. "$") then
-        return true
+    else
+      for _, p in ipairs(patterns) do
+        if check(p, name) then
+          return true
+        end
       end
     end
     return false
@@ -133,11 +147,12 @@ function M.info()
   local lines = {} ---@type string[]
   local first = true
   for _, root in ipairs(roots) do
+    local root_spec = root.spec
     for _, path in ipairs(root.paths) do
       lines[#lines + 1] = ("- [%s] `%s` **(%s)**"):format(
         first and "x" or " ",
         path,
-        type(root.spec) == "table" and table.concat(root.spec, ", ") or root.spec
+        type(root_spec) == "table" and table.concat(root_spec, ", ") or root_spec
       )
       first = false
     end
@@ -204,6 +219,7 @@ end
 
 ---@param opts? {hl_last?: string}
 function M.pretty_path(opts)
+  vim.print(opts)
   return ""
 end
 

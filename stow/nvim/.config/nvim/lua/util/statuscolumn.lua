@@ -206,30 +206,36 @@ function M.gitsigns()
   local gitsigns_signs_staged = namespaces["gitsigns_signs_staged"]
   local gitsigns_removed = namespaces["gitsigns_removed"]
 
-  local extmarks_normal = vim.api.nvim_buf_get_extmarks(0, gitsigns_signs_, 0, -1, { details = true })
-  local extmarks_staged = vim.api.nvim_buf_get_extmarks(0, gitsigns_signs_staged, 0, -1, { details = true })
-  local extmarks_removed = vim.api.nvim_buf_get_extmarks(0, gitsigns_removed, 0, -1, { details = true })
+  if gitsigns_signs_ then
+    local extmarks_normal = vim.api.nvim_buf_get_extmarks(0, gitsigns_signs_, 0, -1, { details = true })
 
-  -- Normal, i.e. unstaged changes, including: Add, change, delete.
-  for _, extmark in ipairs(extmarks_normal) do
-    -- Lua tables are 1-indexed.
-    -- `extmark[2]` holds row number, but 0-indexed, so add `1`.
-    if extmark[2] + 1 == vim.v.lnum then
-      text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+    -- Normal, i.e. unstaged changes, including: Add, change, delete.
+    for _, extmark in ipairs(extmarks_normal) do
+      -- Lua tables are 1-indexed.
+      -- `extmark[2]` holds row number, but 0-indexed, so add `1`.
+      if extmark[2] + 1 == vim.v.lnum then
+        text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+      end
     end
   end
 
-  -- Normal, i.e. staged changes, including: Add, change, delete.
-  for _, extmark in ipairs(extmarks_staged) do
-    if extmark[2] + 1 == vim.v.lnum then
-      text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+  if gitsigns_signs_staged then
+    local extmarks_staged = vim.api.nvim_buf_get_extmarks(0, gitsigns_signs_staged, 0, -1, { details = true })
+    -- Staged changes, including: Add, change, delete.
+    for _, extmark in ipairs(extmarks_staged) do
+      if extmark[2] + 1 == vim.v.lnum then
+        text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+      end
     end
   end
 
-  -- Removals, whatever that is.
-  for _, extmark in ipairs(extmarks_removed) do
-    if extmark[2] + 1 == vim.v.lnum then
-      text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+  if gitsigns_removed then
+    local extmarks_removed = vim.api.nvim_buf_get_extmarks(0, gitsigns_removed, 0, -1, { details = true })
+    -- Removals, whatever that is.
+    for _, extmark in ipairs(extmarks_removed) do
+      if extmark[2] + 1 == vim.v.lnum then
+        text = "%#" .. extmark[4].sign_hl_group .. "#" .. extmark[4].sign_text .. "%*"
+      end
     end
   end
 
