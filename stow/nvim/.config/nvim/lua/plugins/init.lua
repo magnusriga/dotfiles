@@ -101,28 +101,18 @@ return {
   --     - dashboard.    <-- `UIEnter`    : When `opts.dashboard.enabled = true`, or any other `opts.dashboard` is passed,
   --                                        `setup()` is called when opening Neovim to determin if dashboard should be opened.
   --                                        Alternatively, dashboard can be opened manually by calling `Snacks.dashboard.open()`, closed with Escape.
-  --     - scroll.       <-- `UIEnter`.
-  --     - input.        <-- `UIEnter`.
-  --     - scope.        <-- `UIEnter`.
-  --     - picker.       <-- `UIEnter`.
+  --     - scroll.       <-- `UIEnter`, smooth scrolling, handling scrolloff and mouse scrolling, not enabled.
+  --     - input.        <-- `UIEnter`, replaces `vim.fn.input` with prettier prompt, enabled in `plugins/ui.lua`.
+  --     - scope.        <-- `UIEnter`, creates scopes based on indent and treesitter elements,
+  --                                    and adds operators to navigate scopes, enabled in `plugins/ui.lua`.
+  --     - picker.       <-- `UIEnter`, alternative to `fzf-lua`, not enabled.
   --
   -- - `Snacks.<commands>` requiring other manual enabling:
   --     - words: Does not need enabling in config, but without calling `Snacks.words.enable`, `words` will not work.
   --
-  -- Enable sub-plugin, either:
+  -- To enable sub-plugin, either:
   -- - Specify sub-plugin configuration: `terminal = { <config> }`.
   -- - Use sub-plugin default configuration: `notifier = { enabled = true }`.
-  --
-  -- ==================================================================
-  -- Scratch.
-  -- ==================================================================
-  -- - Unique key for scratch file is based on:
-  --   * name: File name.
-  --   * ft: File type.
-  --   * vim.v.count1: Count given in keymap, default to 1.
-  --   * cwd: Current working directory.
-  --   * branch: Current branch name.
-  -- - Thus, new scratch file created when scratch is opened from another file.
   --
   -- ==================================================================
   -- Snacks sub-plugins enabled in:
@@ -139,12 +129,8 @@ return {
   -- - `plugins/ui.lua`:
   --   - indent
   --   - input
-  --   - notifier - Replaces `vim.notify`.
   --   - scope
-  --   - scroll
-  --   - statuscolumn
-  --   - toggle
-  --   - words
+  --   - toggle - Works without config, but set `config` to specify new `map` function.
   --   - dashboard
   --
   -- ==================================================================
@@ -166,14 +152,10 @@ return {
   --
   --   - `Snacks.profiler.status()`, i.e. Neovim lua profiler,
   --     is used to show captured events when profiler is running, in `lualine.nvim`
-  --     - NOT implemented, no need for lua profiling.
+  --     - Implemented, but not used as it applies to Lua files only.
   --
   --   - `Snacks.util.color(<hlgroup>)`, i.e. utility function to get highlight group color,
   --     is used for colors, in `lualine.nvim`.
-  --     - Implemented.
-  --
-  --   - `Snacks.notifier.show_history()` and `Snacks.notifier.hide()`, i.e. functions to show and hide notification history,
-  --     is used in keybindings, in `snacks.nvim`.
   --     - Implemented.
   --
   --   - `Snacks.dashboard` is used for dashboard key commands, in `snacks.nvim`.
@@ -184,90 +166,76 @@ return {
   --   - Implemented.
   --
   -- - `config/keymaps.lua`:
-  --   - `Snacks.toggle.<various>` is used in keybindings to toggle options, and features of built-in and plugin functions.
+  --   - `Snacks.toggle.<various>` is used in keybindings to toggle options,
+  --     and features of built-in and plugin functions.
   --   - Selectively implemented.
-  --
-  -- - `config/options.lua`:
-  --   - `require('snacks.statuscolumn').get()` is used to set option `opt.statuscolumn`.
-  --   - Implemented.
   --
   -- ==================================================================
   -- Snacks sub-plugins enabled by default, without explicit enabling.
   -- ==================================================================
-  --   - `Snacks.notify(..)      : Utility functions for built-in `vim.notify`.
-  --   - `Snacks.toggle(..)`     : Toggle commands, i.e. turn features on|off, used with keymaps.
-  --   - `Snacks.bufdelete(..)`  : Delete buffers without closing window splits.
-  --   - `Snacks.profiler(..)`   : Profiler, for `.lua` files only.
-  --   - `Snacks.win(..)`        : Create and manage floating windows.
-  --   - `Snacks.zen(..)`        : Zen mode.
+  --   - `Snacks.animate(..)      : Efficient animations, including over 45 easing functions (library), not used.
+  --
+  --   - `Snacks.bufdelete(..)`   : Delete buffers without closing window splits.
+  --
+  --   - `Snacks.debug(..)`       : Helper functions for `lua` files, pretty printing objects and backtraces.
+  --                                Always active, not used.
+  --
+  --   - `Snacks.dim(..)          : Focus on active scope by dimming rest.
+  --
+  --   - `Snacks.gitbrowse(..)    : Open current file, branch, commit, or repo in browser (e.g. GitHub, GitLab, ..).
+  --
+  --   - `Snacks.git(..)          : Show git blame line and root of buffer | path, defualting to current buffer.
+  --
+  --   - `Snacks.indent(..)       : Indent guides and scopes.
+  --
+  --   - `Snacks.input(..)`       : Replaces `vim.fn.input` with prettier prompt.
+  --
+  --   - `Snacks.layout(..)       : Window layouts.
+  --
+  --   - `Snacks.lazygit(..)      : Open LazyGit in float, auto-configure colorscheme and integration with Neovim.
+  --                                No need to enable, `Snacks.lazygit()` works regardless.
+  --
+  --   - `Snacks.notify(..)       : Utility functions for built-in `vim.notify`.
+  --
+  --   - `Snacks.picker(..)       : Only used for `git log` commands by default, e.g. `Snacks.picker.git_log_files()`.
+  --
+  --   - `Snacks.profiler(..)`    : Profiler, for `.lua` files only, not used.
+  --
+  --   - `Snacks.rename(..)       : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`.
+  --                                No need, using `yazi`, thus keymaps not implemented.
+  --
+  --   - `Snacks.scope(..)`       : Creates scopes based on indent and treesitter elements.
+  --                                Adds operators to target scopes:
+  --                                - `ii`: Inner scope.
+  --                                - `ai`: Full scope.
+  --                                Adds key bindings to target scopes:
+  --                                - `[i`: Top edge of scope.
+  --                                - `]i`: Bottom edge of scope.
+  --
+  --   - `Snacks.scratch(..)      : Scratch buffers with persistent file.
+  --
+  --   - `Snacks.scroll(..)`      : Smooth scrolling for Neovim, properly handles scrolloff and mouse scrolling.
+  --
+  --   - `Snacks.statuscolumn(..)`: Not enabled, using own custom statuscolumn.
+  --
+  --
   --   - `Snacks.terminal(..)    : Create and toggle floating|split terminal windows.
   --
-  --   - `Snacks.scratch(..)     : Scratch buffers with persistent file.
+  --   - `Snacks.toggle(..)`     : Saves state of any function that can be toggled on|off, allowing easy toggling.
+  --                               - Manual usage: `Snacks.toggle.inlay_hints():toggle()`.
+  --                               - Keymap usage: `Snacks.toggle.inlay_hints():map("<leader>uh")`.
+  --                               - Works without config here, but set `config` to specify new `map` function.
   --
   --   - `Snacks.util(..)`       : Utility functions, like `color` to get highlight group color.
-  --   - `Snacks.notify(..)      : Utility functions for built-in `vim.notify`.
-  --   - `Snacks.picker(..)      : Only used for `git log` commands by default, e.g. `Snacks.picker.git_log_files()`.
-  --   - `Snacks.words(..)       : Disabled by default, but if enabled then highlights, and allows jumping to,
+  --
+  --   - `Snacks.win(..)`        : Create and manage floating windows.
+  --
+  --   - `Snacks.words(..)`      : Disabled by default, but if enabled then highlights, and allows jumping to,
   --                               symbols matching word under cursor, in same file only, more info below.
   --                               No need to enable this in `snacks.nvim` spec,
   --                               but must execute `Snacks.words` to enable.
   --
-  --   - `Snacks.rename(..)      : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`.
-  --                               No need, using `yazi`, thus skip keymaps.
-  --
-  --   - `Snacks.lazygit(..)     : Open LazyGit in float, auto-configure colorscheme and integration with Neovim.
-  --                               No need to enable, `Snacks.lazygit()` works regardless.
-  --
-  --   - `Snacks.layout(..)      : Window layouts.
-  --   - `Snacks.indent(..)      : Indent guides and scopes.
-  --   - `Snacks.gitbrowse(..)   : Open current file, branch, commit, or repo in browser (e.g. GitHub, GitLab, Bitbucket).
-  --
-  --   - `Snacks.git(..)         : Show git blame line and root of buffer | path, defualting to current buffer.
-  --
-  --   - `Snacks.dim(..)         : Focus on active scope by dimming rest.
-  --
-  --   - `Snacks.debug(..)`      : Helper functions for `lua` files, pretty printing objects and backtraces.
-  --                               Always active, not used.
-  --
-  --   - `Snacks.animate(..)     : Efficient animations, including over 45 easing functions (library).
-  --
-  --   - input                   : Replaces `vim.fn.input` with prettier prompt.
-  --
-  --   - scope                   : Creates scopes based on indent and treesitter elements.
-  --                               Adds operators to target scopes:
-  --                               - `ii`: Inner scope.
-  --                               - `ai`: Full scope.
-  --                               Adds key bindings to target scopes:
-  --                               - `[i`: Top edge of scope.
-  --                               - `]i`: Bottom edge of scope.
-  --
-  --   - scroll                   : Smooth scrolling for Neovim, properly handles scrolloff and mouse scrolling.
-  --
-  --   statuscolumn = { enabled = false }, -- we set this in options.lua
-
-  -- `toggle`:
-  -- - Saves state of any function that can be toggled on|off, allowing easy toggling.
-  -- - Manual usage: `Snacks.toggle.inlay_hints():toggle()`.
-  -- - Keymap usage: `Snacks.toggle.inlay_hints():map("<leader>uh")`.
-  -- - Works without config here, but set `config` to specify new `map` function.
-  --
-  -- ==================================================================
-  -- Snacks sub-plugins requiring explicit enabling.
-  -- ==================================================================
-  --   - `Snacks.notifier(..)    : Pretty `vim.notify`, does NOT replace `vim.notify`, unlike `noice.nvim`. Must use own command, not `vim.notify`?
-  --
-  -- ==================================================================
-  -- Good sub-plugins, requiring setup:
-  -- ==================================================================
-  --   -
-  --
-  --
-  -- ==================================================================
-  -- Unused sub-plugins:
-  -- ==================================================================
-  --   - `Snacks.profiler(..)`   : Profiler, for `.lua` files only.
-  --   - `Snacks.rename(..)      : LSP-integrated file renaming, with support for `neo-tree.nvim` and `mini.files`. No need, using `yazi`, thus skip keymaps.
-  --   - `Snacks.notifier(..)    : Pretty `vim.notify`, does NOT replace `vim.notify`, unlike `noice.nvim`. Must use own command, not `vim.notify`?
+  --   - `Snacks.zen(..)`        : Zen mode, can be used with `Snacks.dim(..)`.
   --
   -- ==================================================================
   -- `Snacks.toggle.<..>`.
@@ -276,6 +244,17 @@ return {
   -- - Must call method `toggle`: `Snacks.toggle.diagnostics():toggle()`.
   -- - Which is what `Toggle:map` does: `Snacks.toggle.diagnostics():map(<lhs>, <opts>)`.
   -- - `Toggle:map` also adds to key binding to `which-key.nvim`.
+  --
+  -- ==================================================================
+  -- `Snacks.scratch(..)`.
+  -- ==================================================================
+  -- - Unique key for scratch file is based on:
+  --   * name: File name.
+  --   * ft: File type.
+  --   * vim.v.count1: Count given in keymap, default to 1.
+  --   * cwd: Current working directory.
+  --   * branch: Current branch name.
+  -- - Thus, new scratch file created when scratch is opened from another file.
   --
   -- ==================================================================
   -- `Snacks.notifier`.
@@ -322,7 +301,8 @@ return {
   -- - `config.notify_jump` is `false` by default, set to `true` to run `vim.notify` at jump.
   --
   -- - `Snacks.words` is disabled by default, enable with: `Snacks.words.enable()`.
-  -- - All usage of `Snacks.words`:
+  -- - All usage of `Snacks.words` are in `plugins/addons/lsp/keymaps.lua`,
+  --   but these are not enabled due to condition:
   --   - { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
   --     desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
   --   - { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",

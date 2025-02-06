@@ -40,17 +40,21 @@ return {
     -- appearing in files with filename earlier in alphabetical order,
     -- since plugins get `opts` merged, and `opts`-function run, in order specs for same plugin
     -- appear from top-level spec and forward, with imported specs loaded in alphabetical order of filenames.
-    --
-    -- BUG: Overwrites: `plugins/lang/typescript.lua`???
-    --
+    -- NOTE: Thus, this spec must be sourced before other `nvim-lspconfig` specs in `plugins` directory,
+    -- i.e. `plugins/addons/lang/<language>.lua`, to ensure merging `opts` correctly.
     opts = function()
       ---@class PluginLspOpts
       local ret = {
-        -- Options for vim.diagnostic.config().
+        -- Used for `vim.diagnostic.config()` below, not passed to language server.
         ---@type vim.diagnostic.Opts
         diagnostics = {
           underline = true,
-          update_in_insert = false,
+          -- By default, Neovim's built-in LSP client updates diagnostics on `InsertLeave`,
+          -- i.e. when leaving Insert mode, including when running `ctrl-o` in Insert mode.
+          -- With `update_in_insert = true`, Neovim's built-in LSP client updates diagnostics
+          -- when typing in Insert mode, i.e. on `TextChanged`, which can be slow.
+          -- update_in_insert = false,
+          update_in_insert = true,
           virtual_text = {
             spacing = 4,
             source = "if_many",
@@ -71,12 +75,14 @@ return {
         },
         -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0.
         -- Remember to configure LSP server to provide inlay hints.
-        -- Only used internally, not passed to LSP server.
+        -- Used below for `vim.lsp.inlay_hint.enable(..)`, not passed to language server.
         inlay_hints = {
           enabled = true,
-          exclude = { "vue" }, -- Filetypes for which to not enable inlay hints.
+          -- Disable inlay hints for specific filetypes.
+          exclude = { "vue", "typescript", "typescriptreact" },
         },
-        -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0.
+        -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0,
+        -- i.e. information about references, implementations, etc., above functions.
         -- Remember to configure LSP server to provide the code lenses.
         -- Only used internally, not passed to LSP server.
         codelens = {
@@ -212,17 +218,6 @@ return {
       -- Setup keymaps when registering new capability on client,
       -- see above for all steps.
       MyVim.lsp.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
-
-      -- Diagnostics signs when features from Neovim 10 are not available.
-      if vim.fn.has("nvim-0.10.0") == 0 then
-        if type(opts.diagnostics.signs) ~= "boolean" then
-          for severity, icon in pairs(opts.diagnostics.signs.text) do
-            local name = vim.diagnostic.severity[severity]:lower():gsub("^%l", string.upper)
-            name = "DiagnosticSign" .. name
-            vim.fn.sign_define(name, { text = icon, texthl = name, numhl = "" })
-          end
-        end
-      end
 
       if vim.fn.has("nvim-0.10") == 1 then
         -- Inlay hints.

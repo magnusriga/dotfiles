@@ -5,10 +5,13 @@ Keymaps
 - This file is automatically loaded by `myvim.config.init`.
 - See: `:help vim.keymap.set()`.
 - See: `:help key-notation`.
+- See: `:help vim-diff`.
 - `M-`: Alt-key or meta-key.
 - `A-`: Same as `M-`.
 - 'rhs' commands are vimscript, not Lua,
   thus use e.g. `.` instead of `..` for concatenation, etc.
+- Neovim creates certain keymaps automatically at startup,
+  e.g. `[b` and `[d`, which Vim did not. 
 =============================================
 --]]
 
@@ -21,8 +24,8 @@ local map = vim.keymap.set
 ---------------------------------
 -- Navigating.
 ---------------------------------
--- When navigating up|down, use `gj`|`gk`, as they move by display lines, i.e. not by actual lines.
--- i.e. wrapped lines are counted as separate lines.
+-- When navigating up|down, use `gj`|`gk`, as they move by display lines,
+-- and not by actual lines, so wrapped lines are counted as separate lines.
 -- `v:count`: Count given for last Normal mode command.
 map({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
 map({ "n", "x" }, "<Down>", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
@@ -30,18 +33,23 @@ map({ "n", "x" }, "k", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, 
 map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = true, silent = true })
 
 ---------------------------------
--- Move to window using `c^hjkl`.
+-- Window.
 ---------------------------------
--- Use built-in w-navigation instead: `<C-w>hjkl`.
+-- Move to window using `c^hjkl`.
+-- No need, use built-in w-bindings: `<C-W>hjkl`.
 -- map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
 -- map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
 -- map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
 -- map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 
----------------------------------
+-- Split window with leader.
+-- No need, use built-in w-bindings: `<C-W>s|w|c`.
+-- map("n", "<leader>-", "<C-W>s", { desc = "Split Window Below", remap = true })
+-- map("n", "<leader>|", "<C-W>v", { desc = "Split Window Right", remap = true })
+-- map("n", "<leader>wd", "<C-W>c", { desc = "Delete Window", remap = true })
+
 -- Resize window using <ctrl> arrow keys.
----------------------------------
--- Not using arrow keys.
+-- No need, not using arrow keys.
 -- map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
 -- map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
 -- map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
@@ -70,11 +78,11 @@ map("v", "<A-k>", ":<C-u>execute \"'<,'>move '<-\" . (v:count1 + 1)<cr>gv=gv", {
 ---------------------------------
 -- Buffers.
 ---------------------------------
--- Already built-in Neovim bindings, with same functionality.
+-- No need, use identical built-in bindings instead: `[|]b`.
 -- map("n", "[b", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 -- map("n", "]b", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 
--- No need, use built-in bindings `[|]b` instead.
+-- No need, use built-in bindings instead: `[|]b`.
 -- map("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 -- map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
 
@@ -88,9 +96,9 @@ map("n", "<leader>bd", function()
 end, { desc = "Delete Buffer" })
 
 -- Delete alternate buffer, without changing window.
--- map("n", "<leader>bo", function()
---   Snacks.bufdelete.other()
--- end, { desc = "Delete Other Buffers" })
+map("n", "<leader>bo", function()
+  Snacks.bufdelete.other()
+end, { desc = "Delete Other Buffers" })
 
 -- Delete current buffer and window, i.e. `:bd`.
 -- Use built-in `bd` instead.
@@ -125,47 +133,265 @@ map(
 -- map("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev Search Result" })
 -- map("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev Search Result" })
 
------------------------------------------
------------------------------------------
------------------------------------------
------------------------------------------
------------------------------------------
------------------------------------------
------------------------------------------
------------------------------------------
------------------------------------------
+---------------------------------
+-- Undo, redo.
+---------------------------------
+-- Add undo break-points.
+-- No need, use built-in `c^g u`.
+-- map("i", ",", ",<c-g>u")
+-- map("i", ".", ".<c-g>u")
+-- map("i", ";", ";<c-g>u")
+
+---------------------------------
+-- Files.
+---------------------------------
+-- Save file.
+-- No need, use built-in `:w`.
+-- map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save File" })
+
+-- New file.
+-- No need, use built-in `:enew`.
+-- map("n", "<leader>fn", "<cmd>enew<cr>", { desc = "New File" })
+
+---------------------------------
+-- Location and quickfix lists.
+---------------------------------
+-- Open location list and quickfix list.
+-- No need, use built-in `:lopen` and `:copen`.
+-- map("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
+-- map("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
+
+---------------------------------
+-- Help.
+---------------------------------
+-- Show help for word under cursor, e.g. function signature, using `keywordprg`.
+-- `norm[al][!] {commands}`: Execute Normal mode commands.
+-- `!`: Bang command, i.e. ignore mappings.
+-- No need, use built-in `K`.
+-- map("n", "<leader>K", "<cmd>norm! K<cr>", { desc = "Keywordprg" })
+
+---------------------------------
+-- Comments.
+---------------------------------
+-- Add comment above or below.
+-- Not interfering with built-in keybindings, OK to keep.
+map("n", "gco", "o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Below" })
+map("n", "gcO", "O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>", { desc = "Add Comment Above" })
+
+---------------------------------
+-- Indenting.
+---------------------------------
+-- Use `<` | `>` to indent, instead of built-in `<<` | `>>`,
+-- and enter selection mode, with same selection as last time, after indenting.
+-- No need, use built-in `<<` | `>>`.
+-- map("v", "<", "<gv")
+-- map("v", ">", ">gv")
+
+---------------------------------
+-- Trouble.
+---------------------------------
+-- `trouble.nvim` already provides keybindings `[q` | `q]`,
+-- which jump to next|previous trouble item, using whichever trouble buffer is open,
+-- i.e. diagnostics | symbols | todos | location list | quickfix list.
+-- If `trouble` buffer is not open, `[q` | `q]` will go to next|previous quickfix item.
+-- Note: Quickfix list does not contain diagnostics, only grep results,
+-- making `[q` | `]q` useless unless `trouble` buffer is open,
+-- which remains with below keybindings.
+-- No need, to navigate diagnostics use built-in `[d` | `]d`.
+-- map("n", "[q", vim.cmd.cprev, { desc = "Previous Quickfix" })
+-- map("n", "]q", vim.cmd.cnext, { desc = "Next Quickfix" })
+
+---------------------------------
+-- Diagnostics.
+---------------------------------
+-- Open diagnostics float.
+-- Useful, might also use `<leader>e`, and `<leader>e` again to focus float window.
+map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Open Diagnostics Float." })
+
+--- Jump to diagnostic, helper function.
+---@param next boolean
+---@param severity? vim.diagnostic.Severity
+---@param opts? vim.diagnostic.JumpOpts
+local function diagnostic_jump(next, severity, opts)
+  local jump_opts = opts or {}
+  jump_opts.count = next and 1 or -1
+  jump_opts.severity = severity and vim.diagnostic.severity[severity] or nil
+  return function()
+    vim.diagnostic.jump(jump_opts)
+  end
+end
+
+-- Previous|Next diagnostic.
+-- No need, use identical built-in Neovim bindings, see: `h: vim-diff`.
+-- map("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
+-- map("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
+
+map("n", "]e", diagnostic_jump(true, "ERROR"), { desc = "Next Error" })
+map("n", "[e", diagnostic_jump(false, "ERROR"), { desc = "Prev Error" })
+map("n", "]w", diagnostic_jump(true, "WARN"), { desc = "Next Warning" })
+map("n", "[w", diagnostic_jump(false, "WARN"), { desc = "Prev Warning" })
+
+---------------------------------
+-- Formatting.
+---------------------------------
+-- Format buffer.
+map({ "n", "v" }, "<leader>cf", function()
+  MyVim.format({ force = true })
+end, { desc = "Format" })
+
+-- stylua: ignore start
+
+---------------------------------
+-- Toggle.
+---------------------------------
+-- Toggle automatic formatting on save on|off,
+-- for buffer if `true` is passed in,
+-- otherwise globally for all buffers.
+MyVim.format.snacks_toggle():map("<leader>uf")
+MyVim.format.snacks_toggle(true):map("<leader>uF")
+
+-- `opt.spell`, for spell checking in English,
+-- default only on for text files, e.g. `txt` | `markdown` | ...
+-- See: `config/autocmd.lua` and `config/options.lua`.
+Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
+
+-- `opt.wrap`, for visual wrapping of lines, on by default.
+Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
+
+-- `opt.relativenumber`, for relative line numbers, on by default.
+Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
+
+-- `opt.conceallevel`, for hiding text with `conceal` syntax attribute,
+-- unless text contains replacement character `*`.
+-- `2` by default, `0` when off.
+-- No need, never used.
+-- Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" }):map("<leader>uc")
+
+-- `opt.showtabline`, for toggling tabline, `2` by default, i.e. on when more than one tab.
+-- No need, always on when more than one tab, and generally use tmux for tabs instead.
+-- Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
+
+-- `opt.background`, for toggling background color between `light` and `dark`, `dark` by default.
+-- No need, not using `light` mode.
+-- Snacks.toggle.option("background", { off = "light", on = "dark" , name = "Dark Background" }):map("<leader>ub")
+
+-- Diagnostics.
+Snacks.toggle.diagnostics():map("<leader>ud")
+
+-- Line numbers.
+-- No need, always used.
+-- Snacks.toggle.line_number():map("<leader>ul")
+
+-- Treesitter, i.e. syntax highlightig.
+-- No need, always on.
+-- Snacks.toggle.treesitter():map("<leader>uT")
+
+-- Dimming of code, i.e. `Snacks.dim`, e.g. in `Snacks.zen`.
+Snacks.toggle.dim():map("<leader>uD")
+
+-- Not using `snacks.nvim` animations.
+-- Snacks.toggle.animate():map("<leader>ua")
+
+-- `Snacks.indent`: Colored scope and indentation guides.
+Snacks.toggle.indent():map("<leader>ug")
+
+-- Smoothscroll with mouse wheel, not used.
+-- Snacks.toggle.scroll():map("<leader>uS")
+
+-- Profiler for Lua files only, not used.
+-- Snacks.toggle.profiler():map("<leader>dpp")
+-- Snacks.toggle.profiler_highlights():map("<leader>dph")
+
+-- Inlay hints.
+if vim.lsp.inlay_hint then
+  Snacks.toggle.inlay_hints():map("<leader>uh")
+end
+
+-- Zen mode, zoom.
+-- No need, not working.
+-- Snacks.toggle.zoom():map("<leader>wm"):map("<leader>uZ")
+
+-- Zen mode, normal.
+-- No need, not used.
+-- Snacks.toggle.zen():map("<leader>uz")
+
+---------------------------------
+-- Lazygit.
+---------------------------------
+if vim.fn.executable("lazygit") == 1 then
+  map("n", "<leader>gg", function() Snacks.lazygit( { cwd = MyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
+  map("n", "<leader>gG", function() Snacks.lazygit() end, { desc = "Lazygit (cwd)" })
+
+  -- Only binding using `Snacks.picker(..)`.
+  map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Current File History" })
+
+  -- Git log, i.e. commit logs.
+  -- No need, already created in: `plugins/fzf.lua`.
+  -- map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = MyVim.root.git() }) end, { desc = "Git Log" })
+  -- map("n", "<leader>gL", function() Snacks.picker.git_log() end, { desc = "Git Log (cwd)" })
+end
+
+---------------------------------
+-- Other `snacks.nvim` keybindings.
+---------------------------------
+-- Git blame.
+-- No need, not using `Snacks.picker(..)`, and `fzf-lua` presentation not useful.
+-- map("n", "<leader>gb", function() Snacks.picker.git_log_line() end, { desc = "Git Blame Line" })
+-- map("n", "<leader>gb", "<cmd>FzfLua git_blame<CR>", { desc = "Git Blame" })
+
+-- Open git remote url for current file, i.e. blob, with `vim.ui.open(path, opt)`,
+-- which opens url with macOS `open` | Windows `explorer.exe` | Linux `xdg-open`.
+-- Normally opens url in browser, but not over ssh / when no gui, thus disable.
+-- map({ "n", "x" }, "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Git Browse (open)" })
+
+-- Copy git remote url into X11 system clipboard, i.e. register `+`.
+map({"n", "x" }, "<leader>gY", function()
+  Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
+end, { desc = "Git Browse (copy)" })
+
+---------------------------------
+-- Quit.
+---------------------------------
+-- Quit all windows, buffers, tabs, and Neovim.
+-- No need, use built-in `:qa`.
+-- map("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit All" })
+
+---------------------------------
+-- Treesitter inspect.
+---------------------------------
+-- Show highlights for word under cursor.
+-- No need, use built-in `:Inspect` and `InspectTree`.
+-- map("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
+-- map("n", "<leader>uI", "<cmd>InspectTree<cr>", { desc = "Inspect Tree" })
+
+---------------------------------
+-- Terminal.
+---------------------------------
+-- Floating terminal keybindings.
+-- No need, not using terminal inside Neovim.
+-- map("n", "<leader>fT", function() Snacks.terminal() end, { desc = "Terminal (cwd)" })
+-- map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+-- map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+-- map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
+
+-- Close current window when in terminal mode.
+-- No need, use built-in `:close`.
+-- map("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+-- map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
 
 -- Exit terminal mode in builtin terminal with shortcut that is easier to remember.
 -- Will not work in all terminal emulators or in tmux.
--- Stick to vim default: <C-\><C-n>.
+-- No need, use built-in: <C-\><C-n>.
 -- vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
--- Disable arrow keys in normal mode.
--- No need, not used anyways.
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
--- Keybinds to make split navigation easier.
--- CTRL+<hjkl> to switch between windows.
--- Disabled, use default: <C-w><C-hljk>.
--- List of window commands: `:help wincmd`.
--- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
--- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
--- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
--- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
-
--- Diagnostic keymaps and settings.
--- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
--- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Open diagnostic float, twice to focus" })
--- vim.diagnostic.config({ virtual_text = false, severity_sort = true })
-
--- Clear highlights on search when pressing <Esc> in normal mode.
--- See `:help hlsearch`.
--- vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
-
----------------------------------------------
--- Modeline: `:h modeline`.
----------------------------------------------
--- vim: ts=2 sts=2 sw=2 et
+---------------------------------
+-- Tabs.
+---------------------------------
+-- Side note: <Tab>, by itself, jumps to newer entry in jump list, like `ctrl-o`.
+map("n", "<leader><tab>l", "<cmd>tablast<cr>", { desc = "Last Tab" })
+map("n", "<leader><tab>o", "<cmd>tabonly<cr>", { desc = "Close Other Tabs" })
+map("n", "<leader><tab>f", "<cmd>tabfirst<cr>", { desc = "First Tab" })
+map("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab" })
+map("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
+map("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
+map("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })

@@ -265,7 +265,9 @@ function M.setup()
   end, { desc = "Show info about the formatters for the current buffer." })
 end
 
--- Toggle automatic formatting on save on|off.
+-- Toggle automatic formatting on save on|off,
+-- for buffer if `true` is passed in,
+-- otherwise globally for all buffers.
 -- Bind to keymap, see: `config/keymaps.lua`.
 ---@param buf? boolean
 function M.snacks_toggle(buf)

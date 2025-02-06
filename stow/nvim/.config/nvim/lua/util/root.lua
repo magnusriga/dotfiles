@@ -210,6 +210,7 @@ function M.get(opts)
   return MyVim.is_win() and ret:gsub("/", "\\") or ret
 end
 
+-- Used by e.g. `fzf-lua` and `lazygit` keymaps, to find git root folder.
 function M.git()
   local root = M.get()
   local git_root = vim.fs.find(".git", { path = root, upward = true })[1]

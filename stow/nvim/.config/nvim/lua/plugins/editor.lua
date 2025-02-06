@@ -323,6 +323,10 @@ return {
         lsp = {
           win = { position = "right" },
         },
+        diagnostics = {
+          focus = true,
+          -- win = { position = "right" },
+        },
       },
     },
     keys = {
@@ -345,13 +349,18 @@ return {
       -- Toggle quickfix list.
       { "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", desc = "Quickfix List (Trouble)" },
 
-      -- Next trouble | quickfix entry in buffer.
-      -- Jumps to next Treesitter symbol, not next diagnostic,
-      -- when quickfix list is empty.
+      -- Make `[q` | `q]` jump to next|previous trouble item, using whichever trouble buffer is open,
+      -- i.e. diagnostics | symbols | todos | location list | quickfix list.
+      -- If `trouble` buffer is not open, `[q` | `q]` will go to next|previous quickfix item.
+      -- Note: Quickfix list does not contain diagnostics, only grep results,
+      -- making `[q` | `]q` useless unless `trouble` buffer is open.
+      -- Use built-in `[d` | `]d` instead, to navigate diagnostics.
       {
         "[q",
         function()
           if require("trouble").is_open() then
+            -- The anotation here is wrong, `prev` acction is not called directly, but via internal proxy,
+            -- which passes `self`, i.e. `trouble.View` as first parameter, and `opts` below as second.
             require("trouble").prev({ skip_groups = true, jump = true })
           else
             local ok, err = pcall(vim.cmd.cprev)

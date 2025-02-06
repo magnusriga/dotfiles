@@ -116,7 +116,8 @@ opt.conceallevel = 2
 opt.confirm = true
 
 -- Highlight current line.
-opt.cursorline = true
+-- opt.cursorline = true
+opt.cursorline = false
 
 -- Make vim diff windows vertical by default.
 opt.diffopt:append({ "vertical" })

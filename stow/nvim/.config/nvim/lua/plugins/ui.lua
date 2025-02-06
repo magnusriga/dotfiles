@@ -48,7 +48,8 @@ return {
             { MyVim.lualine.pretty_path() },
           },
           lualine_x = {
-            Snacks.profiler.status(),
+            -- Not needed, profiler for Lua files only.
+            -- Snacks.profiler.status(),
             -- stylua: ignore
             {
               function() return require("noice").api.status.command.get() end,
@@ -153,11 +154,6 @@ return {
   },
 
   -- Enables UI-related sub-modules from `snacks.nvim`.
-  --
-  -- To enable sub-plugin, either:
-  -- - Specify sub-plugin configuration: `terminal = { <config> }`.
-  -- - Use sub-plugin default configuration: `notifier = { enabled = true }`.
-  --
   -- Main `snacks.nvim` spec, with more information: `plugins/init.lua`:
   {
     "snacks.nvim",
@@ -189,18 +185,42 @@ return {
       -- Replaces `vim.fn.input` with prettier prompt.
       input = { enabled = true },
 
-      -- Creates scopes based on indent and treesitter elements.
+      -- Creates scopes based on indent and treesitter elements,
+      -- and adds operators to navigate scopes.
       -- Adds operators to target scopes:
       -- - `ii`: Inner scope.
       -- - `ai`: Full scope.
       -- Adds key bindings to target scopes:
       -- - `[i`: Top edge of scope.
       -- - `]i`: Bottom edge of scope.
-      scope = { enabled = true },
-
-      -- Smooth scrolling for Neovim, handles scrolloff and mouse scrolling.
-      -- Unecessary overhead.
-      -- scroll = { enabled = true },
+      scope = {
+        -- These keymaps will only be set if the `scope` plugin is enabled.
+        -- Alternatively, you can set them manually in your config,
+        -- using the `Snacks.scope.textobject` and `Snacks.scope.jump` functions.
+        keys = {
+          ---@type table<string, snacks.scope.Jump|{desc?:string}>
+          jump = {
+            ["[i"] = {
+              -- Allow single line scopes.
+              min_size = 1,
+              bottom = false,
+              cursor = false,
+              edge = true,
+              treesitter = { blocks = { enabled = false } },
+              desc = "Jump to top edge of scope",
+            },
+            ["]i"] = {
+              -- Allow single line scopes.
+              min_size = 1,
+              bottom = true,
+              cursor = false,
+              edge = true,
+              treesitter = { blocks = { enabled = false } },
+              desc = "Jump to bottom edge of scope",
+            },
+          },
+        },
+      },
 
       -- `statuscolumn` is enabled in `config/options.lua`.
       statuscolumn = { enabled = false },
@@ -215,53 +235,7 @@ return {
         -- but only if `lhs` and `modes` not already defined as keymap in `lazy.nvim`.
         map = MyVim.safe_keymap_set,
       },
-
-      -- Replaces `vim.notify`.
-      -- No need for `Snacks.notifier`, use built-in `vim.notify` instead,
-      -- or `noice.nvim` for custom notifications.
-      -- notifier = { enabled = true },
-
-      -- ==========================
-      -- `Snacks.words`.
-      -- ==========================
-      -- - `vim.lsp.buf.document_highlight()`: Adds extmarks AND highlights for all symbols matching word under cursor, in current file only.
-      -- - Symbols are defined by language, so e.g. cursor on `then` will highlight `if` and `end`.
-      -- - `vim.lsp.buf.clear_references()`: Removes BOTH extmarks AND highlights for all symbols matching word under cursor, in current file.
-      -- - `Snacks.words.enable()`: Schedules `vim.lsp.buf.document_highlight()` to run on `CursorMoved` | `CursorMovedI` | `ModeChanged`,
-      --   debounced to not run more often than every 200 ms, immediately followed by `vim.lsp.buf.clear_references()`.
-      -- - Result: `Snacks.words` highlight references within same file automatically when cursor moves, via `vim.lsp.buf.document_highlight()`,
-      --   and allows jumping to those references using key bindings mapping to `Snacks.words.jump(<count>, [<cycle>])`.
-      -- - `config.notify_jump` is `false` by default, set to `true` to run `vim.notify` at jump.
-      --
-      -- - All usage of `Snacks.words`:
-      --   - { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
-      --     desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
-      --   - { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",
-      --     desc = "Prev Reference", cond = function() return Snacks.words.is_enabled() end },
-      --   - { "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight",
-      --     desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
-      --   - { "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, has = "documentHighlight",
-      --     desc = "Prev Reference", cond = function() return Snacks.words.is_enabled() end },
-      -- - If `Snacks.words` not enabled, keybindings above follow built-in behavior.
-      --
-      -- - Disabled by default, but enabled by passing config | `{ enabled = true }`.
-      -- - Keep disabled, enable manually if needed: `Snacks.words.enable()`.
-      -- words = { enabled = true },
     },
-
-    -- No need for `Snacks.notifier`, use built-in `vim.notify` instead,
-    -- or `noice.nvim` for custom notifications.
-    -- stylua: ignore
-    -- keys = {
-    --   { "<leader>n", function()
-    --     if Snacks.config.picker and Snacks.config.picker.enabled then
-    --       Snacks.picker.notifications()
-    --     else
-    --       Snacks.notifier.show_history()
-    --     end
-    --   end, desc = "Notification History" },
-    --   { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
-    -- },-
   },
 
   -- `snacks.nvim` dashboard.

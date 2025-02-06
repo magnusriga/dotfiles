@@ -560,7 +560,8 @@ require("lazy").setup({
     ---@type number? Set to 1 to check for updates slowly.
     concurrency = nil,
     -- Get notification when new updates are found.
-    notify = true,
+    -- notify = true,
+    notify = false,
     -- Check for updates every hour.
     frequency = 3600,
     -- Check for pinned packages that cannot be updated.

@@ -41,6 +41,7 @@ return {
     opts = function(_, opts)
       local config = require("fzf-lua.config")
       local actions = require("fzf-lua.actions")
+      local trouble_fzf = require("trouble.sources.fzf")
 
       -- Change from these defaults:
       -- fzf = {
@@ -104,30 +105,41 @@ return {
       --   ["alt-h"]       = actions.toggle_hidden,
       --   ["alt-f"]       = actions.toggle_follow,
       --
-      -- - Additional grep keymaps:
-      -- ["ctrl-g"]        = actions.grep_lgrep, toggles between 'grep' and 'live_grep'.
+      -- - Grep keymaps:
+      --   ["ctrl-g"]      = actions.grep_lgrep, toggles between 'grep' and 'live_grep'.
       --
       -- - Other pickers have other keymaps, like buffers, tabs, git.status, etc.
 
+      ----------------------------------------------------------------
+      -- Remap `ctrl-t` for files, from `file_tabedit`, i.e. open selection in new tab,
+      -- to move list into `trouble.nvim` buffer.
+      ----------------------------------------------------------------
       if MyVim.has("trouble.nvim") then
         -- Move fzf list into `trouble.nvim` buffer.
-        config.defaults.actions.files["ctrl-t"] = require("trouble.sources.fzf").actions.open
+        -- config.defaults.actions.files["ctrl-t"] = require("trouble.sources.fzf").actions.open
       end
 
+      ----------------------------------------------------------------
+      -- Remap `ctrl-r` for files, from `toggle_ignore` to toggle between root dir and cwd.
+      -- No need, use built-in behaviour for `ctrl-r`, i.e. `toggle_ignore`.
+      ----------------------------------------------------------------
       -- Toggle where to search from: Root directory | current working directory.
-      config.defaults.actions.files["ctrl-r"] = function(_, ctx)
-        local o = vim.deepcopy(ctx.__call_opts)
-        o.root = o.root == false
-        o.cwd = nil
-        o.buf = ctx.__CTX.bufnr
-        MyVim.pick.open(ctx.__INFO.cmd, o)
-      end
+      -- config.defaults.actions.files["ctrl-r"] = function(_, ctx)
+      --   local o = vim.deepcopy(ctx.__call_opts)
+      --   o.root = o.root == false
+      --   o.cwd = nil
+      --   o.buf = ctx.__CTX.bufnr
+      --   MyVim.pick.open(ctx.__INFO.cmd, o)
+      -- end
 
       -- `alt-c`: Same as `ctrl-r`.
-      config.defaults.actions.files["alt-c"] = config.defaults.actions.files["ctrl-r"]
+      -- config.defaults.actions.files["alt-c"] = config.defaults.actions.files["ctrl-r"]
 
-      config.set_action_helpstr(config.defaults.actions.files["ctrl-r"], "toggle-root-dir")
+      -- config.set_action_helpstr(config.defaults.actions.files["ctrl-r"], "toggle-root-dir")
 
+      ----------------------------------------------------------------
+      -- Image preview.
+      ----------------------------------------------------------------
       local img_previewer ---@type string[]?
       for _, v in ipairs({
         { cmd = "ueberzug", args = {} },
@@ -140,123 +152,142 @@ return {
         end
       end
 
+      local smart_prefix = require("trouble.util").is_win()
+          and "transform(IF %FZF_SELECT_COUNT% LEQ 0 (echo select-all))"
+        or "transform([ $FZF_SELECT_COUNT -eq 0 ] && echo select-all)"
+
+      ----------------------------------------------------------------
+      -- Action to open selected or all items in `trouble.nvim` list.
+      ----------------------------------------------------------------
+      ---@param selected string[]
+      ---@param fzf_opts fzf.Opts
+      ---@param trouble_mode? trouble.Mode
+      local trouble_open = function(selected, fzf_opts, trouble_mode)
+        trouble_mode = trouble_mode or {}
+        trouble_mode.focus = true
+        trouble_fzf.items = {}
+        trouble_fzf.add(selected, fzf_opts, trouble_mode)
+      end
+      local trouble_action_open = { fn = trouble_open, prefix = smart_prefix, desc = "smart-open-with-trouble" }
+
+      ----------------------------------------------------------------
+      -- `fzf-lua` spec `opts`.
+      ----------------------------------------------------------------
       return {
         "default-title",
 
-        -- Highlights, alternative to `fzf_colors`.
-        -- Works in additon to `fzf_colors`.
-        -- Docs: `https://github.com/ibhagwan/fzf-lua/blob/main/OPTIONS.md`.
+        -- NOTE: Colors set in `util/hlcolors.lua`, with some overrides defined below.
+
+        -- Some colors must be set in global `fzf-lua` config, i.e. `hls`,
+        -- since no standard `fzf --color` option exists for them.
         hls = {
-          -- Main fzf (terminal) window normal (text/bg) highlight group.
-          -- Same as `fg` in `fzf-colors`.
-          -- normal = "Normal",
+          live_sym = "FzfLuaLiveSym",
 
-          -- Main fzf (terminal) window border highlight group.
-          -- `FloatBorder`, to match `lazygit` from `snacks.nvim`.
-          border = "FloatBorder",
-          preview_border = "FloatBorder",
-
-          -- Perhaps bug, but this is query text in live search, not prompt.
-          live_prompt = "@property",
-          -- live_prompt = "LazygitMain",
-
-          -- Similar to `fzf_group` below.
-          -- Prefer `fzf_group`, as it offer more customizing with `fg`, `bg`, etc.
-          fzf = {
-            -- Match of fuzzy search, while typing.
-            -- Does not work as `fzf_colors` property.
-            -- match = "LazygitActiveBorderColor",
-            match = "LazygitMain",
-
-            -- Highlight group for fzf's query, by default links to `FzfLuaNormal` and sets text to regular (non-bold).
-            -- Text typed in query field.
-            -- For some reason only applies to file search, grep has another color.
-            query = "LazygitMain",
-            -- Highlight group for fzf's separator, by default links to `FzfLuaFzfBorder`.
-            -- Line between search filed and matches.
-            -- separator = "LazygitActiveBorderColor",
-          },
+          ["file_part"] = "red",
+          ["dir_part"] = "red",
+          ["tab_marker"] = "red",
+          ["tab_title"] = "red",
         },
-
-        -- Fzf `--color` specification.
+        ----------------------------------------------------------------
+        -- `fzf_colors`.
+        ----------------------------------------------------------------
+        -- - These settings are passed directly to `fzf` in `--color` option.
+        -- - Keys: `--color` argument.
+        -- - Values: Which part of given highlitht group to use,
+        --   e.g. for hex color `--color=separator:#xxxxxx` pick e.g. `fg` from `HighlighGroup`.
         --
-        -- Set to `true` to automatically generate an fzf's colorscheme from
-        -- Neovim's current colorscheme:
-        -- fzf_colors       = true,
+        -- - Format.
+        --   - `--color=[BASE_SCHEME][,COLOR_NAME[:ANSI_COLOR][:ANSI_ATTRIBUTES]]...`.
+        --   - See: `man fzf` for values.
         --
-        -- Building a custom colorscheme, has the below specifications:
-        -- If rhs is of type "string" rhs will be passed raw, e.g.:
-        --   `["fg"] = "underline"` will be translated to `--color fg:underline`
-        -- If rhs is of type "table", the following convention is used:
-        --   [1] "what" field to extract from the hlgroup, i.e "fg", "bg", etc.
-        --   [2] Neovim highlight group(s), can be either "string" or "table"
-        --       when type is "table" the first existing highlight group is used
-        --   [3+] any additional fields are passed raw to fzf's command line args
-        -- Example of a "fully loaded" color option:
-        --   `["fg"] = { "fg", { "NonExistentHl", "Comment" }, "underline", "bold" }`
-        -- Assuming `Comment.fg=#010101` the resulting fzf command line will be:
-        --   `--color fg:#010101:underline:bold`
-        -- NOTE: To pass raw arguments: `fzf_opts["--color"]` or `fzf_args`.
+        -- - Terminology.
+        --   - `selected`: Any line in fzf list, except current cursor line.
+        --                 Called "selected" because typing in fzf will narrow down list,
+        --                 and thus "select" certain lines.
+        --                 No to be confused with tab-selected lines.
+        --   - `current` : Line cursor is currently at.
+        --
+        -- - Building a custom colorscheme, has the below specifications:
+        --   If rhs is of type "string" rhs will be passed raw, e.g.:
+        --     `["fg"] = "underline"` will be translated to `--color fg:underline`
+        --   If rhs is of type "table", the following convention is used:
+        --     [1] "what" field to extract from the hlgroup, i.e "fg", "bg", etc.
+        --     [2] Neovim highlight group(s), can be either "string" or "table"
+        --         when type is "table" the first existing highlight group is used
+        --     [3+] any additional fields are passed raw to fzf's command line args
+        --   Example of a "fully loaded" color option:
+        --     `["fg"] = { "fg", { "NonExistentHl", "Comment" }, "underline", "bold" }`
+        --   Assuming `Comment.fg=#010101` the resulting fzf command line will be:
+        --     `--color=fg:#010101:underline:bold`
+        --
+        -- - To pass raw arguments: `fzf_opts["--color"]` or `fzf_args`.
         fzf_colors = {
-          -- Inherit fzf colors not specified below from auto-generated theme,
-          -- similar to `fzf_colors=true`.
-          true,
+          -- Inherit fzf colors not specified below from auto-generated theme, similar to `fzf_colors=true`.
+          -- No need, use default and own configuration.
+          -- true,
 
-          -- Filename, in non-selected lines.
-          -- White, e.g. `CursorLine`, is OK.
-          -- ["fg"] = { "fg", "CursorLine" },
+          -- `fg`:
+          -- - Forground color of selected lines, i.e. all lines except current cursor line.
+          -- - Has no effect, some other setting overrides this.
+          -- - If nothing is typed, all lines still use this foreground color.
+          -- ["fg"] = { "fg", "FzfLuaCursor" },
 
-          -- Highlight group for fzf's separator, by default links to `FzfLuaFzfBorder`.
-          -- Line between search filed and matches.
-          ["separator"] = { "fg", "LazygitActiveBorderColor" },
+          -- `bg`:
+          -- - Background color of selected lines, i.e. all lines except current cursor line.
+          -- - Keep empty, background would cover most of window and be distracting.
+          -- ["bg"] = "red",
 
-          -- Unsure what this does.
-          -- ["bg"] = { "bg", "Normal" },
+          -- `hl`:
+          -- - Highlighted substring in selected lines, i.e. all lines except current cursor line.
+          -- - Meaning, foreground color and attributres, e.g. underline, of part of selected line matching query.
+          -- - If nothing is typed, no lines use this foreground color.
+          -- - Pass in `bold regular` to remove underline from substring.
+          ["hl"] = { "fg", "FzfLuaFzfMatch", "regular", "bold" },
 
-          -- Unsure.
-          -- ["hl"] = { "fg", "Comment" },
+          -- `fg+`:
+          -- - Foreground color of current line.
+          -- - Keep `fzf` default, `None` foreground color, in bold.
+          -- ["fg+"] = { "fg", "None", "bold" },
 
-          -- Filename, in selected line.
-          -- `Visual` matches `lazygit`.
-          -- ["fg+"] = { "fg", "LazygitActiveBorderColor", "underline" },
-          -- ["fg+"] = { "fg", "Normal", "underline" },
-          -- ["fg+"] = { "fg", "Normal", "underline" },
-          ["fg+"] = { "fg", "Visual" },
+          -- `bg+`:
+          -- - BOTH gutter color on left for all lines, AND background color of current line.
+          -- - Set `gutter` to no background color, see below, and use `CursorLine` for current line.
+          ["bg+"] = { "bg", "CursorLine" },
 
-          -- Background of selected line.
-          -- `Visual` matches `lazygit`.
-          -- ["bg+"] = { "bg", { "CursorLine", "Normal" } },
-          ["bg+"] = { "bg", "Visual" },
+          -- `hl`:
+          -- - Highlighted substring in current line, i.e. cursor line.
+          -- - Meaning, foreground color and attributes, e.g. underline, of part of current line mathcing query.
+          -- - If nothing is typed, no line use this foreground color.
+          -- - Keep same as `hl`, since current line is highlighted with `bg+`.
+          ["hl+"] = { "fg", "FzfLuaFzfMatch", "regular", "bold" },
 
-          -- Color of fzf matches, after typing.
-          -- ["hl+"] = { "fg", "Statement" },
-
-          -- Match count.
-          -- ["info"] = { "fg", "PreProc" },
-
-          -- Prompt text, e.g. `All>`.
-          ["prompt"] = { "fg", "LazygitActiveBorderColor" },
-          -- ["prompt"] = { "fg", "Conditional" },
-
-          -- Bar to left of selected line.
-          ["pointer"] = { "fg", "LazygitMain" },
-          -- ["pointer"] = { "fg", "LazygitActiveBorderColor" },
-          -- ["pointer"] = { "fg", "Exception" },
-
-          -- Unsure, does not change color of bar to left of selected line.
-          -- ["marker"] = { "fg", "Keyword" },
-
-          -- Perhaps spinner when waiting for matches.
-          -- ["spinner"] = { "fg", "Label" },
-
-          -- Punctuation in line with information of key bindings, i.e. header.
-          -- Not top search field.
-          -- Thus, gray `Comment` is OK.
-          ["header"] = { "fg", "Comment" },
+          -- Horizontal separator on info line, by default `FzfLuaFzfBorder`.
+          -- Meaning, line between search field and matches.
+          ["separator"] = { "fg", "FzfLuaFzfSeparator" },
 
           -- Gutter to left of non-selected lines.
-          -- `-1`: No color.
-          -- ["gutter"] = "-1",
+          -- `-1`: Default terminal background and foreground colors.
+          ["gutter"] = "-1",
+
+          -- Info line, match counters.
+          ["info"] = { "fg", "FzfLuaFzfInfo" },
+
+          -- Prompt text, e.g. `Files>`.
+          -- ["prompt"] = { "fg", "Conditional" },
+
+          -- Pointer to current line, i.e. bar to left of selected line.
+          -- Red by default.
+          -- ["pointer"] = { "fg", "FzfLuaFzfSeparator" },
+
+          -- Multi-select marker.
+          -- ["marker"] = { "fg", "Keyword" },
+
+          -- Streaming input indicator.
+          -- ["spinner"] = { "fg", "Label" },
+
+          -- Header text, e.g. punctuation in keybindings line, not top search field.
+          -- Grey, e.g. `Comment`.
+          ["header"] = { "fg", "Comment" },
         },
         fzf_opts = {
           ["--no-scrollbar"] = true,
@@ -318,18 +349,102 @@ return {
             scrollchars = { "┃", "" },
           },
         },
-        files = {
-          cwd_prompt = false,
-          actions = {
-            ["alt-i"] = { actions.toggle_ignore },
-            ["alt-h"] = { actions.toggle_hidden },
+        actions = {
+          -- Below are default actions.
+          -- Setting any value will override defaults.
+          -- Other pickers inherit default actions listed below, even if [1] is not `true`.
+          -- Pickers inheriting from these dafault actions:
+          -- - files, git_files, git_status, grep, lsp, oldfiles, quickfix, loclist.
+          -- - tags, btags, args, buffers, tabs, lines, blines.
+          -- If keybinding not usable in inherited picker, it is ignored.
+          files = {
+            -- Inherit excplicitly defined mappings below.
+            -- - `true` : No need, `true` is default.
+            -- - `false`: Pickers do not inherit below mappings.
+            -- false,
+            -- `file_edit_or_qf` opens single selection or sends multiple selection to quickfix.
+            -- Replace `enter` with `file_edit` to open all files/bufs whether single or multiple.
+            -- Replace `enter` with `file_switch_or_edit` to attempt a switch in current tab first.
+            -- ["enter"] = false,
+            ["enter"] = actions.file_edit_or_qf,
+            ["ctrl-s"] = actions.file_split,
+            ["ctrl-v"] = actions.file_vsplit,
+
+            -- `toggle_ignore` is not used by `oldfiles` picker.
+            ["ctrl-r"] = actions.toggle_ignore,
+
+            -- Open all fzf-lua matches in `trouble.nvim`.
+            -- If `trouble.nvim` not installed, use default behaviour: `actions.file_tabedit`.
+            ["ctrl-t"] = MyVim.has("trouble.nvim") and trouble_action_open or actions.file_tabedit,
+
+            -- Remove default `alt` bindings.
+            -- ["alt-q"] = actions.file_sel_to_qf,
+            -- ["alt-Q"] = actions.file_sel_to_ll,
+            -- ["alt-i"] = actions.toggle_ignore,
+            -- ["alt-h"] = actions.toggle_hidden,
+            -- ["alt-f"] = actions.toggle_follow,
           },
         },
+        files = {
+          -- By default, cwd appears in header only if `opts` contain cwd
+          -- parameter with different directory than current working directory,
+          -- i.e. when opening folder in root.
+          -- `true` | `false`: Always | never show cwd in header.
+          cwd_header = false,
+
+          -- Show cwd as prompt, if `false` show `All>`,
+          -- or set manually with `prompt`.
+          cwd_prompt = false,
+
+          -- Manually set prompt, used if `cwd_prompt` is `false`.
+          prompt = "Files❯ ",
+
+          -- Global `rg` options, does not work, presumably overwritten by same options under `grep`.
+          -- rg_opts = [[--hidden --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -g "!.git" ]]
+          --  .. [[-e]],
+
+          -- Additonal key bindings for files picker.
+          -- No need, just used inherited bindings, from `actions.files`.
+          -- actions = {
+          -- `toggle_ignore`: Instead of default `alt-i`, use `ctrl-r`, which is what `grep` uses by default.
+          -- ["alt-i"] = { actions.toggle_ignore },
+          -- ["alt-h"] = { actions.toggle_hidden },
+          -- },
+        },
+        oldfiles = {
+          cwd_header = false,
+          -- cwd_only = false,
+          prompt = "History❯ ",
+          -- Include buffers from current session.
+          -- NOTE: When re-opening all previous buffers on Neovim start,
+          -- all those buffers are added to `history` list.
+          include_current_session = true,
+        },
         grep = {
-          actions = {
-            ["alt-i"] = { actions.toggle_ignore },
-            ["alt-h"] = { actions.toggle_hidden },
-          },
+          cwd_header = false,
+          prompt = "Rg❯ ",
+          input_prompt = "Grep For❯ ",
+
+          -- - Set options passed directly to `rg`.
+          -- - Can omit `--hidden` and `-g "!.git"`, set with other config below.
+          --   - `--colors`: `{type}:{attribute}:{value}`.
+          --   - `type`       : `path` | `line` (line number) | `column` | `match`.
+          --   - `attribute`  : `fg` | `bg` | `style`.
+          --   - `value`      : Color for `fg` | `bg`, or text style for `style`.
+          --   - `{type}:none`: Clears formatting going forward.
+          -- - `match:fg`: Defaults to `LightRed`, i.e. ANSI 256 color `9`.
+          rg_opts = [[--column --line-number --no-heading --color=always --smart-case --max-columns=4096 ]]
+            .. [[--colors 'match:fg:0xff,0x96,0x6c' --colors 'line:fg:10' --colors 'column:fg:14' ]]
+            .. [[-e]],
+
+          -- Include hidden files, i.e. `true`.
+          hidden = true,
+
+          -- Do not follow symlinks.
+          follow = false,
+
+          -- Respect `.gitignore`.
+          no_ignore = false,
         },
         lsp = {
           symbols = {
@@ -380,26 +495,56 @@ return {
     keys = {
       { "<c-j>", "<c-j>", ft = "fzf", mode = "t", nowait = true },
       { "<c-k>", "<c-k>", ft = "fzf", mode = "t", nowait = true },
+
+      ----------------------------------------------------------------
+      -- Top-level.
+      ----------------------------------------------------------------
       {
         "<leader>,",
         "<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>",
         desc = "Switch Buffer",
       },
+      -- Opens file picker from root directory of current file,
+      -- but when root directory cannot be determined from file,
+      -- e.g. at `dashboard`, file picker is opened from current working directory.
+      { "<leader><space>", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
+      { "<leader>.", MyVim.pick("oldfiles"), desc = "Recent (Root Dir)" },
       { "<leader>/", MyVim.pick("live_grep"), desc = "Grep (Root Dir)" },
       { "<leader>:", "<cmd>FzfLua command_history<cr>", desc = "Command History" },
-      { "<leader><space>", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
-      -- find
+
+      ----------------------------------------------------------------
+      -- Find.
+      ----------------------------------------------------------------
       { "<leader>fb", "<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>", desc = "Buffers" },
       { "<leader>fc", MyVim.pick.config_files(), desc = "Find Config File" },
       { "<leader>ff", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
       { "<leader>fF", MyVim.pick("files", { root = false }), desc = "Find Files (cwd)" },
       { "<leader>fg", "<cmd>FzfLua git_files<cr>", desc = "Find Files (git-files)" },
-      { "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent" },
+
+      ----------------------------------------------------------------
+      -- Recent.
+      -- Note: Only updates list when Neovim restarts.
+      ----------------------------------------------------------------
+      -- Recent files, regardless of directory.
+      { "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent (All)" },
+
+      -- Recent files from root directory.
+      -- { "<leader>fR", MyVim.pick("oldfiles"), desc = "Recent (Root Dir)" },
+      -- Recent files from current working directory.
       { "<leader>fR", MyVim.pick("oldfiles", { cwd = vim.uv.cwd() }), desc = "Recent (cwd)" },
-      -- git
-      { "<leader>gc", "<cmd>FzfLua git_commits<CR>", desc = "Commits" },
+
+      ----------------------------------------------------------------
+      -- Git.
+      ----------------------------------------------------------------
+      -- Use `gl` for `git log`.
+      -- { "<leader>gc", "<cmd>FzfLua git_commits<CR>", desc = "Commits" },
+      { "<leader>gl", "<cmd>FzfLua git_commits<CR>", desc = "Git Log (project)" },
+      { "<leader>gL", "<cmd>FzfLua git_bcommits<CR>", desc = "Git Log (buffer)" },
       { "<leader>gs", "<cmd>FzfLua git_status<CR>", desc = "Status" },
-      -- search
+
+      ----------------------------------------------------------------
+      -- Search.
+      ----------------------------------------------------------------
       { '<leader>s"', "<cmd>FzfLua registers<cr>", desc = "Registers" },
       { "<leader>sa", "<cmd>FzfLua autocmds<cr>", desc = "Auto Commands" },
       { "<leader>sb", "<cmd>FzfLua grep_curbuf<cr>", desc = "Buffer" },
