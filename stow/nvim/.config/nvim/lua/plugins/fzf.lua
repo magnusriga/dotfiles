@@ -111,15 +111,6 @@ return {
       -- - Other pickers have other keymaps, like buffers, tabs, git.status, etc.
 
       ----------------------------------------------------------------
-      -- Remap `ctrl-t` for files, from `file_tabedit`, i.e. open selection in new tab,
-      -- to move list into `trouble.nvim` buffer.
-      ----------------------------------------------------------------
-      if MyVim.has("trouble.nvim") then
-        -- Move fzf list into `trouble.nvim` buffer.
-        -- config.defaults.actions.files["ctrl-t"] = require("trouble.sources.fzf").actions.open
-      end
-
-      ----------------------------------------------------------------
       -- Remap `ctrl-r` for files, from `toggle_ignore` to toggle between root dir and cwd.
       -- No need, use built-in behaviour for `ctrl-r`, i.e. `toggle_ignore`.
       ----------------------------------------------------------------
@@ -181,12 +172,8 @@ return {
         -- Some colors must be set in global `fzf-lua` config, i.e. `hls`,
         -- since no standard `fzf --color` option exists for them.
         hls = {
-          live_sym = "FzfLuaLiveSym",
-
-          ["file_part"] = "red",
-          ["dir_part"] = "red",
-          ["tab_marker"] = "red",
-          ["tab_title"] = "red",
+          -- `["help_normal"]` does not set `fg` color on help search.
+          -- ["help_normal"] = { "fg", "LazygitActiveBorderColor" },
         },
         ----------------------------------------------------------------
         -- `fzf_colors`.
@@ -371,7 +358,8 @@ return {
             ["ctrl-v"] = actions.file_vsplit,
 
             -- `toggle_ignore` is not used by `oldfiles` picker.
-            ["ctrl-r"] = actions.toggle_ignore,
+            -- Omit, not enough header space and rarely used.
+            -- ["ctrl-r"] = actions.toggle_ignore,
 
             -- Open all fzf-lua matches in `trouble.nvim`.
             -- If `trouble.nvim` not installed, use default behaviour: `actions.file_tabedit`.
@@ -437,17 +425,31 @@ return {
             .. [[--colors 'match:fg:0xff,0x96,0x6c' --colors 'line:fg:10' --colors 'column:fg:14' ]]
             .. [[-e]],
 
+          -- Remove basic `fzf` header, showing when no bindings available,
+          -- i.e. `CTRL-T: Files/Directories | CTRL-R: All`.
+          -- fzf_opts = {
+          --   ["--no-header"] = true,
+          -- },
+
           -- Include hidden files, i.e. `true`.
           hidden = true,
 
           -- Do not follow symlinks.
           follow = false,
 
+          -- Do not hide full header, it contains e.g. regex search string.
+          -- no_header = true,
+
+          -- Hide interactive header, i.e. `<ctrl-g> to regex search` and `<ctrl-r> to include ignore-files`.
+          -- Enables better view of regex search string, but need to see bindings.
+          -- no_header_i = true,
+
           -- Respect `.gitignore`.
           no_ignore = false,
         },
         lsp = {
           symbols = {
+            prompt = "Symbols❯ ",
             symbol_hl = function(s)
               return "TroubleIcon" .. s
             end,
@@ -458,6 +460,42 @@ return {
           },
           code_actions = {
             previewer = vim.fn.executable("delta") == 1 and "codeaction_native" or nil,
+          },
+        },
+        tags = {
+          prompt = "Tags❯ ",
+          fzf_opts = {
+            ["--no-header"] = true,
+          },
+        },
+        helptags = {
+          prompt = "Helptags❯ ",
+          fzf_opts = {
+            ["--no-header"] = true,
+          },
+        },
+        jumps = {
+          prompt = "Jumptags❯ ",
+          fzf_opts = {
+            ["--no-header"] = true,
+          },
+        },
+        keymaps = {
+          prompt = "Keymaps❯ ",
+          fzf_opts = {
+            ["--no-header"] = true,
+          },
+        },
+        marks = {
+          prompt = "Marks❯ ",
+          fzf_opts = {
+            ["--no-header"] = true,
+          },
+        },
+        manpages = {
+          prompt = "Manpages❯ ",
+          fzf_opts = {
+            ["--no-header"] = true,
           },
         },
       }
