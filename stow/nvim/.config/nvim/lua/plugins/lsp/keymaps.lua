@@ -15,26 +15,81 @@ function M.get()
     M._keys =  {
       { "<leader>cl", "<cmd>LspInfo<cr>", desc = "Lsp Info" },
 
-      -- These four are overwritten in `plugins/fzf.lua`.
-      { "gd", vim.lsp.buf.definition, desc = "Goto Definition", has = "definition" },
-      { "gr", vim.lsp.buf.references, desc = "References", nowait = true },
-      { "gI", vim.lsp.buf.implementation, desc = "Goto Implementation" },
-      { "gy", vim.lsp.buf.type_definition, desc = "Goto T[y]pe Definition" },
+      ---------------------------------------------
+      -- Built-in `gr<x>` commands, see: `:h vim-diff`, `:h lsp`.
+      ---------------------------------------------
+      -- - Normal mode:
+      -- - `grn` : `vim.lsp.buf.rename()`
+      -- - `gra` : `vim.lsp.buf.code_action()`, Normal | Visual mode.
+      -- - `grr` : `vim.lsp.buf.references()`.
+      -- - `gri` : `vim.lsp.buf.implementation()`.
+      -- - `gO`  : `vim.lsp.buf.document_symbol()`.
+      -- - `gq`  : Calls function in `opt.formatexpr()`, initially set to `vim.lsp.formatexpr()` by Neovim,
+      --           but remapped to `util/format.lua` > `format()`.
+      -- - `K`   : `vim.lsp.buf.hover()`.
+      -- - CTRL-]: `vim.lsp.tagfunc()` > `textdocument/definition` < `vim.lsp.buf.defitition`.
+      --
+      -- - Insert mode:
+      -- - CTRL-S: `vim.lsp.buf.signature_help()`.
+      --
+      -- Therefore, below shortcuts not needed, but built-ins are overwritten in `plugins/fzf.lua`
+      -- to open `fzf-lua` picker if multiple results, e.g. mutliple references.
 
-      { "gD", vim.lsp.buf.declaration, desc = "Goto Declaration" },
-      { "K", function() return vim.lsp.buf.hover() end, desc = "Hover" },
-      { "gK", function() return vim.lsp.buf.signature_help() end, desc = "Signature Help", has = "signatureHelp" },
-      { "<c-k>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" },
-      { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Action", mode = { "n", "v" }, has = "codeAction" },
-      { "<leader>cc", vim.lsp.codelens.run, desc = "Run Codelens", mode = { "n", "v" }, has = "codeLens" },
+      -- { "gd", vim.lsp.buf.definition, desc = "Goto Definition", has = "definition" },
+      -- { "gr", vim.lsp.buf.references, desc = "References", nowait = true },
+      -- { "gI", vim.lsp.buf.implementation, desc = "Goto Implementation" },
+      -- { "gy", vim.lsp.buf.type_definition, desc = "Goto T[y]pe Definition" },
+      -- { "gD", vim.lsp.buf.declaration, desc = "Goto Declaration" },
+      -- { "K", function() return vim.lsp.buf.hover() end, desc = "Hover" },
+      -- { "gK", function() return vim.lsp.buf.signature_help() end, desc = "Signature Help", has = "signatureHelp" },
+      -- { "<c-k>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "Signature Help", has = "signatureHelp" },
+      --
+      -- { "<leader>cr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
+      ---------------------------------------------
+
+      ---------------------------------------------
+      -- Code actions.
+      ---------------------------------------------
+      -- Opens `vim.ui.select` to choose code action, overwritten in `plugins/fzf.lua` to use `fzf-lua`.
+      -- No need, use built-in `gra`, which still uses `fzf-lua` picker, since `vim.ui.select` is replaced.
+      -- { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Action", mode = { "n", "v" }, has = "codeAction" },
+
+      -- Apply code action if only one choice, see: `vim.lsp.buf.code_action()`.
+      -- No need, add new `gra` in `fzf-lua` if needed.
+      -- { "<leader>ca", function() vim.lsp.buf.code_action({ apply = true }) end, desc = "Code Action", mode = { "n", "v" }, has = "codeAction" },
+
+      -- Show list of code actions available at current cursor position, including only
+      -- those that apply to entire source file, i.e. entire buffer.
+      -- No need, use normal code actions menu.
+      -- { "<leader>cA", MyVim.lsp.action.source, desc = "Source Action", has = "codeAction" },
+
+      ---------------------------------------------
+      -- Codelens shows information and|or links, next to code.
+      ---------------------------------------------
+      -- - Codelens information:
+      --  - References to piece of code, e.g. functions.
+      --  - Changes to piece of code.
+      --  - Linked bugs.
+      --  - Azure DevOps work items
+      --  - Code reviews.
+      --  - Linked unit tests.
+
+      -- Get codelenses from language server, and show in buffer.
       { "<leader>cC", vim.lsp.codelens.refresh, desc = "Refresh & Display Codelens", mode = { "n" }, has = "codeLens" },
-      { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File", mode ={"n"}, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
-      { "<leader>cr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
-      { "<leader>cA", MyVim.lsp.action.source, desc = "Source Action", has = "codeAction" },
 
-      -- ==========================
+      -- Run codelens under cursor, i.e. when link to other code, e.g. unit tests.
+      { "<leader>cc", vim.lsp.codelens.run, desc = "Run Codelens", mode = { "n", "v" }, has = "codeLens" },
+
+      ---------------------------------------------
+      -- Renaming.
+      ---------------------------------------------
+      -- Rename file and update references.
+      -- Keep, as built-in `grn` only renames source code, not files.
+      { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File", mode ={"n"}, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
+
+      ---------------------------------------------
       -- `Snacks.words`.
-      -- ==========================
+      ---------------------------------------------
       -- - `vim.lsp.buf.document_highlight()`: Adds extmarks AND highlights for all symbols
       --   matching word under cursor, in current file only.
       -- - Symbols are defined by language, so e.g. cursor on `then` will highlight `if` and `end`.
@@ -48,19 +103,16 @@ function M.get()
       --   and allows jumping to those references using key bindings mapping to `Snacks.words.jump(<count>, [<cycle>])`.
       -- - `config.notify_jump` is `false` by default, set to `true` to run `vim.notify` at jump.
       --
-      -- - All usage of `Snacks.words` in MyVim are below.
-      --
       -- - `Snacks.words` is disabled by default, enable with: `Snacks.words.enable()`.
-      --
-      -- - Thus, OK to leave `Snacks.words` keybindings as is.
-      { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
-        desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
-      { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",
-        desc = "Prev. Reference", cond = function() return Snacks.words.is_enabled() end },
-      { "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight",
-        desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
-      { "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, has = "documentHighlight",
-        desc = "Prev. Reference", cond = function() return Snacks.words.is_enabled() end },
+      -- - No need, interferes with built-in, e.g. `[[`:  N sections backwards.
+      -- { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
+      --   desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
+      -- { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",
+      --   desc = "Prev. Reference", cond = function() return Snacks.words.is_enabled() end },
+      -- { "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight",
+      --   desc = "Next Reference", cond = function() return Snacks.words.is_enabled() end },
+      -- { "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, has = "documentHighlight",
+      --  desc = "Prev. Reference", cond = function() return Snacks.words.is_enabled() end },
     }
 
   return M._keys

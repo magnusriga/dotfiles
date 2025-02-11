@@ -19,6 +19,7 @@ local picker = {
   end,
 }
 
+-- Register `fzf-lua` as picker.
 if not MyVim.pick.register(picker) then
   return {}
 end
@@ -34,14 +35,14 @@ local function symbols_filter(entry, ctx)
 end
 
 return {
-  -- Picker for FZF.
+  -- `fzf-lua`, picker for FZF.
   {
     "ibhagwan/fzf-lua",
     cmd = "FzfLua",
     opts = function(_, opts)
+      local trouble_fzf = require("trouble.sources.fzf")
       local config = require("fzf-lua.config")
       local actions = require("fzf-lua.actions")
-      local trouble_fzf = require("trouble.sources.fzf")
 
       -- Change from these defaults:
       -- fzf = {
@@ -165,6 +166,7 @@ return {
       -- `fzf-lua` spec `opts`.
       ----------------------------------------------------------------
       return {
+        -- `opt[1]`: Profile, i.e. `default-title`.
         "default-title",
 
         -- NOTE: Colors set in `util/hlcolors.lua`, with some overrides defined below.
@@ -278,6 +280,25 @@ return {
         },
         fzf_opts = {
           ["--no-scrollbar"] = true,
+
+          --------------------------------
+          -- - `--margin` | `--padding`.
+          --------------------------------
+          --   - `--margin` : Space outside border, `fzf` default: `1`.
+          --   - `--padding`: Space between border and content, `fzf` default: `1`.
+          --   - Same if no `--border`.
+          --   - Since border in `fzf-lua` is different from `--border`, and `--border` is not used,
+          --     `--marging` and `--padding` both add space inside outer `fzf-lua` window border.
+          --   - Absolute number of lines/columns | percentage of terminal | window height.
+          --   - TRBL in one | TB,RL | T,RL,B | T,R,B,L.
+          --   - When specified in absolute lines/columns, lines are taller than columns are wide,
+          --     thus `1,2` is probably as close to eqaul padding as possible with absolute values.
+          --   - Percentage values will also be difficult to make equal, as monitors are not square.
+          --------------------------------
+          -- Set `--margin=0`, to only have to deal with padding.
+          ["--margin"] = 0,
+          -- Set `--padding=2`, for two lines on all edges.
+          ["--padding"] = "1,2",
         },
         defaults = {
           -- formatter = "path.filename_first",
@@ -295,11 +316,16 @@ return {
             ueberzug_scaler = "fit_contain",
           },
         },
-        -- Overwrite `vim.ui.select`, i.e. interactive select menu.
+        -- Overwrite `vim.ui.select`, i.e. interactive select menu, with `fzf-lua`.
         -- Actual replacement is done below, via VeryLazy autocmd.
         ui_select = function(fzf_opts, items)
+          -- `vim.o.lines`: Number of lines in the current window, i.e. screen height.
+          -- `items`      : Number of items to select from, e.g. number of code action items.
           return vim.tbl_deep_extend("force", fzf_opts, {
             prompt = " ",
+            fzf_opts = {
+              ["--no-header"] = true,
+            },
             winopts = {
               title = " " .. vim.trim((fzf_opts.prompt or "Select"):gsub("%s*:%s*$", "")) .. " ",
               title_pos = "center",
@@ -307,17 +333,27 @@ return {
           }, fzf_opts.kind == "codeaction" and {
             winopts = {
               layout = "vertical",
-              -- Height is number of items minus 15 lines for the preview, with a max of 80% screen height.
-              height = math.floor(math.min(vim.o.lines * 0.8 - 16, #items + 2) + 0.5) + 16,
+              -- To determine height, start with number of ui select items,
+              -- add 2 lines for top and bottom `fzf` padding, see above,
+              -- add 2 lines for query line and separator below query line,
+              -- add 16 lines for preview window and its border.
+              height = math.floor(math.min(vim.o.lines * 0.8 - 16, #items + 4) + 0.5) + 16,
               width = 0.5,
-              preview = not vim.tbl_isempty(MyVim.lsp.get_clients({ bufnr = 0, name = "vtsls" })) and {
-                layout = "vertical",
-                vertical = "down:15,border-top",
-                hidden = "hidden",
-              } or {
-                layout = "vertical",
-                vertical = "down:15,border-top",
-              },
+
+              -- Preview window starts as hidden if language server is `vtsls`, i.e. file is typescript.
+              preview = not vim.tbl_isempty(MyVim.lsp.get_clients({ bufnr = 0, name = "vtsls" }))
+                  and {
+                    layout = "vertical",
+                    vertical = "down:15",
+                    -- `border`: "rounded" (default) | "border-top" | "none" | `nvim_open_win` options.
+                    border = "border-top",
+                    hidden = "hidden",
+                  }
+                or {
+                  layout = "vertical",
+                  vertical = "down:15",
+                  border = "border-top",
+                },
             },
           } or {
             winopts = {
@@ -435,7 +471,7 @@ return {
           hidden = true,
 
           -- Do not follow symlinks.
-          follow = false,
+          follow = true,
 
           -- Do not hide full header, it contains e.g. regex search string.
           -- no_header = true,
@@ -459,7 +495,10 @@ return {
             child_prefix = false,
           },
           code_actions = {
-            previewer = vim.fn.executable("delta") == 1 and "codeaction_native" or nil,
+            -- When git-delta is installed use "codeaction_native" for beautiful diffs
+            -- try it out with `:FzfLua lsp_code_actions previewer=codeaction_native`
+            -- scroll up to `previewers.codeaction{_native}` for more previewer options
+            previewer = vim.fn.executable("delta") == 1 and "codeaction_native" or "codeaction",
           },
         },
         tags = {
@@ -501,6 +540,7 @@ return {
       }
     end,
     config = function(_, opts)
+      -- This is true, `opt[1]`, i.e. profile, is `default-title`.
       if opts[1] == "default-title" then
         -- Use same prompt for all pickers for profile `default-title` and
         -- profiles that use `default-title` as base profile.
@@ -520,7 +560,8 @@ return {
     end,
     init = function()
       MyVim.on_very_lazy(function()
-        -- Overwrite `vim.ui.select`, i.e. interactive select menu, with `opt.ui_select`,
+        -- Overwrite `vim.ui.select`, i.e. interactive select menu,
+        -- with `fzf-lua`, passing in `opt.ui_select` from above,
         -- when `lazy.nvim` is done installing and loading plugins.
         vim.ui.select = function(...)
           require("lazy").load({ plugins = { "fzf-lua" } })
@@ -531,8 +572,11 @@ return {
       end)
     end,
     keys = {
-      { "<c-j>", "<c-j>", ft = "fzf", mode = "t", nowait = true },
-      { "<c-k>", "<c-k>", ft = "fzf", mode = "t", nowait = true },
+      ---------------------------------------------
+      -- Unsure what these do.
+      ---------------------------------------------
+      -- { "<c-j>", "<c-j>", ft = "fzf", mode = "t", nowait = true },
+      -- { "<c-k>", "<c-k>", ft = "fzf", mode = "t", nowait = true },
 
       ----------------------------------------------------------------
       -- Top-level.
@@ -640,8 +684,8 @@ return {
   {
     "neovim/nvim-lspconfig",
 
-    -- - Overwrite `plugins.lsp.keymaps._keys`, so `fzf-lua` is used for LSP commands that could return,
-    --   list of multiple results from language server.
+    -- - Overwrite behaviour for built-in LSP keybindings, and/or from `plugins/lsp/keymaps.lua` (not used),
+    --   so `fzf-lua` is used in case LSP command could returns multiple results from language server.
     -- - `opts` as function, so this just executes right before `opts` is passed to `config`
     --   function, during `opts` merging.
     -- - Since below function extends `Keys`, it extends reference to `plugins.lsp.keymaps._keys` table in memory,
@@ -649,12 +693,89 @@ return {
     --   which is where autocmd is set up that creates key bindings from `plugins.lsp.keymaps._keys`.
     opts = function()
       local Keys = require("plugins.lsp.keymaps").get()
+
+      ---------------------------------------------
+      -- Built-in `gr<x>` commands, see: `:h vim-diff`, `:h lsp`.
+      ---------------------------------------------
+      -- - Normal mode:
+      -- - `grn` : `vim.lsp.buf.rename()`
+      -- - `gra` : `vim.lsp.buf.code_action()`, Normal | Visual mode.
+      -- - `grr` : `vim.lsp.buf.references()`.
+      -- - `gri` : `vim.lsp.buf.implementation()`.
+      -- - `gO`  : `vim.lsp.buf.document_symbol()`.
+      -- - `gq`  : Calls function in `opt.formatexpr()`, initially set to `vim.lsp.formatexpr()` by Neovim,
+      --           but remapped to `util/format.lua` > `format()`.
+      -- - `K`   : `vim.lsp.buf.hover()`.
+      -- - CTRL-]: `vim.lsp.tagfunc()` > `textdocument/definition` < `vim.lsp.buf.defitition`.
+      --
+      -- - Insert mode:
+      -- - CTRL-S: `vim.lsp.buf.signature_help()`.
+      --
+      -- Therefore, do not re-create above functionality in new shortcuts,
+      -- except to use `plugins/fzf.lua` if command can return multiple hits, e.g. references.
+      --
+      -- These built-in bindings are remapped to same command, except using `fzf-lua`,
+      -- instead of quickfix list, when language server returns multiple results:
+      -- - `grr`.
+      -- - `gri`.
+      -- - `gO`.
+      --
+      -- These built-in bindings are remapped to same command:
+      -- - `gd` : Built-in behaviour is to go to local declaration, mainly useful in `C`,
+      --          thus remap similar functionality that works across languages,
+      --          i.e. `vim.lsp.buf.definition()`.
+      --
+      -- These built-in bindings are not remapped:
+      -- - `grn`: `vim.lsp.buf.rename()`, no remap needed, cannot return multiple results.
+      -- - `gra`: `vim.lsp.buf.code_action()`, no remap needed, just calls `vim.ui.select`,
+      --          which is overwritten with `fzf-lua` picker.
+      --
+      -- These new bindings are created, following built-in `gr<x>` format, as no built-in binding exists:
+      -- - `grd`: Go to definintion, same as built-in `ctrl-]`.
+      -- - `gry`: Go to type definintion.
+      ---------------------------------------------
+
+      ---------------------------------------------
+      -- Symbols and tags.
+      ---------------------------------------------
+      -- - Tags are defined in tag files, created with `ctags`, `gutentags`, etc.
+      -- - Alternatively, tags can be created on demand, for `{name}` in `:tag {name}`
+      --   or for word under cursor when using `gd` or `ctrl-]`.
+      -- - Tags are created on demand with function defined in `opt.tagfunc`.
+      -- - `opt.tagfunc` is set to `vim.lsp.tagfunc()`, when Neovim's built-in LSP client starts.
+      -- - `vim.lsp.tagfunc()` invokes `textdocument/definition` LSP method when used with Normal mode
+      --   commands, e.g. `gd` or `ctrl-]`, and "workspace/symbol" when used with other tag commands,
+      --   e.g. `:tag` | `:tjump` | `tselect`.
+      -- - Thus, tags are set by LSP response, enabling navigation to function definition.
+      --   - `ctrl-]` : Go to definition.
+      --   - `:tag`   : Go to symbol.
+      -- - Potential ways to continousely update tags, so symbol search is fast:
+      --   - Regularly calling `ctags`.
+      --   - Storing `symbols` for file in table, based on `vim.lsp.buf.document_symbols()`,
+      --     updating it on `InsertLeave`.
+      ---------------------------------------------
+
       -- stylua: ignore
       vim.list_extend(Keys, {
-        { "gd", "<cmd>FzfLua lsp_definitions     jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Definition", has = "definition" },
-        { "gr", "<cmd>FzfLua lsp_references      jump_to_single_result=true ignore_current_line=true<cr>", desc = "References", nowait = true },
-        { "gI", "<cmd>FzfLua lsp_implementations jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Implementation" },
-        { "gy", "<cmd>FzfLua lsp_typedefs        jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
+        -- `grr`: Built-in key binding for `vim.lsp.buf.references()`, here overwriting it with same behaviour,
+        --        except using `fzf-lua` instead of default quickfix list when multiple results.
+        { "grr", "<cmd>FzfLua lsp_references jump_to_single_result=true ignore_current_line=true<cr>", desc = "References", nowait = true },
+
+        -- `gri`: Built-in key binding for `vim.lsp.buf.implementation()`, here overwriting it with same behaviour,
+        --        except using `fzf-lua` instead of default quickfix list when multiple results.
+        { "gri", "<cmd>FzfLua lsp_implementations jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Implementation" },
+
+        -- `gO` : Built-in key binding for `vim.lsp.buf.document_symbol()`, here overwriting it with same behaviour,
+        --        except using `fzf-lua` instead of default quickfix list.
+        -- `regex_filter`: Filters symbols based on list defined in: `config/init.lua` > `options.<lang>|default`.
+        { "gO", function() require("fzf-lua").lsp_document_symbols({ regex_filter = symbols_filter, }) end, desc = "Goto Symbol" },
+
+        -- `gd` : Built-in key binding to go to local declaration, mostly useful in `C`,
+        --        here overwriting it with almost same behaviour, i.e. `vim.lsp.buf.definition()`.
+        { "gd", "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Definition", has = "definition" },
+
+        -- `gry`: Not built-in key binding, thus no overwriting.
+        { "gry", "<cmd>FzfLua lsp_typedefs jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
       })
     end,
   },

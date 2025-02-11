@@ -48,6 +48,10 @@ function M.register(formatter)
   end)
 end
 
+-- - `opt.formatexpr` uses this function, to format buffers when `gq` is called,
+--   or when `textwidth` autoformats text, in latter case `mode()` is `i` or `R`.
+-- - Return non-zero value to fallback to built-in `formatprg`,
+--   which `conform.formatexpr()` does already, no need to call `mode()`.
 function M.formatexpr()
   if MyVim.has("conform.nvim") then
     return require("conform").formatexpr()

@@ -125,6 +125,80 @@ return {
     end,
   },
 
+  -- - Add, delete, replace punctuation / brackets around text.
+  -- - Action are dot-repeatable.
+  -- - Actions:
+  --   - `sa`  : Add.
+  --   - `sd`  : Delete.
+  --   - `sr`  : Replace.
+  --   - `sf|F`: Find next|previous surrounding.
+  --   - `sh`  : Briefly highlight surrounding.
+  --   - `sn`  : Change number of neighbour lines searched for match, default 20.
+  -- - Surroundings:
+  --   - `f`   : Function call.
+  --   - `t`   : Find tag with given name, change tag name.
+  --   - `()`  : Find balanced brackets, change brackets, including: `()`, `[]`, `{}`, `<>`.
+  --   - `?`   : snteractive, prompt for left and right parts.
+  --   - All   : All other characters also supported, with idenitcal left and right parts.
+  -- - Suffix:
+  --   - Instead of operating on surrounding items, operate on last|next pair.
+  --   - Applies to all actions except "Add".
+  --   - `l`   : Last method: `gsrl"' ...`.
+  --   - `n`   : Next method: `gsan"'`.
+  -- - Search method, first applies to current line then to neighborhood:
+  --   - `cover`: Use only covering match, not previous | next, report if not found.
+  --   - `cover_or_next`: Use covering match, if not found use next.
+  --   - `cover_or_prev`: Use covering match, if not found use previous.
+  --   - `cover_or_nearest`: Use covering match, if not found use nearest.
+  --   - `next`: Use next match.
+  --   - `prev`: Use previous match.
+  --   - `nearest`: Use nearest match.
+  -- - Note:
+  --   - Does use whatever is around cursor, without understanding of pairs.
+  {
+    "echasnovski/mini.surround",
+
+    -- `keys` are merged with `keys` from other `mini.surround` specs, just like `opts`.
+    keys = function(_, keys)
+      -- `opts` merged from all `mini.surround` specs, including `opts` below.
+      local opts = MyVim.opts("mini.surround")
+
+      -- `rhs` is nil, so mapping is created in `nvim.surround` config.
+      -- Purpose of below is to add `which-key` descriptions.
+      local mappings = {
+        { opts.mappings.add, desc = "Add Surrounding", mode = { "n", "v" } },
+        { opts.mappings.delete, desc = "Delete Surrounding" },
+        { opts.mappings.find, desc = "Find Right Surrounding" },
+        { opts.mappings.find_left, desc = "Find Left Surrounding" },
+        { opts.mappings.highlight, desc = "Highlight Surrounding" },
+        { opts.mappings.replace, desc = "Replace Surrounding" },
+        { opts.mappings.update_n_lines, desc = "Update `MiniSurround.config.n_lines`" },
+      }
+
+      -- Only include mappings above that are actually defined in `opts`.
+      mappings = vim.tbl_filter(function(m)
+        return m[1] and #m[1] > 0
+      end, mappings)
+
+      return vim.list_extend(mappings, keys)
+    end,
+
+    opts = {
+      mappings = {
+        add = "gsa", -- Add surrounding in Normal and Visual modes.
+        delete = "gsd", -- Delete surrounding.
+        find = "gsf", -- Find surrounding (to the right).
+        find_left = "gsF", -- Find surrounding (to the left).
+        highlight = "gsh", -- Highlight surrounding.
+        replace = "gsr", -- Replace surrounding.
+        update_n_lines = "gsn", -- Update `n_lines`.
+      },
+
+      -- See above and `:h MiniSurround.config`.
+      search_method = "cover_or_next",
+    },
+  },
+
   -- `lazydev` ensures LuaLS does not load, i.e. run, all libraries,
   -- i.e. all `.lua` files inside `~/.config/nvim` directory,
   -- to provide completion suggestions and diagnostics based on available types,

@@ -345,6 +345,15 @@ return {
           end
         end
 
+        -- Set `flags` for all servers.
+        -- PERF: Might affect performance.
+        server_opts.flags = {
+          -- Done to allow `$/cancelRequest` to reach server before `textDocument/didChange`,
+          -- when former is sent to server by InsertLeave and TextChanged, as part of storing symbols,
+          -- if another `textDocument/documentSymbol` request is in flight.
+          debounce_text_changes = 1000,
+        }
+
         -- Finally, execute LSP server's setup function.
         --
         -- `require("lspconfig")[server]` returns table with server-specific

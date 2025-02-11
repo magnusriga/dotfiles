@@ -98,6 +98,7 @@ sudo pacman -Syu --noconfirm \
   vim \
   tmux \
   file \
+  ctags \
   openssh \
   iproute2 \
   rsync \

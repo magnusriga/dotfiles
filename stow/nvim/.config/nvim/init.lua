@@ -83,7 +83,7 @@ nvim CLI options
 -- Neovim Setup.
 -- =========================================================================================================
 
----------------------------------------------
+-------------------------------------------
 -- Bootstrap lazy.nvim plugin manager.
 -- 1. Clone repo `lazy.nvim.git` into `lazypath` directory: `$HOME/.local/share/nvim/lazy/lazy.nvim`.
 -- 2. Add `lazypath` to runtimepath, so `require("lazy")` resolves to: `<lazypath>/lua/lazy`.

@@ -152,13 +152,15 @@ opt.foldlevel = 99
 opt.foldtext = "v:lua.require'util.ui'.foldtext()"
 
 -- Function used for `gq` operator.
-opt.formatexpr = "v:lua.require'myvim.util'.format.formatexpr()"
+opt.formatexpr = "v:lua.require'util.format'.formatexpr()"
 
 -- `formatoptions` determines which lines these apply to:
 -- - `opt.textwidth`.
 -- - `gq` command.
 -- Prefer `wrap`|`linebreak` over `textwidth`, former do NOT insert EOL, just visually drops text to next line.
--- Default: `tcqj`.
+-- - Default: `tcqj`.
+-- - Note: Filtype plugins, e.g. `vim.vim` and `typescript.vim`, append `croql` and remove `t`,
+--   to avoid inserting EOL in source code.
 -- Good: `opt.textwidth = 90`, `formatoptions = "jcroqln"`, alt. inc. `t`.
 -- Exclude `t`, to avoid inserting EOL in source code, since `textwidth` is set.
 -- `opt.formatoptions` options (`:h fo-table`):
@@ -172,7 +174,7 @@ opt.formatexpr = "v:lua.require'myvim.util'.format.formatexpr()"
 --      when they are already longer than `textwidth` when starting Insert mode.
 -- `n`: When formatting text (also comments), lists are recognized using `opt.formatlistpat`,
 --      so indent is applied to next list matching indent of text on first list line.
-opt.formatoptions = "jcroqln"
+opt.formatoptions = "jncroql"
 
 -- Substitute all matches on each line, not just first, wihout having to specify /g.
 -- `%/replaceMe/newText/c` will consider all matches in each line.

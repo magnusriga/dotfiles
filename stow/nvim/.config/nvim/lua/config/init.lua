@@ -124,12 +124,21 @@ local defaults = {
       "Property",
       "Struct",
       "Trait",
+
+      -- Also include these.
+      "Object",
+      "Array",
+      "Variable",
+      -- "Constant",
+      -- "Number",
+      -- "String",
+      -- "Boolean",
     },
   },
 }
 
 ---@param buf? number
----@return string[]|boolean?
+---@return string[]?
 function M.get_kind_filter(buf)
   buf = (buf == nil or buf == 0) and vim.api.nvim_get_current_buf() or buf
   local ft = vim.bo[buf].filetype
@@ -139,8 +148,9 @@ function M.get_kind_filter(buf)
   if M.kind_filter[ft] == false then
     return
   end
-  if type(M.kind_filter[ft]) == "table" then
-    return M.kind_filter[ft]
+  local kind_filter_ft = M.kind_filter[ft]
+  if type(kind_filter_ft) == "table" then
+    return kind_filter_ft
   end
   ---@diagnostic disable-next-line: return-type-mismatch
   return type(M.kind_filter) == "table" and type(M.kind_filter.default) == "table" and M.kind_filter.default or nil
@@ -202,6 +212,7 @@ function M.setup(opts)
       if neovim_autocmds then
         M.load("autocmds")
       end
+
       M.load("keymaps")
       if neovim_clipboard ~= nil then
         vim.opt.clipboard = neovim_clipboard
@@ -218,6 +229,9 @@ function M.setup(opts)
 
       -- Load highlight groups.
       M.load("hlgroups")
+
+      -- Load symbols cahce feature.
+      require("util.document_symbol")
 
       vim.api.nvim_create_user_command("MyHealth", function()
         vim.cmd([[Lazy! load all]])
