@@ -72,7 +72,7 @@ return {
     dependencies = {
       {
         "mason.nvim",
-        opts = { ensure_installed = { "prettier", "prettierd" } },
+        opts = { ensure_installed = { "prettierd" } },
       },
     },
     -- Only load this plugin when `require('conform')`,
@@ -166,7 +166,7 @@ return {
       }
 
       for _, ft in ipairs(prettier_supported) do
-        opts.formatters_by_ft[ft] = { "prettierd", "prettier" }
+        opts.formatters_by_ft[ft] = { "prettierd" }
         -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
         -- table.insert(opts.formatters_by_ft[ft], "prettierd")
         -- table.insert(opts.formatters_by_ft[ft], "prettier")

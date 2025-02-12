@@ -571,29 +571,33 @@ local throttled_store_symbol = throttle(store_symbols, { ms = 1000 })
 -- 3. Need to cancel request on every text change, i.e. `on_lines`, but BEFORE `on_lines`
 --    by Noevim LSP client.
 -- - `on_lines` is like `TextChanged`, just more granular, and apparently fires before.
-vim.api.nvim_create_autocmd({ "InsertLeave" }, {
-  group = vim.api.nvim_create_augroup("update_symbols_inner", { clear = true }),
-  callback = function(data)
-    local clients = vim.lsp.get_clients({ bufnr = data.buf })
-    if not clients or #clients < 1 then
-      return
-    end
+if vim.g.symbols_cache then
+  vim.api.nvim_create_autocmd({ "InsertLeave" }, {
+    group = vim.api.nvim_create_augroup("update_symbols_inner", { clear = true }),
+    callback = function(data)
+      local clients = vim.lsp.get_clients({ bufnr = data.buf })
+      if not clients or #clients < 1 then
+        return
+      end
 
-    throttled_store_symbol(data.buf)
-    -- At this point, symbols have not been stored yet, as LSP request is async.
-  end,
-})
+      throttled_store_symbol(data.buf)
+      -- At this point, symbols have not been stored yet, as LSP request is async.
+    end,
+  })
+end
 
-vim.api.nvim_create_autocmd({ "BufEnter" }, {
-  group = vim.api.nvim_create_augroup("didChange", { clear = true }),
-  callback = function(data)
-    vim.api.nvim_buf_attach(data.buf, false, {
-      on_lines = function()
-        fn_cancel_all()
-      end,
-    })
-  end,
-})
+if vim.g.symbols_cache then
+  vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    group = vim.api.nvim_create_augroup("didChange", { clear = true }),
+    callback = function(data)
+      vim.api.nvim_buf_attach(data.buf, false, {
+        on_lines = function()
+          fn_cancel_all()
+        end,
+      })
+    end,
+  })
+end
 
 local function symbols_filter(entry, ctx)
   if ctx.symbols_filter == nil then

@@ -20,6 +20,9 @@ vim.filetype.add({
 -- Fix markdown indentation settings.
 vim.g.markdown_recommended_style = 0
 
+-- Toggle symbols cache.
+vim.g.symbols_cache = false
+
 ---------------------------------------------
 -- Helper functions.
 ---------------------------------------------
