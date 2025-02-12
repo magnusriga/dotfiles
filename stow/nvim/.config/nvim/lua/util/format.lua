@@ -232,7 +232,6 @@ function M.format(opts)
     if formatter.active then
       done = true
       MyVim.try(function()
-        MyVim.info("Formatting now with " .. formatter.name)
         return formatter.format(buf)
       end, { msg = "Formatter `" .. formatter.name .. "` failed" })
     end

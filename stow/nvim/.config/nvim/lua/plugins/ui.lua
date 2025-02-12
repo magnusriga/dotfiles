@@ -254,7 +254,12 @@ return {
           end
         end,
       }):map("<leader>ut")
-      return { mode = "cursor", max_lines = 3 }
+      return {
+        mode = "cursor",
+        max_lines = 3,
+        -- Prefer separator over highlight, see `config/hlgroups.lua`.
+        separator = "—",
+      }
     end,
   },
 

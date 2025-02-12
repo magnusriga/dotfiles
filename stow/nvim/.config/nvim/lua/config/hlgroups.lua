@@ -117,3 +117,21 @@ vim.cmd([[
   highlight MiniIconsOrange guifg=#ff966c
   highlight MiniIconsYellow guifg=#ffc777
 ]])
+
+-- Treesitter.
+-- `TreesitterContext`                : Background and foreground color of context area, default `NormalFloat`.
+-- `TreesitterContextLineNumbers`     : Background and foreground color of line numbers in
+--                                      context area, default `LineNr`.
+-- `TreesitterContextSeparator`       : Background and foreground color of separator, default `FloatBorder`.
+-- `TreesitterContextBottom`          : Highlight of last line of context window, by default
+--                                      `NONE`, use to create border via underline highlight.
+-- `TreesitterContextLineNumberBottom`: Same as `..Bottom` above, just for line number.
+--
+-- highlight TreesitterContextLineNumbers highlight Treesitter guifg=#ff757f
+-- highlight TreesitterContextSeparator highlight MiniIconsGrey guifg=#c8d3f5
+-- highlight TreesitterContextBottom gui=underline guisp=#495162
+-- highlight TreesitterContextLineNumberBottom gui=underline guisp=#495162
+vim.cmd([[
+  highlight link TreesitterContext Normal
+  highlight link TreesitterContextSeparator LineNr
+]])

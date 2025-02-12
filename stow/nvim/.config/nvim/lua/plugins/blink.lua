@@ -7,6 +7,7 @@
 -- - See: `https://cmp.saghen.dev/installation`.
 -- - Enabled by adding `blink.cmp` to `dependencies` of `nvim-lspconfig`: `plugins/lsp/init.lua`.
 -- ====================================
+
 return {
   {
     "saghen/blink.cmp",
@@ -85,6 +86,17 @@ return {
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
         cmdline = {},
+        -- providers = {
+        --   lsp = {
+        --     override = {
+        --       get_trigger_characters = function(self)
+        --         local trigger_characters = self:get_trigger_characters()
+        --         vim.list_extend(trigger_characters, { "\n", "\t", " " })
+        --         return trigger_characters
+        --       end,
+        --     },
+        --   },
+        -- },
       },
 
       keymap = {
@@ -93,7 +105,28 @@ return {
         -- 'enter': Mappings similar to 'super-tab' but with 'enter' to accept.
         -- preset = "enter",
         preset = "default",
-        ["<C-y>"] = { "select_and_accept" },
+        -- Default:
+        -- ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+        -- ["<C-e>"] = { "hide" },
+        -- ["<C-y>"] = { "select_and_accept" },
+
+        -- ["<Up>"] = { "select_prev", "fallback" },
+        -- ["<Down>"] = { "select_next", "fallback" },
+        -- ["<C-p>"] = { "select_prev", "fallback" },
+        -- ["<C-n>"] = { "select_next", "fallback" },
+
+        -- ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+        -- ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+
+        -- ["<Tab>"] = { "snippet_forward", "fallback" },
+        -- ["<S-Tab>"] = { "snippet_backward", "fallback" },
+
+        -- ["<C-k>"] = { "show_signature", "hide_signature", "fallback" },
+
+        -- Traditional completion keymaps.
+        --['<CR>'] = cmp.mapping.confirm { select = true },
+        --['<Tab>'] = cmp.mapping.select_next_item(),
+        --['<S-Tab>'] = cmp.mapping.select_prev_item(),
       },
     },
 
@@ -113,7 +146,8 @@ return {
             MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
             "fallback",
           }
-        -- Other presets, e.g. `default` | `enter`.
+          -- Other presets, e.g. `default` | `enter`.
+          -- Use `<Tab>` to move to forward in snippet.
         else
           opts.keymap["<Tab>"] = {
             MyVim.cmp.map({ "snippet_forward", "ai_accept" }),

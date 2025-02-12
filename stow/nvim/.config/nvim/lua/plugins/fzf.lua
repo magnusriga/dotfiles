@@ -467,10 +467,10 @@ return {
           --   ["--no-header"] = true,
           -- },
 
-          -- Include hidden files, i.e. `true`.
+          -- Include hidden files.
           hidden = true,
 
-          -- Do not follow symlinks.
+          -- Follow symlinks.
           follow = true,
 
           -- Do not hide full header, it contains e.g. regex search string.
