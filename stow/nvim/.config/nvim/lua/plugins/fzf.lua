@@ -395,7 +395,7 @@ return {
 
             -- `toggle_ignore` is not used by `oldfiles` picker.
             -- Omit, not enough header space and rarely used.
-            ["ctrl-r"] = actions.toggle_ignore,
+            -- ["ctrl-r"] = actions.toggle_ignore,
 
             -- Open all fzf-lua matches in `trouble.nvim`.
             -- If `trouble.nvim` not installed, use default behaviour: `actions.file_tabedit`.
