@@ -237,7 +237,10 @@ return {
         -- { path = "LazyVim", words = { "LazyVim" } },
 
         -- Load lazy.nvim when file has MyVim, because `MyVim` inherits from `lazy.nvim`.
-        { path = "lazy.nvim", words = { "MyVim" } },
+        { path = "lazy.nvim", words = { "MyVim", "LazyVim", "LazySpec" } },
+
+        -- Always load `lazy.nvim`.
+        { path = "yazi.nvim", words = { "YaziConfig" } },
 
         -- Only load luvit types when the `vim.uv` word is found.
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },

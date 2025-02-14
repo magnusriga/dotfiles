@@ -125,6 +125,50 @@ return {
     opts = {
       preset = "helix",
       defaults = {},
+      icons = {
+        -- Symbol used in command line area that shows active key combo.
+        breadcrumb = "»",
+
+        -- Symbol used between key and its label.
+        separator = "➜",
+
+        -- Symbol prepended to group.
+        group = "+",
+
+        ellipsis = "…",
+
+        -- Set to false to disable all mapping icons,
+        -- both those explicitly added in mapping and those from rules.
+        mappings = true,
+
+        --- - Set to `false` to disable keymap icons from rules.
+        --- - See: `lua/which-key/icons.lua`.
+        --- - `icon` can be string, or table:
+        ---    `{
+        ---      icon  = String icon to use.
+        ---      hl    = Highlight group to use.
+        ---      color = Color to use: azure | blue | cyan | green | magenta | orange | red | violet | yellow.
+        ---      cat   = String category of icon: `file` | `filetype` | `extension`.
+        ---      name  = Name of icon in specified category.
+        ---    }`.
+        --- - `icon.cat` and `icon.name` is used to get icon from `mini.icons`:
+        ---   `local Icons = require("mini.icons")`.
+        ---   `local ico = Icons.get(icon.cat, icon.name)`.
+        ---@type wk.IconRule[]|false
+        rules = {
+          -- { plugin = "fzf-lua", cat = "filetype", name = "fzf" },
+          -- { plugin = "neo-tree.nvim", cat = "filetype", name = "neo-tree" },
+          -- { plugin = "octo.nvim", cat = "filetype", name = "git" },
+          -- { plugin = "yanky.nvim", icon = "󰅇", color = "yellow" },
+          -- { plugin = "zen-mode.nvim", icon = "󱅻 ", color = "cyan" },
+          -- { plugin = "telescope.nvim", pattern = "telescope", icon = "", color = "blue" },
+          { plugin = "yazi.nvim", cat = "filetype", name = "neo-tree" },
+        },
+
+        -- Use highlights from `mini.icons`.
+        -- When `false`, use `WhichKeyIcon` instead.
+        colors = true,
+      },
       spec = {
         {
           mode = { "n", "v" },
