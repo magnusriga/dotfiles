@@ -32,13 +32,14 @@ run = "plugin arrow --args=-1"
 on = "j"
 run = "plugin arrow --args=1"
 
-[[manager.prepend_keymap]]
-on = "f"
-run = "search fd --args='--hidden'"
-
-[[manager.prepend_keymap]]
-on = "s"
-run = "search rg --args='--hidden'"
+# No need to remap this to match `fzf-lua.nvim`, just use `fzf` in yazi instead (`Z`),
+# which searces both files and directories.
+# [[manager.prepend_keymap]]
+# on = "f"
+# run = "search fd --args='--hidden'"
+# [[manager.prepend_keymap]]
+# on = "s"
+# run = "search rg --args='--hidden'"
 
 # [manager]
 # keymap = [
