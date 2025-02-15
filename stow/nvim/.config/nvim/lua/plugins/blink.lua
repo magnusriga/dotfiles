@@ -8,6 +8,34 @@
 -- - Enabled by adding `blink.cmp` to `dependencies` of `nvim-lspconfig`: `plugins/lsp/init.lua`.
 -- ====================================
 
+-- ====================================
+-- `blink.cmp` and Copilot.
+-- ====================================
+-- - Problematic that completion menu is blocking view of Copilot ghost text.
+-- - Would be same even if copilot suggestion came from completion menu.
+-- - Yes, but then at least full text shows in documentation window.
+-- - But, `blink.cmp` completion menu does not seem to update as frequently as ghost text from copilot.
+-- - Example: When writing any comment, e.g. "-- Function printing fibbionacci …", it stops showing suggestions.
+-- - Also impossible to generate code based on comments, as completion menu does not show up
+--   on white space, and triggring it with `<C-Space>` does not make the Copilot function
+--   suggestion show up.
+-- - Some bug in `blink.cmp`?
+-- - Thus, turn off `vim.g.ai_cmp` in `config/options.lua`, to disable `blink.cmp` ghost text,
+--   and not show Copilot suggestions in completion menu, and instead only show them as ghost text.
+-- - To remove completion menu if blocking view of Copilot ghost text: `<C-e>`.
+-- ====================================
+
+-- ====================================
+-- Usage.
+-- ====================================
+-- - Ghost text from Copilot is shown automatically when typing, since `auto_trigger` is `true`.
+-- - `<Tab>`    : Accept Copilot suggestion, if visible.
+-- - `<c-l>`    : Next Copilot suggestion.
+-- - `<c-e>`    : Close completion menu, if blocking Copilot ghost text.
+-- - `<c-n|p|y>`: Navigate completion menu.
+-- - `<c-space>`: Manually trigger completion menu.
+-- ====================================
+
 return {
   {
     "saghen/blink.cmp",
@@ -28,6 +56,7 @@ return {
 
     dependencies = {
       "rafamadriz/friendly-snippets",
+      "onsails/lspkind-nvim",
     },
 
     -- Delay plugin load until entering Insert mode.
@@ -61,24 +90,76 @@ return {
           },
         },
 
-        menu = {
-          draw = {
-            treesitter = { "lsp" },
-          },
-        },
-
         documentation = {
           auto_show = true,
           auto_show_delay_ms = 200,
+          treesitter_highlighting = true,
+          window = { border = "rounded" },
+        },
+
+        -- list = {
+        --   -- No effect on cmdline mode, probably due to `config/options.lua` settings,
+        --   -- for wildmenu.
+        --   selection = {
+        --     -- When `true`, automatically select first item in completion list.
+        --     -- Default: `true`.
+        --     -- Makes no difference, as `<c-y>` anyways selects first item.
+        --     -- First item not auto-inserted, even if `auto_insert` is `true`.
+        --     -- preselect = function(ctx)
+        --     --   return ctx.mode ~= "cmdline"
+        --     -- end,
+
+        --     -- When `true`, insert completion item automatically when selecting it,
+        --     -- use `<C-e>` to both undo selection and hide completion menu.
+        --     -- Default: `true`.
+        --     -- auto_insert = function(ctx)
+        --     --   return ctx.mode ~= "cmdline"
+        --     -- end,
+        --   },
+        -- },
+
+        menu = {
+          -- Better looking without border.
+          -- border = "rounded",
+
+          -- cmdline_position = function()
+          --   if vim.g.ui_cmdline_pos ~= nil then
+          --     local pos = vim.g.ui_cmdline_pos -- (1, 0)-indexed
+          --     return { pos[1] - 1, pos[2] }
+          --   end
+          --   local height = (vim.o.cmdheight == 0) and 1 or vim.o.cmdheight
+          --   return { vim.o.lines - height, 0 }
+          -- end,
+
+          draw = {
+            treesitter = { "lsp" },
+
+            -- Show `kind` as text, e.g. `Snippet`, on RHS of completion menu.
+            -- No need, as `kind_icon` already shown on LHS.
+            -- columns = {
+            --   { "kind_icon", "label", gap = 1 },
+            --   { "kind" },
+            -- },
+          },
         },
 
         ghost_text = {
+          -- - Show entries from completion menu as ghost text.
+          -- - Interferes with Copilot suggestions if those also shown as ghost text.
+          --
+          -- - Thus, only enable `blink.cmp` ghost text below, if Copilot suggestions
+          --   ONLY shown as entries in `blink.nvim` completion menu, NOT as ghost text.
+          --
+          -- - See: `plugins/addons/ai.lua` | `plugins/blink.lua` | `config/options.lua`.
           enabled = vim.g.ai_cmp,
         },
       },
 
       -- Experimental signature help support.
-      -- signature = { enabled = true },
+      signature = {
+        enabled = true,
+        window = { border = "rounded" },
+      },
 
       -- List of enabled providers.
       -- Extendable through other `blink.cmp` specs, due to `opts_extend`,
@@ -132,23 +213,37 @@ return {
 
     ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
     config = function(_, opts)
-      -- `map`:
-      -- - Runs all `actions` passed in first argument, if defined in `MyVim.cmp.actions`.
-      -- - Initially, `MyVim.cmp.actions` does not contain `ai_accept`, but can be added later.
-
-      -- Add `ai_accept` to `<Tab>` key.
-      -- If snippet is active, `<Tab>` calls `snippet_forward` action, which jumps to next snippet inpput.
-      -- If snippet not active, `<Tab>` calls `ai_accept` action, which chooses most likely snippet.
+      -- - `plugins/blink.lua` (below):
+      --   `<Tab>` mapped to call each `MyVim.action` function, in sequence.
+      --
+      -- - `MyVim.cmp.lua`:
+      --   `snippet_forward` and `snippet_backward` functions are added to
+      --   `MyVim.cmp.actions` table, which moves forward and backward in snippet ONLY if
+      --   snippet is active, i.e. being filled in on screen, otherwise does nothing.
+      --
+      -- - `plugins/addons/ai.lua`:
+      --   `ai_accept` function is added to `MyVim.cmp.actions` table,
+      --   which accepts AI suggestion if visible ONLY if Copilot suggestion is visible,
+      --   which is always when typing, since `auto_trigger` is `true`, otherwise does nothing.
+      --
+      -- - `else` condition below applies, as `super-tab` preset is not used, see above,
+      --   using `default` preset instead, which follows Neovim built-in completion keymaps,
+      --   e.g. `<C-y>` | etc.
+      --
+      -- - Thus, `<Tab>` calls these functions in sequence:
+      --   - If snippet visible: `snippet_forward` function, to move forward to next snippet input.
+      --   - If Copilot suggestion visible: `ai_accept` function, to accept Copilot suggestion.
       if not opts.keymap["<Tab>"] then
-        if opts.keymap.preset == "super-tab" then -- super-tab
+        if opts.keymap.preset == "super-tab" then
           opts.keymap["<Tab>"] = {
             require("blink.cmp.keymap.presets")["super-tab"]["<Tab>"][1],
             MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
             "fallback",
           }
-          -- Other presets, e.g. `default` | `enter`.
-          -- Use `<Tab>` to move to forward in snippet.
         else
+          -- - This condition applies, as `default` preset is used, not `super-tab`.
+          -- - Thus, `<Tab>` calls `snippet_forward` if snippet is visible,
+          --   then `ai_accept` if Copilot suggestion is visible.
           opts.keymap["<Tab>"] = {
             MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
             "fallback",

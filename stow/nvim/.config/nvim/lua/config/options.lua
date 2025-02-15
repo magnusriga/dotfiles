@@ -64,9 +64,24 @@ vim.g.maplocalleader = " "
 -- - `nvim-cmp`.
 -- vim.g.lazyvim_cmp = "auto"
 
--- Activates ghost text in `blink.nvim`.
--- E.g. copilot added to `sources` in: `plugins/ai.nvim`.
-vim.g.ai_cmp = true
+-- Determine if Copilot suggestions | completion menu entries should show as ghost text.
+-- - `true`:
+--   - Copilot suggestions (`plugins/addons/ai.lua`):
+--     - NOT ghost text.
+--     - ONLY completion menu, including documentation window.
+--     - ALSO ghost text when selected in completion menu.
+--   - Completion menu entries (`plugins/blink.lua`):
+--     - BOTH ghost text, of first entry in menu.
+--     - AND completion menu, including documentation window.
+-- - `false`:
+--   - Copilot suggestions (`plugins/addons/ai.lua`):
+--     - ONLY ghost text.
+--     - NOT completion menu.
+--   - Completion menu entries (`plugins/blink.lua`):
+--     - NOT ghost text, of first entry in menu.
+--     - ONLY completion menu (documentation window).
+-- vim.g.ai_cmp = true
+vim.g.ai_cmp = false
 
 -- Change MyVim root dir detection.
 -- * Name of detector function like `lsp` or `cwd`.

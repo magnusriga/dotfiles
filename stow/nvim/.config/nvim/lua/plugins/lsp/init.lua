@@ -49,18 +49,35 @@ return {
         ---@type vim.diagnostic.Opts
         diagnostics = {
           underline = true,
-          -- By default, Neovim's built-in LSP client updates diagnostics on `InsertLeave`,
-          -- i.e. when leaving Insert mode, including when running `ctrl-o` in Insert mode.
-          -- With `update_in_insert = true`, Neovim's built-in LSP client updates diagnostics
-          -- when typing in Insert mode, i.e. on `TextChanged`, which can be slow.
-          -- update_in_insert = false,
-          update_in_insert = true,
+          -- - By default, Neovim's built-in LSP client updates diagnostics on `InsertLeave`,
+          --   i.e. when leaving Insert mode, including when running `ctrl-o` in Insert mode.
+          -- - With `update_in_insert = true`, Neovim's built-in LSP client updates diagnostics
+          --   when typing in Insert mode, i.e. on `TextChanged`, which can be slow.
+          -- - Turn this off, so virual text does not interfere with ghost text from e.g. AI suggestions.
+          -- update_in_insert = true,
+          update_in_insert = false,
           virtual_text = {
+            -- - Position of virtual text.
+            -- - Better to use `update_in_insert` instead, to avoid virtual text
+            --   interfering with ghost text, e.g. from AI suggestions.
+            -- - Possible values:
+            --   - `eol`        : Right after eol character (default).
+            --   - `overlay`    : Display over specified column, without shifting
+            --                    underlying text.
+            --   - `right_align`: display right aligned in window.
+            --   - `inline`     : Display at specified column, and shift buffer text to
+            --                    right as needed.
+            -- `virtual_text_pos = "eol",
+
+            -- Empty space before virtual text.
             spacing = 4,
+
+            -- Include diagnostic source in message.
+            -- `if_many`: Only show source if multiple sources of diagnostics in buffer.
             source = "if_many",
-            -- prefix = "●",
-            -- This will set the prefix to a function that returns the diagnostics icon based on the severity.
-            -- Only works on Neovim >= 0.10.0. Will be set to "●" when not supported.
+
+            -- - Prefix for each diagnostic in window.
+            -- - Converted to function in `config`, to return icon based on severity.
             prefix = "icons",
           },
           severity_sort = true,
@@ -73,18 +90,19 @@ return {
             },
           },
         },
-        -- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0.
+        -- Inlay hints are type hints, e.g. on function arguments, in editor.
         -- Remember to configure LSP server to provide inlay hints.
         -- Used below for `vim.lsp.inlay_hint.enable(..)`, not passed to language server.
         inlay_hints = {
           enabled = true,
+
           -- Disable inlay hints for specific filetypes.
           exclude = { "vue", "typescript", "typescriptreact" },
         },
-        -- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0,
-        -- i.e. information about references, implementations, etc., above functions.
+        -- Code lense is information, e.g. references | implementations | etc., above functions.
         -- Remember to configure LSP server to provide the code lenses.
         -- Only used internally, not passed to LSP server.
+        -- PERF: Might affect performance, thus disable by default.
         codelens = {
           enabled = false,
         },

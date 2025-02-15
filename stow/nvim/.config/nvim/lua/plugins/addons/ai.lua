@@ -5,10 +5,62 @@
 --   using `:Copilot panel`.
 --=========================================
 
--- TODO: Check if shadow text can be kept when typing space.
--- TODO: Bring up suggestion menu automatically under comment?
+-- ====================================
+-- `blink.cmp` and Copilot.
+-- ====================================
+-- - Problematic that completion menu is blocking view of Copilot ghost text.
+-- - Would be same even if copilot suggestion came from completion menu.
+-- - Yes, but then at least full text shows in documentation window.
+-- - But, `blink.cmp` completion menu does not seem to update as frequently as ghost text from copilot.
+-- - Example: When writing any comment, e.g. "-- Function printing fibbionacci …", it stops showing suggestions.
+-- - Also impossible to generate code based on comments, as completion menu does not show up
+--   on white space, and triggring it with `<C-Space>` does not make the Copilot function
+--   suggestion show up.
+-- - Some bug in `blink.cmp`?
+-- - Thus, turn off `vim.g.ai_cmp` in `config/options.lua`, to disable `blink.cmp` ghost text,
+--   and not show Copilot suggestions in completion menu, and instead only show them as ghost text.
+-- - To remove completion menu if blocking view of Copilot ghost text: `<C-e>`.
+-- ====================================
+
+-- ====================================
+-- Usage.
+-- ====================================
+-- - Ghost text from Copilot is shown automatically when typing, since `auto_trigger` is `true`.
+-- - `<Tab>`    : Accept Copilot suggestion, if visible.
+-- - `<c-l>`    : Next Copilot suggestion.
+-- - `<c-e>`    : Close completion menu, if blocking Copilot ghost text.
+-- - `<c-n|p|y>`: Navigate completion menu.
+-- - `<c-space>`: Manually trigger completion menu.
+-- ====================================
 
 return {
+  -- Github Copilot basic working setup.
+  -- {
+  --   "zbirenbaum/copilot.lua",
+  --   cmd = "Copilot",
+  --   event = "InsertEnter",
+  --   config = function()
+  --     require("copilot").setup({
+  --       suggestion = {
+  --         auto_trigger = true,
+  --         keymap = {
+  --           -- Handled by `blink.cmp`.
+  --           -- <c-y> is used by Neovim and completion engine for confirm,
+  --           -- <Tab> is used by completiokkkkkkkkkkkkkn engine to move forward in snippets,
+  --           -- thus use `<c-l>` to accept. a
+  --           --
+  --           -- so use <Tab> here instead.
+  --           -- TODO: Check if it interferes with snippets from blink.cmp.
+  --           accept = "<Tab>",
+  --
+  --           next = "<C-l>",
+  --           dismiss = "<C-]>",
+  --         },
+  --       },
+  --     })
+  --   end,
+  -- },
+
   -- Github Copilot.
   {
     "zbirenbaum/copilot.lua",
@@ -16,52 +68,111 @@ return {
     build = ":Copilot auth",
     event = "BufReadPost",
     opts = {
+      -- Default `copilot.lua` setting for `panel`, included here for reference.
       panel = {
-        -- Panel can be brought up with `:Copilot panel` even if this is `false`,
-        -- however setting it to `true` allows navigating panel and selecting suggenstion,
-        -- with keybindings below.
+        -- Panel is shown with `:Copilot panel`, even if `enabled` is `false`,
+        -- but `true` allows navigating panel and selecting suggenstion with keybindings.
         enabled = true,
+
         auto_refresh = false,
+
         keymap = {
           jump_prev = "[[",
           jump_next = "]]",
           accept = "<CR>",
-          -- Overlaps with built-in `gr..` bindings, but only in Copilot panel,
-          -- and both are still accessible with long and short click.
+
+          -- Overlaps with built-in `gr..` bindings, but OK to keep as
+          -- only applies in Copilot panel, and both are still accessible with
+          -- long and short click.
           refresh = "gr",
+
           open = "<M-CR>",
         },
+
         layout = {
-          -- top | left | right | horizontal | vertical.
+          -- Position of split panel buffer:
+          -- `top` | `left` | `right` | `horizontal` | `vertical`.
           position = "bottom",
+
           ratio = 0.4,
         },
       },
       suggestion = {
+        -- - With suggestions `enabled`, Copilot suggestions show as ghost text.
+        -- - That works well, if ghost text is turned off in `blink.cmp`.
+        -- - Alternatively, set `enabled` to `false` here, and add Copilot suggestions
+        --   to `blink.cmp` completion menu, see below, then activate ghost text in
+        --   `blink.cmp` to ensure first entry, i.e. Copilot suggestion, is visible as
+        --   ghost text.
         enabled = not vim.g.ai_cmp,
-        -- auto_trigger = true,
+
+        -- Show suggestions automatically when typing, via ghost text or in completion
+        -- menu, depending on `enabled` setting.
+        -- Default: `false`.
+        -- Must be `true` for ghost text to appear automatically when typing.
+        auto_trigger = true,
+
+        -- Hide Copilot suggestions when completion menu is active.
         hide_during_completion = vim.g.ai_cmp,
-        debounce = 75,
+
+        -- Debounce time in milliseconds, default `75`.
+        -- debounce = 75,
+
         keymap = {
-          -- Handled by `blink.cmp`.
+          -- - Accept ghost text suggestion, default: `<M-l>`.
+          -- - Using `<Tab>` instead, see below additon to `MyVim.acitons`.
           accept = false,
 
           accept_word = false,
           accept_line = false,
-          next = "<M-]>",
-          prev = "<M-[>",
-          dismiss = "<C-]>",
+
+          -- - Move to next Copilot suggestion, in ghost text, default: `<M-]>`.
+          -- - Set to `<M-l>`, since `alt` is not available, i.e. used by window
+          --   tiling manager, and `<Tab>` is used for `accept`, see below.
+          next = "<c-l>",
+
+          -- Leave as deafault, not used.
+          -- prev = "<M-[>",
+          -- dismiss = "<C-]>",
         },
       },
+
+      -- - Turn off copilot for certain filetypes.
+      -- - Default:
+      --   - yaml = false,
+      --   - markdown = false,
+      --   - help = false,
+      --   - gitcommit = false,
+      --   - gitrebase = false,
+      --   - hgcommit = false,
+      --   - svn = false,
+      --   - cvs = false,
+      --   - ["."] = false,
       filetypes = {
+        -- Revert "off" default settings for `markdown` and `help` files,
+        -- so Copilot works in those filetypes.
         markdown = true,
         help = true,
       },
     },
   },
 
-  -- Add `ai_accept` function to completion action,
-  -- called when hitting <Tab> to accept visible AI suggestion.
+  -- - `plugins/blink.lua`:
+  --   `<Tab>` mapped to call each `MyVim.action` function, in sequence.
+  --
+  -- - `MyVim.cmp.lua`:
+  --   `snippet_forward` and `snippet_backward` functions are added to
+  --   `MyVim.cmp.actions` table, which moves forward and backward in snippet ONLY if
+  --   snippet is active, i.e. being filled in on screen, otherwise does nothing.
+  --
+  -- - `plugins/addons/ai.lua` (below):
+  --   `ai_accept` function is added to `MyVim.cmp.actions` table,
+  --   which accepts AI suggestion if visible ONLY if Copilot suggestion is visible,
+  --   which is always when typing, since `auto_trigger` is `true`, otherwise does nothing.
+  --
+  -- - Thus, `<Tab>` calls these functions in sequence:
+  --   - If snippet visible: `snippet_forward` function, to move forward to next snippet input.
+  --   - If Copilot suggestion visible: `ai_accept` function, to accept Copilot suggestion.
   {
     "zbirenbaum/copilot.lua",
     opts = function()
