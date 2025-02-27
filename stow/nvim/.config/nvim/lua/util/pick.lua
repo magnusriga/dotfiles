@@ -2,6 +2,19 @@
 ---@overload fun(command:string, opts?:myvim.util.pick.Opts): fun()
 local M = setmetatable({}, {
   __call = function(m, ...)
+    -- ====================================================================
+    -- When `MyVim.pick(<command>)` is called.
+    -- ====================================================================
+    -- - `MyVim.pick(<command>, <opts>)` calls `picker.open(<command>, <opts>)`,
+    --   which uses root of current buffer as `opts.cwd`, if `opts.cwd` is not passed in.
+    -- - Root of current buffer found via: `MyVim.root({ buf = opts.buf })`.
+    -- - Example:
+    --   `MyVim.pick("files")` >
+    --   `MyVim.pick.wrap("files")` >
+    --   `MyVim.pick.open("files")` >
+    --   `MyVim.pick.picker.open("files", { cwd = vim.fn.stdpath("config") })` >
+    --   `MyVim.pick.picker === Table from `lua/plugins/fzf.lua`,
+    --   including `open` | `name` | `commands` keys.
     return m.wrap(...)
   end,
 })
@@ -60,6 +73,8 @@ function M.open(command, opts)
     opts.cwd = nil
   end
 
+  -- When `opts` not passed in to `MyVim.pick(<cmd>, <opts>)`, default to
+  -- `MyVim.root({ buf = opts.buf })`, which is root of current buffer.
   if not opts.cwd and opts.root ~= false then
     opts.cwd = MyVim.root({ buf = opts.buf })
   end

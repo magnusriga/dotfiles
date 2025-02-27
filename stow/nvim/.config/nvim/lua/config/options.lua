@@ -84,14 +84,24 @@ vim.g.maplocalleader = " "
 vim.g.ai_cmp = false
 
 -- Change MyVim root dir detection.
--- * Name of detector function like `lsp` or `cwd`.
--- * Pattern or array of patterns like `.git` or `lua`.
--- * Function with signature `function(buf) -> string|string[]`.
+-- - Options:
+--   - Name of detector function, e.g. `lsp` | `cwd`.
+--     - `lsp` : Detect root from LSP server.
+--   - Pattern or array of patterns, e.g. `.git` | `lua`.
+--     - `.git`: Use folder containing first `.git` folder above current buffer.
+--   - Function with signature `function(buf) -> string|string[]`.
+-- - Not set:
+--   - `MyVim.root.spec` is used.
+--   - `{ "lsp", { ".git", "lua" }, "cwd" }`.
+-- - Prefer:
+--   - Leave default from `MyVim.root.spec`.
+--   - Set `root_dir` for `vtsls` to `.git`.
+--   - Set `root_lsp_ignore` list below, so only `vtsls` is used for TS files.
 -- vim.g.root_spec = { "lsp", { ".git", "lua" }, "cwd" }
 
 -- Set LSP servers to be ignored when used with `util.root.detectors.lsp`
 -- for detecting LSP root.
-vim.g.root_lsp_ignore = { "copilot" }
+vim.g.root_lsp_ignore = { "eslint", "tailwindcss", "copilot" }
 
 -- Show current document symbols location from Trouble in `lualine`.
 -- Disable for buffer: `vim.b.trouble_lualine = false`.

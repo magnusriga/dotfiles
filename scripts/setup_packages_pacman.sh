@@ -118,6 +118,7 @@ sudo pacman -Syu --noconfirm \
   harfbuzz harfbuzz-utils \
   dav1d dav1d-doc \
   rrdtool \
+  valkey \
   vulkan-driver \
   freeglut \
   opengl-man-pages \

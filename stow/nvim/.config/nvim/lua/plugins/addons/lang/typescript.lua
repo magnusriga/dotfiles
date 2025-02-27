@@ -18,6 +18,12 @@ return {
             "typescript.tsx",
           },
 
+          -- Use `.git` directory to determine root of project, instead of default
+          -- `package.json` | `tsconfig.json`, since using monorepo.
+          root_dir = function(fname)
+            return vim.fs.dirname(vim.fs.find(".git", { path = fname, upward = true })[1])
+          end,
+
           -- Almost same as original VSCode extension:
           -- `https://github.com/yioneko/vtsls/blob/main/packages/service/configuration.schema.json`.
           -- `vtsls`: Additional settings exclusive to `vtsls`.
@@ -306,14 +312,14 @@ return {
               local action, uri, range = unpack(command.arguments)
 
               local function move(newf)
-                client.request("workspace/executeCommand", {
+                client:request("workspace/executeCommand", {
                   command = command.command,
                   arguments = { action, uri, range, newf },
                 })
               end
 
               local fname = vim.uri_to_fname(uri)
-              client.request("workspace/executeCommand", {
+              client:request("workspace/executeCommand", {
                 command = "typescript.tsserverRequest",
                 arguments = {
                   "getMoveToRefactoringFileSuggestions",
@@ -429,7 +435,7 @@ return {
     end,
   },
 
-  -- Filetype icons
+  -- Filetype icons.
   {
     "echasnovski/mini.icons",
     opts = {

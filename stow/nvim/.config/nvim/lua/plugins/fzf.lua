@@ -1,6 +1,19 @@
 ---@class FzfLuaOpts: myvim.util.pick.Opts
 ---@field cmd string?
 
+-- ====================================================================
+-- When `picker.open(<command>, <opts>)` is called.
+-- ====================================================================
+-- - `picker.open(<command>, <opts>)` is called when calling `MyVim.pick(<command>)`.
+-- - Example:
+--   `MyVim.pick("files")` calls `picker.open("files", {})`.
+--   `MyVim.pick("files", { cwd = vim.fn.stdpath("config") })` >
+--   `MyVim.pick.wrap("files", { cwd = vim.fn.stdpath("config") })` >
+--   `MyVim.pick.open("files", { cwd = vim.fn.stdpath("config") })` >
+--   `MyVim.pick.picker.open("files", { cwd = vim.fn.stdpath("config") })` >
+--   `MyVim.pick.picker === Table from `lua/plugins/fzf.lua`,
+--   including `open` | `name` | `commands` keys.
+-- - `open`: Uses `fzf-lua` to find root, unless `opts` is passsed in.
 ---@type MyPicker
 local picker = {
   name = "fzf",
