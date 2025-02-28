@@ -8,9 +8,9 @@ echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USERNAME $
 export CHROOT=$HOME/chroot
 
 function makeCleanChroot() {
- sudo rm -rf $CHROOT 
- mkdir $CHROOT
- LC_ALL=C.UTF-8 mkarchroot $CHROOT/root base-devel
+  sudo rm -rf "$CHROOT"
+  mkdir "$CHROOT"
+  LC_ALL=C.UTF-8 mkarchroot "$CHROOT/root" base-devel
 }
 
 # ==================================
@@ -30,7 +30,8 @@ stow --no-folding -vv -d "$HOME/dotfiles/stow" -t "$HOME" pacman
 # Only necessary on `aarch64`, i.e. ARM, because on `x86_64`
 # `arch-nspawn` handles it automatically.
 # ==================================
-[[ $(uname -m) == "aarch64" ]] && echo 'Server = http://mirror.archlinuxarm.org/$arch/$repo/' | sudo tee $CHROOT/root/etc/pacman.d/mirrorlist 1>/dev/null
+# shellcheck disable=SC2016
+[[ $(uname -m) == "aarch64" ]] && echo 'Server = http://mirror.archlinuxarm.org/$arch/$repo/' | sudo tee "$CHROOT/root/etc/pacman.d/mirrorlist" 1>/dev/null
 
 # ==================================
 # For ARM architecture, `stow` updated `arch-nspawn` that does not overwrite
@@ -42,7 +43,7 @@ sudo rm -f "/usr/local/bin/arch-nspawn"
 # ==================================
 # Ensure base chroot ($CHROOT/root) is up to date.
 # ==================================
-arch-nspawn $CHROOT/root pacman -Syy
+arch-nspawn "$CHROOT/root" pacman -Syy
 
 # ==================================
 # Build and Intstall Package.
@@ -55,7 +56,7 @@ arch-nspawn $CHROOT/root pacman -Syy
 # - Create clean chroot.
 #    - Run `makeCleanChroot`, defined above.
 #    - Only run once, as `makechrootpkg -c` will automatically clean chroot folder before building.
-# 
+#
 # Steps:
 # 1) Build inside clean chroot: `makechrootpkg -c -r $CHROOT -- -sc --noconfirm`.
 #    IMPORTANT: `makechrootpkg` must be run as normal user, NOT as root, i.e. not with `sudo`.
@@ -183,50 +184,70 @@ export BUILD_REPOS="${BUILD_HOME:-$HOME/build}/repositories"
 # ==================================
 PACKAGE="yay"
 echo "Installing $PACKAGE"
-echo $BUILD_REPOS/$PACKAGE
-rm -rf $BUILD_REPOS/$PACKAGE
-git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
-ls -la $BUILD_REPOS/$PACKAGE
-ls -la $BUILD_REPOS/$PACKAGE
-cd $BUILD_REPOS/$PACKAGE
-makechrootpkg -c -r $CHROOT -- -sc --noconfirm
+echo "$BUILD_REPOS/$PACKAGE"
+rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+ls -la "$BUILD_REPOS/$PACKAGE"
+ls -la "$BUILD_REPOS/$PACKAGE"
+cd "$BUILD_REPOS/$PACKAGE" || exit
+makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
 # makepkg -sci --noconfirm
-cd $BUILD_HOME/packages
-ls | grep -P "$PACKAGE-\d" | sudo pacman -U --noconfirm -
+cd "$BUILD_HOME/packages" || exit
+sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
 echo "Installed $PACKAGE version: $($PACKAGE --version)"
-cd $CWD
+cd "$CWD" || exit
 
 # ==================================
 # paru.
 # ==================================
 PACKAGE="paru-git"
 echo "Installing $PACKAGE"
-rm -rf $BUILD_REPOS/$PACKAGE
-git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
-cd $BUILD_REPOS/$PACKAGE
-makechrootpkg -c -r $CHROOT -- -sc --noconfirm
-cd $BUILD_HOME/packages
-ls | grep -P "$PACKAGE-\d" | sudo pacman -U --noconfirm -
+rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+cd "$BUILD_REPOS/$PACKAGE" || exit
+makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+cd "$BUILD_HOME/packages" || exit
+sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
 echo "Installed $PACKAGE version: $(paru --version)"
-cd $CWD
+cd "$CWD" || exit
 
 # ==================================
 # snapd.
 # ==================================
 PACKAGE="snapd"
 echo "Installing $PACKAGE"
-rm -rf $BUILD_REPOS/$PACKAGE
-git clone https://aur.archlinux.org/$PACKAGE.git $BUILD_REPOS/$PACKAGE
-cd $BUILD_REPOS/$PACKAGE
-makechrootpkg -c -r $CHROOT -- -sc --noconfirm
-cd $BUILD_HOME/packages
-ls | grep -P "$PACKAGE-\d" | sudo pacman -U --noconfirm -
+rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+cd "$BUILD_REPOS/$PACKAGE" || exit
+makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+cd "$BUILD_HOME/packages" || exit
+sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
 echo "Installed snap version: $(snap --version)"
 # Enable systemd unit that manages main snap communication socket.
 sudo systemctl enable --now snapd.socket
 sudo systemctl enable --now snapd.apparmor.service
 sudo ln -fs /var/lib/snapd/snap /snap
-cd $CWD
+cd "$CWD" || exit
+
+# ==================================
+# grpcurl.
+# ==================================
+PACKAGE="grpcurl"
+echo "Installing $PACKAGE"
+# `${name:?}`: If `name` is not set, print error message and exit, to avoid accidentally
+# deleting "/", i.e. entire drive.
+rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+cd "$BUILD_REPOS/$PACKAGE" || exit
+makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+cd "$BUILD_HOME/packages" || exit
+sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
+echo "Installed $PACKAGE version: $(grpcurl --version)"
+cd "$CWD" || exit
 
 # ==================================
 # `yay`: Install AUR packages.

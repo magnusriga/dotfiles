@@ -10,13 +10,6 @@
 ---------------------------------------------
 -- File-related variables.
 ---------------------------------------------
--- Set custom filetypes for specific files, by extension, filename, or pattern.
-vim.filetype.add({
-  filename = {
-    [".shrc"] = "sh",
-  },
-})
-
 -- Fix markdown indentation settings.
 vim.g.markdown_recommended_style = 0
 

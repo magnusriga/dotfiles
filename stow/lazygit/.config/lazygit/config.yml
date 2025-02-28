@@ -1,5 +1,5 @@
 gui:
-  nerdFontsVersion: 3
+  nerdFontsVersion: "3"
   scrollHeight: 20
 git:
   paging:

@@ -3,7 +3,7 @@ local auto_format = vim.g.myvim_eslint_auto_format == nil or vim.g.myvim_eslint_
 return {
   {
     "neovim/nvim-lspconfig",
-    -- other settings removed for brevity
+    -- Other settings removed for brevity.
     opts = {
       servers = {
         eslint = {

@@ -53,8 +53,9 @@ return {
       checkbox = {
         enabled = false,
       },
+      file_types = { "markdown", "Avante" },
     },
-    ft = { "markdown", "norg", "rmd", "org", "codecompanion" },
+    ft = { "markdown", "norg", "rmd", "org", "codecompanion", "Avante" },
     config = function(_, opts)
       require("render-markdown").setup(opts)
       Snacks.toggle({

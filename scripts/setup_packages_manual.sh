@@ -67,7 +67,7 @@ TMPDIR="$HOME/build"
 sudo mkdir -p $STOWDIR
 
 # Set permissions.
-sudo chown -R $USER:$USER $TARGETDIR $STOWDIR
+sudo chown -R "$USER":"$USER" $TARGETDIR $STOWDIR
 sudo chmod -R 755 $TARGETDIR
 
 # ================================================
@@ -77,14 +77,30 @@ PACKAGE="todocheck"
 VERSION=$(curl -s "https://api.github.com/repos/preslavmihaylov/todocheck/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
 sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir $TMPDIR/$PACKAGE
+mkdir "$TMPDIR/$PACKAGE"
 mkdir -p $STOWDIR/$PACKAGE/bin
-curl -L --output $TMPDIR/$PACKAGE/$PACKAGE https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64 --output $TMPDIR/$PACKAGE/$PACKAGE.sha256 https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256
-if echo "$(cat $TMPDIR/$PACKAGE/$PACKAGE.sha256 | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status ; then
-  sudo mv $TMPDIR/$PACKAGE/$PACKAGE $STOWDIR/$PACKAGE/bin
+curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256"
+if echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status; then
+  sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
   chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
   stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 fi
+
+# ================================================
+# Install grpcurl (Note: Architecture).
+# ================================================
+PACKAGE="grpcurl"
+VERSION=$(curl -s "https://api.github.com/repos/fullstorydev/grpcurl/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/fullstorydev/grpcurl/releases/download/v${VERSION}/grpcurl_${VERSION}_linux_arm64.tar.gz"
+# tar'ed file name: grpcurl.
+tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 
 # ================================================
 # Install neovim.
@@ -94,12 +110,12 @@ PACKAGE=neovim
 BUILD_TYPE=Release
 # `$TMPDIR/$PACKAGE/build` holds CMake cache,
 # which must be cleared before rebuilding.
-sudo rm -rf "$TMPDIR/$PACKAGE" 
-sudo rm -rf "$STOWDIR/$PACKAGE" 
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir "$STOWDIR/$PACKAGE"
 git clone https://github.com/neovim/neovim "$TMPDIR/$PACKAGE"
-cd "$TMPDIR/$PACKAGE"
+cd "$TMPDIR/$PACKAGE" || exit
 # make: Downloads and builds dependencies,
 # and puts nvim executable in `build/nvim`.
 make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STOWDIR/$PACKAGE"
@@ -110,7 +126,7 @@ make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STO
 # including copying binary to directory in PATH (e.g. `/usr/local/bin`),
 # man pages to directory in MANPATH, etc.
 make install
-cd $CURRENTDIR
+cd "$CURRENTDIR" || exit
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
@@ -131,9 +147,9 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # #   to ensure symlinks are not overwritten.
 # PACKAGE=ghostty
 # PREFIX=$STOWDIR/$PACKAGE
-# sudo rm -rf "$TMPDIR/$PACKAGE" 
-# sudo rm -rf "$STOWDIR/$PACKAGE" 
-# sudo rm -rf "$HOME/.config/$PACKAGE" 
+# sudo rm -rf "$TMPDIR/$PACKAGE"
+# sudo rm -rf "$STOWDIR/$PACKAGE"
+# sudo rm -rf "$HOME/.config/$PACKAGE"
 # mkdir "$TMPDIR/$PACKAGE"
 # mkdir "$STOWDIR/$PACKAGE"
 # mkdir "$HOME/.config/$PACKAGE"
@@ -152,9 +168,9 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # # VERSION works, but not needed when using git curl.
 # # VERSION=$(curl -s "https://api.github.com/repos/aspiers/stow/tags" | \grep -Po '"name": *"v\K[^"]*' | head -n 1)
 # PACKAGE="stow"
-# sudo rm -rf "$TMPDIR/$PACKAGE" 
-# sudo rm -rf $STOWDIR/$PACKAGE 
-# rm /usr/local/bin/stow /usr/local/bin/chkstow 
+# sudo rm -rf "$TMPDIR/$PACKAGE"
+# sudo rm -rf $STOWDIR/$PACKAGE
+# rm /usr/local/bin/stow /usr/local/bin/chkstow
 # mkdir -p "$STOWDIR/$PACKAGE"
 # cpan install CPAN
 # cpan install Test::Output
@@ -184,8 +200,8 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # ================================================
 # PACKAGE="lazygit"
 # VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-# sudo rm -rf "$TMPDIR/$PACKAGE" 
-# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# sudo rm -rf "$TMPDIR/$PACKAGE"
+# sudo rm -rf "$STOWDIR/$PACKAGE"
 # curl -Lo $TMPDIR/$PACKAGE.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
 # # tar'ed file name: lazygit.
 # tar xzf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
@@ -216,14 +232,14 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # ================================================
 # PACKAGE="cmake"
 # VERSION=$(curl -s "https://api.github.com/repos/Kitware/CMake/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-# sudo rm -rf "$TMPDIR/$PACKAGE-$VERSION" 
-# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# sudo rm -rf "$TMPDIR/$PACKAGE-$VERSION"
+# sudo rm -rf "$STOWDIR/$PACKAGE"
 # mkdir $TMPDIR/$PACKAGE-$VERSION
 # curl -Lo $TMPDIR/$PACKAGE.tar.gz "https://github.com/Kitware/CMake/releases/download/v${VERSION}/cmake-${VERSION}.tar.gz"
 # tar xzf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
 # cd "$TMPDIR/$PACKAGE-$VERSION"
 # ./bootstrap
-# make 
+# make
 # sudo make install
 # cd $CURRENTDIR
 
@@ -232,7 +248,7 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # Use `pacman -Syu ffmpeg` instead.
 # ================================================
 # PACKAGE="ffmpegthumbnailer"
-# sudo rm -rf "$TMPDIR/$PACKAGE" 
+# sudo rm -rf "$TMPDIR/$PACKAGE"
 # git clone https://github.com/dirkvdb/ffmpegthumbnailer.git $TMPDIR/$PACKAGE
 # cd "$TMPDIR/$PACKAGE"
 # cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_GIO=ON -DENABLE_THUMBNAILER=ON .
@@ -243,8 +259,8 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # Use `pacman -Syu 7zip` instead.
 # ================================================
 # PACKAGE="7zip"
-# sudo rm -rf "$TMPDIR/$PACKAGE" 
-# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# sudo rm -rf "$TMPDIR/$PACKAGE"
+# sudo rm -rf "$STOWDIR/$PACKAGE"
 # mkdir "$TMPDIR/$PACKAGE"
 # mkdir -p "$STOWDIR/$PACKAGE/bin"
 # curl -LO --output-dir $TMPDIR "https://www.7-zip.org/a/7z2409-linux-arm64.tar.xz"
@@ -259,7 +275,7 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # ================================================
 # PACKAGE="luarocks"
 # VERSION=$(curl -L "https://luarocks.org/releases" | grep -Po '(?<=luarocks-)(\d+\.\d+\.\d+)' | head -n 1)
-# sudo rm -rf "$STOWDIR/$PACKAGE" 
+# sudo rm -rf "$STOWDIR/$PACKAGE"
 # mkdir "$STOWDIR/$PACKAGE"
 # curl -LO --output-dir $TMPDIR "https://luarocks.org/releases/$PACKAGE-$VERSION.tar.gz"
 # tar xzpf $TMPDIR/$PACKAGE-$VERSION.tar.gz -C $TMPDIR

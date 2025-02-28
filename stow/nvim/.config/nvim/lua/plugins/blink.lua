@@ -161,12 +161,16 @@ return {
         window = { border = "rounded" },
       },
 
+      -- Match built-in cmdline completion.
+      cmdline = {
+        enabled = true,
+      },
+
       -- List of enabled providers.
       -- Extendable through other `blink.cmp` specs, due to `opts_extend`,
       -- e.g. below for `lazydev` provider.
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
-        cmdline = {},
         -- providers = {
         --   lsp = {
         --     override = {
