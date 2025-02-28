@@ -233,23 +233,6 @@ sudo ln -fs /var/lib/snapd/snap /snap
 cd "$CWD" || exit
 
 # ==================================
-# grpcurl.
-# ==================================
-PACKAGE="grpcurl"
-echo "Installing $PACKAGE"
-# `${name:?}`: If `name` is not set, print error message and exit, to avoid accidentally
-# deleting "/", i.e. entire drive.
-rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
-git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
-cd "$BUILD_REPOS/$PACKAGE" || exit
-makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-cd "$BUILD_HOME/packages" || exit
-sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
-echo "Installed $PACKAGE version: $(grpcurl --version)"
-cd "$CWD" || exit
-
-# ==================================
 # `yay`: Install AUR packages.
 # ==================================
 # NOTE: Do not use `sudo` with `yay`.
