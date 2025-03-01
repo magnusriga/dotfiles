@@ -602,8 +602,8 @@ return {
       -- Opens file picker from root directory of current file,
       -- but when root directory cannot be determined from file,
       -- e.g. at `dashboard`, file picker is opened from current working directory.
-      { "<leader><space>", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
-      { "<leader>.", MyVim.pick("oldfiles"), desc = "Recent (Root Dir)" },
+      -- { "<leader><space>", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
+      { "<leader><space>", MyVim.pick("oldfiles"), desc = "Recent (Root Dir)" },
       { "<leader>/", MyVim.pick("live_grep"), desc = "Grep (Root Dir)" },
       { "<leader>:", "<cmd>FzfLua command_history<cr>", desc = "Command History" },
 

@@ -237,52 +237,50 @@ return {
       -- see above for all steps.
       MyVim.lsp.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
 
-      if vim.fn.has("nvim-0.10") == 1 then
-        -- Inlay hints.
-        if opts.inlay_hints.enabled then
-          -- This function runs when client attaches to buffer,
-          -- and when registring new capability on client,
-          -- for every client, and buffer the client is attached to, that
-          -- supports "textDocument/inlayHint" method.
-          -- Thus, when client attaches to buffer, and when registring new capability on client,
-          -- enable inlay hints in Neovim's built-in LSP client.
-          -- Note: Function below only runs once for a given method-client-buffer combination,
-          -- following which method-client-buffer is registered in `_supported_methods`,
-          -- after which function will not run again, whether it was supported or not by
-          -- client and buffer being attached to, or buffers already attached to in case of capability registration.
-          MyVim.lsp.on_supports_method("textDocument/inlayHint", function(client, buffer)
-            if
-              vim.api.nvim_buf_is_valid(buffer)
-              and vim.bo[buffer].buftype == ""
-              and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype)
-            then
-              vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
-            end
-          end)
-        end
+      -- Inlay hints.
+      if opts.inlay_hints.enabled then
+        -- This function runs when client attaches to buffer,
+        -- and when registring new capability on client,
+        -- for every client, and buffer the client is attached to, that
+        -- supports "textDocument/inlayHint" method.
+        -- Thus, when client attaches to buffer, and when registring new capability on client,
+        -- enable inlay hints in Neovim's built-in LSP client.
+        -- Note: Function below only runs once for a given method-client-buffer combination,
+        -- following which method-client-buffer is registered in `_supported_methods`,
+        -- after which function will not run again, whether it was supported or not by
+        -- client and buffer being attached to, or buffers already attached to in case of capability registration.
+        MyVim.lsp.on_supports_method("textDocument/inlayHint", function(client, buffer)
+          if
+            vim.api.nvim_buf_is_valid(buffer)
+            and vim.bo[buffer].buftype == ""
+            and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype)
+          then
+            vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+          end
+        end)
+      end
 
-        -- Code lens.
-        if opts.codelens.enabled and vim.lsp.codelens then
-          -- This function runs when client attaches to buffer,
-          -- and when registring new capability on client,
-          -- for every client, and buffer the client is attached to,
-          -- that supports "textDocument/codeLens" method.
-          -- Thus, when client attaches to buffer, and when registring new capability on client,
-          -- refresh codelens list from LSP, and create autocmd that refreshes codelens list
-          -- whenever (re)-entering buffer, when no key has been pressed for 4 seconds (`opt.updatetime`),
-          -- and when leaving insert mode.
-          -- Note: Function below only runs once for a given method-client-buffer combination,
-          -- following which method-client-buffer is registered in `_supported_methods`,
-          -- after which function will not run again, whether it was supported or not by
-          -- client and buffer being attached to, or buffers already attached to in case of capability registration.
-          MyVim.lsp.on_supports_method("textDocument/codeLens", function(client, buffer)
-            vim.lsp.codelens.refresh()
-            vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-              buffer = buffer,
-              callback = vim.lsp.codelens.refresh,
-            })
-          end)
-        end
+      -- Code lens.
+      if opts.codelens.enabled and vim.lsp.codelens then
+        -- This function runs when client attaches to buffer,
+        -- and when registring new capability on client,
+        -- for every client, and buffer the client is attached to,
+        -- that supports "textDocument/codeLens" method.
+        -- Thus, when client attaches to buffer, and when registring new capability on client,
+        -- refresh codelens list from LSP, and create autocmd that refreshes codelens list
+        -- whenever (re)-entering buffer, when no key has been pressed for 4 seconds (`opt.updatetime`),
+        -- and when leaving insert mode.
+        -- Note: Function below only runs once for a given method-client-buffer combination,
+        -- following which method-client-buffer is registered in `_supported_methods`,
+        -- after which function will not run again, whether it was supported or not by
+        -- client and buffer being attached to, or buffers already attached to in case of capability registration.
+        MyVim.lsp.on_supports_method("textDocument/codeLens", function(client, buffer)
+          vim.lsp.codelens.refresh()
+          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+            buffer = buffer,
+            callback = vim.lsp.codelens.refresh,
+          })
+        end)
       end
 
       -- Update `opts.diagnostics.virtual_text.prefix` to function which

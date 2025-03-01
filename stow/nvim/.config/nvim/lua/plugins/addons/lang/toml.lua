@@ -1,8 +1,11 @@
 return {
   "neovim/nvim-lspconfig",
   opts = {
+    -- servers = {
+    --   taplo = {},
+    -- },
     servers = {
-      taplo = {},
+      kulala_ls = {},
     },
   },
 }

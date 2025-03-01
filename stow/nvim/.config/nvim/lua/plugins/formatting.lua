@@ -23,7 +23,7 @@ local prettier_supported = {
 ---@param ctx conform.Context`
 function M.has_config(ctx)
   local config_path = vim.fn.system({ "prettier", "--find-config-path", ctx.filename })
-  vim.print("prettier config path: ", config_path)
+  -- vim.print("prettier config path: ", config_path)
   return vim.v.shell_error == 0
 end
 

@@ -214,7 +214,6 @@ return {
         --['<S-Tab>'] = cmp.mapping.select_prev_item(),
       },
     },
-
     ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
     config = function(_, opts)
       -- - `plugins/blink.lua` (below):

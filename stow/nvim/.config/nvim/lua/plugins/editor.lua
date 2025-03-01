@@ -180,6 +180,7 @@ return {
           { "<leader>g", group = "git" },
           { "<leader>gh", group = "hunks" },
           { "<leader>q", group = "quit/session" },
+          { "<leader>R", group = "+Rest" },
           { "<leader>s", group = "search" },
           { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
           { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
@@ -261,6 +262,9 @@ return {
         changedelete = { text = "▎" },
       },
       on_attach = function(buffer)
+        ---@class packagelib
+        local package
+
         local gs = package.loaded.gitsigns
 
         local function map(mode, l, r, desc)

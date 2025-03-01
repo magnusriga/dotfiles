@@ -1,17 +1,38 @@
+-- Make Neovim recognize files with `.http` extension as HTTP files.
 vim.filetype.add({
   extension = {
     ["http"] = "http",
   },
 })
 
+vim.system({ "curl", "-X GET http://localhost:3000" })
+
+-- POST http://localhost:3000
+-- Content-Type: application/json
+-- {"name": "John Doe"}
 -- Run HTTP requests from within Neovim.
+
 return {
+  -- Ensure language parsers are installed.
+  {
+    "nvim-treesitter/nvim-treesitter",
+    opts = {
+      ensure_installed = { "http", "graphql" },
+    },
+  },
+
+  -- Setup Kulala plugin, enabling HTTP requests from within Neovim.
   {
     "mistweaverco/kulala.nvim",
     ft = { "http", "rest" },
     keys = {
-      { "<leader>R", "", desc = "+Rest", ft = "http" },
-      { "<leader>Rb", "<cmd>lua require('kulala').scratchpad()<cr>", desc = "Open scratchpad", ft = "http" },
+      -- { "<leader>Rb", "<cmd>lua require('kulala').scratchpad()<cr>", desc = "Open scratchpad", ft = "http" },
+
+      -- Set in `lua/plugins/editor.lua > which-key.nvim`.
+      -- { "<leader>R", "", desc = "+Rest" },
+
+      { "<leader>Rb", "<cmd>lua require('kulala').scratchpad()<cr>", desc = "Open scratchpad" },
+
       { "<leader>Rc", "<cmd>lua require('kulala').copy()<cr>", desc = "Copy as cURL", ft = "http" },
       { "<leader>RC", "<cmd>lua require('kulala').from_curl()<cr>", desc = "Paste from curl", ft = "http" },
       {
@@ -32,10 +53,13 @@ return {
     opts = {},
   },
 
+  -- Setup LS.
   {
-    "nvim-treesitter/nvim-treesitter",
+    "neovim/nvim-lspconfig",
     opts = {
-      ensure_installed = { "http", "graphql" },
+      servers = {
+        kulala_ls = {},
+      },
     },
   },
 }
