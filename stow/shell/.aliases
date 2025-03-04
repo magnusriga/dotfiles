@@ -29,6 +29,14 @@ alias gs="git status"
 
 alias lg="lazygit"
 
+# ============================================================
+# `GitHub`.
+# ============================================================
+alias gh="infisical run --env=dev --tags=gh --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- gh"
+
+# ============================================================
+# `python`.
+# ============================================================
 alias python=python3
 
 # ============================================================
@@ -75,10 +83,10 @@ alias pt="pnpm test"
 # ============================================================
 # Various Programs.
 # ============================================================
-alias n="nvim"
+alias n="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
+alias nvim="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
 
 alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
-
 
 # Always enable colored `grep` output
 # Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.

@@ -113,7 +113,9 @@ echo "Running .profile..."
 # ================================================================
 # Source exported API Keys, environment variables, and PATH.
 # ================================================================
+
 for file in $HOME/.{env,exports,path,functions}; do
+  [ "$file" = "$HOME/.env" ] && [ ! -f "$file" ] && echo "<--- No .env file found, please add it to $HOME, including INFISICAL_TOKEN. --->" && continue
   [ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
 unset file
@@ -138,9 +140,9 @@ export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 # NOTE: Do NOT start agent like below, when using agent forwarding,
 # as agent on host is used instead, via unix socket `SSH_AUTH_SOCKET`.
 # env=~/.ssh/agent.env
-# 
+#
 # agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
-# 
+#
 # agent_start() {
 #   (
 #     umask 077
@@ -148,20 +150,20 @@ export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 #   )
 #   . "$env" >|/dev/null
 # }
-# 
+#
 # agent_load_env
-# 
+#
 # # agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
 # agent_run_state=$(
 #   ssh-add -l >|/dev/null 2>&1
 #   echo $?
 # )
-# 
+#
 # if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
 #   agent_start
 #   ssh-add
 # elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
 #   ssh-add
 # fi
-# 
+#
 # unset env
