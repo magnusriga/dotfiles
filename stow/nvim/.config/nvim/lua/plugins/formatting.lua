@@ -72,7 +72,7 @@ return {
     dependencies = {
       {
         "mason.nvim",
-        opts = { ensure_installed = { "prettierd" } },
+        opts = { ensure_installed = { "prettierd", "kulala-fmt" } },
       },
     },
     -- Only load this plugin when `require('conform')`,
@@ -141,6 +141,7 @@ return {
           lua = { "stylua" },
           fish = { "fish_indent" },
           sh = { "shfmt" },
+          http = { "kulala" },
         },
 
         -- The options you set here will be merged with the builtin formatters.
@@ -150,6 +151,11 @@ return {
           injected = { options = { ignore_errors = true } },
           prettier = {
             condition = prettier_condition,
+          },
+          kulala = {
+            command = "kulala-fmt",
+            args = { "format", "$FILENAME" },
+            stdin = false,
           },
           -- # Example of using dprint only when a dprint.json file is present
           -- dprint = {

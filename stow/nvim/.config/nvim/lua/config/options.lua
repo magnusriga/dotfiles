@@ -76,24 +76,31 @@ vim.g.maplocalleader = " "
 -- vim.g.ai_cmp = true
 vim.g.ai_cmp = false
 
--- Change MyVim root dir detection.
+-- - `root_spec`: Used by `MyVim.root.get()` to change MyVim root directory detection.
 -- - Options:
 --   - Name of detector function, e.g. `lsp` | `cwd`.
 --     - `lsp` : Detect root from LSP server.
 --   - Pattern or array of patterns, e.g. `.git` | `lua`.
 --     - `.git`: Use folder containing first `.git` folder above current buffer.
 --   - Function with signature `function(buf) -> string|string[]`.
--- - Not set:
---   - `MyVim.root.spec` is used.
+-- - If `root_spec` is not set here:
+--   - Default from `MyVim.root.spec` is used.
 --   - `{ "lsp", { ".git", "lua" }, "cwd" }`.
+-- - `MyVim.root.get()` used by:
+--   - `fzf.lua`: Determine root of project, when opening picker from buffer root.
+--   - `lualine.lua`: Show path to current file, relative to root.
 -- - Prefer:
 --   - Leave default from `MyVim.root.spec`.
---   - Set `root_dir` for `vtsls` to `.git`.
---   - Set `root_lsp_ignore` list below, so only `vtsls` is used for TS files.
+--   - Set `root_dir` for `vtsls` to `.git`, to ensure `fzf.lua` uses `.git` as buffer root,
+--     since `fzf.lua` picker uses `lsp` as root detector by default.
+--   - Set `root_lsp_ignore` list below, so only `vtsls` is used for TS files,
+--     since e.g. `copilot` uses `cwd` as root.
 -- vim.g.root_spec = { "lsp", { ".git", "lua" }, "cwd" }
 
--- Set LSP servers to be ignored when used with `util.root.detectors.lsp`
--- for detecting LSP root.
+-- - `root_lsp_ignore`: Used by `MyVim.root.get()`, to exclude given LSP servers
+--   when using `lsp` as root detector, which is default root detector used when
+--   calling `MyVim.root.get()`.
+-- - Important to exclude `copilot`, which uses `cwd` as root.
 vim.g.root_lsp_ignore = { "eslint", "tailwindcss", "copilot" }
 
 -- Show current document symbols location from Trouble in `lualine`.
@@ -102,6 +109,14 @@ vim.g.trouble_lualine = true
 
 -- Used to determine icons in `Lazy` ui.
 vim.g.have_nerd_font = true
+
+-- - Optionally set built-in Neovim terminal to use, including configuration.
+-- - If not used, built-in Neovim terminal defaults to `$SHELL`.
+-- - In addition to setting which shell Neovim should use for built-in terminal,
+--   `MyVim.terminal.setup("pwsh")` also does additional configuration for:
+--   * pwsh
+--   * powershell
+-- MyVim.terminal.setup("pwsh")
 
 --===========================================
 -- Options.

@@ -33,34 +33,26 @@
 -- - `<c-space>`: Manually trigger completion menu.
 -- ====================================
 
-return {
-  -- Github Copilot basic working setup.
-  -- {
-  --   "zbirenbaum/copilot.lua",
-  --   cmd = "Copilot",
-  --   event = "InsertEnter",
-  --   config = function()
-  --     require("copilot").setup({
-  --       suggestion = {
-  --         auto_trigger = true,
-  --         keymap = {
-  --           -- Handled by `blink.cmp`.
-  --           -- <c-y> is used by Neovim and completion engine for confirm,
-  --           -- <Tab> is used by completiokkkkkkkkkkkkkn engine to move forward in snippets,
-  --           -- thus use `<c-l>` to accept. a
-  --           --
-  --           -- so use <Tab> here instead.
-  --           -- TODO: Check if it interferes with snippets from blink.cmp.
-  --           accept = "<Tab>",
-  --
-  --           next = "<C-l>",
-  --           dismiss = "<C-]>",
-  --         },
-  --       },
-  --     })
-  --   end,
-  -- },
+-- Create autocmd that sets `root_dir` for `copilot` client config,
+-- and restarts LSP client, upon `BufReadPre` event.
+-- TODO: Remove when resolved: https://github.com/zbirenbaum/copilot.lua/issues/371
+-- vim.api.nvim_create_autocmd("BufReadPre", {
+--   pattern = "*",
+--   callback = function()
+--     local root_dir = require("lspconfig.util").root_pattern(".git")(vim.api.nvim_buf_get_name(0))
+--     local clients = vim.lsp.get_clients()
+--     for _, client in ipairs(clients) do
+--       if client.name == "copilot" then
+--         local _config = vim.deepcopy(client.config)
+--         _config.root_dir = root_dir
+--         client:stop()
+--         vim.lsp.start(_config)
+--       end
+--     end
+--   end,
+-- })
 
+return {
   -- Github Copilot.
   {
     "zbirenbaum/copilot.lua",
@@ -72,7 +64,8 @@ return {
       panel = {
         -- Panel is shown with `:Copilot panel`, even if `enabled` is `false`,
         -- but `true` allows navigating panel and selecting suggenstion with keybindings.
-        enabled = true,
+        -- enabled = true,
+        enabled = not vim.g.ai_cmp,
 
         auto_refresh = false,
 
@@ -123,6 +116,7 @@ return {
           -- - Using `<Tab>` instead, see below additon to `MyVim.acitons`.
           accept = false,
 
+          -- Needed for tab-accept of AI suggestion.
           accept_word = false,
           accept_line = false,
 
@@ -154,6 +148,17 @@ return {
         markdown = true,
         help = true,
       },
+
+      -- Override copilot LSP settings.
+      -- server_opts_overrides = {
+      -- on_attach = function(client, bufnr)
+      --   local root_dir = require("lspconfig.util").root_pattern(".git")(vim.api.nvim_buf_get_name(0))
+      --   local _config = vim.deepcopy(client.config)
+      --   _config.root_dir = root_dir
+      --   client:stop()
+      --   vim.lsp.start(_config)
+      -- end,
+      -- },
     },
   },
 
@@ -355,23 +360,43 @@ return {
     },
   },
 
+  -- Add copilot completion source.
   vim.g.ai_cmp
       and {
-        -- Add copilot completion source.
-        {
-          "saghen/blink.cmp",
-          optional = true,
-          dependencies = { "giuxtaposition/blink-cmp-copilot" },
+        "saghen/blink.cmp",
+        optional = true,
+        dependencies = {
+          "fang2hou/blink-copilot",
           opts = {
-            sources = {
-              default = { "copilot" },
-              providers = {
-                copilot = {
-                  name = "copilot",
-                  module = "blink-cmp-copilot",
-                  kind = "Copilot",
-                  score_offset = 100,
-                  async = true,
+            max_completions = 3,
+            max_attempts = 4,
+            kind_name = "Copilot", ---@type string | false
+            kind_icon = " ", ---@type string | false
+            kind_hl = false, ---@type string | false
+            debounce = 200, ---@type integer | false
+            auto_refresh = {
+              backward = true,
+              forward = true,
+            },
+          },
+        },
+        opts = {
+          sources = {
+            default = { "copilot" },
+            providers = {
+              copilot = {
+                name = "copilot",
+                module = "blink-copilot",
+                score_offset = 100,
+                async = true,
+                opts = {
+                  -- Local options override global ones
+                  max_completions = 3, -- Override global max_completions.
+
+                  -- Final settings:
+                  -- * max_completions = 3
+                  -- * max_attempts = 2
+                  -- * all other options are default
                 },
               },
             },

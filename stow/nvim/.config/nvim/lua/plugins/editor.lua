@@ -116,8 +116,21 @@ return {
     },
   },
 
-  -- Helps remember key bindings by showing popup
-  -- with active keybindings of command you started typing.
+  -- - Helps remember key bindings by showing popup
+  --   with active keybindings of command you started typing.
+  -- - Adds mappings to its menu automatically, based on all keymaps.
+  -- - Icons can be provided as attribute below, as string or as table.
+  -- - If `icon` attribute is table, with `name` and `cat`, `mini.icons > get()` is used.
+  --
+  -- - If no `icon` in `spec` below, or added via `wk.add` later, use in order:
+  --   1. Icon from user config `rules > plugin`, if keymap defined in `lazy.nvim > keys`.
+  --   2. Icon from user config `rules > pattern`, checking for pattern anywhere in
+  --      which-key `desc`.
+  --   3. Icon from built-in `rules > plugin`, if keymap defined in `lazy.nvim > keys`.
+  --   4. Icon from built-in `cat = filetype, name = ft`, for `filetype` from Neovim,
+  --      using `mini.icons > get()`.
+  --   5. Icon from built-in `rules > pattern`, checking for pattern anywhere in
+  --      which-key `desc`.
   {
     "folke/which-key.nvim",
     event = "VeryLazy",
@@ -162,7 +175,38 @@ return {
           -- { plugin = "yanky.nvim", icon = "󰅇", color = "yellow" },
           -- { plugin = "zen-mode.nvim", icon = "󱅻 ", color = "cyan" },
           -- { plugin = "telescope.nvim", pattern = "telescope", icon = "", color = "blue" },
+          -- - Copy of built-in pattern rules, known used at top.
+          -- - Needed to overwrite icon based on filetype, e.g. in `rest` mappings.
+          { pattern = "toggle", icon = " ", color = "yellow" },
+          { pattern = "window", icon = " ", color = "blue" },
+
+          { pattern = "%f[%a]git", cat = "filetype", name = "git" },
+          { pattern = "terminal", icon = " ", color = "red" },
+          { pattern = "find", icon = " ", color = "green" },
+          { pattern = "search", icon = " ", color = "green" },
+          { pattern = "test", cat = "filetype", name = "neotest-summary" },
+          { pattern = "lazy", cat = "filetype", name = "lazy" },
+          { pattern = "buffer", icon = "󰈔", color = "cyan" },
+          { pattern = "file", icon = "󰈔", color = "cyan" },
+          { pattern = "diagnostic", icon = "󱖫 ", color = "green" },
+          { pattern = "format", icon = " ", color = "cyan" },
+          { pattern = "debug", icon = "󰃤 ", color = "red" },
+          { pattern = "code", icon = " ", color = "orange" },
+          { pattern = "notif", icon = "󰵅 ", color = "blue" },
+          { pattern = "session", icon = " ", color = "azure" },
+          { pattern = "exit", icon = "󰈆 ", color = "red" },
+          { pattern = "quit", icon = "󰈆 ", color = "red" },
+          { pattern = "tab", icon = "󰓩 ", color = "purple" },
+          { pattern = "%f[%a]ai", icon = " ", color = "green" },
+          { pattern = "ui", icon = "󰙵 ", color = "cyan" },
+
+          -- Own rules, higher priority than above copy of built-in.
           { plugin = "yazi.nvim", cat = "filetype", name = "neo-tree" },
+
+          { pattern = "inspect", icon = " ", color = "green" },
+          { pattern = "download", icon = " ", color = "azure" },
+          -- { pattern = "scratch", icon = "󰭸 ", color = "green" },
+          { pattern = "scratch", icon = "󰭸 ", color = "orange" },
         },
 
         -- Use highlights from `mini.icons`.
@@ -173,6 +217,7 @@ return {
         {
           mode = { "n", "v" },
           { "<leader><tab>", group = "tabs" },
+          { "<leader>a", group = "avante ai" },
           { "<leader>c", group = "code" },
           { "<leader>d", group = "debug" },
           { "<leader>dp", group = "profiler" },
@@ -180,10 +225,14 @@ return {
           { "<leader>g", group = "git" },
           { "<leader>gh", group = "hunks" },
           { "<leader>q", group = "quit/session" },
-          { "<leader>R", group = "+Rest" },
+          { "<leader>R", group = "Rest", icon = { cat = "filetype", name = "http" } },
           { "<leader>s", group = "search" },
           { "<leader>u", group = "ui", icon = { icon = "󰙵 ", color = "cyan" } },
           { "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+
+          -- { "<leader>S", group = "Scratch", icon = { icon = " ", color = "orange" } },
+          { "<leader>S", group = "Scratch", icon = { icon = "󰭸 ", color = "orange" } },
+
           { "[", group = "prev" },
           { "]", group = "next" },
           { "g", group = "goto" },

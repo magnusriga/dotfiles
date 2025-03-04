@@ -233,6 +233,21 @@ sudo ln -fs /var/lib/snapd/snap /snap
 cd "$CWD" || exit
 
 # ==================================
+# infisical-bin.
+# ==================================
+PACKAGE="infisical-bin"
+echo "Installing $PACKAGE"
+rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+cd "$BUILD_REPOS/$PACKAGE" || exit
+makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+cd "$BUILD_HOME/packages" || exit
+sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
+echo "Installed infisical CLI version: $(infisical --version)"
+cd "$CWD" || exit
+
+# ==================================
 # `yay`: Install AUR packages.
 # ==================================
 # NOTE: Do not use `sudo` with `yay`.

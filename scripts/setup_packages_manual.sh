@@ -3,7 +3,7 @@
 # ========================================================
 # NOTES
 # ========================================================
-# - Binaries downloaded manually are first compiled or downloaded into /tmp/<package>,
+# - Binaries downloaded manually are first compiled or downloaded into /tmp/<package>.
 # - If the file is downloaded with curl, checksums are verified.
 # - The package is then installed into `/usr/local/stow/<package>`,
 #   or, if it was a downloaded binary, moved into: `/usr/local/stow/<package>/bin/<binary>`.

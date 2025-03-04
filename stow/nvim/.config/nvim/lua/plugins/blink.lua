@@ -36,6 +36,9 @@
 -- - `<c-space>`: Manually trigger completion menu.
 -- ====================================
 
+-- Build blink from source, i.e. main branch, to keep up with latest changes.
+vim.g.myvim_blink_main = true
+
 return {
   {
     "saghen/blink.cmp",
@@ -57,6 +60,7 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       "onsails/lspkind-nvim",
+      "Kaiser-Yang/blink-cmp-git",
     },
 
     -- Delay plugin load until entering Insert mode.
@@ -147,11 +151,20 @@ return {
           -- - Show entries from completion menu as ghost text.
           -- - Interferes with Copilot suggestions if those also shown as ghost text.
           --
-          -- - Thus, only enable `blink.cmp` ghost text below, if Copilot suggestions
+          -- - Thus, only enable `blink.cmp` ghost text below, if Copilot suggestions are
           --   ONLY shown as entries in `blink.nvim` completion menu, NOT as ghost text.
           --
           -- - See: `plugins/addons/ai.lua` | `plugins/blink.lua` | `config/options.lua`.
           enabled = vim.g.ai_cmp,
+
+          -- Only show ghost text when menu is closed.
+          show_with_menu = false,
+        },
+
+        trigger = {
+          -- By default, `blink.cmp` blocks newline, tab, and space trigger characters.
+          -- Disable that behavior, to allow menu to show on whitespace (for Copilot suggestions).
+          show_on_blocked_trigger_characters = {},
         },
       },
 
@@ -163,7 +176,7 @@ return {
 
       -- Match built-in cmdline completion.
       cmdline = {
-        enabled = true,
+        enabled = false,
       },
 
       -- List of enabled providers.
@@ -171,17 +184,19 @@ return {
       -- e.g. below for `lazydev` provider.
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
-        -- providers = {
-        --   lsp = {
-        --     override = {
-        --       get_trigger_characters = function(self)
-        --         local trigger_characters = self:get_trigger_characters()
-        --         vim.list_extend(trigger_characters, { "\n", "\t", " " })
-        --         return trigger_characters
-        --       end,
-        --     },
-        --   },
-        -- },
+
+        -- To trigger menu on whitespace, for Copilot suggestions.
+        providers = {
+          lsp = {
+            override = {
+              get_trigger_characters = function(self)
+                local trigger_characters = self:get_trigger_characters()
+                vim.list_extend(trigger_characters, { "\n", "\t", " " })
+                return trigger_characters
+              end,
+            },
+          },
+        },
       },
 
       keymap = {
@@ -236,6 +251,7 @@ return {
       -- - Thus, `<Tab>` calls these functions in sequence:
       --   - If snippet visible: `snippet_forward` function, to move forward to next snippet input.
       --   - If Copilot suggestion visible: `ai_accept` function, to accept Copilot suggestion.
+      --
       if not opts.keymap["<Tab>"] then
         if opts.keymap.preset == "super-tab" then
           opts.keymap["<Tab>"] = {
@@ -323,6 +339,85 @@ return {
       },
     },
   },
+
+  -- Add git provider, allowing to search and insert following into commit messages in
+  -- filetypes `octo` | `gitcommit` | `markdown`:
+  -- - Commit hashes (`:`).
+  -- - GitHub issues and pull request (`#`), users (`@`),
+  -- {
+  --   "saghen/blink.cmp",
+  --   opts = {
+  --     sources = {
+  --       -- Add `lazydev` to completion providers.
+  --       default = { "git" },
+  --       providers = {
+  --         git = {
+  --           module = "blink-cmp-git",
+  --           name = "Git",
+  --           -- Enable source for filetype: `gitcommit` | `markdown` | `octo`.
+  --           enabled = function()
+  --             return vim.tbl_contains({ "octo", "gitcommit", "markdown" }, vim.bo.filetype)
+  --           end,
+  --           --- @module 'blink-cmp-git'
+  --           --- @type blink-cmp-git.Options
+  --           opts = {
+  --             commit = {
+  --               -- Customize when to enable commit source.
+  --               -- The default will enable this when `git` is found and `cwd` is in a git repository
+  --               -- enable = function() end
+  --               -- Change triggers.
+  --               -- triggers = { ':' },
+  --             },
+  --             git_centers = {
+  --               github = {
+  --                 -- Those below have the same fields with `commit`
+  --                 -- Those features will be enabled when `git` and `gh` (or `curl`) are found and
+  --                 -- remote contains `github.com`
+  --                 -- issue = {
+  --                 --     get_token = function() return '' end,
+  --                 -- },
+  --                 -- pull_request = {
+  --                 --     get_token = function() return '' end,
+  --                 -- },
+  --                 -- mention = {
+  --                 --     get_token = function() return '' end,
+  --                 --     get_documentation = function(item)
+  --                 --         local default = require('blink-cmp-git.default.github')
+  --                 --             .mention.get_documentation(item)
+  --                 --         default.get_token = function() return '' end
+  --                 --         return default
+  --                 --     end
+  --                 -- }
+  --               },
+  --               -- gitlab = {
+  --               -- Those below have the same fields with `commit`
+  --               -- Those features will be enabled when `git` and `glab` (or `curl`) are found and
+  --               -- remote contains `gitlab.com`
+  --               -- issue = {
+  --               --     get_token = function() return '' end,
+  --               -- },
+  --               -- NOTE:
+  --               -- Even for `gitlab`, you should use `pull_request` rather than`merge_request`
+  --               -- pull_request = {
+  --               --     get_token = function() return '' end,
+  --               -- },
+  --               -- mention = {
+  --               --     get_token = function() return '' end,
+  --               --     get_documentation = function(item)
+  --               --         local default = require('blink-cmp-git.default.gitlab')
+  --               --            .mention.get_documentation(item)
+  --               --         default.get_token = function() return '' end
+  --               --         return default
+  --               --     end
+  --               -- }
+  --               -- },
+  --             },
+  --           },
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
 
   -- Catppuccin colorscheme support.
   -- Installs Cattpucin if not done elsewhere,

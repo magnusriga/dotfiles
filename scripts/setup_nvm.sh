@@ -13,7 +13,7 @@ NVM_DIR=${NVM_DIR:-$HOME/.nvm}
 # NVM install should have been done by NVM script from curl,
 # but for some reason it does not, so we must do it manually.
 # "node" is an alias for the latest version, however we must use an actual version number for the addition to PATH to work.
-# NODE_VERSION="22.11.0"
+# NODE_VERSION="22.14.0"
 NODE_VERSION="node"
 curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
