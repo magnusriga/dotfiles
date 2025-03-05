@@ -87,6 +87,22 @@ if echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '{print $1}') $TMPDIR/$P
 fi
 
 # ================================================
+# Install 7zip (Note: Architecture and Version).
+# ================================================
+PACKAGE="7z"
+VERSION="2409"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://www.7-zip.org/a/${PACKAGE}${VERSION}-linux-arm64.tar.xz"
+# tar'ed file name: 7z.
+tar xzf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE"
+sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+
+# ================================================
 # Install grpcurl (Note: Architecture).
 # ================================================
 PACKAGE="grpcurl"
@@ -101,6 +117,28 @@ tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
 sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
 chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
 stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+
+# ================================================
+# Install HashiCorp vault (Note: Architecture).
+# ================================================
+PACKAGE="vault"
+# `grep -P`: Use perl-compatible regex (PCRE).
+# `grep -o`: Output match only, not whole line.
+# `\K`     : Start match from this position.
+# `[^/]*`  : Zero or more off all characters except `/`.
+# Thus, match ends when first slash is encountered, and match is printed.
+VERSION=$(curl -s "https://releases.hashicorp.com/vault/" | \grep -Po '"/vault/\K[^/]*' | grep -v '[-+]' | head -n 1)
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p $STOWDIR/$PACKAGE/bin
+curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE.zip" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_linux_arm64.zip" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_SHA256SUMS"
+if echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | grep 'linux_arm64' | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE.zip" | sha256sum --check --status; then
+  unzip "$TMPDIR/$PACKAGE/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
+  sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+  chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
+  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+fi
 
 # ================================================
 # Install neovim.

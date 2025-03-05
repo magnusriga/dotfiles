@@ -169,12 +169,6 @@ return {
         ---   `local ico = Icons.get(icon.cat, icon.name)`.
         ---@type wk.IconRule[]|false
         rules = {
-          -- { plugin = "fzf-lua", cat = "filetype", name = "fzf" },
-          -- { plugin = "neo-tree.nvim", cat = "filetype", name = "neo-tree" },
-          -- { plugin = "octo.nvim", cat = "filetype", name = "git" },
-          -- { plugin = "yanky.nvim", icon = "󰅇", color = "yellow" },
-          -- { plugin = "zen-mode.nvim", icon = "󱅻 ", color = "cyan" },
-          -- { plugin = "telescope.nvim", pattern = "telescope", icon = "", color = "blue" },
           -- - Copy of built-in pattern rules, known used at top.
           -- - Needed to overwrite icon based on filetype, e.g. in `rest` mappings.
           { pattern = "toggle", icon = " ", color = "yellow" },
@@ -205,7 +199,6 @@ return {
 
           { pattern = "inspect", icon = " ", color = "green" },
           { pattern = "download", icon = " ", color = "azure" },
-          -- { pattern = "scratch", icon = "󰭸 ", color = "green" },
           { pattern = "scratch", icon = "󰭸 ", color = "orange" },
         },
 

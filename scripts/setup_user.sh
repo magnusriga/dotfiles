@@ -18,15 +18,19 @@ PASSWORD=$USERNAME
 
 echo "Running setup_user.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
 
-if [ $(whoami) == "$USERNAME" ]; then
+if [ "$(whoami)" == "$USERNAME" ]; then
   echo "This script should be sourced by sudoer user different from new user, now exiting..."
-  [ ${BASH_SOURCE[0]} == ${0} ] && exit || return
+  [ "${BASH_SOURCE[0]}" == "${0}" ] && exit || return
 fi
 
-SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1 ; pwd -P )/"
+SCRIPTPATH="$(
+  cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 || exit
+  pwd -P
+)/"
 echo "SCRIPTPATH is $SCRIPTPATH."
 
-export CURRENT_USER=$(whoami)
+CURRENT_USER=$(whoami)
+export CURRENT_USER
 
 SHELL=$(which bash)
 
@@ -34,15 +38,17 @@ SHELL=$(which bash)
 if ! grep -iFq $USERNAME /etc/passwd; then
   echo "User $USERNAME did not exist, adding a new user with username $USERNAME, password $USERNAME, and UID:GID $USER_UID:$USER_GID."
   sudo groupadd -g $USER_GID $GROUPNAME
-  sudo useradd -m -g $GROUPNAME -s $SHELL -u $USER_UID $USERNAME
-  echo $USERNAME:$USERNAME | sudo chpasswd 
+  sudo useradd -m -g $GROUPNAME -s "$SHELL" -u $USER_UID $USERNAME
+  echo $USERNAME:$PASSWORD | sudo chpasswd
 fi
 
 # Update sudoers file.
 sudo chmod 755 "/etc/sudoers.d"
 sudo rm -rf "/etc/sudoers.d/$USERNAME"
 if [ ! -e "/etc/sudoers.d/$USERNAME" ] || ! sudo grep -iFq "User_Alias NEW_ADMIN" "/etc/sudoers.d/$USERNAME"; then
-  # echo "/etc/sudoers.d/$USERNAME did not exist, or the file did not contain the right alias, adding NEW_ADMIN User_Alias to: /etc/sudoers.d/$USERNAME"
   echo "Adding User_Alias NEW_ADMIN and NEW_FULLTIMERS to /etc/sudoers.d/$USERNAME, with NOPASSWD: ALL."
-  echo -e "User_Alias NEW_ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : NEW_FULLTIMERS = $USERNAME, %$USERNAME\n\nNEW_ADMIN, NEW_FULLTIMERS ALL = (ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USERNAME" 1> /dev/null
+  echo -e "User_Alias NEW_ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : NEW_FULLTIMERS = $USERNAME, %$USERNAME\n\nNEW_ADMIN, NEW_FULLTIMERS ALL = (ALL) NOPASSWD: ALL" | sudo tee "/etc/sudoers.d/$USERNAME" 1>/dev/null
 fi
+
+# Add user to docker group, to allow running docker commands without sudo.
+sudo usermod -aG docker "${USERNAME}"

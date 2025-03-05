@@ -33,6 +33,7 @@ alias lg="lazygit"
 # `GitHub`.
 # ============================================================
 alias gh="infisical run --env=dev --tags=gh --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- gh"
+# alias gh="hcp vault-secrets run -- gh"
 
 # ============================================================
 # `python`.
@@ -85,6 +86,8 @@ alias pt="pnpm test"
 # ============================================================
 alias n="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
 alias nvim="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
+# alias n="hcp vault-secrets run -- nvim"
+# alias nvim="hcp vault-secrets run -- nvim"
 
 alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
 

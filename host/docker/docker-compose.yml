@@ -1,0 +1,183 @@
+# version: '3.9'
+
+# Unlike the compose files in /docker, this is for vscode devcontainer
+# As it is possible to run it with compose
+# See: https://code.visualstudio.com/docs/devcontainers/create-dev-container#_use-docker-compose
+
+# https://docs.docker.com/compose/compose-file/11-extension/#example-2
+x-defaults: &defaults
+  # Activate init, stdin_open, and tty if you want to open long lasting container with terminal attached
+  # No need, as we use exec to enter container and set those options there: docker exec -it ....
+  init: true # docker run --init (Run an init (top level process) inside container that forwards signals to child processes and reaps zombie processes)
+  # stdin_open: true # docker run -i (Keep STDIN open even if not attached)
+  # tty: true        # docker run -t (Allocate a pseudo-TTY)
+  restart: always # Only applies to compose up/run, not to stack deploy (i.e. not swarm mode)
+  deploy:
+    # Only applies to swarm mode, not compose up/run
+    mode: replicated
+    # replicas: 2
+    replicas: 1
+    restart_policy:
+      # condition: on-failure
+      condition: any
+      delay: 5s
+      window: 120s
+    update_config:
+      # delay: 5s
+      delay: 10s
+      failure_action: rollback
+      max_failure_ratio: .5
+      monitor: 5s
+      # parallelism: 1
+      parallelism: 2
+
+services:
+  nfront:
+    # Both image and build are present:
+    # - Compose attempts to find image locally or in registry (Docker Hub or local registry)
+    # - If not found, it builds image as specified by "build"
+    image: 127.0.0.1:5000/nfront
+    build:
+      # context path is relative to this compose file.
+      # When sending compose file in as stdin, it used path of shell (/dev),
+      # thus we set aboulute path here instead.
+      context: ${ROOTDIR}
+      # dockerfile path is relative to context path.
+      dockerfile: ./Dockerfile
+      ulimits:
+        nofile:
+          soft: 1048576
+          hard: 1048576
+    # Overrides default command so things don't shut down after the process ends.
+    # command: /bin/sh -c "while sleep 1000; do :; done"
+    # IMPORTANT: Container port (target) MUST match port used by next-server, which is 3000
+    # Might want to leave published unset, so Docker randomly assigns ports on host (avoids port conflict).
+    <<: *defaults
+    environment:
+      # Variables set here become available inside container.
+      # Same effect as variables sourced via env_file field.
+      # SSH_AUTH_SOCK: Used to forward the ssh-agent socket into the container.
+      - APP=nfront-academy
+      - SSH_AUTH_SOCK=${SSH_AUTH_SOCK}
+    env_file:
+      # Since this is a sequence and not mapping, it is combined with base, not replaced.
+      # Makes envs from file available inside container after start.
+      # env_file path is relative to compose file.
+      # TURBO_TEAM and TURBO_TOKEN are added here.
+      - ${ROOTDIR}/envs/docker-dev.env
+      # - /${ROOTDIR}/envs/docker-dev.env
+    ports:
+      # Container port MUST match port used by next-server, which is 3000.
+      # Can leave host port (published) unset, so Docker randomly assigns ports on host (avoids port conflict).
+      # However, in dev mode we only want one replica anyways, so OK to set published (host) port.
+      # Makes life easier, as we can save URL as fixed browser bookmark.
+      - target: 3000
+        published: 3000
+    # depends_on:
+    #   # depends_on is ignored when deploying stack in swarm mode with version 3 Compose file.
+    #   db:
+    #     condition: service_healthy
+    #     restart: true
+    networks:
+      # Define a network, which allows containers to communicate
+      # with each other, by using their container name as a hostname
+      - frontend
+      - backend
+    volumes:
+      # Bind mount workspace folder on host to container,
+      # so when host files/folders change, so does same files/folders inside container.
+      # Some people exclude folders created by container alone, like node_modules and build outputs.
+      # Done by creating anonymous volumes for them.
+      # Anonymous volumes are persisted after container is removed, except in swarm mode.
+      # NOTE: vscode devcontainer does NOT exlcude node_modules (no anonymouse volumes),
+      # so I suggest bind mounting whole workspace when in dev mode.
+      # source (folder on host) can be relative path, in which case it is relative to this compose-file.
+
+      # target (path inside container) should match where files were stored in Dockerfile (if any).
+      # In this case, nothing is actually installed or copied by container itself, it is all bind mounted.
+      # Thus, container immediately gets all files from host (source path below).
+      # PS: Must add target path below  as 'workspaceFolder' in '.devcontainer/devcontainer.json'.
+      - type: bind
+        source: ../.
+        target: /home/nfu/nfront
+      # Forward the Docker socket by mounting it in the container using the mounts property.
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+      # Forward the ssh-agent socket, by mounting it in the container using the mounts property.
+      - type: bind
+        source: ${SSH_AUTH_SOCK}
+        target: ${SSH_AUTH_SOCK}
+      # Persist command history between container restarts, in a volume.  Since
+      # this uses a volume, and not a folder on the host machine (like bind
+      # mount), the source (volume name) must be added to the volumes section.
+      # The entire /commandhistory directory from the container (filled with
+      # code history by bash_profile) is copied to this volume.
+      - type: volume
+        source: nfront-bashhistory
+        target: /commandhistory
+
+    # Overrides default command so things don't shut down after the process ends.
+    # command: /bin/sh -c "while sleep 1000; do :; done"
+
+  db:
+    # Test database:
+    # 1) Outside containers: docker exec -it ed9518067592 psql -U nfdbu nfdb
+    #    Or: docker exec -it <CNAME> bash +  PGPASSWORD=nfdbp psql -U nfdbu nfdb
+    # 2) In psql CLI: /l (list databases), /c nfdb (connect to nfdb), \d (list tables)
+    # 1) In app container (not db container): npx prisma db pull
+    image: postgres:latest
+    <<: *defaults
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    env_file:
+      # Since this is a sequence and not mapping, it is combined with base, not replaced.
+      # Makes envs from file available inside container after start.
+      - ${ROOTDIR}/envs/docker-dev.env
+    ports:
+      # Choose another host port than 5432, as that is often in use.
+      - "6500:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - backend
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+
+  pg_proxy:
+    image: ghcr.io/neondatabase/wsproxy:latest
+    <<: *defaults
+    environment:
+      APPEND_PORT: "postgres:5432"
+      ALLOW_ADDR_REGEX: ".*"
+      LOG_TRAFFIC: "true"
+    ports:
+      - "5433:80"
+    depends_on:
+      # depends_on is ignored when deploying stack in swarm mode with version 3 Compose file.
+      - db
+
+networks:
+  frontend:
+    name: nfront_frontend
+  backend:
+    name: nfront_backend
+
+volumes:
+  # Define named volumes here, if multiple services need to access them.
+  # If so, use below name in volumes filed inside services section above.
+  # dbdata:
+  # Through named volume dbdata, database files are persisted after containers are removed,
+  # and can be accessed through their volume name across services.
+  dbdata:
+  # Volume for persisting command history between container restarts:
+  nfront-bashhistory:
