@@ -32,22 +32,50 @@ FROM menci/archlinuxarm AS builder
 # SHELL ["/bin/bash", "-l", "-euxo", "pipefail", "-c"]
 SHELL ["/bin/bash", "-exo", "pipefail", "-c" ]
 
+# ================================================
+# Setup pacman and install initial packages.
+# ================================================
+# Replace pacman.conf with custom one, e.g. to disable sandboxing,
+# which does not work on ARM version of Arch Linux.
 RUN rm -f /etc/pacman.conf
 COPY pacman.conf /etc/pacman.conf
 
+# Setup pacman keyring and populate it.
 RUN pacman-key --init && pacman-key --populate archlinux
 
-# Install sudo and git[]
+# Install sudo and git, needed for initial setup.
 RUN pacman -Syu --noconfirm sudo git
 
-# ==========================================================
-# Set locale.
-# ==========================================================
-# `localectl` needs `systemd`, thus skip.
-#RUN sudo localectl set-locale LANG=en_US.UTF-8 && \
-#  unset LANG && \
-#  source /etc/profile.d/locale.sh
-ENV LANG en_US.utf8
+# ================================================
+# Install Docker Compose.
+# ================================================
+RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/compose/releases/latest" | grep -o -P '(?<="tag_name": ").+(?=")') \
+  && curl -sSL "https://github.com/docker/compose/releases/download/${LATEST_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+  && chmod +x /usr/local/bin/docker-compose
+
+# ================================================
+# Create new group and user, and add user to sudoers file.
+# ================================================
+ARG USERNAME=nfu
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+# Create new group, and new user within it.
+RUN groupadd --gid $USER_GID $USERNAME \
+  && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+  # Update sudoers file so $USERNAME does not have to type password for sudo commands.
+  && echo "User_Alias ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : FULLTIMERS = $USERNAME, %$USERNAME" >> "/etc/sudoers.d/$USERNAME" \
+  && echo 'ADMIN, FULLTIMERS ALL = NOPASSWD: ALL' >> "/etc/sudoers.d/$USERNAME" \
+  && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# Setting passwords to same as username, in case needed.
+RUN echo 'root:root' | chpasswd; \
+  echo "$USERNAME:$USERNAME" | chpasswd
+
+# ================================================
+# Switch to new, non-root, user for rest of setup.
+# ================================================
+USER $USERNAME
 
 # ================================================
 # Setup: Directories.
@@ -62,6 +90,26 @@ RUN . ./setup_directories.sh && \
 COPY setup_packages_pacman.sh .
 RUN . ./setup_packages_pacman.sh && \
   echo "Completed: ./setup_packages_pacman.sh."
+
+# ================================================
+# Arch User Repository (AUR): Install packages.
+# ================================================
+COPY setup_packages_aur.sh .
+RUN . ./setup_packages_aur.sh && \
+  echo "Completed: ./setup_packages_aur.sh."
+
+# ================================================
+# Setup: Locale.
+# ================================================
+RUN localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+ENV LANG en_US.utf8
+
+# ================================================
+# Setup: Rust toolchain via `rustup`, and add it to path.
+# ================================================
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y \
+  && . $HOME/.cargo/env \
+  && rustup update
 
 # ================================================
 # Arch User Repository (AUR): Install packages.
@@ -498,8 +546,7 @@ RUN . ./setup_packages_pacman.sh && \
 # ENTRYPOINT ["/bin/sh", "-c", "echo Container started trap \"exit 0\" 15\n \n exec \"$@\"\n while sleep 1 & wait $!; do :; done", "-"]
 # CMD ["/bin/sh", "-c", "while sleep 1000; do :; done"]
 # ${@} allows us to take whatever extra args were passed to /bin/sh, and supply those same arguments to our script.
-COPY --chmod=0755 entrypoint.sh .
-# RUN chmod +x /entrypoint.sh
+# COPY --chmod=0755 entrypoint.sh .
 
 # WORKS, used prior to adding Docker in Docker.
 # ENTRYPOINT ["/bin/sh", "-c"]
@@ -535,6 +582,7 @@ COPY --chmod=0755 entrypoint.sh .
 #   then cd to the project folder, then run nvim from there.
 # - Type "exit" to get out of the container.
 
+COPY --chmod=0755 docker-init.sh "/usr/local/share/"
 ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
 CMD [ "sleep", "infinity" ]
 

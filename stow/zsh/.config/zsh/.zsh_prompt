@@ -2,6 +2,15 @@
 
 echo "Running .zsh_prompt..."
 
+# - Starship introduces noticable delay on AMD Linux running on ARM
+#   architcture, thus stick to native architecture, in which case
+#   Starship only introduces a small delay.
+# - Starship also introduces small flicker in cursor,
+#   when escaping from Insert mode to Normal mode, in ZSH.
+eval "$(starship init zsh)"
+
+return
+
 # ===================================
 # NOTES
 # ===================================
@@ -164,13 +173,6 @@ git_branch_and_status() {
   # which include color escape codes.
   echo "${branchName}${s}";
 }
-
-
-# Starship introduces noticable delay, thus avoid.
-# Dealy does not happen on Wezterm, only on Ghostty.
-eval "$(starship init zsh)"
-
-return
 
 # Git variables.
 # Punctuation in eza: `#5c6370`.

@@ -118,12 +118,49 @@
 # Ghostty Shell Integration for ZSH.
 # Must be Placed at Top of `.zshrc`.
 # ================================================================
+# FIX: Remove once Ghostty makes automatic shell integration work in ssh:
+# https://github.com/ghostty-org/ghostty/discussions/5892
+export GHOSTTY_SHELL_INTEGRATION_NO_CURSOR=1
 # WARNING: Adds small delay, slightly more than `zoxide`.
 if [[ -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration" && \
 ${TERM} == xterm-ghostty ]]; then
   echo "Sourcing Ghostty shell integration..."
   builtin source "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration"
 fi
+
+# ================================================================
+# Set cursor to non-blinking bar|block, depending on ZSH vi-mode.
+# ================================================================
+function __set_bar_cursor {
+    echo -ne '\e[6 q'
+}
+
+function __set_block_cursor {
+    echo -ne '\e[2 q'
+}
+
+# - When keymap changes, i.e. when switching between Insert and Normal mode,
+#   set cursor to bar|block, depending on new mode.
+# - `KEYMAP`: Keymap being switched to, i.e. `main` | `viins` | `vicmd`.
+# - Thus, when switching to `vicmd`, set cursor to block, and when switching to
+#  `viins` or `main`, set cursor to bar.
+function zle-keymap-select {
+  case $KEYMAP in
+    vicmd) __set_block_cursor;;
+    viins|main) __set_bar_cursor;;
+  esac
+}
+zle -N zle-keymap-select
+
+# Start new lines with bar cursor, since, in ZSH vi-mode, each line starts in Insert mode.
+# Not needed, when using `precmd`.
+# function zle-line-init {
+#     __set_bar_cursor
+# }
+# zle -N zle-line-init
+
+# When prompt is redrawn, set cursor to bar.
+precmd_functions+=__set_bar_cursor
 
 # ================================================================
 # iTerm2 Shell Integration for ZSH.
@@ -139,6 +176,52 @@ fi
 # ================================================================
 echo "Running .zshrc, about to source .shrc..."
 source "$HOME/.shrc"
+
+# ==================================
+# Remove delay after pressing Escape or `^[`.
+# ==================================
+# - Options:
+#   1) Remove all bindings starting with `^[`
+#   2) Set low `KEYTIMEOUT`, in hundreths of seconds.
+#      - Defualt: `40`, i.e. 400ms (0.4s).
+#      - Problem:
+#        - Below `3`, i.e. 30ms, last character becomes uppercase when pasting.
+#        - Only happens when pasting after waiting > ~3s, after new line is started.
+#        - Thus, if setting this, set >= `4`, i.e. `40` ms.
+#   3) Map `^[[91;5u` to `vi-cmd-mode`.
+#     - When `fixterm` is enabled, which it is by default in Ghostty,
+#     - `ctrl+[` is encoded as `^[[91;5u`.
+#     - Thus, mapping `^[[91;5u` to `vi-cmd-mode` means `ctrl-[` swaps to Normal mode
+#       wihout delay, since `ctrl-[` is not encoding it as `^[`, and only `^[` has delay.
+#     - Prefer this approach over others.
+# - Problem:
+#   - Unfortunately, tmux changes encoding of `ctrl-[` to `^[`.
+#   - Thus, above solution does not work in tmux.
+#   - Thus, setting low `KEYTIMEOUT` is probably best solution in tmux.
+# bindkey -rpM viins '^['
+# [[ ${TERM} == xterm-ghostty ]] && echo "Setting ^[[91;5u escape key to vi-cmd-mode." && bindkey '^[[91;5u' vi-cmd-mode
+[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && echo "Setting: bindkey '^[[91;5u' vi-cmd-mode" && bindkey '^[[91;5u' vi-cmd-mode
+KEYTIMEOUT=4
+[[ -n "$TMUX" ]] && echo "Setting: KEYTIMEOUT = $KEYTIMEOUT" && export KEYTIMEOUT=$KEYTIMEOUT
+
+# Ensure `^w` and `^h` deletes past last insert.
+bindkey -M viins '^h' backward-delete-char
+bindkey -M viins '^w' backward-kill-word
+
+# Search command history for line starting with current line up to cursor.
+# If line is empty, moves to next/previous event in history list.
+# Overwrites default `self-insert` in mode `viins`.
+# Overwrites default `down-history` in mode `vicmd`.
+bindkey '^P' history-beginning-search-backward
+bindkey '^N' history-beginning-search-forward
+
+# bindkey '^k' up-line-or-search
+# bindkey '^j' down-line-or-search
+# bindkey '^[[A' up-line-or-search
+# bindkey '^[[B' down-line-or-search
+
+# bindkey '^[[A' up-line-or-beginning-search # Up
+# bindkey '^[[B' down-line-or-beginning-search # Down
 
 # ================================================================
 # ZSH Options.
@@ -249,10 +332,18 @@ eval "$(zoxide init zsh)"
 # ================================================================
 # No delay introduced.
 # Set suggestion strategy.
-# - `history`: Most recent match from history.
-# - `completion`: Uses tab-completion suggestion.
+# - `history` (default): Most recent match from history.
+# - `completion`       : Uses tab-completion suggestion.
+# - `match_prev_cmd`   : Like history, but chooses most recent match whose preceding history
+#                        item matches most recently executed command,
+#                        thus match is more likely relevant for current command,
+#                        if related current command is a continuation of previous command.
 # - Can be combined in array, in which case next entry is tried if no match in first entry.
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# - Problem:
+#   - `completion`: Makes cursor line, instead of bar, when pasting in Normal mode.
+#   - Thus, use `history` (default), and/or `match_prev_cmd`.
+# ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd history)
 
 # Set suggestion highlight style.
 # - Can be 256-color ANSII escape sequence digit, e.g. `fg=8`,
@@ -307,52 +398,13 @@ bindkey '^e' autosuggest-clear
 #   ghostty to send `^[` and removing all key bindings that start with `^[`.
 
 # ================================================================
-# Set 10ms delay after pressing Escape or `^[`.
-# ================================================================
-# Better to remove all bindings starting with `^[`, as `KEYTIMEOUT`
-# might be used for other bindings besides those starting with `Escape`,
-# like all the motion commands.
-# Set 10ms delay after pressing Escape or `^[`.
-# export KEYTIMEOUT=1
-bindkey -rpM viins '^['
-
-# Bind sequence sent by terminal, when `fixterm` is enabled,
-# for `Ctrl+[`, i.e. `^[[91;5u`,to `vi-cmd-mode`,
-# with added benefit of no `KEYTIMEOUT` delay.
-# ZSH deletes line if `Escape` is hit in `vicmd` mode,
-# not sure why.
-# Only for ghostty, as other terminals do not use `fixterm` by default.
-# bindkey '^[' self-insert
-[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && bindkey '^[[91;5u' vi-cmd-mode
-
-# bindkey -M viins '^[' self-insert
-# bindkey -M viins '^1' self-insert
-# bindkey -M viins '^2' self-insert
-# bindkey -M viins '^i' self-insert
-# bindkey -M viins '^m' self-insert
-
-# Ensure `^w` and `^h` deletes past last insert.
-bindkey -M viins '^h' backward-delete-char
-bindkey -M viins '^w' backward-kill-word
-
-# Search command history for line starting with current line up to cursor.
-# If line is empty, moves to next/previous event in history list.
-# Overwrites default `self-insert` in mode `viins`.
-# Overwrites default `down-history` in mode `vicmd`.
-bindkey '^P' history-beginning-search-backward
-bindkey '^N' history-beginning-search-forward
-
-# bindkey '^k' up-line-or-search
-# bindkey '^j' down-line-or-search
-# bindkey '^[[A' up-line-or-search
-# bindkey '^[[B' down-line-or-search
-
-# bindkey '^[[A' up-line-or-beginning-search # Up
-# bindkey '^[[B' down-line-or-beginning-search # Down
-
-# ================================================================
 # Source Script for Prompt Configuration.
 # ===============================================================
+# - Starship introduces noticable delay on AMD Linux running on ARM
+#   architcture, thus stick to native architecture, in which case
+#   Starship only introduces a small delay.
+# - Starship also introduces small flicker in cursor,
+#   when escaping from Insert mode to Normal mode, in ZSH.
 . ${ZDOTDIR:-$HOME}/.zsh_prompt
 
 # ================================================================

@@ -344,80 +344,80 @@ return {
   -- filetypes `octo` | `gitcommit` | `markdown`:
   -- - Commit hashes (`:`).
   -- - GitHub issues and pull request (`#`), users (`@`),
-  -- {
-  --   "saghen/blink.cmp",
-  --   opts = {
-  --     sources = {
-  --       -- Add `lazydev` to completion providers.
-  --       default = { "git" },
-  --       providers = {
-  --         git = {
-  --           module = "blink-cmp-git",
-  --           name = "Git",
-  --           -- Enable source for filetype: `gitcommit` | `markdown` | `octo`.
-  --           enabled = function()
-  --             return vim.tbl_contains({ "octo", "gitcommit", "markdown" }, vim.bo.filetype)
-  --           end,
-  --           --- @module 'blink-cmp-git'
-  --           --- @type blink-cmp-git.Options
-  --           opts = {
-  --             commit = {
-  --               -- Customize when to enable commit source.
-  --               -- The default will enable this when `git` is found and `cwd` is in a git repository
-  --               -- enable = function() end
-  --               -- Change triggers.
-  --               -- triggers = { ':' },
-  --             },
-  --             git_centers = {
-  --               github = {
-  --                 -- Those below have the same fields with `commit`
-  --                 -- Those features will be enabled when `git` and `gh` (or `curl`) are found and
-  --                 -- remote contains `github.com`
-  --                 -- issue = {
-  --                 --     get_token = function() return '' end,
-  --                 -- },
-  --                 -- pull_request = {
-  --                 --     get_token = function() return '' end,
-  --                 -- },
-  --                 -- mention = {
-  --                 --     get_token = function() return '' end,
-  --                 --     get_documentation = function(item)
-  --                 --         local default = require('blink-cmp-git.default.github')
-  --                 --             .mention.get_documentation(item)
-  --                 --         default.get_token = function() return '' end
-  --                 --         return default
-  --                 --     end
-  --                 -- }
-  --               },
-  --               -- gitlab = {
-  --               -- Those below have the same fields with `commit`
-  --               -- Those features will be enabled when `git` and `glab` (or `curl`) are found and
-  --               -- remote contains `gitlab.com`
-  --               -- issue = {
-  --               --     get_token = function() return '' end,
-  --               -- },
-  --               -- NOTE:
-  --               -- Even for `gitlab`, you should use `pull_request` rather than`merge_request`
-  --               -- pull_request = {
-  --               --     get_token = function() return '' end,
-  --               -- },
-  --               -- mention = {
-  --               --     get_token = function() return '' end,
-  --               --     get_documentation = function(item)
-  --               --         local default = require('blink-cmp-git.default.gitlab')
-  --               --            .mention.get_documentation(item)
-  --               --         default.get_token = function() return '' end
-  --               --         return default
-  --               --     end
-  --               -- }
-  --               -- },
-  --             },
-  --           },
-  --         },
-  --       },
-  --     },
-  --   },
-  -- },
+  {
+    "saghen/blink.cmp",
+    opts = {
+      sources = {
+        -- Add `lazydev` to completion providers.
+        default = { "git" },
+        providers = {
+          git = {
+            module = "blink-cmp-git",
+            name = "Git",
+            -- Enable source for filetype: `gitcommit` | `markdown` | `octo`.
+            enabled = function()
+              return vim.tbl_contains({ "octo", "gitcommit", "markdown" }, vim.bo.filetype)
+            end,
+            --- @module 'blink-cmp-git'
+            --- @type blink-cmp-git.Options
+            opts = {
+              commit = {
+                -- Customize when to enable commit source.
+                -- The default will enable this when `git` is found and `cwd` is in a git repository
+                -- enable = function() end
+                -- Change triggers.
+                -- triggers = { ':' },
+              },
+              git_centers = {
+                github = {
+                  -- Those below have the same fields with `commit`
+                  -- Those features will be enabled when `git` and `gh` (or `curl`) are found and
+                  -- remote contains `github.com`
+                  -- issue = {
+                  --     get_token = function() return '' end,
+                  -- },
+                  -- pull_request = {
+                  --     get_token = function() return '' end,
+                  -- },
+                  -- mention = {
+                  --     get_token = function() return '' end,
+                  --     get_documentation = function(item)
+                  --         local default = require('blink-cmp-git.default.github')
+                  --             .mention.get_documentation(item)
+                  --         default.get_token = function() return '' end
+                  --         return default
+                  --     end
+                  -- }
+                },
+                -- gitlab = {
+                -- Those below have the same fields with `commit`
+                -- Those features will be enabled when `git` and `glab` (or `curl`) are found and
+                -- remote contains `gitlab.com`
+                -- issue = {
+                --     get_token = function() return '' end,
+                -- },
+                -- NOTE:
+                -- Even for `gitlab`, you should use `pull_request` rather than`merge_request`
+                -- pull_request = {
+                --     get_token = function() return '' end,
+                -- },
+                -- mention = {
+                --     get_token = function() return '' end,
+                --     get_documentation = function(item)
+                --         local default = require('blink-cmp-git.default.gitlab')
+                --            .mention.get_documentation(item)
+                --         default.get_token = function() return '' end
+                --         return default
+                --     end
+                -- }
+                -- },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 
   -- Catppuccin colorscheme support.
   -- Installs Cattpucin if not done elsewhere,

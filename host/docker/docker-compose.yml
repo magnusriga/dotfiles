@@ -84,21 +84,21 @@ services:
       - frontend
       - backend
     volumes:
-      # Bind mount workspace folder on host to container,
-      # so when host files/folders change, so does same files/folders inside container.
-      # Some people exclude folders created by container alone, like node_modules and build outputs.
-      # Done by creating anonymous volumes for them.
-      # Anonymous volumes are persisted after container is removed, except in swarm mode.
-      # NOTE: vscode devcontainer does NOT exlcude node_modules (no anonymouse volumes),
-      # so I suggest bind mounting whole workspace when in dev mode.
-      # source (folder on host) can be relative path, in which case it is relative to this compose-file.
-
-      # target (path inside container) should match where files were stored in Dockerfile (if any).
-      # In this case, nothing is actually installed or copied by container itself, it is all bind mounted.
-      # Thus, container immediately gets all files from host (source path below).
-      # PS: Must add target path below  as 'workspaceFolder' in '.devcontainer/devcontainer.json'.
+      # - Bind mount workspace folder on host to container,
+      #   so when host files/folders change, so does same files/folders inside container.
+      # - Some people exclude folders created by container alone, like `node_modules` and build outputs.
+      # - Done by creating anonymous volumes for them.
+      # - Anonymous volumes are persisted after container is removed, except in swarm mode.
+      # - NOTE: `vscode` devcontainer does NOT exlcude `node_modules` (no anonymouse volumes),
+      #   thus follow that approach and bind mount whole workspace from host to container.
+      #
+      # - `source`: Folder on host, can be relative to this compose-file.
+      # - `target`: Path inside container, must match where files were stored in Dockerfile (if any).
+      # - In this case, workspace is not installed or copied into container, it is only bind mounted,
+      #   including `node_modules`.
+      # - Thus, container immediately gets all files from host (source path below).
       - type: bind
-        source: ../.
+        source: ~/nfront
         target: /home/nfu/nfront
       # Forward the Docker socket by mounting it in the container using the mounts property.
       - type: bind
@@ -108,11 +108,11 @@ services:
       - type: bind
         source: ${SSH_AUTH_SOCK}
         target: ${SSH_AUTH_SOCK}
-      # Persist command history between container restarts, in a volume.  Since
-      # this uses a volume, and not a folder on the host machine (like bind
-      # mount), the source (volume name) must be added to the volumes section.
-      # The entire /commandhistory directory from the container (filled with
-      # code history by bash_profile) is copied to this volume.
+      # - Persist command history between container restarts, in a volume.
+      # - Volumes are persisted on host machine, hidden on host machine.
+      # - `source`: Volume name, must be added to `volumes` section below.
+      # - Result: Entire `/commandhistory` directory from container, which contains
+      # `.zsh-history` and `.shell-history`, i.e. bash history, is copied to volume.
       - type: volume
         source: nfront-bashhistory
         target: /commandhistory

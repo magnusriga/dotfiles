@@ -32,6 +32,7 @@ source "${ROOTDIR}/envs/docker-dev.env"
 # Build Docker image.
 echo "Building Docker image."
 docker compose --progress plain -f "${ROOTDIR}/docker-compose.yml" build --no-cache
+# docker compose --progress plain -f "${ROOTDIR}/docker-compose.yml" build
 
 # List Docker images.
 docker image ls

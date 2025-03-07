@@ -147,10 +147,18 @@ theme = OneHalfDark
 # Default: bold-is-bright = false
 # bold-is-bright = true
 
-# shell-integration-features set to avoid automatically
-# turning cursor to bar, thus `cursor-style`, `cursor-color`,
-# and `cursor-invert-fg-bg` applies.
-cursor-style = block
+# - `cursor-style`:
+#   - Only works if `shell-integration-features = no-cursor`.
+#   - Does NOT work if `shell-integration-features = cursor`,
+#     because then handling of cursor if passed to shell, i.e. ZSH vi-mode handles cursor.
+#   - ZSH default: Blinking cursor, with bar in Insert mode and block in Normal mode.
+#
+# - If `shell-integration-features = no-cursor`, turn cursor to bar|block, permanently.
+# - Default: `block`.
+# cursor-style = bar
+#
+# - If `shell-integration-features = no-cursor`, turn off|on cursor blinking.
+# - Default: `true`.
 cursor-style-blink = false
 
 # Color of cursor.
@@ -164,7 +172,7 @@ cursor-style-blink = false
 # i.e. background of file itself.
 # cursor-invert-fg-bg = true
 
-# `1c2021`, i.e. black-grey, goes well with opacity.
+# `#1c2021`, i.e. black-grey, goes well with opacity.
 # background = 1c2021
 # background-opacity = 0.9
 
@@ -418,8 +426,6 @@ copy-on-select = clipboard
 # sudo      : Set sudo wrapper to preserve terminfo.
 # title     : Set window title via shell integration.
 # Default: cursor,no-sudo,title
-# shell-integration-features = cursor,sudo,no-title
-# shell-integration-features = no-cursor,sudo
 shell-integration-features = no-cursor,sudo,title
 
 # -------------------------

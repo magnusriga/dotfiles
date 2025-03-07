@@ -109,6 +109,7 @@
 # ================================================================
 
 echo "Running .shrc..."
+
 # ================================================================
 # Load the Shell Dotfiles, and Then Some
 # ================================================================
@@ -126,11 +127,9 @@ echo "Running .shrc..."
 # selecting output of previous commands, etc.
 # PATH is already set up in .zprofile > .profile.
 # WARNING: Adds small noticable delay.
-# Only source if 
 # ================================================================
-# if uname -a | grep -q WSL; then
-if [[ -f $WEZTERM_HOME/shell-integration/wezterm.sh && \
-${TERM_PROGRAM} == WezTerm ]]; then
+if [[ -f $WEZTERM_HOME/shell-integration/wezterm.sh &&
+  ${TERM_PROGRAM} == WezTerm ]]; then
   echo "Sourcing Wezterm shell integration..."
   source $WEZTERM_HOME/shell-integration/wezterm.sh
 fi

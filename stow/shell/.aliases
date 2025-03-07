@@ -26,19 +26,25 @@ alias ga="git add --all"
 alias gc="git add -A && git commit -am"
 alias gp="git push"
 alias gs="git status"
+# alias gitc="infisical run --env=dev --tags=gh --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- git commit"
 
 alias lg="lazygit"
 
 # ============================================================
 # `GitHub`.
 # ============================================================
-alias gh="infisical run --env=dev --tags=gh --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- gh"
+# alias gh="infisical run --env=dev --tags=gh --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- gh"
 # alias gh="hcp vault-secrets run -- gh"
 
 # ============================================================
 # `python`.
 # ============================================================
 alias python=python3
+
+# ============================================================
+# `Infisical`.
+# ============================================================
+# alias secrets="infisical secrets --env=dev --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad"
 
 # ============================================================
 # Lists.
@@ -84,8 +90,8 @@ alias pt="pnpm test"
 # ============================================================
 # Various Programs.
 # ============================================================
-alias n="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
-alias nvim="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
+# alias n="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
+# alias nvim="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
 # alias n="hcp vault-secrets run -- nvim"
 # alias nvim="hcp vault-secrets run -- nvim"
 
@@ -98,7 +104,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # Enable aliases to be sudo’ed
-alias sudo='sudo '
+# alias sudo='sudo '
 
 # Add an "alert" alias for long running commands.  Use like so:
 # sleep 10; alert

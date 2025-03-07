@@ -10,14 +10,45 @@ echo "Running .exports..."
 export XDG_CONFIG_HOME=$HOME/.config
 
 # ================================================================
-# Used by some programs, like `delta`.
+# Used by programs that support 24-bit colors, like `delta`, `bat`,
+# text editors, and modern terminal applications.
 # ================================================================
-COLORTERM="truecolor"
+export COLORTERM="truecolor"
 
 # ================================================================
 # Set default shell to ZSH.
 # ================================================================
 SHELL=$(which zsh)
+
+# ================================================================
+# Secrets, using command from `.aliases`.
+# ================================================================
+# - `read <var>`:
+#   - Reads single line from standard input, into `<var>`.
+#   - Returns 0 if more lines in standard input.
+#   - Each next `read` call, reads next line.
+# `-r`:
+#   - Treat backslash within line as literal character.
+#   - Without `-r`, backslash is escape character.
+# - `IFS`:
+#   - Delemiter for word, aka. field, splitting, within each line.
+#   - Note: `read` reads ONE line, `IFS` splits that one line up into fields, aka. words.
+#   - `IFS='' | IFS=`: Set IFS to `null`, i.e. no splitting, i.e. `read` assigns line unchanged
+#     thus helpful below where line, i.e. environment variable assignment, may contain spaces.
+#   - By default, `IFS` is space, tab, and newline, but newline not relevant with `read`,
+#     since `read` only reads one single line per call.
+#   - When line is split on IFS, e.g. space and tab, each field is assigned to variables
+#     following read, e.g. if three fields: `read one two three`.
+#   - If more variables than fields, surpurfulous variables set to empty string.
+#   - If more fields than variables, then last variable contains field it would normally
+#     map to, as well as rest of line, including IFS delimiters,
+#     but with final IFS whitespace removed.
+# - Result:
+#   - Below loop exports each line, as is, without word splitting.
+#   - Meaing, without line split on IFS, and with backslash kept as literal character.
+# secrets --plain --silent | while IFS='' read -r line; do
+#   export "${line:?}"
+# done
 
 # ================================================================
 # Folder for zsh plugins (no longer use oh-my-zsh).
@@ -95,7 +126,7 @@ export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
 # ================================================================
 # Setup shell history persistence.
-# Consider setting in `.shrc`, so variables are created for interactive shells only. 
+# Consider setting in `.shrc`, so variables are created for interactive shells only.
 # ================================================================
 # Set path to command history file.
 HISTFILE="/commandhistory/.shell_history"
@@ -114,11 +145,10 @@ HISTFILESIZE="${HISTSIZE}"
 #   thus keep their setting just remove duplicates and some stray colon at end.
 # - Consider turning off reloading of history, i.e. `history -r`,
 #   if terminal slows down (should not happen with < 100k entries).
-# sed "s/history -[acr];* *//g" <<< $PROMPT_COMMAND | echo "$(sed "s/://g")"" history -a; history -c; history -r;"
-case "history -a; history -c; history -r" in
-  "$PROMPT_COMMAND") ;;
-  *) PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
-esac
+# Check if history command is already in PROMPT_COMMAND to avoid duplication.
+if [[ "$PROMPT_COMMAND" != *"history -a; history -c; history -r"* ]]; then
+  PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+fi
 
 # ================================================================
 # Set `nvm` directory, used in `.profile` to load `nvm`, `node`, `npm`.
@@ -128,46 +158,61 @@ export NVM_DIR="$HOME/.nvm"
 # ================================================================
 # Enable persistent REPL history for `node`.
 # ================================================================
-export NODE_REPL_HISTORY=~/.node_history;
+export NODE_REPL_HISTORY=~/.node_history
 # Allow 32³ entries; the default is 1000.
-export NODE_REPL_HISTORY_SIZE='32768';
+export NODE_REPL_HISTORY_SIZE='32768'
 # Use sloppy mode by default, matching web browsers.
-export NODE_REPL_MODE='sloppy';
+export NODE_REPL_MODE='sloppy'
 
 # ================================================================
 # Make Python use UTF-8 encoding for output to stdin, stdout, and stderr.
 # ================================================================
-export PYTHONIOENCODING='UTF-8';
+export PYTHONIOENCODING='UTF-8'
 
 # ================================================================
 # Prefer US English and use UTF-8.
 # ================================================================
-export LANG='en_US.UTF-8';
-export LC_ALL='en_US.UTF-8';
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
+
+# ================================================================
+# Define colors for terminal output.
+# ================================================================
+# ANSI color codes
+# black='\e[0;30m'
+# red='\e[0;31m'
+# green='\e[0;32m'
+yellow='\e[0;33m'
+# blue='\e[0;34m'
+# purple='\e[0;35m'
+# cyan='\e[0;36m'
+# white='\e[0;37m'
+# reset='\e[0m'
 
 # ================================================================
 # Highlight section titles in manual pages.
 # ================================================================
-export LESS_TERMCAP_md="${yellow}";
+export LESS_TERMCAP_md="${yellow}"
 
 # ================================================================
 # Don’t clear the screen after quitting a manual page.
 # ================================================================
-export MANPAGER='less -X';
+export MANPAGER='less -X'
 
 # ================================================================
 # Set GnuPG home directory, where GnuPG suite stores its keyrings
 # and private keys, and reads configurations from.
 # ================================================================
-export GNUPGHOME="$HOME/.gnupg";
+export GNUPGHOME="$HOME/.gnupg"
 
 # ================================================================
 # Avoid issues with `gpg` as installed via Homebrew.
 # https://stackoverflow.com/a/42265848/96656
 # ================================================================
-export GPG_TTY=$(tty);
+GPG_TTY=$(tty)
+export GPG_TTY
 
 # ================================================================
 # Hide the “default interactive shell is now zsh” warning on macOS.
 # ================================================================
-export BASH_SILENCE_DEPRECATION_WARNING=1;
+export BASH_SILENCE_DEPRECATION_WARNING=1
