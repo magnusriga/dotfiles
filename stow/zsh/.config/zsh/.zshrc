@@ -208,6 +208,14 @@ KEYTIMEOUT=4
 bindkey -M viins '^h' backward-delete-char
 bindkey -M viins '^w' backward-kill-word
 
+# - Change `j` and `k` in vi command mode:
+#   - From: `down-line-or-history` and `up-line-or-history`.
+#   - To  : `down-line` and `up-line`.
+# - Thus do not accidentally move to next/previous history event,
+#   which can instead be done with `^P` and `^N`.
+bindkey -M vicmd 'j' down-line
+bindkey -M vicmd 'k' up-line
+
 # Search command history for line starting with current line up to cursor.
 # If line is empty, moves to next/previous event in history list.
 # Overwrites default `self-insert` in mode `viins`.
