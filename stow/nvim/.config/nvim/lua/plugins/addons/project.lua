@@ -94,7 +94,7 @@ return {
       -- detection_methods = { "pattern" },
 
       -- All the patterns used to detect root dir, when **"pattern"** is in detection_methods.
-      patterns = { ".git", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json" },
+      patterns = { ".git", "lua", "_darcs", ".hg", ".bzr", ".svn", "Makefile", "package.json" },
       -- patterns = { ".git", ".gitignore", "README.md", "go.mod", "Makefile" },
 
       -- silent_chdir = false,

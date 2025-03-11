@@ -30,6 +30,9 @@ return {
       -- On `nvim <file>...`, render <file> before loading plugins.
       quickfile = { enabled = true },
 
+      -- Image viewer using Kitty Graphics Protocol, to view images in picker.
+      image = {},
+
       -- `Snacks.lazygit` does not require enabling with config, but done here to change colors.
       lazygit = {
         theme = {

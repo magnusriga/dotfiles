@@ -30,6 +30,8 @@ pnpm --allow-build=puppeteer \
   add -g \
   @mermaid-js/mermaid-cli
 
+pnpm add -g neovim
+
 # pnpm --allow-build=tree-node-cli add -g tree-node-cli
 # pnpm --allow-build=contentful-cli add -g contentful-cli
 # pnpm --allow-build=neonctl add -g neonctl
