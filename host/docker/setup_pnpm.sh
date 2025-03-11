@@ -25,6 +25,11 @@ pnpm --allow-build=spawn-sync \
   neonctl \
   @mistweaverco/kulala-ls
 
+pnpm --allow-build=puppeteer \
+  --allow-build=vue-demi \
+  add -g \
+  @mermaid-js/mermaid-cli
+
 # pnpm --allow-build=tree-node-cli add -g tree-node-cli
 # pnpm --allow-build=contentful-cli add -g contentful-cli
 # pnpm --allow-build=neonctl add -g neonctl

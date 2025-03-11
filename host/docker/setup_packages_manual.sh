@@ -183,21 +183,18 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # #   e.g. `bat` folder contains syntax highlighting file for ghostty.
 # # - Thus, as always, stow dotfiles into home directory after this file has run,
 # #   to ensure symlinks are not overwritten.
-# PACKAGE=ghostty
-# PREFIX=$STOWDIR/$PACKAGE
-# sudo rm -rf "$TMPDIR/$PACKAGE"
-# sudo rm -rf "$STOWDIR/$PACKAGE"
-# sudo rm -rf "$HOME/.config/$PACKAGE"
-# mkdir "$TMPDIR/$PACKAGE"
-# mkdir "$STOWDIR/$PACKAGE"
-# mkdir "$HOME/.config/$PACKAGE"
-# git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
-# cd "$TMPDIR/$PACKAGE"
-# zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
-# cd -- "$(dirname "$BASH_SOURCE")"
-# cp ~{/dotfiles,}/.stow-global-ignore
-# cd $CURRENTDIR
-# stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+PACKAGE=ghostty
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+sudo rm -rf "$HOME/.config/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir "$STOWDIR/$PACKAGE"
+mkdir "$HOME/.config/$PACKAGE"
+git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
+cd "$TMPDIR/$PACKAGE" || exit
+zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
+cd "$CURRENTDIR" || exit
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
 # Install Stow (needs `autoconf` pre-installed).

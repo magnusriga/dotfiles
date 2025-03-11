@@ -139,6 +139,32 @@ opt.breakindent = true
 -- opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
 opt.clipboard = "unnamedplus"
 
+vim.g.clipboard = [[{
+          \   'name': 'myClipboard',
+          \   'copy': {
+          \      '+': ['pbcopy', '-'],
+          \      '*': ['pbcopy', '-'],
+          \    },
+          \   'paste': {
+          \      '+': ['pbpaste'],
+          \      '*': ['pbpaste'],
+          \   },
+          \   'cache_enabled': 1,
+          \ }]]
+
+-- vim.g.clipboard = [[{
+--           \   'name': 'myClipboard',
+--           \   'copy': {
+--           \      '+': ['tmux', 'load-buffer', '-'],
+--           \      '*': ['tmux', 'load-buffer', '-'],
+--           \    },
+--           \   'paste': {
+--           \      '+': ['tmux', 'save-buffer', '-'],
+--           \      '*': ['tmux', 'save-buffer', '-'],
+--           \   },
+--           \   'cache_enabled': 1,
+--           \ }]]
+
 -- Insert mode completion options (default: `menu,preview`):
 -- - `menu`    : Popup menu to show completions.
 -- - `menuone` : Popup menu also when only one completion option.

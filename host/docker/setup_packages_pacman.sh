@@ -107,6 +107,7 @@ sudo pacman -Syu --noconfirm \
   bat \
   tree \
   glow \
+  tectonic \
   fastfetch neofetch \
   docker docker-buildx docker-compose \
   github-cli \
@@ -128,7 +129,7 @@ sudo pacman -Syu --noconfirm \
   tk gnuplot sysstat \
   python-setuptools python-keyring python-xdg python python-pip python-pipx \
   lua luarocks \
-  evince gtk4 libadwaita \
+  evince gtk4 libadwaita blueprint-compiler \
   libjpeg-turbo libpng zlib \
   libva-mesa-driver libvdpau-va-gl \
   opencl-driver \

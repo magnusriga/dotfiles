@@ -13,13 +13,19 @@ web:*.{html,css,js,ts,json,md}*
 --no-ignore
 
 # Using glob patterns to include/exclude files or folders
---glob=!.git/*
---glob=!.cache/*
---glob=!.history/*
---glob=!.rust*/*
---glob=!.cargo/*
---glob=!.next/*
---glob=!node_modules/*
+--glob=!.git/
+--glob=!.cache/
+--glob=!.history/
+--glob=!Trash/
+--glob=!.rust*
+--glob=!.cargo/
+--glob=!.npm/
+--glob=!.next*
+--glob=!node_modules/
+--glob=!**/pnpm/store/**
+--glob=!build/
+--glob=!dist/
+--glob=!chroot/
 
 # or
 # --glob
