@@ -93,7 +93,7 @@ sudo pacman -Syu --noconfirm \
   zsh-syntax-highlighting zsh-autosuggestions \
   fish \
   iputils \
-  libxkbcommon-x11 wayland \
+  libxkbcommon-x11 wayland waypipe \
   jless \
   vim \
   tmux \
@@ -101,6 +101,7 @@ sudo pacman -Syu --noconfirm \
   ctags \
   openssh \
   iproute2 \
+  netcat socat net-tools lsof \
   rsync \
   cronie \
   bat \

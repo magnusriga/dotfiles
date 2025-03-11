@@ -78,11 +78,11 @@ services:
     #   db:
     #     condition: service_healthy
     #     restart: true
-    networks:
-      # Define a network, which allows containers to communicate
-      # with each other, by using their container name as a hostname
-      - frontend
-      - backend
+    # networks:
+    # Define a network, which allows containers to communicate
+    # with each other, by using their container name as a hostname
+    # - frontend
+    # - backend
     volumes:
       # - Bind mount workspace folder on host to container,
       #   so when host files/folders change, so does same files/folders inside container.
@@ -114,7 +114,7 @@ services:
       # - Result: Entire `/commandhistory` directory from container, which contains
       # `.zsh-history` and `.shell-history`, i.e. bash history, is copied to volume.
       - type: volume
-        source: nfront-bashhistory
+        source: nfront-shellhistory
         target: /commandhistory
 
     # Overrides default command so things don't shut down after the process ends.
@@ -122,10 +122,23 @@ services:
 
   db:
     # Test database:
-    # 1) Outside containers: docker exec -it ed9518067592 psql -U nfdbu nfdb
-    #    Or: docker exec -it <CNAME> bash +  PGPASSWORD=nfdbp psql -U nfdbu nfdb
-    # 2) In psql CLI: /l (list databases), /c nfdb (connect to nfdb), \d (list tables)
-    # 1) In app container (not db container): npx prisma db pull
+    # 1) Check:
+    #    - Socket is listening outside container: `ss -tuplrn | grep docker` + `docker ps`.
+    #    - Socket works:
+    #      - Terminal 1: `docker logs <CNAME>`.
+    #      - Terminal 2: `nc localhost <port_from_ss>`.
+    #        - Not possible to communicate with database this way.
+    #        - Just to check connection.
+    # 2) Ccommunicate with postgres database in container, from outside container:
+    #    - `psql -h localhost -p <port_from_ss> -d <db_name_from_env> -U <user_from_env>`.
+    #    - `\l` etc.
+    # 2) Ccommunicate with postgres database in container, from inside container:
+    #   - `docker exec -it <CNAME> psql -d <db_name_from_env> -U <user_from_env>`.
+    #   - `docker exec -it <CNAME> bash` +  `PGPASSWORD=nfdbp psql -U nfdbu nfdb`.
+    # 2) In `psql` CLI:
+    #   - `\l`     : List databases.
+    #   - `\d`     : List tables, aka. type of relation, if any.
+    #   - `\c nfdb`: Connect to another database with name `nfdb`.
     image: postgres:latest
     <<: *defaults
     volumes:
@@ -147,8 +160,8 @@ services:
       timeout: 5s
       retries: 3
       start_period: 10s
-    networks:
-      - backend
+    # networks:
+    # - backend
     deploy:
       placement:
         constraints: [node.role == manager]
@@ -166,11 +179,11 @@ services:
       # depends_on is ignored when deploying stack in swarm mode with version 3 Compose file.
       - db
 
-networks:
-  frontend:
-    name: nfront_frontend
-  backend:
-    name: nfront_backend
+# networks:
+#   frontend:
+#     name: nfront_frontend
+#   backend:
+#     name: nfront_backend
 
 volumes:
   # Define named volumes here, if multiple services need to access them.
@@ -180,4 +193,4 @@ volumes:
   # and can be accessed through their volume name across services.
   dbdata:
   # Volume for persisting command history between container restarts:
-  nfront-bashhistory:
+  nfront-shellhistory:

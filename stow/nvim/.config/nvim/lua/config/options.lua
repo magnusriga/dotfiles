@@ -136,7 +136,8 @@ opt.breakindent = true
 
 -- Sync with system clipboard if not in SSH,
 -- to make sure OSC 52 integration works automatically.
-opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
+-- opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
+opt.clipboard = "unnamedplus"
 
 -- Insert mode completion options (default: `menu,preview`):
 -- - `menu`    : Popup menu to show completions.

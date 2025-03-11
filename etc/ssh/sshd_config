@@ -94,7 +94,10 @@ AuthorizedKeysFile      .ssh/authorized_keys
 AcceptEnv LANG LC_*
 AcceptEnv TERM_PROGRAM
 
-#AllowAgentForwarding yes
+# Allow running graphical applications over SSH.
+X11Forwarding yes
+
+AllowAgentForwarding yes
 #AllowTcpForwarding yes
 #GatewayPorts no
 #X11Forwarding no
