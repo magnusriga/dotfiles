@@ -84,8 +84,13 @@ alias csp="pnpm changeset publish"
 
 alias pd="pnpm dev"
 alias pb="pnpm build"
-# alias ps="pnpm start"
 alias pt="pnpm test"
+
+# ============================================================
+# Processes.
+# ============================================================
+# `.exports` contains `PS_FORMAT` which sets `ps` columns.
+alias ps="ps -eH"
 
 # ============================================================
 # Various Programs.
