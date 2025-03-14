@@ -90,7 +90,8 @@ alias pt="pnpm test"
 # Processes.
 # ============================================================
 # `.exports` contains `PS_FORMAT` which sets `ps` columns.
-alias ps="ps -eH"
+# Do not alias this, might not always want `-H` | `-e`.
+# alias ps="ps -eH"
 
 # ============================================================
 # Various Programs.
