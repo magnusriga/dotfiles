@@ -77,6 +77,14 @@ export VISUAL=$EDITOR
 # fi
 
 # ================================================================
+# `ps` command format.
+# ================================================================
+# `comm` | `cmd` should go last, they then span screen width.
+# To see CPU and MEM info, use `htop`.
+export PS_FORMAT="ppid pid comm:20=EXECUTABLE stat:10 euser:15 tname netns:20 docker:10 machine:10 cmd"
+# export PS_FORMAT="pid ppid s=STATE euser:15 tty:10 vsz rsz %mem %cpu time:15 stime:12 netns:20 docker:10 machine:10 comm:20=EXECUTABLE cmd"
+
+# ================================================================
 # Directories for vim backups, swaps, colors, syntax, undo, etc.
 # ================================================================
 export VIM_HOME="$HOME/.vim"

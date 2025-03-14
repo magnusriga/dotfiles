@@ -92,7 +92,6 @@ sudo pacman -Syu --noconfirm \
   zsh zsh-doc \
   zsh-syntax-highlighting zsh-autosuggestions \
   fish \
-  iputils \
   libxkbcommon-x11 wayland waypipe \
   jless \
   vim \
@@ -100,7 +99,7 @@ sudo pacman -Syu --noconfirm \
   file \
   ctags \
   openssh \
-  iproute2 \
+  iproute2 iputils strace \
   netcat socat net-tools lsof \
   rsync \
   cronie \

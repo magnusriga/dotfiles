@@ -5,21 +5,23 @@ return {
     event = "VeryLazy",
     keys = {
       {
+        -- Open yazi at current file.
         "<leader>e",
-        "<cmd>Yazi toggle<cr>",
-        desc = "Resume yazi",
-      },
-      {
-        "<leader>c-",
-        mode = { "n", "v" },
         "<cmd>Yazi<cr>",
         desc = "Open yazi (file)",
       },
       {
-        -- Open in the current working directory
+        -- Open yazi in current working directory.
         "<leader>cw",
         "<cmd>Yazi cwd<cr>",
         desc = "Open yazi (cwd)",
+      },
+      {
+        -- Resume last yazi session.
+        "<leader>c-",
+        mode = { "n", "v" },
+        "<cmd>Yazi toggle<cr>",
+        desc = "Resume yazi",
       },
     },
 
