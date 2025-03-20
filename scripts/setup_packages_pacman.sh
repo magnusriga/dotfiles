@@ -99,7 +99,7 @@ sudo pacman -Syu --noconfirm \
   file \
   ctags \
   openssh \
-  iproute2 iputils strace \
+  iproute2 iputils strace nmap \
   netcat socat net-tools lsof \
   rsync \
   cronie \
