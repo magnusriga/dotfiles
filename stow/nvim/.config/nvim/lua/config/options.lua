@@ -381,6 +381,9 @@ opt.smoothscroll = true
 -- Default: `en`.
 opt.spelllang = { "en" }
 
+-- Set spellfile to use.
+opt.spellfile = "~/.config/nvim/spell/en.utf-8.add"
+
 -- When horizontally splitting window, put new window below current window.
 opt.splitbelow = true
 

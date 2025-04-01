@@ -32,6 +32,8 @@ pnpm --allow-build=puppeteer \
 
 pnpm add -g neovim
 
+pnpm --allow-build=@anthropic-ai/claude-code add -g @anthropic-ai/claude-code
+
 # pnpm --allow-build=tree-node-cli add -g tree-node-cli
 # pnpm --allow-build=contentful-cli add -g contentful-cli
 # pnpm --allow-build=neonctl add -g neonctl
