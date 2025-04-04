@@ -26,8 +26,8 @@ function M.get()
       -- - `gO`  : `vim.lsp.buf.document_symbol()`.
       -- - `gq`  : Calls function in `opt.formatexpr()`, initially set to `vim.lsp.formatexpr()` by Neovim,
       --           but remapped to `util/format.lua` > `format()`.
-      -- - `K`   : `vim.lsp.buf.hover()`.
       -- - CTRL-]: `vim.lsp.tagfunc()` > `textdocument/definition` < `vim.lsp.buf.defitition`.
+      -- - `K`   : `vim.lsp.buf.hover()`.
       --
       -- - Insert mode:
       -- - CTRL-S: `vim.lsp.buf.signature_help()`.
@@ -46,6 +46,9 @@ function M.get()
       --
       -- { "<leader>cr", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
       ---------------------------------------------
+
+    -- Same as built-in K, but with border around hover window.
+    { "K", function() vim.lsp.buf.hover({ border = "single" }) end, desc = "Hover" },
 
       ---------------------------------------------
       -- Code actions.

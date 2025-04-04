@@ -33,25 +33,6 @@
 -- - `<c-space>`: Manually trigger completion menu.
 -- ====================================
 
--- Create autocmd that sets `root_dir` for `copilot` client config,
--- and restarts LSP client, upon `BufReadPre` event.
--- TODO: Remove when resolved: https://github.com/zbirenbaum/copilot.lua/issues/371
--- vim.api.nvim_create_autocmd("BufReadPre", {
---   pattern = "*",
---   callback = function()
---     local root_dir = require("lspconfig.util").root_pattern(".git")(vim.api.nvim_buf_get_name(0))
---     local clients = vim.lsp.get_clients()
---     for _, client in ipairs(clients) do
---       if client.name == "copilot" then
---         local _config = vim.deepcopy(client.config)
---         _config.root_dir = root_dir
---         client:stop()
---         vim.lsp.start(_config)
---       end
---     end
---   end,
--- })
-
 return {
   -- Github Copilot.
   {
@@ -148,18 +129,10 @@ return {
         markdown = true,
         help = true,
       },
-
-      -- Override copilot LSP settings.
-      -- server_opts_overrides = {
-      -- on_attach = function(client, bufnr)
-      --   local root_dir = require("lspconfig.util").root_pattern(".git")(vim.api.nvim_buf_get_name(0))
-      --   local _config = vim.deepcopy(client.config)
-      --   _config.root_dir = root_dir
-      --   client:stop()
-      --   vim.lsp.start(_config)
-      -- end,
-      -- },
     },
+    root_dir = function()
+      return vim.fs.dirname(vim.fs.find(".git", { upward = true })[1])
+    end,
   },
 
   -- - `plugins/blink.lua`:
