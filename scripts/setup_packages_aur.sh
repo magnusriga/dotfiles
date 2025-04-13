@@ -235,19 +235,17 @@ cd "$CWD" || exit
 # ==================================
 # zig-bin.
 # ==================================
-# Use version from official Arch Linux repository instead,
-# as AUR version was too new and broke ghostty build.
-# PACKAGE="zig-bin"
-# echo "Installing $PACKAGE"
-# rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-# rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
-# git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
-# cd "$BUILD_REPOS/$PACKAGE" || exit
-# makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-# cd "$BUILD_HOME/packages" || exit
-# sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
-# echo "Installed zig CLI version: $(zig version)"
-# cd "$CWD" || exit
+PACKAGE="zig-bin"
+echo "Installing $PACKAGE"
+rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+cd "$BUILD_REPOS/$PACKAGE" || exit
+makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+cd "$BUILD_HOME/packages" || exit
+sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
+echo "Installed zig CLI version: $(zig version)"
+cd "$CWD" || exit
 
 # ==================================
 # infisical-bin.

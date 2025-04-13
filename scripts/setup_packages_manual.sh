@@ -74,13 +74,14 @@ sudo chmod -R 755 $TARGETDIR
 # Install todocheck (Note: Architecture).
 # ================================================
 PACKAGE="todocheck"
-VERSION=$(curl -s "https://api.github.com/repos/preslavmihaylov/todocheck/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+VERSION=$(curl -s "https://api.github.com/repositories/280693435/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
 sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p $STOWDIR/$PACKAGE/bin
 curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256"
 if echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status; then
+  echo "${PACKAGE} checksum verified, moving binary to stow directory, then stowing."
   sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
   chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
   stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
@@ -97,9 +98,9 @@ sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p "$STOWDIR/$PACKAGE/bin"
 curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://github.com/ip7z/7zip/releases/download/${VERSION}/7z${VERSION_NO_DOT}-linux-arm64.tar.xz"
-tar xzf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE"
-sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+tar xf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE"
+sudo mv "$TMPDIR"/"$PACKAGE"/7zz{,s} "$STOWDIR/$PACKAGE/bin"
+chmod 755 "$STOWDIR/$PACKAGE"/bin/7zz{,s}
 stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 
 # ================================================
