@@ -358,9 +358,9 @@ require("lazy").setup({
     --   e.g. `plugins/addons/ai.lua > lualine.nvim` use `opts` from `plugins/ui.lua > lualine.nvim`.
     { import = "plugins" },
     -- Import other plugins, from sub-folders.
-    { import = "plugins/addons" },
-    { import = "plugins/addons/dap" },
-    { import = "plugins/addons/lang" },
+    { import = "plugins/dap" },
+    { import = "plugins/lang" },
+    { import = "plugins/ai" },
   },
   -- Load Project specific `.lazy.lua` spec files, always added at end of spec.
   local_spec = true,

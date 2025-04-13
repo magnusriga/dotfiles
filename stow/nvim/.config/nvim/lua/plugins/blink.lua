@@ -75,6 +75,28 @@ return {
         end,
       },
 
+      fuzzy = {
+        implementation = "prefer_rust_with_warning",
+
+        -- Controls which sorts to use and in which order,
+        -- falling back to next sort if first one returns `nil`.
+        sorts = {
+          -- Non-default: Always prioritize exact matches, case-sensitive.
+          "exact",
+
+          -- Pass function for custom behavior.
+          -- function(item_a, item_b)
+          --   return item_a.score > item_b.score
+          -- end,
+
+          -- Fuzzy matching score.
+          "score",
+
+          -- `sortText` field, from completion item.
+          "sort_text",
+        },
+      },
+
       appearance = {
         -- Sets fallback highlight groups to nvim-cmp's highlight groups,
         -- useful for when theme doesn't support `blink.cmp`.
@@ -87,12 +109,7 @@ return {
       },
 
       completion = {
-        accept = {
-          -- Experimental auto-brackets support.
-          auto_brackets = {
-            enabled = true,
-          },
-        },
+        accept = { auto_brackets = { enabled = true } },
 
         documentation = {
           auto_show = true,
@@ -124,26 +141,91 @@ return {
 
         menu = {
           -- Better looking without border.
-          -- border = "rounded",
+          border = "rounded",
 
-          -- cmdline_position = function()
-          --   if vim.g.ui_cmdline_pos ~= nil then
-          --     local pos = vim.g.ui_cmdline_pos -- (1, 0)-indexed
-          --     return { pos[1] - 1, pos[2] }
-          --   end
-          --   local height = (vim.o.cmdheight == 0) and 1 or vim.o.cmdheight
-          --   return { vim.o.lines - height, 0 }
-          -- end,
+          cmdline_position = function()
+            if vim.g.ui_cmdline_pos ~= nil then
+              local pos = vim.g.ui_cmdline_pos -- (1, 0)-indexed
+              return { pos[1] - 1, pos[2] }
+            end
+            local height = (vim.o.cmdheight == 0) and 1 or vim.o.cmdheight
+            return { vim.o.lines - height, 0 }
+          end,
 
           draw = {
-            treesitter = { "lsp" },
+            -- Show `kind_icon` and `label`, i.e. name, on LHS of completion menu,
+            -- and `kind`, i.e. type as text, e.g. `Snippet`, on RHS.
+            columns = {
+              { "kind_icon", "label", gap = 1 },
+              { "kind" },
+            },
 
-            -- Show `kind` as text, e.g. `Snippet`, on RHS of completion menu.
-            -- No need, as `kind_icon` already shown on LHS.
-            -- columns = {
-            --   { "kind_icon", "label", gap = 1 },
-            --   { "kind" },
-            -- },
+            components = {
+              -- - For icon:
+              --   - Use nvim-web-devicons, icon and color, if completion item is a file path.
+              --   - Otherwise use `lspkind` icon.
+              --
+              -- - For text:
+              --   - Add same highlight as for icon.
+              kind_icon = {
+                text = function(ctx)
+                  local icon = ctx.kind_icon
+                  if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                    local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
+                    if dev_icon then
+                      icon = dev_icon
+                    end
+                  else
+                    icon = require("lspkind").symbolic(ctx.kind, {
+                      mode = "symbol",
+                    })
+                  end
+
+                  return icon .. ctx.icon_gap
+                end,
+
+                highlight = function(ctx)
+                  local hl = ctx.kind_hl
+                  if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                    local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+                    if dev_icon then
+                      hl = dev_hl
+                    end
+                  end
+                  return hl
+                end,
+              },
+              label = {
+                -- text = function(item)
+                --   return item.label
+                -- end,
+                highlight = function(ctx)
+                  local hl = ctx.kind_hl
+                  if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                    local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+                    if dev_icon then
+                      hl = dev_hl
+                    end
+                  end
+                  return hl
+                end,
+              },
+              kind = {
+                -- text = function(item)
+                --   return item.kind
+                -- end,
+                highlight = function(ctx)
+                  local hl = ctx.kind_hl
+                  if vim.tbl_contains({ "Path" }, ctx.source_name) then
+                    local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+                    if dev_icon then
+                      hl = dev_hl
+                    end
+                  end
+                  return hl
+                end,
+              },
+            },
           },
         },
 
@@ -161,11 +243,11 @@ return {
           show_with_menu = false,
         },
 
-        trigger = {
-          -- By default, `blink.cmp` blocks newline, tab, and space trigger characters.
-          -- Disable that behavior, to allow menu to show on whitespace (for Copilot suggestions).
-          show_on_blocked_trigger_characters = {},
-        },
+        -- trigger = {
+        -- By default, `blink.cmp` blocks newline, tab, and space trigger characters.
+        -- Disable that behavior, to allow menu to show on whitespace (for Copilot suggestions).
+        -- show_on_blocked_trigger_characters = {},
+        -- },
       },
 
       -- Experimental signature help support.
@@ -176,26 +258,66 @@ return {
 
       -- Match built-in cmdline completion.
       cmdline = {
-        enabled = false,
+        -- sources = { "cmdline" },
+        -- enabled = false,
+        keymap = {
+          -- Recommended when auto_show completion menu,
+          -- as default keymap will only show and select next item.
+          ["<Tab>"] = { "show", "accept" },
+        },
+        completion = { menu = { auto_show = true } },
       },
 
-      -- List of enabled providers.
-      -- Extendable through other `blink.cmp` specs, due to `opts_extend`,
-      -- e.g. below for `lazydev` provider.
+      -- - List of enabled providers.
+      -- - Extendable through other `blink.cmp` specs, due to `opts_extend`,
+      --   e.g. below for `lazydev` provider.
+      -- - By default, `blink.cmp` uses snippets from `friendly-snippets`,
+      --   and `~/.config/nvim/snippets`.
       sources = {
-        default = { "lsp", "path", "snippets", "buffer" },
+        -- Remove 'buffer' to skip text completions,
+        -- by default it is only enabled when LSP returns no items.
+        default = { "snippets", "lsp", "path", "buffer", "codecompanion" },
 
-        -- To trigger menu on whitespace, for Copilot suggestions.
         providers = {
-          lsp = {
-            override = {
-              get_trigger_characters = function(self)
-                local trigger_characters = self:get_trigger_characters()
-                vim.list_extend(trigger_characters, { "\n", "\t", " " })
-                return trigger_characters
-              end,
-            },
+          cmdline = {
+            min_keyword_length = function(ctx)
+              -- Only auto-show completion menu after typing 3 characters or more than one word.
+              if ctx.mode == "cmdline" and string.find(ctx.line, " ") == nil then
+                return 3
+              end
+              return 0
+            end,
           },
+          -- lsp = {
+          --   override = {
+          --     get_trigger_characters = function(self)
+          --       local trigger_characters = self:get_trigger_characters()
+          --       vim.list_extend(trigger_characters, { "\n", "\t", " " })
+          --       return trigger_characters
+          --     end,
+          --   },
+          -- },
+          --
+          -- lsp = {
+          --   min_keyword_length = 2, -- Number of characters to trigger porvider
+          --   score_offset = 0, -- Boost/penalize the score of the items
+          -- },
+          --
+          -- path = {
+          --   min_keyword_length = 0,
+          -- },
+          --
+          -- snippets = {
+          --   min_keyword_length = 1,
+          --   opts = {
+          --     search_paths = { "~/.config/snippets" },
+          --   },
+          -- },
+          --
+          -- buffer = {
+          --   min_keyword_length = 5,
+          --   max_items = 5,
+          -- },
         },
       },
 
@@ -239,7 +361,7 @@ return {
       --   `MyVim.cmp.actions` table, which moves forward and backward in snippet ONLY if
       --   snippet is active, i.e. being filled in on screen, otherwise does nothing.
       --
-      -- - `plugins/addons/ai.lua`:
+      -- - `plugins/copilot.lua`:
       --   `ai_accept` function is added to `MyVim.cmp.actions` table,
       --   which accepts AI suggestion if visible ONLY if Copilot suggestion is visible,
       --   which is always when typing, since `auto_trigger` is `true`, otherwise does nothing.
@@ -271,7 +393,7 @@ return {
       end
 
       -- Check if symbol kinds must be overwritten,
-      -- needed by `addons/ai.lua > copilot`.
+      -- needed by `ai/copilot.lua`.
       for _, provider in pairs(opts.sources.providers or {}) do
         ---@cast provider blink.cmp.SourceProviderConfig|{kind?:string}
         if provider.kind then
@@ -294,7 +416,7 @@ return {
             return items
           end
 
-          -- Unset custom prop to pass blink.cmp validation
+          -- Unset custom prop to pass blink.cmp validation.
           provider.kind = nil
         end
       end
@@ -304,13 +426,14 @@ return {
   },
 
   -- Add icons to completion menu.
-  {
-    "saghen/blink.cmp",
-    opts = function(_, opts)
-      opts.appearance = opts.appearance or {}
-      opts.appearance.kind_icons = vim.tbl_extend("force", opts.appearance.kind_icons or {}, MyVim.config.icons.kinds)
-    end,
-  },
+  -- Using `lspkind` instead.
+  -- {
+  --   "saghen/blink.cmp",
+  --   opts = function(_, opts)
+  --     opts.appearance = opts.appearance or {}
+  --     opts.appearance.kind_icons = vim.tbl_extend("force", opts.appearance.kind_icons or {}, MyVim.config.icons.kinds)
+  --   end,
+  -- },
 
   -- `lazydev` plugin, included in `plugin/coding.lua`,
   -- forces LuaLS to only load modules, within `.config/nvim`, when module has been `require()`'ed

@@ -6,5 +6,4 @@ echo "Running setup_pip_packages.sh as $(whoami), with HOME $HOME and USERNAME $
 pipx ensurepath
 
 # Install packages.
-# Use `pacman` instead.
-# pipx install pre-commit
+pipx install vectorcode

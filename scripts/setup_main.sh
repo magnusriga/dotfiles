@@ -11,7 +11,10 @@ echo "Running setup_main.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME
 # Change directory to path of current script,
 # to execute other scripts with relative path.
 # ==========================================================
-SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1 ; pwd -P )/"
+SCRIPTPATH="$(
+  cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1
+  pwd -P
+)/"
 echo "cd to SCRIPTPATH: $SCRIPTPATH"
 cd $SCRIPTPATH
 
@@ -79,11 +82,11 @@ if [ -f "./setup_packages_manual.sh" ]; then
 fi
 
 # ================================================
-# `pip`: Install packages, currently none.
+# `pip`: Install packages.
 # ================================================
-# if [ -f "./setup_pip_packages.sh" ]; then
-#   . ./setup_pip_packages.sh
-# fi
+if [ -f "./setup_packages_pip.sh" ]; then
+  . ./setup_packages_pip.sh
+fi
 
 # ================================================
 # Not using Homebrew on Linux.
