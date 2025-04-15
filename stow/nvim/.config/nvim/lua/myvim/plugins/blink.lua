@@ -59,8 +59,9 @@ return {
 
     dependencies = {
       "rafamadriz/friendly-snippets",
-      "onsails/lspkind-nvim",
+      -- "onsails/lspkind-nvim", -- Prefer own icons.
       "Kaiser-Yang/blink-cmp-git",
+      "Kaiser-Yang/blink-cmp-avante",
     },
 
     -- Delay plugin load until entering Insert mode.
@@ -163,7 +164,7 @@ return {
             components = {
               -- - For icon:
               --   - Use nvim-web-devicons, icon and color, if completion item is a file path.
-              --   - Otherwise use `lspkind` icon.
+              --   - Otherwise use own icon (not lspkind).
               --
               -- - For text:
               --   - Add same highlight as for icon.
@@ -175,10 +176,10 @@ return {
                     if dev_icon then
                       icon = dev_icon
                     end
-                  else
-                    icon = require("lspkind").symbolic(ctx.kind, {
-                      mode = "symbol",
-                    })
+                    -- else
+                    --   icon = require("lspkind").symbolic(ctx.kind, {
+                    --     mode = "symbol",
+                    --   })
                   end
 
                   return icon .. ctx.icon_gap
@@ -258,14 +259,13 @@ return {
 
       -- Match built-in cmdline completion.
       cmdline = {
-        -- sources = { "cmdline" },
-        -- enabled = false,
-        keymap = {
-          -- Recommended when auto_show completion menu,
-          -- as default keymap will only show and select next item.
-          ["<Tab>"] = { "show", "accept" },
-        },
-        completion = { menu = { auto_show = true } },
+        enabled = false,
+        -- completion = { menu = { auto_show = true } },
+        -- keymap = {
+        --   -- Recommended when auto_show completion menu,
+        --   -- as default keymap will only show and select next item.
+        --   ["<Tab>"] = { "show", "accept" },
+        -- },
       },
 
       -- - List of enabled providers.
@@ -276,18 +276,21 @@ return {
       sources = {
         -- Remove 'buffer' to skip text completions,
         -- by default it is only enabled when LSP returns no items.
-        default = { "snippets", "lsp", "path", "buffer", "codecompanion" },
+        default = { "lsp", "path", "snippets", "buffer" },
 
         providers = {
-          cmdline = {
-            min_keyword_length = function(ctx)
-              -- Only auto-show completion menu after typing 3 characters or more than one word.
-              if ctx.mode == "cmdline" and string.find(ctx.line, " ") == nil then
-                return 3
-              end
-              return 0
-            end,
-          },
+          -- Only needed when using command line completion.
+          -- cmdline = {
+          --   min_keyword_length = function(ctx)
+          --     -- Only auto-show completion menu after typing 3 characters or more than one word.
+          --     if ctx.mode == "cmdline" and string.find(ctx.line, " ") == nil then
+          --       return 3
+          --     end
+          --     return 0
+          --   end,
+          -- },
+
+          -- Activate completion menu on whitespace, currently not working.
           -- lsp = {
           --   override = {
           --     get_trigger_characters = function(self)
@@ -297,23 +300,24 @@ return {
           --     end,
           --   },
           -- },
-          --
-          -- lsp = {
-          --   min_keyword_length = 2, -- Number of characters to trigger porvider
-          --   score_offset = 0, -- Boost/penalize the score of the items
-          -- },
-          --
+
+          -- - Activate different providers after specific number of characters,
+          --   so snippets are easy to find after just typing one character,
+          --   and all lsp results only show after typing two characters.
+          -- - Not useful, as c-space does not work.
           -- path = {
           --   min_keyword_length = 0,
           -- },
-          --
           -- snippets = {
           --   min_keyword_length = 1,
           --   opts = {
           --     search_paths = { "~/.config/snippets" },
           --   },
           -- },
-          --
+          -- lsp = {
+          --   min_keyword_length = 2, -- Number of characters to trigger porvider
+          --   score_offset = 0, -- Boost/penalize the score of the items
+          -- },
           -- buffer = {
           --   min_keyword_length = 5,
           --   max_items = 5,
@@ -425,15 +429,50 @@ return {
     end,
   },
 
-  -- Add icons to completion menu.
-  -- Using `lspkind` instead.
-  -- {
-  --   "saghen/blink.cmp",
-  --   opts = function(_, opts)
-  --     opts.appearance = opts.appearance or {}
-  --     opts.appearance.kind_icons = vim.tbl_extend("force", opts.appearance.kind_icons or {}, MyVim.config.icons.kinds)
-  --   end,
-  -- },
+  -- Overwrite default icons with custom ones.
+  -- Default icons:
+  --   Text = '󰉿',
+  --   Method = '󰊕',
+  --   Function = '󰊕',
+  --   Constructor = '󰒓',
+  --
+  --   Field = '󰜢',
+  --   Variable = '󰆦',
+  --   Property = '󰖷',
+  --
+  --   Class = '󱡠',
+  --   Interface = '󱡠',
+  --   Struct = '󱡠',
+  --   Module = '󰅩',
+  --
+  --   Unit = '󰪚',
+  --   Value = '󰦨',
+  --   Enum = '󰦨',
+  --   EnumMember = '󰦨',
+  --
+  --   Keyword = '󰻾',
+  --   Constant = '󰏿',
+  --
+  --   Snippet = '󱄽',
+  --   Color = '󰏘',
+  --   File = '󰈔',
+  --   Reference = '󰬲',
+  --   Folder = '󰉋',
+  --   Event = '󱐋',
+  --   Operator = '󰪚',
+  --   TypeParameter = '󰬛',
+  {
+    "saghen/blink.cmp",
+    opts = function(_, opts)
+      opts.appearance = opts.appearance or {}
+      opts.appearance.kind_icons = MyVim.config.icons.kinds
+
+      -- Use block instead of icon for color items, to make swatches more usable.
+      opts.appearance.kind_icons = vim.tbl_extend("keep", {
+        Color = "██",
+      }, MyVim.config.icons.kinds)
+    end,
+  },
 
   -- `lazydev` plugin, included in `plugin/coding.lua`,
   -- forces LuaLS to only load modules, within `.config/nvim`, when module has been `require()`'ed

@@ -11,7 +11,7 @@
 --
 -- `config > init.lua > setup()` previously executed from entrypoint, `init.lua`.
 -- `config > init.lua > init()` executed here.
-require("config").init()
+require("myvim.config").init()
 
 return {
   -- ==================================================================

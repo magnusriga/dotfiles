@@ -1,8 +1,9 @@
 return {
+  -- AI programming, alternative to `avante.nvim`.
   {
-    "olimorris/codecompanion.nvim", -- The KING of AI programming
+    "olimorris/codecompanion.nvim",
     dependencies = {
-      "j-hui/fidget.nvim",
+      -- "j-hui/fidget.nvim",
       {
         "Davidyz/VectorCode",
         version = "*",
@@ -318,7 +319,17 @@ I'm also sharing my `config.lua` file which I'm mapping to the `configuration` s
       --     },
       --   },
       -- })
-      require("util.spinner"):init()
+      -- require("util.spinner"):init()
     end,
+  },
+
+  -- Add `codecompanion` to completion providers.
+  {
+    "saghen/blink.cmp",
+    opts = {
+      sources = {
+        default = { "codecompanion" },
+      },
+    },
   },
 }

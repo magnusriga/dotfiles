@@ -226,7 +226,7 @@ return {
       -- i.e. `opts.servers[client.name]`,
       -- which in turn are merged with all keymaps defined in `plugins.lsp.keymaps`.
       MyVim.lsp.on_attach(function(client, buffer)
-        require("plugins.lsp.keymaps").on_attach(client, buffer)
+        require("myvim.plugins.lsp.keymaps").on_attach(client, buffer)
       end)
 
       -- Setup autocmds that runs when client attaches to buffer,
@@ -235,7 +235,7 @@ return {
 
       -- Setup keymaps when registering new capability on client,
       -- see above for all steps.
-      MyVim.lsp.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
+      MyVim.lsp.on_dynamic_capability(require("myvim.plugins.lsp.keymaps").on_attach)
 
       -- Inlay hints.
       if opts.inlay_hints.enabled then

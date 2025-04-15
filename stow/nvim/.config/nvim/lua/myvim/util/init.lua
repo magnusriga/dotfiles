@@ -25,7 +25,7 @@ setmetatable(M, {
       return LazyUtil[k]
     end
     ---@diagnostic disable-next-line: no-unknown
-    t[k] = require("util." .. k)
+    t[k] = require("myvim.util." .. k)
     -- M.deprecated.decorate(k, t[k])
     return t[k]
   end,

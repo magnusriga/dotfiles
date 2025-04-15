@@ -356,11 +356,11 @@ require("lazy").setup({
     -- - Specs in `plugins` must load before specs in `plugins/addosn`,
     --   as some specs use `opts` from other specs,
     --   e.g. `plugins/addons/ai.lua > lualine.nvim` use `opts` from `plugins/ui.lua > lualine.nvim`.
-    { import = "plugins" },
+    { import = "myvim/plugins" },
     -- Import other plugins, from sub-folders.
-    { import = "plugins/dap" },
-    { import = "plugins/lang" },
-    { import = "plugins/ai" },
+    { import = "myvim/plugins/dap" },
+    { import = "myvim/plugins/lang" },
+    { import = "myvim/plugins/ai" },
   },
   -- Load Project specific `.lazy.lua` spec files, always added at end of spec.
   local_spec = true,

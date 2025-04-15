@@ -1,4 +1,4 @@
-_G.MyVim = require("util")
+_G.MyVim = require("myvim.util")
 
 ---@class MyVimConfig: MyVimOptions
 local M = {}
@@ -168,7 +168,7 @@ function M.load(name)
   local pattern = "MyVim" .. name:sub(1, 1):upper() .. name:sub(2)
 
   -- Load file.
-  _load("config." .. name)
+  _load("myvim.config." .. name)
 
   vim.api.nvim_exec_autocmds("User", { pattern = pattern, modeline = false })
 end
@@ -231,7 +231,7 @@ function M.setup(opts)
       M.load("hlgroups")
 
       -- Load symbols cahce feature.
-      require("util.document_symbol")
+      require("myvim.util.document_symbol")
 
       vim.api.nvim_create_user_command("MyHealth", function()
         vim.cmd([[Lazy! load all]])

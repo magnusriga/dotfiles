@@ -481,15 +481,15 @@ return {
     },
   },
 
-  -- Finds and lists all TODO, HACK, BUG, etc. comments
-  -- in project and loads them into browsable list.
+  -- Finds and lists all TODO, HACK, BUG, etc. comments in project
+  -- and loads them into browsable list.
   {
     "folke/todo-comments.nvim",
     cmd = { "TodoTrouble", "TodoTelescope" },
     event = "LazyFile",
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = {
-      -- keywords recognized as todo comments
+      -- Keywords recognized as todo comments.
       keywords = {
         FIX = {
           icon = " ", -- icon used for the sign, and in search results
@@ -547,9 +547,21 @@ return {
         desc = "Todo/Fix/Fixme (Trouble)",
       },
 
-      -- Overwritten by `fzf.lua`.
-      { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo" },
-      { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
+      {
+        "<leader>st",
+        function()
+          Snacks.picker.todo_comments()
+        end,
+        desc = "Todo",
+      },
+
+      {
+        "<leader>sT",
+        function()
+          Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } })
+        end,
+        desc = "Todo/Fix/Fixme",
+      },
     },
   },
 }

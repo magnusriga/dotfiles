@@ -204,7 +204,7 @@ opt.fillchars = {
 }
 
 -- Use treesitter to create folds.
-opt.foldexpr = "v:lua.require'util'.ui.foldexpr()"
+opt.foldexpr = "v:lua.require'myvim.util'.ui.foldexpr()"
 opt.foldmethod = "expr"
 
 -- Start with all folds open.
@@ -212,10 +212,10 @@ opt.foldlevel = 99
 
 -- Use custom foldtext, with treesitter syntax highlighting
 -- and additonal information appended.
-opt.foldtext = "v:lua.require'util.ui'.foldtext()"
+opt.foldtext = "v:lua.require'myvim.util.ui'.foldtext()"
 
 -- Function used for `gq` operator.
-opt.formatexpr = "v:lua.require'util.format'.formatexpr()"
+opt.formatexpr = "v:lua.require'myvim.util.format'.formatexpr()"
 
 -- `formatoptions` determines which lines these apply to:
 -- - `opt.textwidth`.
@@ -399,7 +399,7 @@ opt.splitright = true
 -- Using custom `statuscolumn`, i.e. margin to left containing:
 -- Gitsigns (or other signs), diagnostics, todo-comments, line numbers, fold icons, border, etc.
 -- vim.opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
-opt.statuscolumn = [[%!v:lua.require("util.statuscolumn").get()]]
+opt.statuscolumn = [[%!v:lua.require("myvim.util.statuscolumn").get()]]
 
 -- Number of spaces tabs count for.
 opt.tabstop = 2

@@ -3,9 +3,8 @@ return {
   {
     "yetone/avante.nvim",
     event = "VeryLazy",
-    -- `lazy = *`: Always pull latest release version.
-    -- `lazy = false`: Update to latest version from GitHub.
     lazy = false,
+    -- Never set `version = "*"`, `false` means latest from GitHub.
     version = false,
     -- Build from source: `make BUILD_FROM_SOURCE=true`.
     build = "make",
@@ -25,8 +24,8 @@ return {
 
       "nvim-tree/nvim-web-devicons",
 
-      -- If providers='copilot'.
-      -- "zbirenbaum/copilot.lua",
+      -- For providers='copilot'.
+      "zbirenbaum/copilot.lua",
       {
         -- Support for image pasting.
         "HakonHarnes/img-clip.nvim",
@@ -39,10 +38,18 @@ return {
               insert_mode = true,
             },
             -- For Windows.
-            use_absolute_path = true,
+            -- use_absolute_path = true,
           },
         },
       },
+      -- {
+      --   -- Needed, when `lazy=true`.
+      --   "MeanderingProgrammer/render-markdown.nvim",
+      --   opts = {
+      --     file_types = { "markdown", "Avante" },
+      --   },
+      --   ft = { "markdown", "Avante" },
+      -- },
     },
     init = function()
       vim.api.nvim_create_autocmd("User", {
@@ -75,8 +82,10 @@ return {
         endpoint = "https://api.anthropic.com",
         model = "claude-3-7-sonnet-20250219",
         timeout = 30000,
-        temperature = 1,
-        max_tokens = 20000,
+        temperature = 0,
+        max_tokens = 4096,
+        -- temperature = 1,
+        -- max_tokens = 20000,
 
         -- Defaults:
         -- endpoint = "https://api.anthropic.com",
@@ -101,17 +110,14 @@ return {
       --   max_tokens = 4096,
       --   -- reasoning_effort = "high" -- Supported for reasoning models (o1, etc.).
       -- },
-
       -- - Specify special dual_boost mode.
       -- - Experimental feature, may not work as expected.
-      --
       -- - Settings:
       --   1. enabled: Whether to enable dual_boost mode. Default to false.
       --   2. first_provider: The first provider to generate response. Default to "openai".
       --   3. second_provider: The second provider to generate response. Default to "claude".
       --   4. prompt: The prompt to generate response based on the two reference outputs.
       --   5. timeout: Timeout in milliseconds. Default to 60000.
-      --
       -- - How it works:
       --   - When dual_boost is enabled, avante will generate two responses,
       --     from first_provider and second_provider respectively.
@@ -144,6 +150,28 @@ return {
 
         -- Whether to enable Cursor Planning Mode. Default: `false`.
         enable_cursor_planning_mode = false,
+
+        -- Whether to enable Claude Text Editor Tool Mode.
+        enable_claude_text_editor_tool_mode = false,
+      },
+    },
+  },
+
+  -- Add `avante` to completion providers.
+  {
+    "saghen/blink.cmp",
+    opts = {
+      sources = {
+        default = { "avante" },
+        providers = {
+          avante = {
+            module = "blink-cmp-avante",
+            name = "Avante",
+            opts = {
+              -- options for blink-cmp-avante
+            },
+          },
+        },
       },
     },
   },

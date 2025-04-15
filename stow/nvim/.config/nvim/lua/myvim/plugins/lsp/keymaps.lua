@@ -13,7 +13,8 @@ function M.get()
   end
     -- stylua: ignore
     M._keys =  {
-      { "<leader>cl", "<cmd>LspInfo<cr>", desc = "Lsp Info" },
+      -- { "<leader>cl", "<cmd>LspInfo<cr>", desc = "Lsp Info" },
+      { "<leader>cl", function() Snacks.picker.lsp_config() end, desc = "Lsp Info" },
 
       ---------------------------------------------
       -- Built-in `gr<x>` commands, see: `:h vim-diff`, `:h lsp`.

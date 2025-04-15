@@ -16,8 +16,8 @@ vim.cmd([[
   highlight LazygitDefaultFgColor guifg=#c0caf5 guibg=#1a1b26
   highlight LazygitInactiveBorderColor guifg=#27a1b9 guibg=#16161e
 
-  highlight link LazygitOptionsTextColor LazygitCherryPickedCommitFgColor
-  highlight link LazygitSearchingActiveBorderColor LazygitActiveBorderColor
+  highlight! link LazygitOptionsTextColor LazygitCherryPickedCommitFgColor
+  highlight! link LazygitSearchingActiveBorderColor LazygitActiveBorderColor
 
   highlight LazygitSelectedLineBgColor guibg=#283457
   highlight LazygitUnstagedChangesColor guifg=#db4b4b
@@ -40,10 +40,13 @@ vim.cmd([[
 -- - Not working:
 --   - Counter text: `highlight link FzfLuaFzfInfo Comment`.
 --
+-- - Links:
+--   - Must use `!`, since `{to-group}` already set.
+--
 -- - Other color settings in `fzf-lua.nvim`.
 --   - `TermCursor`: Used by `fzf-lua`.
 --   - `highlight link FzfLuaPreviewNormal Normal`:
---   - Ensures preview window background is same as normal coding window.
+--     Ensures preview window background is same as normal coding window.
 --
 -- - Colors from `tokyodark`, overwritten:
 --   - `highlight FzfLuaLiveSym guifg=PaleVioletRed1`.
@@ -55,50 +58,60 @@ vim.cmd([[
   highlight CursorLine guibg=#2f334d
   highlight CursorLineNr cterm=bold gui=bold guifg=#ff966c
   highlight TermCursor guifg=bg guibg=fg
-  highlight Title cterm=bold gui=bold guifg=#82aaff
+  " highlight Title cterm=bold gui=bold guifg=#82aaff
   highlight Directory guifg=#82aaff
   highlight TabLine guifg=#3b4261 guibg=#1e2030
   highlight Visual guibg=#2d3f76
   highlight NonText guifg=#545c7e guibg=Normal
 
   highlight FzfLuaTitle guifg=#ff966c guibg=#1e2030
-  highlight link FzfLuaPath Directory
+  highlight FzfLuaPreviewNormal guibg=#ff007c
+  highlight! link FzfLuaPath Directory
   highlight FzfLuaBorder guifg=#589ed7 guibg=#1e2030
   highlight FzfLuaCursor guifg=#1b1d2b guibg=#ff966c
   highlight FzfLuaNormal guifg=#c8d3f5 guibg=#1e2030
   highlight FzfLuaSearch guifg=#1b1d2b guibg=#ff966c
   highlight FzfLuaDirPart guifg=#828bb8
-  highlight link FzfLuaFilePart FzfLuaFzfNormal
-  highlight link FzfLuaHeaderText FzfLuaFzfHeader
-  highlight link FzfLuaHeaderBind FzfLuaFzfHeader
+  highlight! link FzfLuaFilePart FzfLuaFzfNormal
+  highlight! link FzfLuaHeaderText FzfLuaFzfHeader
+  highlight! link FzfLuaHeaderBind FzfLuaFzfHeader
 
   highlight FzfLuaFzfNormal guifg=#c8d3f5
-  highlight link FzfLuaFzfHeader Comment
+  highlight! link FzfLuaFzfHeader Comment
   highlight FzfLuaFzfSeparator guifg=#ff966c guibg=#1e2030
   highlight FzfLuaFzfMatch guifg=#ff966c guibg=#1e2030
   highlight FzfLuaFzfPointer guifg=#ff007c
-  highlight link FzfLuaFzfCursorLine Visual
+  highlight! link FzfLuaFzfCursorLine Visual
 
-  highlight link FzfLuaFzfInfo Comment
+  highlight! link FzfLuaFzfInfo Comment
 
   highlight FzfLuaLiveSym guifg=#ff966c guibg=#1e2030
-  highlight link FzfLuaLivePrompt FzfLuaFzfQuery
+  highlight! link FzfLuaLivePrompt FzfLuaFzfQuery
 
   highlight FzfLuaScrollBorderBackCompat guifg=#1e2030 guibg=#589ed7
 
-  highlight link FzfLuaPreviewNormal Normal
-  highlight FzfLuaPreviewTitle guifg=#589ed7 guibg=#1e2030
+  highlight! link FzfLuaPreviewNormal Normal
+  highlight FzfLuaPreviewTitle guifg=#589ed7 guibg=None
   highlight FzfLuaPreviewBorder guifg=#589ed7 guibg=None
+]])
+
+-- WhichKey.
+-- - `WhichKeyFloat`: Links to NormalFloat, below linked to Normal,
+-- - `WhichKeyBorder`: Links to FloatBorder, below changed to match `fzf-lua`.
+-- - Result: Floating windows have same background as normal windows, just with border.
+vim.cmd([[
+  highlight! link NormalFloat Normal
+  highlight FloatBorder guifg=#589ed7 guibg=None
 ]])
 
 -- Pmenu.
 vim.cmd([[
   highlight Pmenu guifg=#c8d3f5 guibg=#1e2030
   highlight PmenuSel guibg=#363c58
-  highlight link PmenuKind Pmenu
-  highlight link PmenuKindSel PmenuSel
-  highlight link PmenuExtra Pmenu
-  highlight link PmenuExtraSel PmenuSel
+  highlight! link PmenuKind Pmenu
+  highlight! link PmenuKindSel PmenuSel
+  highlight! link PmenuExtra Pmenu
+  highlight! link PmenuExtraSel PmenuSel
   highlight PmenuSbar guibg=#27293a
   highlight PmenuThumb guibg=#3b4261
   highlight PmenuMatch guifg=#65bcff guibg=#1e2030
@@ -132,6 +145,6 @@ vim.cmd([[
 -- highlight TreesitterContextBottom gui=underline guisp=#495162
 -- highlight TreesitterContextLineNumberBottom gui=underline guisp=#495162
 vim.cmd([[
-  highlight link TreesitterContext Normal
-  highlight link TreesitterContextSeparator LineNr
+  highlight! link TreesitterContext Normal
+  highlight! link TreesitterContextSeparator LineNr
 ]])

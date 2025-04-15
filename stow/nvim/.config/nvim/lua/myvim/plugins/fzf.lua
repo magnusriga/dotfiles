@@ -684,15 +684,16 @@ return {
     },
   },
 
-  {
-    "folke/todo-comments.nvim",
-    -- Overwrites Telescope key bingings in `plugins/editor.lua`.
-    -- stylua: ignore
-    keys = {
-      { "<leader>st", function() require("todo-comments.fzf").todo() end, desc = "Todo" },
-      { "<leader>sT", function () require("todo-comments.fzf").todo({ keywords = { "TODO", "FIX", "FIXME" } }) end, desc = "Todo/Fix/Fixme" },
-    },
-  },
+  -- Set directly in `editor.lua`, using Snacks.picker.
+  -- {
+  --   "folke/todo-comments.nvim",
+  --   -- Overwrites Telescope key bingings in `plugins/editor.lua`.
+  --   -- stylua: ignore
+  --   keys = {
+  --     { "<leader>st", function() require("todo-comments.fzf").todo() end, desc = "Todo" },
+  --     { "<leader>sT", function () require("todo-comments.fzf").todo({ keywords = { "TODO", "FIX", "FIXME" } }) end, desc = "Todo/Fix/Fixme" },
+  --   },
+  -- },
 
   {
     "neovim/nvim-lspconfig",
@@ -705,7 +706,7 @@ return {
     --   thus it does not matter that this is executed before `nvim-lspconfig` config-function,
     --   which is where autocmd is set up that creates key bindings from `plugins.lsp.keymaps._keys`.
     opts = function()
-      local Keys = require("plugins.lsp.keymaps").get()
+      local Keys = require("myvim.plugins.lsp.keymaps").get()
 
       ---------------------------------------------
       -- Built-in `gr<x>` commands, see: `:h vim-diff`, `:h lsp`.

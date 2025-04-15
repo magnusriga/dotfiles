@@ -88,7 +88,7 @@ nvim CLI options
 -- 1. Clone repo `lazy.nvim.git` into `lazypath` directory: `$HOME/.local/share/nvim/lazy/lazy.nvim`.
 -- 2. Add `lazypath` to runtimepath, so `require("lazy")` resolves to: `<lazypath>/lua/lazy`.
 ---------------------------------------------
-require("util.lazy-bootstrap")
+require("myvim.util.lazy-bootstrap")
 
 ---------------------------------------------
 -- Initialization.
@@ -98,11 +98,11 @@ require("util.lazy-bootstrap")
 -- and running plugins' main `setup()`,
 -- i.e. at VeryLazy event.
 ---------------------------------------------
-require("config").setup()
+require("myvim.config").setup()
 
 ---------------------------------------------
 -- Load all plugins, including those imported
 -- from `lua/plugins` directory.
 -- VeryLazy event is called when done.
 ---------------------------------------------
-require("util.lazy-plugins")
+require("myvim.util.lazy-plugins")
