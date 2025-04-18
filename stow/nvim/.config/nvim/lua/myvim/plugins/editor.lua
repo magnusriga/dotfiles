@@ -31,6 +31,7 @@ return {
     },
   },
 
+  -- Not using flash.
   -- Adds jump labels:
   -- - `/`      : Optional, default off, toggle with `require("flash").toggle(boolean?)`.
   --              Keep disabled, regular search is good enough.
@@ -45,76 +46,76 @@ return {
   -- Upgrades `f|F|t|T`:
   -- - Go past current line, i.e. multi-line.
   -- - Repeat with same character, but `;` | `,` already repeats forward | backward.
-  {
-    "folke/flash.nvim",
-    event = "VeryLazy",
-    ---@type Flash.Config
-    opts = {
-      highlight = {
-        -- Show backdrop with `hl FlashBackdrop`, e.g. making
-        -- font gray from cursor forward, `true` by default.
-        backdrop = false,
-        -- Highlight search matches, `true` by default.
-        -- Same as `Search` and `IncSearch` highlight groups,
-        -- i.e. gray bacground and orang font.
-        -- Bring pink box is lables, not matches.
-        matches = true,
-        -- Extmark priority.
-        priority = 5000,
-        groups = {
-          match = "FlashMatch",
-          current = "FlashCurrent",
-          backdrop = "FlashBackdrop",
-          label = "FlashLabel",
-        },
-      },
-      modes = {
-        search = {
-          -- `true`: `flash` activate by default for regular search.
-          -- Toggle on/off: `require("flash").toggle()`.
-          enabled = false,
-        },
-        -- `char`: Options when `flash` is activated through
-        -- `f`, `F`, `t`, `T`, `;`, `,` motions.
-        char = {
-          -- enabled = false,
-          jump_labels = true,
-          highlight = {
-            backdrop = false,
-            groups = {
-              -- Pink highlight too disturbing in this mode.
-              label = "IncSearch",
-            },
-          },
-        },
-      },
-    },
-    -- stylua: ignore
-    keys = {
-      -- Search forward|backwards, like regular search with jump labels.
-      -- Disable, clashes with built-in substitute binding `s`.
-      -- { "s", mode = { "n", "o", "x" }, function() require("flash").jump() end, desc = "Flash" },
-
-      -- Visually select forward|backward with labels.
-      -- Expand|contract selection with `;`|`,`.
-      -- Prefer increment|decrement with: `^Space`|`Backspace`, see `treesitter.lua`.
-      -- { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
-
-      -- `r` in operator pending mode (`o`) to use jump labels as operator for motion.
-      -- Labels use same character for start and end of selection.
-      { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
-
-      -- `R` in operator pending mode (`o`) and visual mode (`x`) to use jump labels as operator for motion.
-      -- Type full search after `R`.
-      -- Thus, possible to yank|delete|select upwards|downwards, not just next match.
-      -- Example: `yRa` then choose jump target to yank text inside label.
-      { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-
-      -- `C-s` in command mode (`c`), to toggle flash search on/off for regular (`/`) search.
-      -- Disbaled, interferes with `tmux`.
-      -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
-    },
-  },
+  -- {
+  --   "folke/flash.nvim",
+  --   event = "VeryLazy",
+  --   ---@type Flash.Config
+  --   opts = {
+  --     highlight = {
+  --       -- Show backdrop with `hl FlashBackdrop`, e.g. making
+  --       -- font gray from cursor forward, `true` by default.
+  --       backdrop = false,
+  --       -- Highlight search matches, `true` by default.
+  --       -- Same as `Search` and `IncSearch` highlight groups,
+  --       -- i.e. gray bacground and orang font.
+  --       -- Bring pink box is lables, not matches.
+  --       matches = true,
+  --       -- Extmark priority.
+  --       priority = 5000,
+  --       groups = {
+  --         match = "FlashMatch",
+  --         current = "FlashCurrent",
+  --         backdrop = "FlashBackdrop",
+  --         label = "FlashLabel",
+  --       },
+  --     },
+  --     modes = {
+  --       search = {
+  --         -- `true`: `flash` activate by default for regular search.
+  --         -- Toggle on/off: `require("flash").toggle()`.
+  --         enabled = false,
+  --       },
+  --       -- `char`: Options when `flash` is activated through
+  --       -- `f`, `F`, `t`, `T`, `;`, `,` motions.
+  --       char = {
+  --         -- enabled = false,
+  --         jump_labels = true,
+  --         highlight = {
+  --           backdrop = false,
+  --           groups = {
+  --             -- Pink highlight too disturbing in this mode.
+  --             label = "IncSearch",
+  --           },
+  --         },
+  --       },
+  --     },
+  --   },
+  --   -- stylua: ignore
+  --   keys = {
+  --     -- Search forward|backwards, like regular search with jump labels.
+  --     -- Disable, clashes with built-in substitute binding `s`.
+  --     -- { "s", mode = { "n", "o", "x" }, function() require("flash").jump() end, desc = "Flash" },
+  --
+  --     -- Visually select forward|backward with labels.
+  --     -- Expand|contract selection with `;`|`,`.
+  --     -- Prefer increment|decrement with: `^Space`|`Backspace`, see `treesitter.lua`.
+  --     -- { "S", mode = { "n", "o", "x" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+  --
+  --     -- `r` in operator pending mode (`o`) to use jump labels as operator for motion.
+  --     -- Labels use same character for start and end of selection.
+  --     { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+  --
+  --     -- `R` in operator pending mode (`o`) and visual mode (`x`) to use jump labels as operator for motion.
+  --     -- Type full search after `R`.
+  --     -- Thus, possible to yank|delete|select upwards|downwards, not just next match.
+  --     -- Example: `yRa` then choose jump target to yank text inside label.
+  --     { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+  --
+  --     -- `C-s` in command mode (`c`), to toggle flash search on/off for regular (`/`) search.
+  --     -- Disbaled, interferes with `tmux`.
+  --     -- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+  --   },
+  -- },
 
   -- - Helps remember key bindings by showing popup
   --   with active keybindings of command you started typing.

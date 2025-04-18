@@ -145,8 +145,29 @@ return {
       },
     },
     init = function()
-      package.preload["nvim-web-devicons"] = function()
+      -- - `package.preload['<modname>']`:
+      --   - Contains module loaders.
+      --   - Loader runs when module is required.
+      --   - Thus: `require('<modname>')` -> `package.preload['<modname>']('modname')`.
+      -- - Below works as follows:
+      --   1. `require('nvim-web-devicons')`.
+      --   2. Lua checks for table in `package.loaded['nvim-web-devicons']`.
+      --   3. If found: Returns that table.
+      --   4. If not found: Runs `package.preload['nvim-web-devicons']`.
+      --      - Meaning, if below `package.preload['nvim-web-devicons']` runs,
+      --        then `require('nvim-web-devicons`) has not been called yet,
+      --        since that would have set `package.loaded['nvim-web-devicons']`.
+      --   5. `package.preload['nvim-web-devicons']`:
+      --      - `require('nvim-web-devicons')` not called before.
+      --      - `package.loaded['nvim-web-devicons']`: Somehow previously set to a large negative value.
+      --      - `package.loaded['nvim-web-devicons']`: Overwritten by `mock_nvim_web_devicons()`,
+      --        with table from `mini.icons`, identical to table returned by `require('nvim-web-devicons')`.
+      package.preload["nvim-web-devicons"] = function(modname)
+        -- Sets `package.loaded['nvim-web-devicons']` to function returning table
+        -- identical to what `require('nvim-web-devicons')` would return.
         require("mini.icons").mock_nvim_web_devicons()
+        -- Returned value assigned in functin above, mimicing what
+        -- `require('nvim-web-devicons')` would return.
         return package.loaded["nvim-web-devicons"]
       end
     end,
@@ -181,7 +202,7 @@ return {
         },
       },
 
-      -- Replaces `vim.fn.input` with prettier prompt.
+      -- Replaces `vim.ui.input` with prettier prompt.
       input = { enabled = true },
 
       -- Creates scopes based on indent and treesitter elements,

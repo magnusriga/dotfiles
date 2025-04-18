@@ -96,10 +96,12 @@ return {
   --   end,
   -- },
 
-  -- `blink.cmp` integration.
+  -- Add dadbod completions to `blink.cmp`.
   {
     "saghen/blink.cmp",
-    optional = true,
+    dependencies = {
+      "kristijanhusak/vim-dadbod-completion",
+    },
     opts = {
       sources = {
         default = { "dadbod" },
@@ -107,9 +109,6 @@ return {
           dadbod = { name = "Dadbod", module = "vim_dadbod_completion.blink" },
         },
       },
-    },
-    dependencies = {
-      "kristijanhusak/vim-dadbod-completion",
     },
   },
 

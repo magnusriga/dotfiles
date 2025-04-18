@@ -49,7 +49,7 @@ return {
     -- If not using release tag, build from source.
     build = vim.g.myvim_blink_main and "cargo build --release",
 
-    -- Ensure nested field `sources` is actually extended, and not overwritten,
+    -- Ensure nested array `sources` is actually extended, and not overwritten,
     -- when other `blink.cmp` specs define same field.
     -- `opts_extend`: Takes each dot-separated word and uses it as key in `opts`,
     -- mergining that table's values with values from same table in parent spec.
@@ -60,8 +60,11 @@ return {
     dependencies = {
       "rafamadriz/friendly-snippets",
       -- "onsails/lspkind-nvim", -- Prefer own icons.
+      -- "xzbdmw/colorful-menu.nvim", -- Does not work well, avoid.
       "Kaiser-Yang/blink-cmp-git",
       "Kaiser-Yang/blink-cmp-avante",
+      "disrupted/blink-cmp-conventional-commits",
+      "jdrupal-dev/css-vars.nvim",
     },
 
     -- Delay plugin load until entering Insert mode.
@@ -71,6 +74,8 @@ return {
     ---@type blink.cmp.Config
     opts = {
       snippets = {
+        -- Function to use when expanding LSP provided snippets.
+        -- Default: `function(snippet) vim.snippet.expand(snippet) end`.
         expand = function(snippet)
           return MyVim.cmp.expand(snippet)
         end,
@@ -79,22 +84,117 @@ return {
       fuzzy = {
         implementation = "prefer_rust_with_warning",
 
-        -- Controls which sorts to use and in which order,
-        -- falling back to next sort if first one returns `nil`.
+        -- -------------------------------
+        -- LSP completion items.
+        -- -------------------------------
+        -- 1. LSP client sends `textDocument/completion` request, with `CompletionParams`, to LSP server.
+        -- 2. LSP server responds with: `CompletionItem[]` | `CompletionList` | `null`.
+        --
+        -- Trigger characters:
+        -- - LSP client sets default trigger characters: `[a-zA-Z]`.
+        -- - LSP server can define addition trigger characters.
+        -- - JS/TS: Server typically inlcudes `.` as trigger character.
+        --
+        -- - `CompletionItem` from LSP server:
+        --   - `label`:
+        --     - Text to display in completion menu.
+        --     - By default, used as `insertText` (see below).
+        --   - `labelDetails`:
+        --     - `detail`     : If defined, insert after `label`, when selecting item.
+        --     - `description`: If defined, insert after `labelDetails.detail`, when selecting item.
+        --   - `kind`:
+        --     - Kind of completion item.
+        --     - Default kinds:
+        --       export namespace CompletionItemKind {
+        --         export const Text = 1;
+        --         export const Method = 2;
+        --         export const Function = 3;
+        --         export const Constructor = 4;
+        --         export const Field = 5;
+        --         export const Variable = 6;
+        --         export const Class = 7;
+        --         export const Interface = 8;
+        --         export const Module = 9;
+        --         export const Property = 10;
+        --         export const Unit = 11;
+        --         export const Value = 12;
+        --         export const Enum = 13;
+        --         export const Keyword = 14;
+        --         export const Snippet = 15;
+        --         export const Color = 16;
+        --         export const File = 17;
+        --         export const Reference = 18;
+        --         export const Folder = 19;
+        --         export const EnumMember = 20;
+        --         export const Constant = 21;
+        --         export const Struct = 22;
+        --         export const Event = 23;
+        --         export const Operator = 24;
+        --         export const TypeParameter = 25;
+        --       }
+        --     - `sortText`:
+        --       - String used to sort this item against other items.
+        --       - If not defined, `label` is used.
+        --     - `filterText`:
+        --       - String used to filter this item against other items, when typing in IDE.
+        --       - If not defined, `label` is used.
+        --     - `insertText`:
+        --       - String inserted into document when this completion item is selected.
+        --       - If not defined, `label` is used.
+        --     - `insertTextFormat`:
+        --        - Defines if item is plain text or snippet.
+        --     - Several others.
+
+        -- -------------------------------
+        -- `blink.cmp` > `fuzzy.sorts`.
+        -- -------------------------------
+        -- - Controls sorting of completion items.
+        -- - If one entry of `sorts` returns `nil`, `blink.cmp` continues to next entry.
+        -- - Accepts:
+        --   - Built-in strings.
+        --   - Function(s): Works like Lua's `table.sort`.
+        -- - `exact`:
+        --   - Sort by exact match.
+        --   - Case-sensitive.
+        -- - `score`:
+        --   - Sort by fuzzy matching score.
+        --   - Determined by `blink.nvim`.
+        --   - Uses: Frequency (previous select count) | proximity.
+        -- - `sort_text`:
+        --   - Sort by `sortText` property from LSP.
+        --   - `sortText`: Returned by LSP server as part of `textDocument/completion` response.
+        --   - `sortText`: String used when comparing this item with other items.
+        --   - When `sortText` omitted from LSP response, `label` used for sorting.
+        -- - `label`:
+        --   - Sort by `label` field from completion item, e.g. from LSP server.
+        --   - Deprioritizes items with leading `_`.
+        -- - `kind`:
+        --   - Sort by numeric `kind` field, defined in LSP (protocol).
+        --   - See list above.
+        --
+        -- - NOTE:Entry in `sorts` returns `nil` if two items have same weight,
+        --        thus next entry in `sorts` determines sorting among items with equal
+        --        parent weight.
         sorts = {
-          -- Non-default: Always prioritize exact matches, case-sensitive.
-          "exact",
+          -- Always prioritize exact matches, case-sensitive.
+          -- "exact",
 
           -- Pass function for custom behavior.
           -- function(item_a, item_b)
           --   return item_a.score > item_b.score
           -- end,
 
-          -- Fuzzy matching score.
+          -- Sort by Fuzzy matching score.
           "score",
 
-          -- `sortText` field, from completion item.
+          -- Sort by `sortText` field from LSP server, defaults to `label`.
+          -- `sortText` often differs from `label`.
           "sort_text",
+
+          -- Sort by `label` field from LSP server, i.e. name in completion menu.
+          -- Needed to sort results from LSP server by `label`,
+          -- even though protocol specifies default value of `sortText` is `label`.
+          "label",
         },
       },
 
@@ -119,26 +219,30 @@ return {
           window = { border = "rounded" },
         },
 
-        -- list = {
-        --   -- No effect on cmdline mode, probably due to `config/options.lua` settings,
-        --   -- for wildmenu.
-        --   selection = {
-        --     -- When `true`, automatically select first item in completion list.
-        --     -- Default: `true`.
-        --     -- Makes no difference, as `<c-y>` anyways selects first item.
-        --     -- First item not auto-inserted, even if `auto_insert` is `true`.
-        --     -- preselect = function(ctx)
-        --     --   return ctx.mode ~= "cmdline"
-        --     -- end,
+        list = {
+          -- Maximum number of items to display.
+          -- Default: 200.
+          max_items = 7500,
+          -- No effect on cmdline mode, probably due to `config/options.lua` settings,
+          -- for wildmenu.
+          selection = {
+            -- When `true`, automatically select first item in completion list.
+            -- Default: `true`.
+            -- Makes no difference, as `<c-y>` anyways selects first item.
+            -- First item not auto-inserted, even if `auto_insert` is `true`.
+            -- preselect = function(ctx)
+            --   return ctx.mode ~= "cmdline"
+            -- end,
 
-        --     -- When `true`, insert completion item automatically when selecting it,
-        --     -- use `<C-e>` to both undo selection and hide completion menu.
-        --     -- Default: `true`.
-        --     -- auto_insert = function(ctx)
-        --     --   return ctx.mode ~= "cmdline"
-        --     -- end,
-        --   },
-        -- },
+            -- When `true`, insert completion item automatically when selecting it,
+            -- use `<C-e>` to both undo selection and hide completion menu.
+            -- Default: `true`.
+            -- auto_insert = function(ctx)
+            --   return ctx.mode ~= "cmdline"
+            -- end,
+            auto_insert = false,
+          },
+        },
 
         menu = {
           -- Better looking without border.
@@ -157,22 +261,38 @@ return {
             -- Show `kind_icon` and `label`, i.e. name, on LHS of completion menu,
             -- and `kind`, i.e. type as text, e.g. `Snippet`, on RHS.
             columns = {
-              { "kind_icon", "label", gap = 1 },
-              { "kind" },
+              { "kind_icon" },
+              { "label", "label_description", gap = 1 },
+              -- { "kind" },
             },
 
+            -- Use treesitter to highlight `label.text`.
+            -- Prefer `colorful-menu`, see below.
+            treesitter = { "lsp" },
+
             components = {
-              -- - For icon:
-              --   - Use nvim-web-devicons, icon and color, if completion item is a file path.
-              --   - Otherwise use own icon (not lspkind).
-              --
-              -- - For text:
-              --   - Add same highlight as for icon.
+              -- Use `mini.icons` for `kind_icon.text+highlight`,
+              -- i.e. icon itself and its color.
+              -- kind_icon = {
+              --   text = function(ctx)
+              --     local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
+              --     return kind_icon
+              --   end,
+              --   highlight = function(ctx)
+              --     local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
+              --     return hl
+              --   end,
+              -- },
+
+              -- Use `nvim-web-devicons` for `kind_icon.text+highlight`,
+              -- i.e. icon itself and its color, if completion item is a file path,
+              -- otherwise use own icon (not lspkind).
               kind_icon = {
                 text = function(ctx)
                   local icon = ctx.kind_icon
                   if vim.tbl_contains({ "Path" }, ctx.source_name) then
                     local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
+                    vim.print(ctx.label)
                     if dev_icon then
                       icon = dev_icon
                     end
@@ -192,25 +312,97 @@ return {
                     if dev_icon then
                       hl = dev_hl
                     end
+                    -- else
+                    -- local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+                    -- if dev_icon then
+                    --   hl = dev_hl
+                    -- end
+                    -- local _, mini_hl, _ = require("mini.icons").get("lsp", ctx.kind)
+                    -- if mini_hl then
+                    --   hl = mini_hl
+                    -- end
                   end
                   return hl
                 end,
               },
-              label = {
-                -- text = function(item)
-                --   return item.label
-                -- end,
-                highlight = function(ctx)
-                  local hl = ctx.kind_hl
-                  if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                    local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
-                    if dev_icon then
-                      hl = dev_hl
-                    end
-                  end
-                  return hl
-                end,
+
+              label_description = {
+                -- Add code that aligns description to the right in the column.
+                width = {
+                  fill = true,
+                },
               },
+
+              -- `colorful-menu`:
+              -- - Modifies label to also include surrounding context,
+              --   e.g. rest of function, and highlights both label and context.
+              -- - Does not work well, avoid.
+              -- label = {
+              --   text = function(ctx)
+              --     return require("colorful-menu").blink_components_text(ctx)
+              --   end,
+              --   highlight = function(ctx)
+              --     return require("colorful-menu").blink_components_highlight(ctx)
+              --   end,
+              -- },
+              --
+              -- label = {
+              --   text = function(ctx)
+              --     local highlights_info = require("colorful-menu").blink_highlights(ctx)
+              --     if highlights_info ~= nil then
+              --       -- Can add more information to label.
+              --       return highlights_info.label
+              --     else
+              --       return ctx.label
+              --     end
+              --   end,
+              --   highlight = function(ctx)
+              --     if vim.tbl_contains({ "Path" }, ctx.source_name) then
+              --       local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+              --       if dev_icon then
+              --         return dev_hl
+              --       end
+              --     end
+              --     local highlights = {}
+              --     local highlights_info = require("colorful-menu").blink_highlights(ctx)
+              --     if highlights_info ~= nil then
+              --       highlights = highlights_info.highlights
+              --     end
+              --     for _, idx in ipairs(ctx.label_matched_indices) do
+              --       table.insert(highlights, { idx, idx + 1, group = "BlinkCmpLabelMatch" })
+              --     end
+              --     return highlights
+              --   end,
+              -- },
+
+              -- label = {
+              --   -- text = function(item)
+              --   --   return item.label
+              --   -- end,
+              --   highlight = function(ctx)
+              --     local hl = ctx.kind_hl
+              --     if vim.tbl_contains({ "Path" }, ctx.source_name) then
+              --       local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+              --       if dev_icon then
+              --         hl = dev_hl
+              --       end
+              --     end
+              --     return hl
+              --   end,
+              -- },
+
+              -- Use `mini.icons` for `kind.highlight`, i.e. kind as text,
+              -- so it matches icon color.
+              -- kind = {
+              --   -- (optional) use highlights from mini.icons
+              --   highlight = function(ctx)
+              --     local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
+              --     return hl
+              --   end,
+              -- },
+
+              -- Use `nvim-web-devicons` for `kind.highlight`, i.e. kind as text,
+              -- if completion item is a file path, otherwise use built-in kind color.
               kind = {
                 -- text = function(item)
                 --   return item.kind
@@ -233,10 +425,8 @@ return {
         ghost_text = {
           -- - Show entries from completion menu as ghost text.
           -- - Interferes with Copilot suggestions if those also shown as ghost text.
-          --
           -- - Thus, only enable `blink.cmp` ghost text below, if Copilot suggestions are
           --   ONLY shown as entries in `blink.nvim` completion menu, NOT as ghost text.
-          --
           -- - See: `plugins/addons/ai.lua` | `plugins/blink.lua` | `config/options.lua`.
           enabled = vim.g.ai_cmp,
 
@@ -257,15 +447,20 @@ return {
         window = { border = "rounded" },
       },
 
-      -- Match built-in cmdline completion.
+      -- Cmdline completion, applies to:
+      -- - `:`: Command line completion.
+      -- - `/`: Search completion.
+      -- - `?`: Search completion.
+      -- - `!`: Shell command completion.
       cmdline = {
-        enabled = false,
-        -- completion = { menu = { auto_show = true } },
-        -- keymap = {
-        --   -- Recommended when auto_show completion menu,
-        --   -- as default keymap will only show and select next item.
-        --   ["<Tab>"] = { "show", "accept" },
-        -- },
+        -- enabled = false,
+        sources = { "cmdline" },
+        completion = { menu = { auto_show = true } },
+        keymap = {
+          -- Recommended when auto_show completion menu,
+          -- as default keymap will only show and select next item.
+          ["<Tab>"] = { "show", "accept" },
+        },
       },
 
       -- - List of enabled providers.
@@ -274,21 +469,58 @@ return {
       -- - By default, `blink.cmp` uses snippets from `friendly-snippets`,
       --   and `~/.config/nvim/snippets`.
       sources = {
-        -- Remove 'buffer' to skip text completions,
-        -- by default it is only enabled when LSP returns no items.
+        -- `default`:
+        -- - Static list of enabled providers, or function to dynamically
+        --   enable/disable providers based on context.
+        -- - Remove 'buffer' to skip text completions, by default it is only enabled
+        --   when LSP returns no items.
         default = { "lsp", "path", "snippets", "buffer" },
 
+        -- `per_filetype`:
+        -- - Define providers per filetype
+        -- per_filetype = {
+        --   lua = { 'lsp', 'path' },
+        -- },
+
+        -- `transform_items`:
+        -- - Function to transform items before returned, for all providers.
+        -- - Default function lowers score for snippets, to sort them lower in list.
+        -- transform_items = function(_, items)
+        --   return items
+        -- end,
+
+        -- `min_keyword_length`:
+        -- - Minimum number of characters in keyword to trigger any provider.
+        -- - May also be `function(ctx: blink.cmp.Context): number`.
+        -- - Default: `0`.
+        -- min_keyword_length = 0,
+
+        -- `providers`:
+        -- - Configuration for each provider.
         providers = {
           -- Only needed when using command line completion.
-          -- cmdline = {
-          --   min_keyword_length = function(ctx)
-          --     -- Only auto-show completion menu after typing 3 characters or more than one word.
-          --     if ctx.mode == "cmdline" and string.find(ctx.line, " ") == nil then
-          --       return 3
-          --     end
-          --     return 0
-          --   end,
-          -- },
+          cmdline = {
+            min_keyword_length = function(ctx)
+              -- Only auto-show completion menu after typing 3 characters or more than one word.
+              if ctx.mode == "cmdline" and string.find(ctx.line, " ") == nil then
+                return 3
+              end
+              return 0
+            end,
+          },
+
+          -- - Remove `Keyword` items from LSP completion results,
+          --   e.g. `if`, `else`, `for`, etc.
+          -- - Use snippets instead.
+          lsp = {
+            name = "LSP",
+            module = "blink.cmp.sources.lsp",
+            transform_items = function(_, items)
+              return vim.tbl_filter(function(item)
+                return item.kind ~= require("blink.cmp.types").CompletionItemKind.Keyword
+              end, items)
+            end,
+          },
 
           -- Activate completion menu on whitespace, currently not working.
           -- lsp = {
@@ -386,7 +618,8 @@ return {
             "fallback",
           }
         else
-          -- - This condition applies, as `default` preset is used, not `super-tab`.
+          -- - This condition applies, overwriting `Tab` in selected preset, i.e. `default`.
+          -- - Land in this `else`, as not using `super-tab` preset.
           -- - Thus, `<Tab>` calls `snippet_forward` if snippet is visible,
           --   then `ai_accept` if Copilot suggestion is visible.
           opts.keymap["<Tab>"] = {
@@ -407,6 +640,7 @@ return {
           CompletionItemKind[kind_idx] = provider.kind
           ---@diagnostic disable-next-line: no-unknown
           CompletionItemKind[provider.kind] = kind_idx
+          print("Adding kind: " .. CompletionItemKind)
 
           ---@type fun(ctx: blink.cmp.Context, items: blink.cmp.CompletionItem[]): blink.cmp.CompletionItem[]
           local transform_items = provider.transform_items
@@ -502,6 +736,47 @@ return {
     },
   },
 
+  -- Completion of conventional commits, i.e. `fix`, `feat`, etc.,
+  -- in filetypes `gitcommit` | `markdown`.
+  {
+    "saghen/blink.cmp",
+    opts = {
+      sources = {
+        default = { "conventional_commits" },
+        providers = {
+          conventional_commits = {
+            name = "Conventional Commits",
+            module = "blink-cmp-conventional-commits",
+            enabled = function()
+              -- Enable source for filetype: `gitcommit` | `markdown`.
+              return vim.tbl_contains({ "gitcommit", "markdown" }, vim.bo.filetype)
+            end,
+            opts = {},
+          },
+        },
+      },
+    },
+  },
+
+  -- Completion of CSS variables.
+  -- Scans project for css variables, using ripgrep, on boot.
+  -- Thus, restart neovim to update variables.
+  -- Not working.
+  -- {
+  --   "Saghen/blink.cmp",
+  --   opts = {
+  --     providers = {
+  --       css_vars = {
+  --         name = "css-vars",
+  --         module = "css-vars.blink",
+  --         opts = {
+  --           search_extensions = { ".js", ".ts", ".jsx", ".tsx" },
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
+
   -- Add git provider, allowing to search and insert following into commit messages in
   -- filetypes `octo` | `gitcommit` | `markdown`:
   -- - Commit hashes (`:`).
@@ -510,7 +785,6 @@ return {
     "saghen/blink.cmp",
     opts = {
       sources = {
-        -- Add `lazydev` to completion providers.
         default = { "git" },
         providers = {
           git = {

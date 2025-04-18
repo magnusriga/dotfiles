@@ -41,7 +41,7 @@ function M.register(picker)
 
   if M.picker and M.picker.name ~= picker.name then
     MyVim.warn(
-      "`MyVim.pick`: picker already set to `" .. M.picker.name .. "`,\nignoring new picker `" .. picker.name .. "`"
+      "`MyVim.pick`: picker already set to `" .. M.picker.name .. "`,\nignoring new picker `" .. picker.name .. "`."
     )
     return false
   end

@@ -597,35 +597,27 @@ return {
       {
         "<leader>,",
         "<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>",
-        desc = "Switch Buffer",
+        desc = "Buffers",
       },
+      { "<leader>/", MyVim.pick("live_grep"), desc = "Grep (Root Dir)" },
+      { "<leader>:", "<cmd>FzfLua command_history<cr>", desc = "Command History" },
       -- Opens file picker from root directory of current file,
       -- but when root directory cannot be determined from file,
       -- e.g. at `dashboard`, file picker is opened from current working directory.
-      -- { "<leader><space>", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
-      { "<leader><space>", MyVim.pick("oldfiles"), desc = "Recent (Root Dir)" },
-      { "<leader>/", MyVim.pick("live_grep"), desc = "Grep (Root Dir)" },
-      { "<leader>:", "<cmd>FzfLua command_history<cr>", desc = "Command History" },
+      { "<leader><space>", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
 
       ----------------------------------------------------------------
       -- Find.
+      -- Recent: Only updates list when Neovim restarts.
       ----------------------------------------------------------------
       { "<leader>fb", "<cmd>FzfLua buffers sort_mru=true sort_lastused=true<cr>", desc = "Buffers" },
       { "<leader>fc", MyVim.pick.config_files(), desc = "Find Config File" },
       { "<leader>ff", MyVim.pick("files"), desc = "Find Files (Root Dir)" },
       { "<leader>fF", MyVim.pick("files", { root = false }), desc = "Find Files (cwd)" },
       { "<leader>fg", "<cmd>FzfLua git_files<cr>", desc = "Find Files (git-files)" },
-
-      ----------------------------------------------------------------
-      -- Recent.
-      -- Note: Only updates list when Neovim restarts.
-      ----------------------------------------------------------------
-      -- Recent files, regardless of directory.
-      { "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent (All)" },
-
-      -- Recent files from root directory.
+      -- { "<leader>fr", "<cmd>FzfLua oldfiles<cr>", desc = "Recent (All)" },
+      { "<leader>fr", MyVim.pick("oldfiles"), desc = "Recent (Root Dir)" },
       -- { "<leader>fR", MyVim.pick("oldfiles"), desc = "Recent (Root Dir)" },
-      -- Recent files from current working directory.
       { "<leader>fR", MyVim.pick("oldfiles", { cwd = vim.uv.cwd() }), desc = "Recent (cwd)" },
 
       ----------------------------------------------------------------
@@ -633,8 +625,8 @@ return {
       ----------------------------------------------------------------
       -- Use `gl` for `git log`.
       -- { "<leader>gc", "<cmd>FzfLua git_commits<CR>", desc = "Commits" },
-      { "<leader>gl", "<cmd>FzfLua git_commits<CR>", desc = "Git Log (project)" },
-      { "<leader>gL", "<cmd>FzfLua git_bcommits<CR>", desc = "Git Log (buffer)" },
+      { "<leader>gl", "<cmd>FzfLua git_commits<CR>", desc = "Git Log (all)" },
+      { "<leader>gL", "<cmd>FzfLua git_bcommits<CR>", desc = "Git Log (open buffers)" },
       { "<leader>gs", "<cmd>FzfLua git_status<CR>", desc = "Status" },
 
       ----------------------------------------------------------------
@@ -642,7 +634,7 @@ return {
       ----------------------------------------------------------------
       { '<leader>s"', "<cmd>FzfLua registers<cr>", desc = "Registers" },
       { "<leader>sa", "<cmd>FzfLua autocmds<cr>", desc = "Auto Commands" },
-      { "<leader>sb", "<cmd>FzfLua grep_curbuf<cr>", desc = "Buffer" },
+      { "<leader>sb", "<cmd>FzfLua grep_curbuf<cr>", desc = "Buffer Lines" },
       { "<leader>sc", "<cmd>FzfLua command_history<cr>", desc = "Command History" },
       { "<leader>sC", "<cmd>FzfLua commands<cr>", desc = "Commands" },
       { "<leader>sd", "<cmd>FzfLua diagnostics_document<cr>", desc = "Document Diagnostics" },
@@ -650,19 +642,36 @@ return {
       { "<leader>sg", MyVim.pick("live_grep"), desc = "Grep (Root Dir)" },
       { "<leader>sG", MyVim.pick("live_grep", { root = false }), desc = "Grep (cwd)" },
       { "<leader>sh", "<cmd>FzfLua help_tags<cr>", desc = "Help Pages" },
-      { "<leader>sH", "<cmd>FzfLua highlights<cr>", desc = "Search Highlight Groups" },
+      { "<leader>sH", "<cmd>FzfLua highlights<cr>", desc = "Highlight Groups" },
       { "<leader>sj", "<cmd>FzfLua jumps<cr>", desc = "Jumplist" },
-      { "<leader>sk", "<cmd>FzfLua keymaps<cr>", desc = "Key Maps" },
+      { "<leader>sk", "<cmd>FzfLua keymaps<cr>", desc = "Keymaps" },
       { "<leader>sl", "<cmd>FzfLua loclist<cr>", desc = "Location List" },
       { "<leader>sM", "<cmd>FzfLua man_pages<cr>", desc = "Man Pages" },
-      { "<leader>sm", "<cmd>FzfLua marks<cr>", desc = "Jump to Mark" },
+      { "<leader>sm", "<cmd>FzfLua marks<cr>", desc = "Marks" },
       { "<leader>sR", "<cmd>FzfLua resume<cr>", desc = "Resume" },
       { "<leader>sq", "<cmd>FzfLua quickfix<cr>", desc = "Quickfix List" },
-      { "<leader>sw", MyVim.pick("grep_cword"), desc = "Word (Root Dir)" },
-      { "<leader>sW", MyVim.pick("grep_cword", { root = false }), desc = "Word (cwd)" },
+
+      ----------------------------------------------------------------
+      -- Grep.
+      ----------------------------------------------------------------
+      { "<leader>sw", MyVim.pick("grep_word"), desc = "Visual selection or word (Root Dir)", mode = { "n", "x" } },
+      {
+        "<leader>sW",
+        MyVim.pick("grep_word", { root = false }),
+        desc = "Visual selection or word (cwd)",
+        mode = { "n", "x" },
+      },
       { "<leader>sw", MyVim.pick("grep_visual"), mode = "v", desc = "Selection (Root Dir)" },
       { "<leader>sW", MyVim.pick("grep_visual", { root = false }), mode = "v", desc = "Selection (cwd)" },
+
+      ----------------------------------------------------------------
+      -- UI.
+      ----------------------------------------------------------------
       { "<leader>uC", MyVim.pick("colorschemes"), desc = "Colorscheme with Preview" },
+
+      ----------------------------------------------------------------
+      -- LSP Symbols.
+      ----------------------------------------------------------------
       {
         "<leader>ss",
         function()
@@ -684,6 +693,7 @@ return {
     },
   },
 
+  -- Keybindings for todo-comments.
   -- Set directly in `editor.lua`, using Snacks.picker.
   -- {
   --   "folke/todo-comments.nvim",

@@ -192,16 +192,17 @@ return {
         dependencies = {
           "fang2hou/blink-copilot",
           opts = {
-            max_completions = 3,
-            max_attempts = 4,
-            kind_name = "Copilot", ---@type string | false
-            kind_icon = " ", ---@type string | false
-            kind_hl = false, ---@type string | false
-            debounce = 200, ---@type integer | false
-            auto_refresh = {
-              backward = true,
-              forward = true,
-            },
+            -- Below are default options for `blink-copilot`:
+            -- max_completions = 3, -- Global default for max_completions.
+            -- max_attempts = 4, -- Global default for max_attempts.
+            -- kind_name = "Copilot", ---@type string | false
+            -- kind_icon = " ", ---@type string | false
+            -- kind_hl = false, ---@type string | false
+            -- debounce = 200, ---@type integer | false
+            -- auto_refresh = {
+            --   backward = true,
+            --   forward = true,
+            -- },
           },
         },
         opts = {
@@ -212,10 +213,11 @@ return {
                 name = "copilot",
                 module = "blink-copilot",
                 score_offset = 100,
+                -- `async` speeds up completion.
                 async = true,
                 opts = {
-                  -- Local options override global ones
-                  max_completions = 3, -- Override global max_completions.
+                  -- Local options override global defaults.
+                  max_completions = 3,
 
                   -- Final settings:
                   -- * max_completions = 3

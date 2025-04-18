@@ -157,9 +157,8 @@ map(
 -- Location and quickfix lists.
 ---------------------------------
 -- Open location list and quickfix list.
+-- Could use built-in `:lopen` and `:copen`, below adds notification.
 -- No need, use built-in `:lopen` and `:copen`.
--- map("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
--- map("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 
 -- Location list.
 map("n", "<leader>xl", function()
@@ -337,19 +336,22 @@ end
 if vim.fn.executable("lazygit") == 1 then
   map("n", "<leader>gg", function() Snacks.lazygit( { cwd = MyVim.root.git() }) end, { desc = "Lazygit (Root Dir)" })
   map("n", "<leader>gG", function() Snacks.lazygit() end, { desc = "Lazygit (cwd)" })
-
-  -- Only binding using `Snacks.picker(..)`.
-  map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Current File History" })
-
-  -- Git log, i.e. commit logs.
-  -- No need, already created in: `plugins/fzf.lua`.
-  -- map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = MyVim.root.git() }) end, { desc = "Git Log" })
-  -- map("n", "<leader>gL", function() Snacks.picker.git_log() end, { desc = "Git Log (cwd)" })
 end
 
 ---------------------------------
--- Other `snacks.nvim` keybindings.
+-- Git.
 ---------------------------------
+-- Git log: Current file.
+map("n", "<leader>gf", function() Snacks.picker.git_log_file() end, { desc = "Git Current File History" })
+
+-- Git log: Root directory.
+-- No need, already created in: `plugins/fzf.lua`.
+-- map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = MyVim.root.git() }) end, { desc = "Git Log" })
+
+-- Git log: Current working directory.
+-- No need, already created in: `plugins/fzf.lua`.
+-- map("n", "<leader>gL", function() Snacks.picker.git_log() end, { desc = "Git Log (cwd)" })
+
 -- Git blame.
 -- No need, not using `Snacks.picker(..)`, and `fzf-lua` presentation not useful.
 -- map("n", "<leader>gb", function() Snacks.picker.git_log_line() end, { desc = "Git Blame Line" })
@@ -376,9 +378,13 @@ end, { desc = "Git Browse (copy)" })
 -- Treesitter inspect.
 ---------------------------------
 -- Show highlights for word under cursor.
--- No need, use built-in `:Inspect` and `InspectTree`.
+-- No need, use built-in `:Inspect`.
 -- map("n", "<leader>ui", vim.show_pos, { desc = "Inspect Pos" })
--- map("n", "<leader>uI", "<cmd>InspectTree<cr>", { desc = "Inspect Tree" })
+
+-- Show treesitter tree for buffer.
+-- Same as ":InspectTree", except sends "I" after opening tree,
+-- i.e. shows language of each node.
+map("n", "<leader>uI", function() vim.treesitter.inspect_tree() vim.api.nvim_input("I") end, { desc = "Inspect Tree" })
 
 ---------------------------------
 -- Terminal.

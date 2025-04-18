@@ -188,7 +188,7 @@ return {
   --
   --   - `Snacks.indent(..)       : Indent guides and scopes.
   --
-  --   - `Snacks.input(..)`       : Replaces `vim.fn.input` with prettier prompt.
+  --   - `Snacks.input(..)`       : Replaces `vim.ui.input` with prettier prompt.
   --
   --   - `Snacks.layout(..)       : Window layouts.
   --

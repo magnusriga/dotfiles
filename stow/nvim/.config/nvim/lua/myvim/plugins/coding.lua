@@ -6,7 +6,7 @@ return {
     event = "VeryLazy",
     opts = {
       -- In which modes mappings from this `config` should be created.
-      modes = { insert = true, command = true, terminal = false },
+      modes = { insert = true, command = false, terminal = false },
 
       -- Skip autopair when next character is one of these.
       skip_next = [=[[%w%%%'%[%"%.%`%$]]=],

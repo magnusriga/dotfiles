@@ -104,18 +104,52 @@ vim.cmd([[
   highlight FloatBorder guifg=#589ed7 guibg=None
 ]])
 
--- Pmenu.
+-- Pmenu, e.g. completion menu.
+-- - Remove background color.
 vim.cmd([[
-  highlight Pmenu guifg=#c8d3f5 guibg=#1e2030
-  highlight PmenuSel guibg=#363c58
-  highlight! link PmenuKind Pmenu
-  highlight! link PmenuKindSel PmenuSel
-  highlight! link PmenuExtra Pmenu
-  highlight! link PmenuExtraSel PmenuSel
-  highlight PmenuSbar guibg=#27293a
-  highlight PmenuThumb guibg=#3b4261
-  highlight PmenuMatch guifg=#65bcff guibg=#1e2030
-  highlight PmenuMatchSel guifg=#65bcff guibg=#363c58
+  " highlight Pmenu guifg=#c8d3f5 guibg=#1e2030
+  " highlight Pmenu guifg=#c8d3f5 guibg=#1e2030
+  " highlight Pmenu guibg=None
+  " highlight PmenuSel guibg=#363c58
+  " highlight! link PmenuKind Pmenu
+  " highlight! link PmenuKindSel PmenuSel
+  " highlight! link PmenuExtra Pmenu
+  " highlight! link PmenuExtraSel PmenuSel
+  " highlight PmenuSbar guibg=#27293a
+  " highlight PmenuThumb guibg=#3b4261
+  " highlight PmenuMatch guifg=#65bcff guibg=#1e2030
+  " highlight PmenuMatchSel guifg=#65bcff guibg=#363c58
+]])
+
+-- Blink.cmp.
+-- Bright pink: #EA0FFA
+-- Bright green: #39D877
+vim.cmd([[
+  " highlight BlinkCmpMenu guibg=#1e2030
+  " highlight BlinkCmpMenuBorder guifg=#589ed7 guibg=#1e2030
+  highlight BlinkCmpMenu guifg=#abb2bf guibg=#16161d
+  highlight BlinkCmpMenuBorder guifg=#5c6370 guibg=Normal
+  highlight BlinkCmpMenuSelection guibg=#2f334d
+
+  highlight BlinkCmpScrollBarThumb guifg=#1e2030 guibg=#589ed7
+
+  highlight BlinkCmpDoc guifg=#abb2bf guibg=#16161d
+  highlight BlinkCmpDocBorder guifg=#5c6370 guibg=Normal
+
+  highlight BlinkCmpDocSeparator guifg=#5c6370 guibg=Normal
+
+  highlight BlinkCmpKindVariable cterm=bold gui=bold guifg=#65bcff
+  highlight BlinkCmpKindField cterm=bold gui=bold guifg=#65bcff
+
+  highlight BlinkCmpKindConstructor cterm=bold gui=bold guifg=#c678dd
+  highlight BlinkCmpKindFunction cterm=bold gui=bold guifg=#c678dd
+  highlight BlinkCmpKindMethod cterm=bold gui=bold guifg=#c678dd
+
+  highlight BlinkCmpLabelDeprecated cterm=strikethrough gui=strikethrough guifg=#7f848e
+  highlight BlinkCmpLabelMatch guifg=#39D877
+  highlight! link BlinkCmpLabelDescription Comment
+  " highlight BlinkCmpLabelMatch guifg=#EA0FFA
+  " highlight BlinkCmpLabelMatch guifg=#ff966c
 ]])
 
 -- MiniIcons.
