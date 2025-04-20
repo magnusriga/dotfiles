@@ -190,7 +190,7 @@ opt.expandtab = true
 
 opt.fillchars = {
   -- Fold fill characters.
-  -- Ignored, due to own `statuscolum` implementation: `util/statuscolumn.lua`.
+  -- Ignored if using own `statuscolum` implementation: `util/statuscolumn.lua`.
   foldopen = "",
   foldclose = "",
   fold = " ",
