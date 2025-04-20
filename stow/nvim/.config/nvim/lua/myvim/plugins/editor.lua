@@ -305,9 +305,6 @@ return {
         changedelete = { text = "▎" },
       },
       on_attach = function(buffer)
-        ---@class packagelib
-        local package
-
         local gs = package.loaded.gitsigns
 
         local function map(mode, l, r, desc)
@@ -387,7 +384,6 @@ return {
   -- When adding same plugin source multiple times, spec `opts` are merged into one.
   -- Directory name can be used as source, since `gitsigns.nvim` was installed,
   -- added to runtimepath, and loaded, above.
-
   {
     -- Adds keymap to toggle Gitsigns sign column, i.e. signs in margin, via `snacks.nvim`.
     -- `plugins/init.lua`: List of all `snacks.nvim` specs and usages.

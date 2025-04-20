@@ -22,7 +22,8 @@ return {
       -- Use `fzf-lua` as `file_selector`.
       "ibhagwan/fzf-lua",
 
-      "nvim-tree/nvim-web-devicons",
+      -- Use `mini.icons`, not `nvim-web-devicons`, as file icons.
+      "echasnovski/mini.icons",
 
       -- For providers='copilot'.
       "zbirenbaum/copilot.lua",

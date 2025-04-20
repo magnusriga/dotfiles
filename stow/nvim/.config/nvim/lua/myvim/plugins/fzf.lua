@@ -51,6 +51,11 @@ return {
   -- `fzf-lua`, picker for FZF.
   {
     "ibhagwan/fzf-lua",
+    branch = "2001",
+    -- Uses `mini.icons` by default, but add here as dependency
+    -- so `mini.icons` loads before `fzf-lua`.
+    dependencies = { "echasnovski/mini.icons" },
+    -- dependencies = { "nvim-tree/nvim-web-devicons" },
     cmd = "FzfLua",
     opts = function(_, opts)
       local trouble_fzf = require("trouble.sources.fzf")

@@ -65,6 +65,8 @@ return {
       "Kaiser-Yang/blink-cmp-avante",
       "disrupted/blink-cmp-conventional-commits",
       "jdrupal-dev/css-vars.nvim",
+
+      -- "nvim-tree/nvim-web-devicons",
     },
 
     -- Delay plugin load until entering Insert mode.
@@ -291,15 +293,13 @@ return {
                 text = function(ctx)
                   local icon = ctx.kind_icon
                   if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                    local dev_icon, _ = require("nvim-web-devicons").get_icon(ctx.label)
+                    local kind_icon, _, is_default = require("mini.icons").get("file", ctx.label)
                     vim.print(ctx.label)
-                    if dev_icon then
-                      icon = dev_icon
+                    if not is_default then
+                      icon = kind_icon
+                    else
+                      icon, _, _ = require("mini.icons").get("directory", ctx.label)
                     end
-                    -- else
-                    --   icon = require("lspkind").symbolic(ctx.kind, {
-                    --     mode = "symbol",
-                    --   })
                   end
 
                   return icon .. ctx.icon_gap
@@ -308,29 +308,15 @@ return {
                 highlight = function(ctx)
                   local hl = ctx.kind_hl
                   if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                    local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
-                    if dev_icon then
-                      hl = dev_hl
+                    local _, kind_hl, is_default = require("mini.icons").get("file", ctx.label)
+                    if not is_default then
+                      hl = kind_hl
+                    else
+                      _, hl, _ = require("mini.icons").get("directory", ctx.label)
                     end
-                    -- else
-                    -- local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
-                    -- if dev_icon then
-                    --   hl = dev_hl
-                    -- end
-                    -- local _, mini_hl, _ = require("mini.icons").get("lsp", ctx.kind)
-                    -- if mini_hl then
-                    --   hl = mini_hl
-                    -- end
                   end
                   return hl
                 end,
-              },
-
-              label_description = {
-                -- Add code that aligns description to the right in the column.
-                width = {
-                  fill = true,
-                },
               },
 
               -- `colorful-menu`:
@@ -403,21 +389,18 @@ return {
 
               -- Use `nvim-web-devicons` for `kind.highlight`, i.e. kind as text,
               -- if completion item is a file path, otherwise use built-in kind color.
-              kind = {
-                -- text = function(item)
-                --   return item.kind
-                -- end,
-                highlight = function(ctx)
-                  local hl = ctx.kind_hl
-                  if vim.tbl_contains({ "Path" }, ctx.source_name) then
-                    local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
-                    if dev_icon then
-                      hl = dev_hl
-                    end
-                  end
-                  return hl
-                end,
-              },
+              -- kind = {
+              --   highlight = function(ctx)
+              --     local hl = ctx.kind_hl
+              --     if vim.tbl_contains({ "Path" }, ctx.source_name) then
+              --       local dev_icon, dev_hl = require("nvim-web-devicons").get_icon(ctx.label)
+              --       if dev_icon then
+              --         hl = dev_hl
+              --       end
+              --     end
+              --     return hl
+              --   end,
+              -- },
             },
           },
         },

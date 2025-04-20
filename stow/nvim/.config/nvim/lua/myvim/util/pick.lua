@@ -63,6 +63,8 @@ function M.open(command, opts)
     return MyVim.error("MyVim.pick: picker not set")
   end
 
+  vim.print(" MyVim.pick: picker set to " .. M.picker.name)
+
   command = command ~= "auto" and command or "files"
   opts = opts or {}
 
