@@ -10,7 +10,11 @@ return {
     -- Empty means default configuration.
     picker = {
       sources = {
-        explorer = {},
+        -- ---@type snacks.picker.explorer.Config: snacks.picker.files.Config|{}
+        explorer = {
+          hidden = true,
+          ignored = true,
+        },
       },
     },
   },
@@ -19,17 +23,26 @@ return {
       "<leader>fe",
       function()
         Snacks.explorer({ cwd = MyVim.root() })
+        vim.cmd("normal! zz")
       end,
-      desc = "Explorer Snacks (Root Dir)",
+      desc = "Explorer (Root Dir)",
     },
     {
       "<leader>fE",
       function()
         Snacks.explorer()
       end,
-      desc = "Explorer Snacks (cwd)",
+      desc = "Explorer (cwd)",
     },
+    -- {
+    --   "<leader>f-",
+    --   function()
+    --     Snacks.explorer.reveal()
+    --   end,
+    --   desc = "Explorer (Reveal, cwd)",
+    -- },
     { "<leader>e", "<leader>fe", desc = "Explorer (Root Dir)", remap = true },
     { "<leader>E", "<leader>fE", desc = "Explorer (cwd)", remap = true },
+    -- { "<leader>-", "<leader>f-", desc = "Explorer (Reveal, cwd)", remap = true },
   },
 }
