@@ -69,7 +69,7 @@ sudo pacman -Syu --noconfirm \
   coreutils \
   which \
   sudo \
-  curl \
+  curl lynx \
   wget \
   stow \
   jsoncpp jsoncpp-doc \
