@@ -358,6 +358,7 @@ require("lazy").setup({
     --   e.g. `plugins/addons/ai.lua > lualine.nvim` use `opts` from `plugins/ui.lua > lualine.nvim`.
     { import = "myvim/plugins" },
     -- Import other plugins, from sub-folders.
+    { import = "myvim/plugins/util" },
     { import = "myvim/plugins/dap" },
     { import = "myvim/plugins/lang" },
     { import = "myvim/plugins/ai" },

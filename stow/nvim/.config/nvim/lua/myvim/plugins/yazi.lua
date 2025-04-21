@@ -4,12 +4,13 @@ return {
     "mikavilpas/yazi.nvim",
     event = "VeryLazy",
     keys = {
-      {
-        -- Open yazi at current file.
-        "<leader>e",
-        "<cmd>Yazi<cr>",
-        desc = "Open yazi (file)",
-      },
+      -- {
+      --   -- Open yazi at current file.
+      --   -- Using `snacks.explorer` instead.
+      --   "<leader>e",
+      --   "<cmd>Yazi<cr>",
+      --   desc = "Open yazi (file)",
+      -- },
       {
         -- Open yazi in current working directory.
         "<leader>cw",

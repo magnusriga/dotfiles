@@ -95,6 +95,20 @@ vim.cmd([[
   highlight FzfLuaPreviewBorder guifg=#589ed7 guibg=None
 ]])
 
+-- `snacks.nvim` picker.
+vim.cmd([[
+  highlight SnacksPickerSelected guifg=#ff007c
+
+  highlight SnacksPickerInputTitle guibg=None guifg=#ff966c
+  highlight SnacksPickerInputBorder guibg=None guifg=#ff966c
+
+  highlight SnacksPickerBoxTitle guibg=#1e2030 guifg=#ff966c
+
+  highlight SnacksInputIcon guifg=#65bcff
+  highlight SnacksInputTitle guifg=#ffc777
+  highlight SnacksInputBorder guifg=#ffc777
+]])
+
 -- WhichKey.
 -- - `WhichKeyFloat`: Links to NormalFloat, below linked to Normal,
 -- - `WhichKeyBorder`: Links to FloatBorder, below changed to match `fzf-lua`.

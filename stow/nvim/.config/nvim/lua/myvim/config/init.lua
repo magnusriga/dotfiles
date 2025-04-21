@@ -239,8 +239,9 @@ function M.setup(opts)
       -- Load highlight groups.
       M.load("hlgroups")
 
-      -- Load symbols cahce feature.
-      require("myvim.util.document_symbol")
+      -- Load own symbols cahce feature.
+      -- Use built-in LSP symbols instead.
+      -- require("myvim.util.document_symbol")
 
       vim.api.nvim_create_user_command("MyHealth", function()
         vim.cmd([[Lazy! load all]])

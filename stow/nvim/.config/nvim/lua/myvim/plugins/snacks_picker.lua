@@ -1,3 +1,4 @@
+local explorer = require("snacks.explorer")
 -- To use snacks.picker: `options.lua` > `vim.g.MyVim_picker = "snacks"`.
 
 -- No need to register picker, using `fzf.lua`.
@@ -200,7 +201,6 @@ return {
   -- Not using flash.
   -- {
   --   "folke/flash.nvim",
-  --   optional = true,
   --   specs = {
   --     {
   --       "folke/snacks.nvim",

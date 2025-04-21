@@ -672,28 +672,6 @@ return {
       -- UI.
       ----------------------------------------------------------------
       { "<leader>uC", MyVim.pick("colorschemes"), desc = "Colorscheme with Preview" },
-
-      ----------------------------------------------------------------
-      -- LSP Symbols.
-      ----------------------------------------------------------------
-      {
-        "<leader>ss",
-        function()
-          require("fzf-lua").lsp_document_symbols({
-            regex_filter = symbols_filter,
-          })
-        end,
-        desc = "Goto Symbol",
-      },
-      {
-        "<leader>sS",
-        function()
-          require("fzf-lua").lsp_live_workspace_symbols({
-            regex_filter = symbols_filter,
-          })
-        end,
-        desc = "Goto Symbol (Workspace)",
-      },
     },
   },
 
@@ -719,6 +697,9 @@ return {
     -- - Since below function extends `Keys`, it extends reference to `plugins.lsp.keymaps._keys` table in memory,
     --   thus it does not matter that this is executed before `nvim-lspconfig` config-function,
     --   which is where autocmd is set up that creates key bindings from `plugins.lsp.keymaps._keys`.
+    -- - NOTE: When keymap is defined on `lsp.keymaps`, `which-key` does not interpret keybinding as
+    --         being from plugin `fzf-lua`, which is good because keybindings defined in `lsp.keymaps`
+    --         get dynamic icon based on filetype, and not from `which-key` plugin rule for `fzf-lua`.
     opts = function()
       local Keys = require("myvim.plugins.lsp.keymaps").get()
 
@@ -804,6 +785,10 @@ return {
 
         -- `gry`: Not built-in key binding, thus no overwriting.
         { "gry", "<cmd>FzfLua lsp_typedefs jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
+
+      -- LSP symbols, set on `lsp.keymaps` so `which-key` uses dynamic icon based on filetype.
+      { "<leader>ss", function() require("fzf-lua").lsp_document_symbols({ regex_filter = symbols_filter, }) end, desc = "LSP Symbols", has = "documentSymbol" },
+      { "<leader>sS", function() require("fzf-lua").lsp_live_workspace_symbols({ regex_filter = symbols_filter, }) end, desc = "LSP Workspace Symbols", has = "workspace/symbols" },
       })
     end,
   },
