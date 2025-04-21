@@ -113,7 +113,7 @@ sudo pacman -Syu --noconfirm \
   fzf viu \
   zoxide \
   fd ripgrep \
-  ffmpeg jq poppler poppler-data imagemagick chafa yazi \
+  ffmpeg jq poppler poppler-data imagemagick chafa \
   ueberzugpp \
   graphite graphite-docs \
   harfbuzz harfbuzz-utils \

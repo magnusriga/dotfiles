@@ -419,6 +419,9 @@ return {
       -- Replaces `vim.ui.input` with prettier prompt.
       input = { enabled = true },
 
+      -- Old alternative to `noice.nvim`, avoid.
+      -- notifier = { enabled = true },
+
       -- Creates scopes based on indent and treesitter elements,
       -- and adds operators to navigate scopes.
       -- Adds operators to target scopes:
@@ -456,9 +459,11 @@ return {
         },
       },
 
+      -- Smoooth scrolling, e.g. when navigating up/down with `c-u|d`.
+      -- scroll = { enabled = true },
+
       -- `statuscolumn` is enabled in `config/options.lua`.
       statuscolumn = { enabled = false },
-      -- statuscolumn = {},
 
       -- `toggle`:
       -- - Saves state of any function that can be toggled on|off, allowing easy toggling.
@@ -470,6 +475,10 @@ return {
         -- but only if `lhs` and `modes` not already defined as keymap in `lazy.nvim`.
         map = MyVim.safe_keymap_set,
       },
+
+      -- Highlight matching words to word under cursor, in current buffer,
+      -- using LSP references.
+      -- words = { enabled = true },
     },
   },
 

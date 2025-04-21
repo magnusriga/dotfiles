@@ -198,6 +198,24 @@ cd "$CURRENTDIR" || exit
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
+# Install yazi from source.
+# Use manual build instead of `pacman -Syu yazi`.
+# ================================================
+# Update rustup, also done in `setup_main.sh`.
+rustup update
+PACKAGE=yazi
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE"/bin # Deviation.
+git clone https://github.com/sxyazi/yazi.git "$TMPDIR/$PACKAGE"
+cd "$TMPDIR/$PACKAGE" || exit
+cargo build --release --locked
+mv target/release/yazi target/release/ya $STOWDIR/$PACKAGE/bin
+cd "$CURRENTDIR" || exit
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+
+# ================================================
 # Install Stow (needs `autoconf` pre-installed).
 # Use `pacman -Syu stow` instead.
 # ================================================
