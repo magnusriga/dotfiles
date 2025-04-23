@@ -1,11 +1,19 @@
--- vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
---   callback = function()
---     -- Set when entering buffer.
---     vim.cmd([[
---       highlight Cursor guifg=red guibg=yellow
---     ]])
---   end,
--- })
+-- General.
+-- - Also applies to WhichKey and others.
+-- - `WhichKeyFloat`: Links to NormalFloat, below linked to Normal,
+-- - `WhichKeyBorder`: Links to FloatBorder, below changed to match `fzf-lua`.
+-- - Result: Floating windows have same background as normal windows, just with border.
+vim.cmd([[
+  " highlight Normal guifg=#c8d3f5 guibg=#16161d
+
+  highlight NormalFloat guifg=#c8d3f5 guibg=#1e2030
+  highlight FloatBorder guifg=#589ed7 guibg=#1e2030
+
+  highlight LineNrAbove guifg=#495162 guibg=#16161d
+  " LineNr set in condition logic below.
+  " highlight LineNr guifg=#ff966c guibg=#16161d
+  highlight LineNrBelow guifg=#495162 guibg=#16161d
+]])
 
 -- Lazygit.
 vim.cmd([[
@@ -30,13 +38,6 @@ vim.cmd([[
   highlight DiffChange guifg=#282c34 guibg=#e5c07b
   highlight DiffDelete guifg=#282c34 guibg=#e06c75
   highlight DiffText guifg=#282c34 guibg=#61afef
-]])
-
--- Floating Windows.
--- Used by other programs, e.g. `fzf-lua`, `snacks.nvim`, `vimdiff`.
-vim.cmd([[
-  highlight! NormalFloat guifg=#c8d3f5 guibg=#1e2030
-  highlight! FloatBorder guifg=#589ed7 guibg=#1e2030
 ]])
 
 -- FzfLua.
@@ -131,15 +132,6 @@ vim.cmd([[
   highlight! link SnacksInputCursorLine CursorLine
 ]])
 
--- WhichKey.
--- - `WhichKeyFloat`: Links to NormalFloat, below linked to Normal,
--- - `WhichKeyBorder`: Links to FloatBorder, below changed to match `fzf-lua`.
--- - Result: Floating windows have same background as normal windows, just with border.
-vim.cmd([[
-  highlight! link NormalFloat Normal
-  highlight FloatBorder guifg=#589ed7 guibg=None
-]])
-
 -- Pmenu, e.g. completion menu.
 -- - Remove background color.
 vim.cmd([[
@@ -218,3 +210,133 @@ vim.cmd([[
   highlight! link TreesitterContext Normal
   highlight! link TreesitterContextSeparator LineNr
 ]])
+
+-- `render-markdown.nvim`.
+vim.cmd([[
+  highlight @markup.list.markdown guifg=#ff966c
+  highlight RenderMarkdownBullet guifg=#ff966c
+  highlight RenderMarkdownDash guifg=#ff966c
+
+  " highlight @markup.list.markdown guifg=#589ed7
+  " highlight RenderMarkdownBullet guifg=#589ed7
+  " highlight RenderMarkdownDash guifg=#589ed7
+  " Good: #589ed7
+
+  " highlight @markup.list.markdown guifg=#FFC777
+  " highlight RenderMarkdownBullet guifg=#FFC777
+  " highlight RenderMarkdownDash guifg=#FFC777
+
+  highlight RenderMarkdownLink guifg=#65BCFF
+  highlight @markup.link.label guifg=#65BCFF
+
+  highlight RenderMarkdownTableRow guifg=#ff966c
+
+  highlight RenderMarkdownCode guibg=None
+
+  highlight RenderMarkdownSign guibg=#222436
+
+  highlight RenderMarkdownCodeInline guifg=#82AAFF guibg=#1e2030
+  highlight @markup.raw.markdown_inline guifg=#82AAFF guibg=#1e2030
+
+  highlight RenderMarkdownCodeInline guifg=#82AAFF guibg=None
+  highlight @markup.raw.markdown_inline guifg=#82AAFF guibg=None
+
+  " highlight RenderMarkdownCodeInline guifg=#82AAFF guibg=#444A73
+  " highlight @markup.raw.markdown_inline guifg=#82AAFF guibg=#444A73
+
+  " LazyVim: guifg=#82AAFF guibg=#444A73
+  " highlight RenderMarkdownCodeInline guifg=#7aa2f7 guibg=None
+  " highlight @markup.raw.markdown_inline guifg=#7aa2f7 guibg=None
+  " Good: #7aa2f7
+  " OK  : #C099FF
+  " Evernote: guifg=#F37E73 guibg=#262626
+  " Green: #39D877 (OK) or #98c379 (OK)
+  " vscode: #fc618d
+  " vscode: #7bd88f
+
+  highlight SpellBad cterm=underline gui=underline guisp=#C53B53 guifg=None
+  highlight SpellCap cterm=underline gui=underline guisp=#FFC777 guifg=None
+  highlight SpellRare cterm=underline gui=underline guisp=#4FD6BE guifg=None
+  highlight SpellLocalRare cterm=underline gui=underline guisp=#0DB9D7 guifg=None
+
+  highlight RenderMarkdownH1 cterm=bold gui=bold guifg=#82AAFF
+  highlight RenderMarkdownH2 cterm=bold gui=bold guifg=#FFC777
+  highlight RenderMarkdownH3 cterm=bold gui=bold guifg=#C3E88D
+  highlight RenderMarkdownH4 cterm=bold gui=bold guifg=#4FD6BE
+  highlight RenderMarkdownH5 cterm=bold gui=bold guifg=#C099FF
+  highlight RenderMarkdownH6 cterm=bold gui=bold guifg=#FCA7EA
+  highlight RenderMarkdownH7 cterm=bold gui=bold guifg=#FF966C
+  highlight RenderMarkdownH8 cterm=bold gui=bold guifg=#FF757F
+
+  highlight @markup.heading.1.markdown cterm=bold gui=bold guifg=#82AAFF
+  highlight @markup.heading.2.markdown cterm=bold gui=bold guifg=#FFC777
+  highlight @markup.heading.3.markdown cterm=bold gui=bold guifg=#C3E88D
+  highlight @markup.heading.4.markdown cterm=bold gui=bold guifg=#4FD6BE
+  highlight @markup.heading.5.markdown cterm=bold gui=bold guifg=#C099FF
+  highlight @markup.heading.6.markdown cterm=bold gui=bold guifg=#FCA7EA
+  highlight @markup.heading.7.markdown cterm=bold gui=bold guifg=#FF966C
+  highlight @markup.heading.8.markdown cterm=bold gui=bold guifg=#FF757F
+
+  highlight RenderMarkdownH1Bg guibg=#2C314A
+  highlight RenderMarkdownH2Bg guibg=#38343D
+  highlight RenderMarkdownH3Bg guibg=#32383F
+  highlight RenderMarkdownH4Bg guibg=#273644
+  highlight RenderMarkdownH5Bg guibg=#32304A
+  highlight RenderMarkdownH6Bg guibg=#383148
+  highlight RenderMarkdownH7Bg guibg=#382F3B
+  highlight RenderMarkdownH8Bg guibg=#382C3D
+]])
+
+-- =====================================
+-- Conditinal highlighting.
+-- =====================================
+-- Store namespaces by window ID.
+local window_namespaces = {}
+
+-- Conditinal highlighting: Markdown.
+vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
+  pattern = "*",
+  callback = function()
+    local win_id = vim.api.nvim_get_current_win()
+
+    -- Create namespace specific to window, if it doesn't exist.
+    if not window_namespaces[win_id] then
+      window_namespaces[win_id] = vim.api.nvim_create_namespace("filetype_highlights_" .. win_id)
+    end
+
+    local ns_id = window_namespaces[win_id]
+
+    local ft = vim.bo.filetype
+
+    if ft == "markdown" or ft == "avante" then
+      vim.api.nvim_set_hl(ns_id, "Normal", { fg = "#C8D3F5", bg = "#222436" })
+      vim.api.nvim_set_hl(ns_id, "LineNrAbove", { fg = "#3B4261", bg = "#222436" })
+      vim.api.nvim_set_hl(ns_id, "LineNr", { fg = "#ff966c", bg = "#222436" })
+      vim.api.nvim_set_hl(ns_id, "LineNrBelow", { fg = "#3B4261", bg = "#222436" })
+    elseif ft == "fzf" or ft == "snacks_picker_*" or ft == nil then
+      vim.api.nvim_set_hl(ns_id, "Normal", { fg = "#C8D3F5", bg = "#1e2030" })
+      vim.api.nvim_set_hl(ns_id, "LineNrAbove", { fg = "#3B4261", bg = "#1e2030" })
+      vim.api.nvim_set_hl(ns_id, "LineNr", { fg = "#ff966c", bg = "#1e2030" })
+      vim.api.nvim_set_hl(ns_id, "LineNrBelow", { fg = "#3B4261", bg = "#1e2030" })
+    else
+      vim.api.nvim_set_hl(ns_id, "Normal", { fg = "#abb2bf", bg = "#16161d" })
+      vim.api.nvim_set_hl(ns_id, "LineNrAbove", { fg = "#495162", bg = "#16161d" })
+      vim.api.nvim_set_hl(ns_id, "LineNr", { fg = "#ff966c", bg = "#16161d" })
+      vim.api.nvim_set_hl(ns_id, "LineNrBelow", { fg = "#495162", bg = "#16161d" })
+    end
+
+    -- Apply namespace to current window.
+    vim.api.nvim_win_set_hl_ns(win_id, ns_id)
+  end,
+})
+
+-- Clean up namespaces when windows are closed.
+vim.api.nvim_create_autocmd("WinClosed", {
+  pattern = "*",
+  callback = function(opts)
+    local win_id = tonumber(opts.match)
+    if win_id and window_namespaces[win_id] then
+      window_namespaces[win_id] = nil
+    end
+  end,
+})

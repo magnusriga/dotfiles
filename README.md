@@ -1,3 +1,5 @@
+# README
+
 ## Setup Host (once).
 
 0. Install terminal.
@@ -5,11 +7,11 @@
 2. `ssh-keygen`, save as `~/.ssh/nfu_ed25519`, and add to `IdentityFile` in `~/.ssh/config`, alongside: `Host: 127.0.0.1 Port: 2222 User nfu ForwardAgent Yes` (see: `dotfiles/_unused/.ssh/config`).
 3. Repeat for `~/.ssh/github_ed25519`, with: `Host: github.com User git`.
 4. Add keys to ssh agent, so they can be forwarded to server: `ssh-add ~/.ssh/github_ed25519`.
-5. Add `~/.ssh/github_ed25519.pub` to github.
+5. Add `~/.ssh/github_ed25519.pub` to GitHub.
 
 ## Setup Linux.
 
-1.  Create new arch amd machine, named `arch`, which will get default user `magnus`.
+1.  Create new arch AMD machine, named `arch`, which will get default user `magnus`.
 2.  Host: `orb -u root -m <new_machine_name>`, `passwd magnus`, and set password to `magnus`.
 3.  `sudo pacman-key init && sudo pacman-key --populate && sudo pacman -Syu --noconfirm archlinux-keyring && sudo pacman -Syu --noconfirm which openssh vim git`,
     then modify `sshd` config, `sudo vim /etc/ssh/sshd_config`, to listen to port 2222 (see: `dotfiles/_unused/etc/ssh/sshd_config`). Note: File is replaced later, during install.
@@ -21,7 +23,7 @@
 9.  `. ~/dotfiles/scripts/setup_user`.
 10. Host: `ssh-copy-id -i ~/.ssh/nfu_ed25519.pub nfu`, type password to remote user `nfu`, which is also `nfu`.
 11. Host: Copy terminfo to new user: `infocmp -x | ssh nfu -- tic -x -`.
-12. Login with new user, `ssh nfu`, then delete orbstack `ssh_config`: `sudo rm -rf /etc/ssh/ssh_config.d/10-orbstack.conf`.
+12. Login with new user, `ssh nfu`, then delete OrbStack `ssh_config`: `sudo rm -rf /etc/ssh/ssh_config.d/10-orbstack.conf`.
 13. `cd ~ & git clone git@github.com:magnusriga/dotfiles.git`.
 14. `. ~/dotfiles/scripts/bootstrap.sh`.
 
@@ -54,7 +56,7 @@
 ## Running Production Containers.
 
 1. Build image from Linux (once): `./scripts/compose-build.sh -e prod`
-2. Deploy stack from Linux (everytime we run container): `./scripts/stack-deploy.sh -e prod`
+2. Deploy stack from Linux (every time we run container): `./scripts/stack-deploy.sh -e prod`
 3. Check by visiting: [localhost](http://localhost:3000)
 
 If git clone does not work:
@@ -66,4 +68,3 @@ Other Notes
 
 - Manually add name and email to `.gitconfig`: `. ~/dotfiles/_unused/setup_git_credentials.sh`.
 - Prompt slightly delayed due to `git_status`, remove git status to avoid.
-
