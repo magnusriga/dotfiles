@@ -216,6 +216,11 @@ cd "$CURRENTDIR" || exit
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
+# Install uv, python package manager.
+# ================================================
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# ================================================
 # Install Stow (needs `autoconf` pre-installed).
 # Use `pacman -Syu stow` instead.
 # ================================================

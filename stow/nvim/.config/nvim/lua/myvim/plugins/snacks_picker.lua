@@ -148,6 +148,55 @@ return {
                 },
               },
             },
+            -- layout = {
+            -- Each layout level can have properties:
+            -- - `box` (string): Type of box to use, 'horizontal' | 'vertical' | 'flex' | 'grid'.
+            -- - `id` (string): id of the box, used to identify the box in the layout.
+            -- - `depth` (number): Depth of box window, used to identify box window in layout.
+            -- - `win` (string): Window box window name, used to identify box window in layout.
+            -- - All properties from `snacks.win.Config`, e.g. `border`, `title`, `width`, `height`, etc.
+            -- - `height` | `width`: Height | width of window:
+            --   - <1     : Relative height.
+            --   - 0      : Full height.
+            --   - 1      : 1 line.
+            --   - Default: `0.9`.
+            --  ---@type snacks.layout.Box
+            --   layout = {
+            --     box = "horizontal",
+            --     width = 0.8,
+            --     min_width = 120,
+            --     height = 0.8,
+            --     {
+            --       box = "vertical",
+            --       border = "rounded",
+            --       title = "{title} {live} {flags}",
+            --       -- on_win = function(win)
+            --         -- win:add_padding()
+            --         -- win:update()
+            --         -- win:toggle_help()
+            --       -- end,
+            --       {
+            --         win = "input",
+            --         height = 1,
+            --         border = "bottom",
+            --         col = 0.1,
+            --         width = 0.8,
+            --       },
+            --       {
+            --         win = "list",
+            --         border = "none",
+            --         col = 0.1,
+            --         width = 0.8,
+            --       },
+            --     },
+            --     -- Preview window is half of full width, when shown.
+            --     { win = "preview", title = "{preview}", border = "rounded", width = 0.5 },
+            --   },
+            -- },
+            -- sources = {
+            --   files = {
+            --   },
+            -- },
           },
         })
       end

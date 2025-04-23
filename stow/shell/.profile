@@ -136,6 +136,11 @@ export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 [ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
 
 # ================================================================
+# Upgrade, aka. update, selected packages.
+# ================================================================
+gh extension upgrade gh-copilot
+
+# ================================================================
 # Start SSH agent to Avoid Typing Github Password
 # ================================================================
 # NOTE: Do NOT start agent like below, when using agent forwarding,

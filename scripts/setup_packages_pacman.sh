@@ -162,6 +162,9 @@ sudo pacman -Syu --noconfirm \
 # ==========================================================
 # Setup above packages and install related tools.
 # ==========================================================
+# Install `github-cli` extension: `Copilot`.
+gh extension install github/gh-copilot
+
 # Install luzsocket.
 sudo luarocks install luasocket
 # lua require "socket"

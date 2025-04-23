@@ -32,6 +32,13 @@ vim.cmd([[
   highlight DiffText guifg=#282c34 guibg=#61afef
 ]])
 
+-- Floating Windows.
+-- Used by other programs, e.g. `fzf-lua`, `snacks.nvim`, `vimdiff`.
+vim.cmd([[
+  highlight! NormalFloat guifg=#c8d3f5 guibg=#1e2030
+  highlight! FloatBorder guifg=#589ed7 guibg=#1e2030
+]])
+
 -- FzfLua.
 -- - `FzfLuaTitle`: Title of window.
 -- - `FzfLuaHeaderText`: Actual keybinding description, in fzf `header` line.
@@ -97,16 +104,31 @@ vim.cmd([[
 
 -- `snacks.nvim` picker.
 vim.cmd([[
+  highlight SnacksPicker guifg=#c8d3f5 guibg=#1e2030
+  highlight SnacksPickerBorder guifg=#589ed7 guibg=#1e2030
+  highlight SnacksPickerIcon guifg=#589ed7 guibg=#1e2030
+  highlight SnacksPickerPrompt guifg=#589ed7 guibg=#1e2030
+  highlight SnacksPickerDir guifg=#828bb8
+
   highlight SnacksPickerSelected guifg=#ff007c
 
-  highlight SnacksPickerInputTitle guibg=None guifg=#ff966c
-  highlight SnacksPickerInputBorder guibg=None guifg=#ff966c
+  highlight SnacksPickerTree guifg=#495162 guibg=None
+
+
+  highlight! link SnacksPickerCursorLine CursorLine
+
+  highlight SnacksPickerInputTitle guifg=#ff966c guibg=None
+  highlight SnacksPickerInputBorder guifg=#ff966c guibg=#1e2030 
+  highlight SnacksPickerInputIcon guifg=#ff966c guibg=#1e2030
+
 
   highlight SnacksPickerBoxTitle guibg=#1e2030 guifg=#ff966c
 
-  highlight SnacksInputIcon guifg=#65bcff
-  highlight SnacksInputTitle guifg=#ffc777
-  highlight SnacksInputBorder guifg=#ffc777
+  highlight SnacksInputNormal guifg=#c8d3f5 guibg=#1e2030
+  highlight SnacksInputTitle guifg=#ffc777 guibg=#1e2030
+  highlight SnacksInputBorder guifg=#ffc777 guibg=#1e2030
+  highlight SnacksInputIcon guifg=#589ed7 guibg=#1e2030
+  highlight! link SnacksInputCursorLine CursorLine
 ]])
 
 -- WhichKey.
@@ -131,8 +153,8 @@ vim.cmd([[
   " highlight! link PmenuExtraSel PmenuSel
   " highlight PmenuSbar guibg=#27293a
   " highlight PmenuThumb guibg=#3b4261
-  " highlight PmenuMatch guifg=#65bcff guibg=#1e2030
-  " highlight PmenuMatchSel guifg=#65bcff guibg=#363c58
+  " highlight PmenuMatch guifg=#589ed7 guibg=#1e2030
+  " highlight PmenuMatchSel guifg=#589ed7 guibg=#363c58
 ]])
 
 -- Blink.cmp.
@@ -152,8 +174,8 @@ vim.cmd([[
 
   highlight BlinkCmpDocSeparator guifg=#5c6370 guibg=Normal
 
-  highlight BlinkCmpKindVariable cterm=bold gui=bold guifg=#65bcff
-  highlight BlinkCmpKindField cterm=bold gui=bold guifg=#65bcff
+  highlight BlinkCmpKindVariable cterm=bold gui=bold guifg=#589ed7
+  highlight BlinkCmpKindField cterm=bold gui=bold guifg=#589ed7
 
   highlight BlinkCmpKindConstructor cterm=bold gui=bold guifg=#c678dd
   highlight BlinkCmpKindFunction cterm=bold gui=bold guifg=#c678dd
