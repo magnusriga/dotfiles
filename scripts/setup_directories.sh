@@ -59,6 +59,11 @@ if [ ! -d "$BAT_HOME" ]; then
   mkdir -p "${BAT_HOME}/themes"
 fi
 
+export GLOW_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/glow"
+if [ ! -d "$GLOW_HOME" ]; then
+  mkdir -p "$GLOW_HOME"
+fi
+
 # Directory for delta repo, with themes.
 # No need, let git clone create directory.
 # export DELTA_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/delta"

@@ -69,7 +69,9 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup("close_with_q"),
   pattern = {
-    "PlenaryTestPopup",
+    "Avante",
+    "AvanteInput",
+    "AvanteSelectedFiles",
     "checkhealth",
     "dbout",
     "gitsigns-blame",
@@ -80,6 +82,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "neotest-output-panel",
     "neotest-summary",
     "notify",
+    "PlenaryTestPopup",
     "qf",
     "spectre_panel",
     "startuptime",

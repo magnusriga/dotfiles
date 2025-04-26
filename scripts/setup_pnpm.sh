@@ -13,7 +13,9 @@ case ":$PATH:" in
 esac
 
 # Install global pnpm packages.
-pnpm add -g node-gyp node-gyp-build
+pnpm add -g node-gyp node-gyp-build \
+  neovim \
+  yarn
 
 pnpm --allow-build=spawn-sync \
   --allow-build=tree-sitter \
@@ -29,8 +31,6 @@ pnpm --allow-build=puppeteer \
   --allow-build=vue-demi \
   add -g \
   @mermaid-js/mermaid-cli
-
-pnpm add -g neovim
 
 pnpm --allow-build=@anthropic-ai/claude-code add -g @anthropic-ai/claude-code
 

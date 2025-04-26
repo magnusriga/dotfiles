@@ -1,0 +1,19 @@
+# style name or JSON path.
+# Default "auto".
+# style: "dark"
+
+# Mouse wheel support (TUI-mode only).
+# Default: `true`.
+# mouse: true
+
+# Use pager to display markdown.
+# Default: `true`.
+# pager: true
+
+# At which column should word wrap.
+# Default: `80`.
+# width: 80
+
+# Show all files, including hidden and ignored.
+# Default: `false`.
+all: true

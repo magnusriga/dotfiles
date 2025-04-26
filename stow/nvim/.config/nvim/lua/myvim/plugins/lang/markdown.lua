@@ -19,10 +19,11 @@ return {
   {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    build = function()
-      require("lazy").load({ plugins = { "markdown-preview.nvim" } })
-      vim.fn["mkdp#util#install"]()
+    build = "cd app && yarn install",
+    init = function()
+      vim.g.mkdp_filetypes = { "markdown" }
     end,
+    ft = { "markdown" },
     keys = {
       {
         "<leader>cp",
@@ -31,9 +32,6 @@ return {
         desc = "Markdown Preview",
       },
     },
-    config = function()
-      vim.cmd([[do FileType]])
-    end,
   },
 
   -- Improved view of markdown files, inside Neovim.
@@ -66,7 +64,6 @@ return {
         -- Turn on / off any sign column related rendering.
         -- Default: `true`.
         -- sign = false,
-        highlight = "RenderMarkdownSign",
 
         -- Replaces '#+' of 'atx_h._marker'.
         -- Output is evaluated depending on type.

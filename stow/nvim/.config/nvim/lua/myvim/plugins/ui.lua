@@ -394,15 +394,31 @@ return {
     opts = {
       -- Show indent guides and scopes, based on treesitter.
       indent = {
-        indent = {},
+        -- `indent`: Vertical grey lines, aka. indent lines.
+        indent = {
+          -- Show grey indent lines, by default in all scopes.
+          -- Default: `true`.
+          -- enabled = false,
+
+          -- Indent lines only in current scope, i.e. where cursor is.
+          -- Default: `false`.
+          -- only_scope = `false`,
+
+          -- Only show vertical grey line, aka. indent lines, in current window,
+          -- so when two windows in split, only current window has indent lines.
+          -- Default: false.
+          -- only_current = `false`,
+        },
         animate = {
           enabled = false,
         },
+        -- `scope`: Vertical color-coded line, aka. indent lines, only in current scope.
         scope = {
-          -- Enable (default) or disable highlight of line indicating scope.
-          -- enabled = false,
+          -- Show colored indent line, only for current scopes.
+          -- Default: `true`.
+          -- enabled = true,
 
-          -- Add different colors for different scopes.
+          -- Add different colors for different scope depths.
           hl = {
             "SnacksIndent1",
             "SnacksIndent2",
@@ -414,6 +430,36 @@ return {
             "SnacksIndent8",
           },
         },
+        -- Indent guides in normal buffers, but not for text files.
+        -- filter = function(buf)
+        --   local base_check = vim.g.snacks_indent ~= false
+        --     and vim.b[buf].snacks_indent ~= false
+        --     and vim.bo[buf].buftype == ""
+        --
+        --   -- Base filter check first.
+        --   if not base_check then
+        --     return false
+        --   end
+        --
+        --   -- Get filetype of buffer.
+        --   local ft = vim.bo[buf].filetype
+        --
+        --   -- Exclude comment-heavy filetypes.
+        --   local comment_heavy_filetypes = {
+        --     "markdown",
+        --     "txt",
+        --     "text",
+        --     "help",
+        --   }
+        --
+        --   for _, exclude_ft in ipairs(comment_heavy_filetypes) do
+        --     if ft == exclude_ft then
+        --       return false
+        --     end
+        --   end
+        --
+        --   return true
+        -- end,
       },
 
       -- Replaces `vim.ui.input` with prettier prompt.
@@ -479,6 +525,17 @@ return {
       -- Highlight matching words to word under cursor, in current buffer,
       -- using LSP references.
       -- words = { enabled = true },
+    },
+    -- stylua: ignore
+    keys = {
+      { "<leader>n", function()
+        if Snacks.config.picker and Snacks.config.picker.enabled then
+          Snacks.picker.notifications()
+        else
+          Snacks.notifier.show_history()
+        end
+      end, desc = "Notification History" },
+      { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
     },
   },
 

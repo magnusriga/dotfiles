@@ -16,6 +16,10 @@ vim.g.markdown_recommended_style = 0
 -- Toggle symbols cache.
 vim.g.symbols_cache = false
 
+-- Set default browser for markdown preview.
+-- vim.g.mkdp_browser = "firefox"
+vim.g.mkdp_browser = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
 ---------------------------------------------
 -- Helper functions.
 ---------------------------------------------

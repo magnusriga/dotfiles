@@ -1,3 +1,7 @@
+-- Colors.
+-- - Bright pink: #EA0FFA
+-- - Bright green: #39D877
+
 -- General.
 -- - Also applies to WhichKey and others.
 -- - `WhichKeyFloat`: Links to NormalFloat, below linked to Normal,
@@ -8,6 +12,7 @@ vim.cmd([[
 
   highlight NormalFloat guifg=#c8d3f5 guibg=#1e2030
   highlight FloatBorder guifg=#589ed7 guibg=#1e2030
+  highlight WinSeparator guifg=#495162 guibg=#1e2030
 
   highlight LineNrAbove guifg=#495162 guibg=#16161d
   " LineNr set in condition logic below.
@@ -99,7 +104,7 @@ vim.cmd([[
   highlight FzfLuaScrollBorderBackCompat guifg=#1e2030 guibg=#589ed7
 
   highlight! link FzfLuaPreviewNormal Normal
-  highlight FzfLuaPreviewTitle guifg=#589ed7 guibg=None
+  highlight! link FzfLuaPreviewTitle FloatTitle
   highlight FzfLuaPreviewBorder guifg=#589ed7 guibg=None
 ]])
 
@@ -110,65 +115,95 @@ vim.cmd([[
   highlight SnacksPickerIcon guifg=#589ed7 guibg=#1e2030
   highlight SnacksPickerPrompt guifg=#589ed7 guibg=#1e2030
   highlight SnacksPickerDir guifg=#828bb8
+  " `SnacksPickerToggle`: Characters next to title, indicating:
+  " - follow (`f`): Follow symlinks when searching, i.e. in grep list.
+  " - hidden (`h`): Show hidden files.
+  " - ignored (`i`): Show ignored files.
+  " - modified (`m`): Show only modified buffers, i.e. buffer list only.
+  highlight SnacksPickerToggle guifg=#828bb8 guibg=#1e2030
+
+  " `SnacksPickerBox`: First box of picker, i.e. not preview box.
+  highlight SnacksPickerBoxTitle guifg=#ff966c guibg=#1e2030 
+
+  " `SnacksPickerPreview`: Second box of picker, i.e. preview box.
+  highlight! link SnacksPickerPreview Normal
+  highlight SnacksPickerPreviewBorder guifg=#589ed7 guibg=None
 
   highlight SnacksPickerSelected guifg=#ff007c
-
   highlight SnacksPickerTree guifg=#495162 guibg=None
-
-
   highlight! link SnacksPickerCursorLine CursorLine
 
-  highlight SnacksPickerInputTitle guifg=#ff966c guibg=None
+  " `SnacksPickerInput`: Applies to search box at top of picker list, not to `vim.input` box.
+  highlight SnacksPickerInput guifg=#ff966c guibg=#1e2030
+  highlight SnacksPickerInputTitle guifg=#ff966c guibg=#1e2030
   highlight SnacksPickerInputBorder guifg=#ff966c guibg=#1e2030 
   highlight SnacksPickerInputIcon guifg=#ff966c guibg=#1e2030
 
-
-  highlight SnacksPickerBoxTitle guibg=#1e2030 guifg=#ff966c
-
+  " `SnacksInput`: Applies to `vim.input` box, not to search box at top of list.
+  highlight SnacksInput guifg=#c8d3f5 guibg=#1e2030
   highlight SnacksInputNormal guifg=#c8d3f5 guibg=#1e2030
   highlight SnacksInputTitle guifg=#ffc777 guibg=#1e2030
   highlight SnacksInputBorder guifg=#ffc777 guibg=#1e2030
   highlight SnacksInputIcon guifg=#589ed7 guibg=#1e2030
   highlight! link SnacksInputCursorLine CursorLine
+
+  " Same as above, but with `None` background.
+  " highlight SnacksInput guifg=#c8d3f5 guibg=None
+  " highlight SnacksInputNormal guifg=#c8d3f5 guibg=None
+  " highlight SnacksInputTitle guifg=#ffc777 guibg=None
+  " highlight SnacksInputBorder guifg=#ffc777 guibg=None
+  " highlight SnacksInputIcon guifg=#589ed7 guibg=None
+  " highlight SnacksInputCursorLine  guibg=None
 ]])
 
 -- Pmenu, e.g. completion menu.
--- - Remove background color.
+-- - Used by `blink.cmp`, etc.
 vim.cmd([[
-  " highlight Pmenu guifg=#c8d3f5 guibg=#1e2030
-  " highlight Pmenu guifg=#c8d3f5 guibg=#1e2030
-  " highlight Pmenu guibg=None
-  " highlight PmenuSel guibg=#363c58
+  highlight Pmenu guifg=#c8d3f5 guibg=#1e2030
+  highlight! link PmenuSel CursorLine
+  highlight PmenuThumb guifg=#1e2030 guibg=#589ed7
+
   " highlight! link PmenuKind Pmenu
   " highlight! link PmenuKindSel PmenuSel
+
   " highlight! link PmenuExtra Pmenu
   " highlight! link PmenuExtraSel PmenuSel
+
+  " `PmenuSbar`: Scrollbar gutter.
   " highlight PmenuSbar guibg=#27293a
+
+  " `PmenuThumb`: Scrollbar thumb.
   " highlight PmenuThumb guibg=#3b4261
+
   " highlight PmenuMatch guifg=#589ed7 guibg=#1e2030
   " highlight PmenuMatchSel guifg=#589ed7 guibg=#363c58
 ]])
 
--- Blink.cmp.
--- Bright pink: #EA0FFA
--- Bright green: #39D877
+-- Avante.
 vim.cmd([[
-  " highlight BlinkCmpMenu guibg=#1e2030
-  " highlight BlinkCmpMenuBorder guifg=#589ed7 guibg=#1e2030
-  highlight BlinkCmpMenu guifg=#abb2bf guibg=#16161d
-  highlight BlinkCmpMenuBorder guifg=#5c6370 guibg=Normal
-  highlight BlinkCmpMenuSelection guibg=#2f334d
+  highlight AvanteSidebarWinSeparator guifg=#495162 guibg=#1e2030
+  highlight AvanteSidebarWinHorizontalSeparator guifg=#495162 guibg=#1e2030
+]])
 
-  highlight BlinkCmpScrollBarThumb guifg=#1e2030 guibg=#589ed7
+-- Blink.cmp.
+-- - `*Menu`: Links to `Pmenu*`, set above.
+-- - `*Doc`: Links to `NormalFloat`, set above.
+vim.cmd([[
+  " Links to Pmenu, set above.
+  " highlight BlinkCmpMenu guibg=#1e2030
+  " highlight BlinkCmpScrollBarThumb guifg=#1e2030 guibg=#589ed7
+  " highlight! link BlinkCmpCusorLineMenuHack CursorLine
+  
+  highlight BlinkCmpMenuBorder guifg=#589ed7 guibg=#1e2030
+  highlight BlinkCmpMenuSelection guibg=#2f334d
 
   highlight BlinkCmpDoc guifg=#abb2bf guibg=#16161d
   highlight BlinkCmpDocBorder guifg=#5c6370 guibg=Normal
-
   highlight BlinkCmpDocSeparator guifg=#5c6370 guibg=Normal
 
+  " Kind highlight groups set by `blink.cmp` | `mini.icons`, some overwritten here.
   highlight BlinkCmpKindVariable cterm=bold gui=bold guifg=#589ed7
   highlight BlinkCmpKindField cterm=bold gui=bold guifg=#589ed7
-
   highlight BlinkCmpKindConstructor cterm=bold gui=bold guifg=#c678dd
   highlight BlinkCmpKindFunction cterm=bold gui=bold guifg=#c678dd
   highlight BlinkCmpKindMethod cterm=bold gui=bold guifg=#c678dd
@@ -290,53 +325,119 @@ vim.cmd([[
 -- =====================================
 -- Conditinal highlighting.
 -- =====================================
--- Store namespaces by window ID.
-local window_namespaces = {}
+-- Define highlight colors.
+local highlights = {
+  Normal = { fg = "#c8d3f5", bg = "#222436" },
+  LineNr = { fg = "#ff966c", bg = "#222436" },
+  LineNrAbove = { fg = "#3b4261", bg = "#222436" },
+  LineNrBelow = { fg = "#3b4261", bg = "#222436" },
+}
 
--- Conditinal highlighting: Markdown.
-vim.api.nvim_create_autocmd({ "FileType", "BufEnter" }, {
-  pattern = "*",
-  callback = function()
-    local win_id = vim.api.nvim_get_current_win()
+-- Set highlight groups.
+for group, attrs in pairs(highlights) do
+  vim.api.nvim_set_hl(0, "Markdown" .. group, attrs)
+end
 
-    -- Create namespace specific to window, if it doesn't exist.
-    if not window_namespaces[win_id] then
-      window_namespaces[win_id] = vim.api.nvim_create_namespace("filetype_highlights_" .. win_id)
+-- List of filetypes for custom highlighting.
+local highlighted_filetypes = {
+  ["markdown"] = true,
+  -- ["avante"] = true,
+  -- ["avanteinput"] = true,
+  -- ["avanteselectedfiles"] = true,
+  -- ["blink-cmp-menu"] = true,
+  -- ["blink-cmp-documentation"] = true,
+}
+
+-- Update highlight groups for current window, if it contains buffer with
+-- `markdown` filetype.
+local function update_window_highlights()
+  local win_id = vim.api.nvim_get_current_win()
+  local buf = vim.api.nvim_win_get_buf(win_id)
+  local ft = vim.api.nvim_get_option_value("filetype", { buf = buf })
+
+  -- Convert filetype to lowercase for case-insensitive comparison
+  ft = ft:lower()
+
+  -- Get current winhighlight setting.
+  local current_winhighlight = vim.api.nvim_get_option_value("winhighlight", { win = win_id })
+
+  if highlighted_filetypes[ft] then
+    -- Prepare highlight additions.
+    local our_highlights = "Normal:MarkdownNormal,LineNr:MarkdownLineNr,"
+      .. "LineNrAbove:MarkdownLineNrAbove,LineNrBelow:MarkdownLineNrBelow"
+
+    -- Function to merge highlights without duplicates.
+    local function merge_highlights(current, new)
+      if current == "" then
+        return new
+      end
+
+      -- Parse current highlight settings into table.
+      local highlights_table = {}
+      for part in current:gmatch("[^,]+") do
+        local group, target = part:match("([^:]+):([^:]+)")
+        if group then
+          highlights_table[group] = target
+        end
+      end
+
+      -- Add/override with new highlight settings.
+      for part in new:gmatch("[^,]+") do
+        local group, target = part:match("([^:]+):([^:]+)")
+        if group then
+          highlights_table[group] = target
+        end
+      end
+
+      -- Convert back to string.
+      local result = {}
+      for group, target in pairs(highlights_table) do
+        table.insert(result, group .. ":" .. target)
+      end
+
+      return table.concat(result, ",")
     end
 
-    local ns_id = window_namespaces[win_id]
+    -- Merge our highlights with existing ones.
+    local merged_highlights = merge_highlights(current_winhighlight, our_highlights)
+    vim.api.nvim_set_option_value("winhighlight", merged_highlights, { win = win_id })
+  else
+    -- For non-target filetypes, remove only custom highlights.
+    if current_winhighlight ~= "" then
+      -- Parse current highlight settings.
+      local result = {}
+      local modified = false
 
-    local ft = vim.bo.filetype
+      for part in current_winhighlight:gmatch("[^,]+") do
+        local group, target = part:match("([^:]+):([^:]+)")
+        if group and target then
+          -- Skip custom highlights.
+          if
+            target ~= "MarkdownNormal"
+            and target ~= "MarkdownLineNr"
+            and target ~= "MarkdownLineNrAbove"
+            and target ~= "MarkdownLineNrBelow"
+          then
+            table.insert(result, part)
+          else
+            modified = true
+          end
+        end
+      end
 
-    if ft == "markdown" or ft == "avante" then
-      vim.api.nvim_set_hl(ns_id, "Normal", { fg = "#C8D3F5", bg = "#222436" })
-      vim.api.nvim_set_hl(ns_id, "LineNrAbove", { fg = "#3B4261", bg = "#222436" })
-      vim.api.nvim_set_hl(ns_id, "LineNr", { fg = "#ff966c", bg = "#222436" })
-      vim.api.nvim_set_hl(ns_id, "LineNrBelow", { fg = "#3B4261", bg = "#222436" })
-    elseif ft == "fzf" or ft == "snacks_picker_*" or ft == nil then
-      vim.api.nvim_set_hl(ns_id, "Normal", { fg = "#C8D3F5", bg = "#1e2030" })
-      vim.api.nvim_set_hl(ns_id, "LineNrAbove", { fg = "#3B4261", bg = "#1e2030" })
-      vim.api.nvim_set_hl(ns_id, "LineNr", { fg = "#ff966c", bg = "#1e2030" })
-      vim.api.nvim_set_hl(ns_id, "LineNrBelow", { fg = "#3B4261", bg = "#1e2030" })
-    else
-      vim.api.nvim_set_hl(ns_id, "Normal", { fg = "#abb2bf", bg = "#16161d" })
-      vim.api.nvim_set_hl(ns_id, "LineNrAbove", { fg = "#495162", bg = "#16161d" })
-      vim.api.nvim_set_hl(ns_id, "LineNr", { fg = "#ff966c", bg = "#16161d" })
-      vim.api.nvim_set_hl(ns_id, "LineNrBelow", { fg = "#495162", bg = "#16161d" })
+      -- Update only if group was removed.
+      if modified then
+        vim.api.nvim_set_option_value("winhighlight", table.concat(result, ","), { win = win_id })
+      end
     end
+  end
+end
 
-    -- Apply namespace to current window.
-    vim.api.nvim_win_set_hl_ns(win_id, ns_id)
-  end,
-})
+-- Create autogroup for markdown highlights, cleared when reloaded.
+local augroup = vim.api.nvim_create_augroup("MarkdownHighlights", { clear = true })
 
--- Clean up namespaces when windows are closed.
-vim.api.nvim_create_autocmd("WinClosed", {
-  pattern = "*",
-  callback = function(opts)
-    local win_id = tonumber(opts.match)
-    if win_id and window_namespaces[win_id] then
-      window_namespaces[win_id] = nil
-    end
-  end,
+-- Update highlights when buffers/windows change.
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "WinEnter", "FileType" }, {
+  group = augroup,
+  callback = update_window_highlights,
 })

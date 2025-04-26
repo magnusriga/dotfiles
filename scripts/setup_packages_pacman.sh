@@ -122,6 +122,7 @@ sudo pacman -Syu --noconfirm \
   valkey \
   vulkan-driver \
   freeglut \
+  libnotify \
   opengl-man-pages \
   gdk-pixbuf2 gimp java-runtime \
   libwmf libopenraw libavif libheif libjxl librsvg webp-pixbuf-loader \
