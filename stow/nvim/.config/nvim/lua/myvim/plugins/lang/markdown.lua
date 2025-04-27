@@ -126,6 +126,11 @@ return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     opts = {
+      bullet = {
+        -- Default: `{ '●', '○', '◆', '◇' }`.
+        -- icons = { "●", "󰧞", "○", "◆", "◇" },
+        icons = { "●", "", "◆", "◇" },
+      },
       -- Options for code block and inline code rendering.
       code = {
         -- Turn on / off any sign column related rendering.

@@ -427,14 +427,11 @@ map("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 ---------------------------------
 -- Auto-bullet continuation for Markdown files.
 ---------------------------------
--- Define key for native Enter behavior (to avoid recursion).
-local native_cr = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
--- Set up mapping in insert mode (only for markdown files).
-map('i', '<CR>', function()
-  -- Only markdown files.
+local base_key = "<CR>"
+local function auto_bullet()
+  -- For non-markdown files, just return base key.
   if vim.bo.filetype ~= 'markdown' then
-    -- For non-markdown files, just return the native CR
-    return native_cr
+    return base_key
   end
 
   -- Get current line.
@@ -449,15 +446,15 @@ map('i', '<CR>', function()
   -- Try to match bullet pattern.
   local bullet_char, bullet_text = line:match(bullet_pattern)
 
-  -- For bullet points
+  -- For bullet points.
   if bullet_char and bullet_text then
-    -- If text after bullet is empty, end the list (just return native CR).
+    -- If text after bullet is empty, end list (return base key).
     if bullet_text:match("^%s*$") then
-      return native_cr
+      return base_key
     end
 
-    -- Return CR followed by bullet.
-    return native_cr .. bullet_char .. " "
+    -- Return base key followed by bullet.
+    return base_key .. bullet_char .. " "
   end
 
   -- Try to match numbered list pattern.
@@ -465,16 +462,32 @@ map('i', '<CR>', function()
 
   -- For numbered lists.
   if num and num_text then
-    -- If text after number is empty, end the list (just return native CR)
+    -- If text after number is empty, end list (return base key)
     if num_text:match("^%s*$") then
-      return native_cr
+      return base_key
     end
 
     -- Return CR followed by incremented number.
     local next_num = tonumber(num) + 1
-    return native_cr .. next_num .. ". "
+    return base_key .. next_num .. ". "
   end
 
-  -- Default behavior: just return native Enter.
-  return native_cr
+  -- Default behavior: Return base key.
+  return base_key
+end
+
+-- Mappings.
+map('i', '<CR>', function()
+  base_key = "<CR>"
+  return auto_bullet()
+end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
+
+map('n', 'o', function()
+  base_key = "o"
+  return auto_bullet()
+end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
+
+map('n', 'O', function()
+  base_key = "O"
+  return auto_bullet()
 end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
