@@ -66,7 +66,7 @@ config.font = wezterm.font("JetBrainsMono Nerd Font")
 config.font_size = 12
 
 -- Line height.
-config.line_height = 1.6
+config.line_height = 1.8
 
 -- Changing the color scheme.
 -- config.color_scheme = 'Batman'

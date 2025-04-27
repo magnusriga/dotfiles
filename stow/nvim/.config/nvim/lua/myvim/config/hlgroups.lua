@@ -8,7 +8,7 @@
 -- - `WhichKeyBorder`: Links to FloatBorder, below changed to match `fzf-lua`.
 -- - Result: Floating windows have same background as normal windows, just with border.
 vim.cmd([[
-  " highlight Normal guifg=#c8d3f5 guibg=#16161d
+  " highlight Normal guifg=#b5bcc9 guibg=#16161d
 
   highlight NormalFloat guifg=#c8d3f5 guibg=#1e2030
   highlight FloatBorder guifg=#589ed7 guibg=#1e2030
@@ -255,7 +255,9 @@ vim.cmd([[
 vim.cmd([[
   highlight @markup.list.markdown guifg=#ff966c
   highlight RenderMarkdownBullet guifg=#ff966c
-  highlight RenderMarkdownDash guifg=#ff966c
+
+  " highlight! link RenderMarkdownDash LineNr
+  highlight RenderMarkdownDash guifg=#313741
 
   " highlight @markup.list.markdown guifg=#589ed7
   " highlight RenderMarkdownBullet guifg=#589ed7
@@ -280,6 +282,7 @@ vim.cmd([[
   " Decent: guifg=#f7eed0 guibg=#4b463e
   " Decent bg: #2E2C32
   highlight RenderMarkdownInlineHighlight guifg=#D9CF8B guibg=#2E2C32
+  " highlight RenderMarkdownInlineHighlight guifg=#D9CF8B
 
   " Good for navy background: guifg=#e06c75 guibg=#2a2d43 
   " Good for dark background: guifg=#e06c75 guibg=#1b1c22 

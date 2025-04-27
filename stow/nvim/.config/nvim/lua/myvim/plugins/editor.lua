@@ -323,6 +323,11 @@ return {
         changedelete = { text = "▎" },
       },
       on_attach = function(buffer)
+        -- Do not use Gitsigns in markdown files.
+        if vim.bo[buffer].filetype == "markdown" then
+          return false
+        end
+
         local gs = package.loaded.gitsigns
 
         local function map(mode, l, r, desc)

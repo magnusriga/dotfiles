@@ -72,6 +72,17 @@ return {
         markdown = { "markdownlint" },
       },
     },
+    init = function()
+      -- Disable diagnostics for markdown files, re-enabled with `<leader>ud`.
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("disable-diagnostics", { clear = true }),
+        callback = function()
+          if vim.bo.filetype == "markdown" then
+            vim.diagnostic.enable(false)
+          end
+        end,
+      })
+    end,
   },
 
   {
@@ -109,21 +120,21 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     opts = {
       -- Options for code block and inline code rendering.
-      -- code = {
-      -- Turn on / off any sign column related rendering.
-      -- Default: `true`.
-      -- sign = false,
+      code = {
+        -- Turn on / off any sign column related rendering.
+        -- Default: `true`.
+        sign = false,
 
-      -- Width of code block background.
-      -- `full` (default): Full width of window.
-      -- `block`: Width of code block.
-      -- width = "block",
+        -- Width of code block background.
+        -- `full` (default): Full width of window.
+        -- `block`: Width of code block.
+        -- width = "block",
 
-      -- Amount of padding to add to right of code blocks, when width is 'block'.
-      -- If float < 1 is provided, it is treated as percentage of available window space.
-      -- Default: `0`.
-      -- right_pad = 1,
-      -- },
+        -- Amount of padding to add to right of code blocks, when width is 'block'.
+        -- If float < 1 is provided, it is treated as percentage of available window space.
+        -- Default: `0`.
+        -- right_pad = 1,
+      },
 
       -- Options for heading rendering.
       -- `level`: Number of '#' in heading marker.
@@ -131,7 +142,7 @@ return {
       heading = {
         -- Turn on / off any sign column related rendering.
         -- Default: `true`.
-        -- sign = false,
+        sign = false,
 
         -- Replaces '#+' of 'atx_h._marker'.
         -- Output is evaluated depending on type.
