@@ -122,7 +122,7 @@ return {
         -- min_chars = 2,
       },
 
-      -- Default mappings.
+      -- Default key mappings.
       -- mappings = {
       --   -- Overrides `gf` mapping, to work on markdown/wiki links within vault.
       --   ["gf"] = {
@@ -219,6 +219,7 @@ return {
           note:add_alias(note.title)
         end
 
+        -- local out = { title = note.title, id = note.id, aliases = note.aliases, tags = note.tags }
         local out = { id = note.id, aliases = note.aliases, tags = note.tags }
 
         -- `note.metadata`: Contains manually added fields in frontmatter.
@@ -339,61 +340,66 @@ return {
       -- - Additional syntax highlighting / extmarks.
       -- - Requires `opt.conceallevel = 1|2`.
       -- - See `:help conceallevel`.
-      ui = {
-        -- `false`: Disable additional syntax features.
-        enable = true,
-
-        -- Update delay after text change (ms).
-        update_debounce = 200,
-
-        -- Disable UI features for files with more than this many lines.
-        max_file_length = 5000,
-
-        -- Define how check-boxes are displayed.
-        checkboxes = {
-          --`char`: Must be single character.
-          [" "] = { char = "󰄱", hl_group = "ObsidianTodo" },
-          ["x"] = { char = "", hl_group = "ObsidianDone" },
-          [">"] = { char = "", hl_group = "ObsidianRightArrow" },
-          ["~"] = { char = "󰰱", hl_group = "ObsidianTilde" },
-          ["!"] = { char = "", hl_group = "ObsidianImportant" },
-          -- If no patched font, use:
-          -- [" "] = { char = "☐", hl_group = "ObsidianTodo" },
-          -- ["x"] = { char = "✔", hl_group = "ObsidianDone" },
-
-          -- Add custom checkboxes, if desired...
-        },
-
-        -- Use bullet marks for non-checkbox lists.
-        bullets = { char = "•", hl_group = "ObsidianBullet" },
-
-        external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
-        -- If no patched font, use:
-        -- external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
-
-        reference_text = { hl_group = "ObsidianRefText" },
-
-        highlight_text = { hl_group = "ObsidianHighlightText" },
-
-        tags = { hl_group = "ObsidianTag" },
-
-        block_ids = { hl_group = "ObsidianBlockID" },
-
-        hl_groups = {
-          -- Options passed directly to: `vim.api.nvim_set_hl()`.
-          ObsidianTodo = { bold = true, fg = "#f78c6c" },
-          ObsidianDone = { bold = true, fg = "#89ddff" },
-          ObsidianRightArrow = { bold = true, fg = "#f78c6c" },
-          ObsidianTilde = { bold = true, fg = "#ff5370" },
-          ObsidianImportant = { bold = true, fg = "#d73128" },
-          ObsidianBullet = { bold = true, fg = "#89ddff" },
-          ObsidianRefText = { underline = true, fg = "#c792ea" },
-          ObsidianExtLinkIcon = { fg = "#c792ea" },
-          ObsidianTag = { italic = true, fg = "#89ddff" },
-          ObsidianBlockID = { italic = true, fg = "#89ddff" },
-          ObsidianHighlightText = { bg = "#75662e" },
-        },
-      },
+      -- - NOTE: Must set to `false`, since we are using `render-markdown.nvim`.
+      ui = { enable = false },
+      -- ui = {
+      --   -- `false`: Disable additional syntax features.
+      --   enable = true,
+      --
+      --   -- Update delay after text change (ms).
+      --   update_debounce = 200,
+      --
+      --   -- Disable UI features for files with more than this many lines.
+      --   max_file_length = 5000,
+      --
+      --   -- Define how check-boxes are displayed.
+      --   checkboxes = {
+      --     --`char`: Must be single character.
+      --     [" "] = { char = "󰄱", hl_group = "ObsidianTodo" },
+      --     ["x"] = { char = "", hl_group = "ObsidianDone" },
+      --     [">"] = { char = "", hl_group = "ObsidianRightArrow" },
+      --     ["~"] = { char = "󰰱", hl_group = "ObsidianTilde" },
+      --     ["!"] = { char = "", hl_group = "ObsidianImportant" },
+      --     -- If no patched font, use:
+      --     -- [" "] = { char = "☐", hl_group = "ObsidianTodo" },
+      --     -- ["x"] = { char = "✔", hl_group = "ObsidianDone" },
+      --
+      --     -- Add custom checkboxes, if desired...
+      --   },
+      --
+      --   -- Use bullet marks for non-checkbox lists.
+      --   bullets = { char = "•", hl_group = "ObsidianBullet" },
+      --
+      --   external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
+      --   -- If no patched font, use:
+      --   -- external_link_icon = { char = "", hl_group = "ObsidianExtLinkIcon" },
+      --
+      --   reference_text = { hl_group = "ObsidianRefText" },
+      --
+      --   highlight_text = { hl_group = "ObsidianHighlightText" },
+      --
+      --   tags = { hl_group = "ObsidianTag" },
+      --
+      --   block_ids = { hl_group = "ObsidianBlockID" },
+      --
+      --   hl_groups = {
+      --     -- Options passed directly to: `vim.api.nvim_set_hl()`.
+      --     ObsidianTodo = { bold = true, fg = "#f78c6c" },
+      --     ObsidianDone = { bold = true, fg = "#89ddff" },
+      --     ObsidianRightArrow = { bold = true, fg = "#f78c6c" },
+      --     ObsidianTilde = { bold = true, fg = "#ff5370" },
+      --     ObsidianImportant = { bold = true, fg = "#d73128" },
+      --     ObsidianBullet = { bold = true, fg = "#89ddff" },
+      --
+      --     -- Links.
+      --     -- ObsidianRefText = { underline = true, fg = "#c792ea" },
+      --
+      --     ObsidianExtLinkIcon = { fg = "#c792ea" },
+      --     ObsidianTag = { italic = true, fg = "#89ddff" },
+      --     ObsidianBlockID = { italic = true, fg = "#89ddff" },
+      --     -- ObsidianHighlightText = { bg = "#75662e" },
+      --   },
+      -- },
 
       -- Specify how to handle attachments.
       attachments = {

@@ -54,7 +54,9 @@ config.term = 'wezterm'
 -- config.enable_csi_u_key_encoding = true
 
 -- Remember to install all the fonts in the chosen family, in OS.
-config.font = wezterm.font("JetBrainsMono Nerd Font")
+-- config.font = wezterm.font("Atkinson Hyperlegible Mono")
+-- config.font = wezterm.font("Atkinson Hyperlegible Mono")
+-- config.font = wezterm.font("JetBrainsMono Nerd Font")
 -- config.font = wezterm.font("JetBrains Mono")
 -- config.font = wezterm.font("Hack Nerd Font")
 -- config.font = wezterm.font_with_fallback("Hack Nerd Font")
@@ -62,6 +64,9 @@ config.font = wezterm.font("JetBrainsMono Nerd Font")
 -- vscode uses 14px (12pt) by default.
 -- 12 in WezTerm corresponds to 11 in Ghostty.
 config.font_size = 12
+
+-- Line height.
+config.line_height = 1.6
 
 -- Changing the color scheme.
 -- config.color_scheme = 'Batman'

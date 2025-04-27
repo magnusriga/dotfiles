@@ -144,3 +144,18 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
+
+-- Disable `treesitter-context` for certain filetypes.
+local disabled_filetypes = { "markdown", "help", "txt" }
+local context_group = vim.api.nvim_create_augroup("TreesitterContextToggle", { clear = true })
+vim.api.nvim_create_autocmd({ "BufEnter", "FileType" }, {
+  group = context_group,
+  callback = function()
+    local current_ft = vim.bo.filetype
+    if vim.tbl_contains(disabled_filetypes, current_ft) then
+      require("treesitter-context").disable()
+    else
+      require("treesitter-context").enable()
+    end
+  end,
+})

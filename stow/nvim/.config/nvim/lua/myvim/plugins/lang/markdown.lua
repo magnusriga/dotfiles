@@ -8,9 +8,77 @@ return {
   {
     "stevearc/conform.nvim",
     opts = {
+      formatters = {
+        ["markdown-toc"] = {
+          condition = function(_, ctx)
+            for _, line in ipairs(vim.api.nvim_buf_get_lines(ctx.buf, 0, -1, false)) do
+              if line:find("<!%-%- toc %-%->") then
+                return true
+              end
+            end
+          end,
+        },
+        ["markdownlint-cli2"] = {
+          condition = function(_, ctx)
+            local diag = vim.tbl_filter(function(d)
+              return d.source == "markdownlint"
+            end, vim.diagnostic.get(ctx.buf))
+            return #diag > 0
+          end,
+        },
+      },
+      -- Prefer formatting with `pretter` and linting with `markdownlint`.
       formatters_by_ft = {
-        ["markdown"] = { "prettierd" },
-        ["markdown.mdx"] = { "prettierd" },
+        -- ["markdown"] = { "prettierd", "markdownlint-cli2", "markdown-toc" },
+        -- ["markdown.mdx"] = { "prettierd", "markdownlint-cli2", "markdown-toc" },
+        ["markdown"] = { "prettierd", "markdownlint", "markdown-toc" },
+        ["markdown.mdx"] = { "prettierd", "markdownlint", "markdown-toc" },
+      },
+    },
+  },
+
+  {
+    "williamboman/mason.nvim",
+    -- opts = { ensure_installed = { "markdownlint-cli2", "markdown-toc" } },
+    opts = { ensure_installed = { "markdownlint", "markdown-toc" } },
+  },
+
+  -- Prefer `nvim-lint`.
+  -- Not using `none-ls` anywhere else in Neovim config.
+  -- {
+  --   "nvimtools/none-ls.nvim",
+  --   config = function(_, opts)
+  --     local null_ls = require("null-ls")
+  --     local sources = {
+  --       -- null_ls.builtins.diagnostics.markdownlint_cli2,
+  --       null_ls.builtins.diagnostics.markdownlint,
+  --     }
+  --     null_ls.setup({ sources = sources })
+  --   end,
+  -- },
+
+  -- - Using `markdownlint` instead of `markdownlint-cli2`, as `markdownlint` supports `--stdin`,
+  --   meaning it can update diagnostics on `InsertLeave` and `TextChanged` events,
+  --   not just after buffer has been written to file.
+  -- - Also, prefer `nvim-lint` over `none-ls`.
+  --   - Avoids installing another LSP server.
+  --   - `nvim-lint` offer better linting messages.
+  --   - `nvim-lint` also used for other file linting, setup in `plugins/linting.lua`.
+  {
+    "mfussenegger/nvim-lint",
+    opts = {
+      linters_by_ft = {
+        -- markdown = { "markdownlint-cli2" },
+        markdown = { "markdownlint" },
+      },
+    },
+  },
+
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        marksman = {},
       },
     },
   },
@@ -70,7 +138,7 @@ return {
         -- `function`: `value(context)`.
         -- `string[]`: `cycle(value, context.level)`.
         -- Default: `{ '󰲡 ', '󰲣 ', '󰲥 ', '󰲧 ', '󰲩 ', '󰲫 ' }`.
-        icons = {},
+        icons = { "󰲡  ", "󰲣  ", "󰲥  ", "󰲧  ", "󰲩  ", "󰲫  " },
       },
       -- Checkboxes are special instance of 'list_item', that start with 'shortcut_link'.
       -- There are two special states for unchecked & checked defined in markdown grammar.

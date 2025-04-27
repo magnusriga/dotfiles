@@ -431,35 +431,35 @@ return {
           },
         },
         -- Indent guides in normal buffers, but not for text files.
-        -- filter = function(buf)
-        --   local base_check = vim.g.snacks_indent ~= false
-        --     and vim.b[buf].snacks_indent ~= false
-        --     and vim.bo[buf].buftype == ""
-        --
-        --   -- Base filter check first.
-        --   if not base_check then
-        --     return false
-        --   end
-        --
-        --   -- Get filetype of buffer.
-        --   local ft = vim.bo[buf].filetype
-        --
-        --   -- Exclude comment-heavy filetypes.
-        --   local comment_heavy_filetypes = {
-        --     "markdown",
-        --     "txt",
-        --     "text",
-        --     "help",
-        --   }
-        --
-        --   for _, exclude_ft in ipairs(comment_heavy_filetypes) do
-        --     if ft == exclude_ft then
-        --       return false
-        --     end
-        --   end
-        --
-        --   return true
-        -- end,
+        filter = function(buf)
+          local base_check = vim.g.snacks_indent ~= false
+            and vim.b[buf].snacks_indent ~= false
+            and vim.bo[buf].buftype == ""
+
+          -- Base filter check first.
+          if not base_check then
+            return false
+          end
+
+          -- Get filetype of buffer.
+          local ft = vim.bo[buf].filetype
+
+          -- Exclude comment-heavy filetypes.
+          local comment_heavy_filetypes = {
+            "markdown",
+            "txt",
+            "text",
+            "help",
+          }
+
+          for _, exclude_ft in ipairs(comment_heavy_filetypes) do
+            if ft == exclude_ft then
+              return false
+            end
+          end
+
+          return true
+        end,
       },
 
       -- Replaces `vim.ui.input` with prettier prompt.

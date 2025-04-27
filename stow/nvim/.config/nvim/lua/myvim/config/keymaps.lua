@@ -417,3 +417,64 @@ map("n", "<leader><tab><tab>", "<cmd>tabnew<cr>", { desc = "New Tab" })
 map("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 map("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 map("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
+
+---------------------------------
+-- Send "gsah" keystrokes in markdown file selection.
+-- Does not work.
+---------------------------------
+-- map("x", "<leader>h", "gsah", { desc = "Send gsah keystrokes to selected text" })
+
+---------------------------------
+-- Auto-bullet continuation for Markdown files.
+---------------------------------
+-- Define key for native Enter behavior (to avoid recursion).
+local native_cr = vim.api.nvim_replace_termcodes("<CR>", true, false, true)
+-- Set up mapping in insert mode (only for markdown files).
+map('i', '<CR>', function()
+  -- Only markdown files.
+  if vim.bo.filetype ~= 'markdown' then
+    -- For non-markdown files, just return the native CR
+    return native_cr
+  end
+
+  -- Get current line.
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local line_num = cursor[1]
+  local line = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
+
+  -- Define patterns for bullets and numbered lists.
+  local bullet_pattern = "^%s*([*-])%s+(.*)$"
+  local numbered_pattern = "^%s*(%d+)%.%s+(.*)$"
+
+  -- Try to match bullet pattern.
+  local bullet_char, bullet_text = line:match(bullet_pattern)
+
+  -- For bullet points
+  if bullet_char and bullet_text then
+    -- If text after bullet is empty, end the list (just return native CR).
+    if bullet_text:match("^%s*$") then
+      return native_cr
+    end
+
+    -- Return CR followed by bullet.
+    return native_cr .. bullet_char .. " "
+  end
+
+  -- Try to match numbered list pattern.
+  local num, num_text = line:match(numbered_pattern)
+
+  -- For numbered lists.
+  if num and num_text then
+    -- If text after number is empty, end the list (just return native CR)
+    if num_text:match("^%s*$") then
+      return native_cr
+    end
+
+    -- Return CR followed by incremented number.
+    local next_num = tonumber(num) + 1
+    return native_cr .. next_num .. ". "
+  end
+
+  -- Default behavior: just return native Enter.
+  return native_cr
+end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })

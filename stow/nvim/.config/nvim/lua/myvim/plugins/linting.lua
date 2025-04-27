@@ -4,7 +4,7 @@ return {
     event = "LazyFile",
     opts = {
       -- Event to trigger linters.
-      events = { "BufWritePost", "BufReadPost", "InsertLeave" },
+      events = { "BufWritePost", "BufReadPost", "InsertLeave", "TextChanged" },
       linters_by_ft = {
         fish = { "fish" },
         -- Use the "*" filetype to run linters on all filetypes.
@@ -15,7 +15,7 @@ return {
       },
       -- LazyVim extension to easily override linter options
       -- or add custom linters.
-      ---@type table<string,table>
+      ---@type table<string,lint.Linter>
       linters = {
         -- -- Example of using selene only when `selene.toml` is present.
         -- selene = {
@@ -31,6 +31,8 @@ return {
       local M = {}
 
       local lint = require("lint")
+
+      -- Add custom linters, from `opts.linters`, to `nvim-lint`.
       for name, linter in pairs(opts.linters) do
         if type(linter) == "table" and type(lint.linters[name]) == "table" then
           lint.linters[name] = vim.tbl_deep_extend("force", lint.linters[name], linter)
@@ -42,14 +44,16 @@ return {
           lint.linters[name] = linter
         end
       end
+
+      -- Add linters by filetype, from `opts.linters_by_ft`, to `nvim-lint`.
       lint.linters_by_ft = opts.linters_by_ft
 
       function M.debounce(ms, fn)
-        local timer = vim.uv.new_timer()
+        local timer = assert(vim.uv.new_timer())
         return function(...)
           local argv = { ... }
-          assert(timer):start(ms, 0, function()
-            assert(timer):stop()
+          timer:start(ms, 0, function()
+            timer:stop()
             vim.schedule_wrap(fn)(unpack(argv))
           end)
         end
@@ -62,7 +66,7 @@ return {
         -- * Differs from `conform.nvim`, which only uses first filetype that has a formatter.
         local names = lint._resolve_linter_by_ft(vim.bo.filetype)
 
-        -- Create copy of names table to avoid modifying the original.
+        -- Create copy of names table to avoid modifying original.
         names = vim.list_extend({}, names)
 
         -- Add fallback linters.
@@ -73,7 +77,7 @@ return {
         -- Add global linters.
         vim.list_extend(names, lint.linters_by_ft["*"] or {})
 
-        -- Filter out linters that don't exist or don't match the condition.
+        -- Filter out linters that don't exist or don't match condition.
         local ctx = { filename = vim.api.nvim_buf_get_name(0) }
         ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
         names = vim.tbl_filter(function(name)

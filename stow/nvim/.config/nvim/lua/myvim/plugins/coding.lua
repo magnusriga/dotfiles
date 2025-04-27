@@ -184,6 +184,10 @@ return {
     end,
 
     opts = {
+      custom_surroundings = {
+        -- Add custom surrounding for `h` keyword, to add highlighting in markdown files.
+        ["h"] = { output = { left = "==", right = "==" } },
+      },
       mappings = {
         add = "gsa", -- Add surrounding in Normal and Visual modes.
         delete = "gsd", -- Delete surrounding.
