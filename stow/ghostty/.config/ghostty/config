@@ -80,6 +80,7 @@
 # - JetBrainsMono Nerd Font Mono
 # Latter has smaller symbols, fitting in one cell.
 # Use non-mono, even if ghostty does not show it in `+list-fonts`.
+# font-family = "Atkinson Hyperlegible"
 font-family = "JetBrainsMono Nerd Font"
 
 # font-feature.
