@@ -10,7 +10,7 @@
 
 return {
   {
-    "epwalsh/obsidian.nvim",
+    "obsidian-nvim/obsidian.nvim",
     -- Use latest release instead of latest commit.
     version = "*",
     lazy = true,
@@ -117,10 +117,12 @@ return {
         -- Enables completion using `nvim_cmp`.
         -- Default: `true`.
         -- nvim_cmp = true,
-        -- nvim_cmp = false,
+        nvim_cmp = false,
 
-        -- Not working in `epwalsh/obsidian.nvim`.
-        -- blink = true,
+        -- Not working in `epwalsh/obsidian.nvim`, only in fork `obsidian-nvim/obsidian.nvim`.
+        -- `obsidian-nvim/obsidian.nvim` and `epwalsh/obsidian.nvim` are pretty
+        -- much the same, both slow on Obsidian completions and serves duplicate comnpletion items.
+        blink = true,
 
         -- Trigger completion at `x` chars.
         -- Default: `2`.
@@ -200,13 +202,13 @@ return {
       -- - "prepend_note_path", e.g. '[[foo-bar.md|Foo Bar]]'
       -- - "use_path_only", e.g. '[[foo-bar.md]]'
       -- Or: Use function that takes table of options and returns string, e.g.:
-      -- wiki_link_func = function(opts)
-      --   return require("obsidian.util").wiki_link_id_prefix(opts)
-      -- end,
-
-      prepend_note_id = true,
-      prepend_note_path = false,
-      use_path_only = false,
+      -- prepend_note_id = true,
+      -- prepend_note_path = false,
+      -- use_path_only = false,
+      -- use_path_only = true,
+      wiki_link_func = function(opts)
+        return require("obsidian.util").wiki_link_id_prefix(opts)
+      end,
 
       -- Customize how markdown links are formatted.
       markdown_link_func = function(opts)
@@ -508,27 +510,27 @@ return {
       },
     },
   },
-  {
-    "saghen/blink.cmp",
-    dependencies = { "saghen/blink.compat" },
-    opts = {
-      sources = {
-        default = { "obsidian", "obsidian_new", "obsidian_tags" },
-        providers = {
-          obsidian = {
-            name = "obsidian",
-            module = "blink.compat.source",
-          },
-          obsidian_new = {
-            name = "obsidian_new",
-            module = "blink.compat.source",
-          },
-          obsidian_tags = {
-            name = "obsidian_tags",
-            module = "blink.compat.source",
-          },
-        },
-      },
-    },
-  },
+  -- {
+  --   "saghen/blink.cmp",
+  --   dependencies = { "saghen/blink.compat" },
+  --   opts = {
+  --     sources = {
+  --       default = { "obsidian", "obsidian_new", "obsidian_tags" },
+  --       providers = {
+  --         obsidian = {
+  --           name = "obsidian",
+  --           module = "blink.compat.source",
+  --         },
+  --         obsidian_new = {
+  --           name = "obsidian_new",
+  --           module = "blink.compat.source",
+  --         },
+  --         obsidian_tags = {
+  --           name = "obsidian_tags",
+  --           module = "blink.compat.source",
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
 }
