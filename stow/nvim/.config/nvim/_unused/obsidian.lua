@@ -10,7 +10,7 @@
 
 return {
   {
-    "epwalsh/obsidian.nvim",
+    "obsidian-nvim/obsidian.nvim",
     -- Use latest release instead of latest commit.
     version = "*",
     lazy = true,
@@ -117,10 +117,9 @@ return {
         -- Enables completion using `nvim_cmp`.
         -- Default: `true`.
         -- nvim_cmp = true,
-        -- nvim_cmp = false,
+        nvim_cmp = false,
 
-        -- Not working in `epwalsh/obsidian.nvim`.
-        -- blink = true,
+        blink = true,
 
         -- Trigger completion at `x` chars.
         -- Default: `2`.
@@ -504,29 +503,6 @@ return {
           { name = "Short Break", duration = "5m" },
           { name = "Work", duration = "25m" },
           { name = "Long Break", duration = "15m" },
-        },
-      },
-    },
-  },
-  {
-    "saghen/blink.cmp",
-    dependencies = { "saghen/blink.compat" },
-    opts = {
-      sources = {
-        default = { "obsidian", "obsidian_new", "obsidian_tags" },
-        providers = {
-          obsidian = {
-            name = "obsidian",
-            module = "blink.compat.source",
-          },
-          obsidian_new = {
-            name = "obsidian_new",
-            module = "blink.compat.source",
-          },
-          obsidian_tags = {
-            name = "obsidian_tags",
-            module = "blink.compat.source",
-          },
         },
       },
     },

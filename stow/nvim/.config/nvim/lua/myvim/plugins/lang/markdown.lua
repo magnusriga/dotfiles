@@ -92,6 +92,10 @@ return {
     end,
   },
 
+  -- NOTE: Use `obsidian.nvim` because:
+  -- - Links created with completions from `obsidian.nvim` work in Obsidian application.
+  -- - `Obsidian***`: Nice way to create notes with templates and frontmatter.
+  -- - Keep `marksman` for diagnostics, etc.
   {
     "neovim/nvim-lspconfig",
     opts = {

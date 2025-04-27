@@ -768,11 +768,11 @@ return {
       vim.list_extend(Keys, {
         -- `grr`: Built-in key binding for `vim.lsp.buf.references()`, here overwriting it with same behaviour,
         --        except using `fzf-lua` instead of default quickfix list when multiple results.
-        { "grr", "<cmd>FzfLua lsp_references jump_to_single_result=true ignore_current_line=true<cr>", desc = "References", nowait = true },
+        { "grr", "<cmd>FzfLua lsp_references jump1 ignore_current_line=true<cr>", desc = "References", nowait = true },
 
         -- `gri`: Built-in key binding for `vim.lsp.buf.implementation()`, here overwriting it with same behaviour,
         --        except using `fzf-lua` instead of default quickfix list when multiple results.
-        { "gri", "<cmd>FzfLua lsp_implementations jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Implementation" },
+        { "gri", "<cmd>FzfLua lsp_implementations jump1 ignore_current_line=true<cr>", desc = "Goto Implementation" },
 
         -- `gO` : Built-in key binding for `vim.lsp.buf.document_symbol()`, here overwriting it with same behaviour,
         --        except using `fzf-lua` instead of default quickfix list.
@@ -781,10 +781,10 @@ return {
 
         -- `gd` : Built-in key binding to go to local declaration, mostly useful in `C`,
         --        here overwriting it with almost same behaviour, i.e. `vim.lsp.buf.definition()`.
-        { "gd", "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto Definition", has = "definition" },
+        { "gd", "<cmd>FzfLua lsp_definitions jump1 ignore_current_line=true<cr>", desc = "Goto Definition", has = "definition" },
 
         -- `gry`: Not built-in key binding, thus no overwriting.
-        { "gry", "<cmd>FzfLua lsp_typedefs jump_to_single_result=true ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
+        { "gry", "<cmd>FzfLua lsp_typedefs jump1 ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
 
       -- LSP symbols, set on `lsp.keymaps` so `which-key` uses dynamic icon based on filetype.
       { "<leader>ss", function() require("fzf-lua").lsp_document_symbols({ regex_filter = symbols_filter, }) end, desc = "LSP Symbols", has = "documentSymbol" },

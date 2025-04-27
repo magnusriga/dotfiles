@@ -54,11 +54,18 @@ return {
     -- `opts_extend`: Takes each dot-separated word and uses it as key in `opts`,
     -- mergining that table's values with values from same table in parent spec.
     opts_extend = {
+      "sources.completion.enabled_providers",
+      "sources.compat",
       "sources.default",
     },
 
     dependencies = {
       "rafamadriz/friendly-snippets",
+      {
+        "saghen/blink.compat",
+        opts = {},
+        version = not vim.g.myvim_blink_main and "*",
+      },
       -- "onsails/lspkind-nvim", -- Prefer own icons.
       -- "xzbdmw/colorful-menu.nvim", -- Does not work well, avoid.
       "Kaiser-Yang/blink-cmp-git",
@@ -81,123 +88,6 @@ return {
         expand = function(snippet)
           return MyVim.cmp.expand(snippet)
         end,
-      },
-
-      fuzzy = {
-        implementation = "prefer_rust_with_warning",
-
-        -- -------------------------------
-        -- LSP completion items.
-        -- -------------------------------
-        -- 1. LSP client sends `textDocument/completion` request, with `CompletionParams`, to LSP server.
-        -- 2. LSP server responds with: `CompletionItem[]` | `CompletionList` | `null`.
-        --
-        -- Trigger characters:
-        -- - LSP client sets default trigger characters: `[a-zA-Z]`.
-        -- - LSP server can define addition trigger characters.
-        -- - JS/TS: Server typically inlcudes `.` as trigger character.
-        --
-        -- - `CompletionItem` from LSP server:
-        --   - `label`:
-        --     - Text to display in completion menu.
-        --     - By default, used as `insertText` (see below).
-        --   - `labelDetails`:
-        --     - `detail`     : If defined, insert after `label`, when selecting item.
-        --     - `description`: If defined, insert after `labelDetails.detail`, when selecting item.
-        --   - `kind`:
-        --     - Kind of completion item.
-        --     - Default kinds:
-        --       export namespace CompletionItemKind {
-        --         export const Text = 1;
-        --         export const Method = 2;
-        --         export const Function = 3;
-        --         export const Constructor = 4;
-        --         export const Field = 5;
-        --         export const Variable = 6;
-        --         export const Class = 7;
-        --         export const Interface = 8;
-        --         export const Module = 9;
-        --         export const Property = 10;
-        --         export const Unit = 11;
-        --         export const Value = 12;
-        --         export const Enum = 13;
-        --         export const Keyword = 14;
-        --         export const Snippet = 15;
-        --         export const Color = 16;
-        --         export const File = 17;
-        --         export const Reference = 18;
-        --         export const Folder = 19;
-        --         export const EnumMember = 20;
-        --         export const Constant = 21;
-        --         export const Struct = 22;
-        --         export const Event = 23;
-        --         export const Operator = 24;
-        --         export const TypeParameter = 25;
-        --       }
-        --     - `sortText`:
-        --       - String used to sort this item against other items.
-        --       - If not defined, `label` is used.
-        --     - `filterText`:
-        --       - String used to filter this item against other items, when typing in IDE.
-        --       - If not defined, `label` is used.
-        --     - `insertText`:
-        --       - String inserted into document when this completion item is selected.
-        --       - If not defined, `label` is used.
-        --     - `insertTextFormat`:
-        --        - Defines if item is plain text or snippet.
-        --     - Several others.
-
-        -- -------------------------------
-        -- `blink.cmp` > `fuzzy.sorts`.
-        -- -------------------------------
-        -- - Controls sorting of completion items.
-        -- - If one entry of `sorts` returns `nil`, `blink.cmp` continues to next entry.
-        -- - Accepts:
-        --   - Built-in strings.
-        --   - Function(s): Works like Lua's `table.sort`.
-        -- - `exact`:
-        --   - Sort by exact match.
-        --   - Case-sensitive.
-        -- - `score`:
-        --   - Sort by fuzzy matching score.
-        --   - Determined by `blink.nvim`.
-        --   - Uses: Frequency (previous select count) | proximity.
-        -- - `sort_text`:
-        --   - Sort by `sortText` property from LSP.
-        --   - `sortText`: Returned by LSP server as part of `textDocument/completion` response.
-        --   - `sortText`: String used when comparing this item with other items.
-        --   - When `sortText` omitted from LSP response, `label` used for sorting.
-        -- - `label`:
-        --   - Sort by `label` field from completion item, e.g. from LSP server.
-        --   - Deprioritizes items with leading `_`.
-        -- - `kind`:
-        --   - Sort by numeric `kind` field, defined in LSP (protocol).
-        --   - See list above.
-        --
-        -- - NOTE:Entry in `sorts` returns `nil` if two items have same weight,
-        --        thus next entry in `sorts` determines sorting among items with equal
-        --        parent weight.
-        sorts = {
-          -- Always prioritize exact matches, case-sensitive.
-          -- "exact",
-
-          -- Pass function for custom behavior.
-          -- function(item_a, item_b)
-          --   return item_a.score > item_b.score
-          -- end,
-
-          -- Sort by Fuzzy matching score.
-          "score",
-
-          -- Sort by `sortText` field from LSP server, defaults to `label`.
-          -- `sortText` often differs from `label`.
-          "sort_text",
-
-          -- Sort by `label` field from LSP server, i.e. name in completion menu.
-          -- Needed to sort results from LSP server by `label`,
-          -- even though protocol specifies default value of `sortText` is `label`.
-          "label",
-        },
       },
 
       appearance = {
@@ -424,6 +314,124 @@ return {
         -- },
       },
 
+      fuzzy = {
+        implementation = "prefer_rust_with_warning",
+
+        -- -------------------------------
+        -- LSP completion items.
+        -- -------------------------------
+        -- 1. LSP client sends `textDocument/completion` request, with `CompletionParams`, to LSP server.
+        -- 2. LSP server responds with: `CompletionItem[]` | `CompletionList` | `null`.
+        --
+        -- Trigger characters:
+        -- - LSP client sets default trigger characters: `[a-zA-Z]`.
+        -- - LSP server can define addition trigger characters.
+        -- - JS/TS: Server typically inlcudes `.` as trigger character.
+        --
+        -- - `CompletionItem` from LSP server:
+        --   - `label`:
+        --     - Text to display in completion menu.
+        --     - By default, used as `insertText` (see below).
+        --   - `labelDetails`:
+        --     - `detail`     : If defined, insert after `label`, when selecting item.
+        --     - `description`: If defined, insert after `labelDetails.detail`, when selecting item.
+        --   - `kind`:
+        --     - Kind of completion item.
+        --     - Default kinds:
+        --       export namespace CompletionItemKind {
+        --         export const Text = 1;
+        --         export const Method = 2;
+        --         export const Function = 3;
+        --         export const Constructor = 4;
+        --         export const Field = 5;
+        --         export const Variable = 6;
+        --         export const Class = 7;
+        --         export const Interface = 8;
+        --         export const Module = 9;
+        --         export const Property = 10;
+        --         export const Unit = 11;
+        --         export const Value = 12;
+        --         export const Enum = 13;
+        --         export const Keyword = 14;
+        --         export const Snippet = 15;
+        --         export const Color = 16;
+        --         export const File = 17;
+        --         export const Reference = 18;
+        --         export const Folder = 19;
+        --         export const EnumMember = 20;
+        --         export const Constant = 21;
+        --         export const Struct = 22;
+        --         export const Event = 23;
+        --         export const Operator = 24;
+        --         export const TypeParameter = 25;
+        --       }
+        --     - `sortText`:
+        --       - String used to sort this item against other items.
+        --       - If not defined, `label` is used.
+        --     - `filterText`:
+        --       - String used to filter this item against other items, when typing in IDE.
+        --       - If not defined, `label` is used.
+        --     - `insertText`:
+        --       - String inserted into document when this completion item is selected.
+        --       - If not defined, `label` is used.
+        --     - `insertTextFormat`:
+        --        - Defines if item is plain text or snippet.
+        --     - Several others.
+
+        -- -------------------------------
+        -- `blink.cmp` > `fuzzy.sorts`.
+        -- -------------------------------
+        -- - Controls sorting of completion items.
+        -- - If one entry of `sorts` returns `nil`, `blink.cmp` continues to next entry.
+        -- - Accepts:
+        --   - Built-in strings.
+        --   - Function(s): Works like Lua's `table.sort`.
+        -- - `exact`:
+        --   - Sort by exact match.
+        --   - Case-sensitive.
+        -- - `score`:
+        --   - Sort by fuzzy matching score.
+        --   - Determined by `blink.nvim`.
+        --   - Uses: Frequency (previous select count) | proximity.
+        -- - `sort_text`:
+        --   - Sort by `sortText` property from LSP.
+        --   - `sortText`: Returned by LSP server as part of `textDocument/completion` response.
+        --   - `sortText`: String used when comparing this item with other items.
+        --   - When `sortText` omitted from LSP response, `label` used for sorting.
+        -- - `label`:
+        --   - Sort by `label` field from completion item, e.g. from LSP server.
+        --   - Deprioritizes items with leading `_`.
+        -- - `kind`:
+        --   - Sort by numeric `kind` field, defined in LSP (protocol).
+        --   - See list above.
+        --
+        -- - NOTE:Entry in `sorts` returns `nil` if two items have same weight,
+        --        thus next entry in `sorts` determines sorting among items with equal
+        --        parent weight.
+
+        sorts = {
+          -- Always prioritize exact matches, case-sensitive.
+          -- "exact",
+
+          -- Pass function for custom behavior.
+          -- function(item_a, item_b)
+          --   return item_a.score > item_b.score
+          -- end,
+
+          -- Sort by Fuzzy matching score.
+          "score",
+
+          -- Sort by `sortText` field from LSP server, defaults to `label`.
+          -- `sortText` often differs from `label`.
+          "sort_text",
+
+          -- Sort by `label` field from LSP server, i.e. name in completion menu.
+          -- Needed to sort results from LSP server by `label`,
+          -- even though protocol specifies default value of `sortText` is `label`.
+          "label",
+        },
+      },
+
       -- Experimental signature help support.
       signature = {
         enabled = true,
@@ -572,6 +580,19 @@ return {
     },
     ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
     config = function(_, opts)
+      -- Setup compat sources.
+      local enabled = opts.sources.default
+      for _, source in ipairs(opts.sources.compat or {}) do
+        opts.sources.providers[source] = vim.tbl_deep_extend(
+          "force",
+          { name = source, module = "blink.compat.source" },
+          opts.sources.providers[source] or {}
+        )
+        if type(enabled) == "table" and not vim.tbl_contains(enabled, source) then
+          table.insert(enabled, source)
+        end
+      end
+
       -- - `plugins/blink.lua` (below):
       --   `<Tab>` mapped to call each `MyVim.action` function, in sequence.
       --
@@ -611,6 +632,9 @@ return {
           }
         end
       end
+
+      -- Unset custom prop to pass `blink.cmp` validation.
+      opts.sources.compat = nil
 
       -- Check if symbol kinds must be overwritten,
       -- needed by `ai/copilot.lua`.
