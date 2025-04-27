@@ -271,7 +271,8 @@ vim.cmd([[
   highlight! link @markup.italic.markdown_inline @markup.italic
 
   highlight! link RenderMarkdownLink @markup.link.label
-  highlight @markup.link.label guifg=#65bcff
+  highlight @markup.link.label guifg=#589ed7
+  " highlight @markup.link.label guifg=#65bcff
 
   highlight RenderMarkdownTableRow guifg=#ff966c
 

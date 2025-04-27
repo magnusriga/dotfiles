@@ -88,6 +88,10 @@ return {
           return linter and not (type(linter) == "table" and linter.condition and not linter.condition(ctx))
         end, names)
 
+        -- Disable virtual text for `markdownlint`.
+        -- local ns = require("lint").get_namespace("markdownlint")
+        -- vim.diagnostic.config({ virtual_text = false }, ns)
+
         -- Run linters.
         if #names > 0 then
           lint.try_lint(names)

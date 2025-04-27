@@ -73,7 +73,14 @@ return {
       },
     },
     init = function()
-      -- Disable diagnostics for markdown files, re-enabled with `<leader>ud`.
+      -- local markdownlint = require("lint").linters.markdownlint
+      -- markdownlint.args = {
+      --   "-q",
+      --   -- <- Add a new parameter here
+      --   "--report=json",
+      --   "-",
+      -- }
+      --   -- Disable diagnostics for markdown files, re-enabled with `<leader>ud`.
       vim.api.nvim_create_autocmd("FileType", {
         group = vim.api.nvim_create_augroup("disable-diagnostics", { clear = true }),
         callback = function()
