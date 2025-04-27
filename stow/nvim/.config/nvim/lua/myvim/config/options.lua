@@ -416,7 +416,7 @@ opt.termguicolors = true
 -- `wrapmargin` is relative to screen width, whereas `textwidth` is absolute.
 -- `wrapmargin` is not used when `textwidth` is set.
 -- `textwidth` only applies to newly inserted text, not existing text.
-opt.textwidth = 90
+opt.textwidth = 80
 
 -- Time in milliseconds to wait for mapped sequence to complete.
 -- Lower than default, 1000, to quickly trigger which-key.
