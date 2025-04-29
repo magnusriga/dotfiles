@@ -106,3 +106,127 @@ require("myvim.config").setup()
 -- VeryLazy event is called when done.
 ---------------------------------------------
 require("myvim.util.lazy-plugins")
+
+-- =============================================
+-- Minimal repo.
+-- - Comment in above, and comment out below.
+-- - NOTE: Only run from $HOME, since it clones into `<cwd>/.repro`.
+-- =============================================
+-- vim.env.LAZY_STDPATH = ".repro"
+-- load(vim.fn.system("curl -s https://raw.githubusercontent.com/folke/lazy.nvim/main/bootstrap.lua"))()
+--
+-- vim.fn.mkdir(".repro/vault", "p")
+--
+-- vim.o.conceallevel = 2
+--
+-- local plugins = {
+--   {
+--     "obsidian-nvim/obsidian.nvim",
+--     dependencies = { "nvim-lua/plenary.nvim" },
+--     opts = {
+--       completion = {
+--         blink = true,
+--         nvim_cmp = false,
+--       },
+--       workspaces = {
+--         {
+--           name = "test",
+--           -- path = vim.fs.joinpath(vim.uv.cwd(), ".repro", "vault"),
+--           path = "~/notes/vaults/personal",
+--         },
+--       },
+--     },
+--   },
+--
+--   -- **Choose your renderer**
+--   { "MeanderingProgrammer/render-markdown.nvim", dependencies = { "echasnovski/mini.icons" }, opts = {} },
+--   -- { "OXY2DEV/markview.nvim", lazy = false },
+--
+--   -- **Choose your picker**
+--   "nvim-telescope/telescope.nvim",
+--   -- "folke/snacks.nvim",
+--   -- "ibhagwan/fzf-lua",
+--   -- "echasnovski/mini.pick",
+--
+--   {
+--     "saghen/blink.cmp",
+--     opts = {
+--       fuzzy = { implementation = "lua" }, -- no need to build binary
+--       keymap = {
+--         preset = "default",
+--       },
+--     },
+--   },
+-- }
+--
+-- require("lazy.minit").repro({ spec = plugins })
+--
+-- vim.cmd("checkhealth obsidian")
+
+-- =============================================
+-- Testing.
+-- =============================================
+-- local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+-- local lazypath = "/tmp/lazy/lazy.nvim"
+-- if not (vim.uv or vim.loop).fs_stat(lazypath) then
+--   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+--   local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+--   if vim.v.shell_error ~= 0 then
+--     vim.api.nvim_echo({
+--       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+--       { out, "WarningMsg" },
+--       { "\nPress any key to exit..." },
+--     }, true, {})
+--     vim.fn.getchar()
+--     os.exit(1)
+--   end
+-- end
+-- vim.opt.rtp:prepend(lazypath)
+--
+-- require('config').setup()
+--
+-- vim.lsp.enable({'luals'})
+--
+-- require("lazy").setup({
+--   spec = {
+--     -- add LazyVim and import its plugins
+--     -- { "LazyVim/LazyVim", import = "lazyvim.plugins" },
+--     -- import/override with your plugins
+--     { import = "plugins" },
+--     -- Import other plugins, from sub-folders.
+--     { import = "myvim/plugins/util" },
+--     { import = "myvim/plugins/dap" },
+--     { import = "myvim/plugins/lang" },
+--     { import = "myvim/plugins/ai" },
+--   },
+--   root = "/tmp/lazy", -- directory where plugins will be installed
+--   defaults = {
+--     -- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
+--     -- If you know what you're doing, you can set this to `true` to have all your custom plugins lazy-loaded by default.
+--     lazy = false,
+--     -- It's recommended to leave version=false for now, since a lot the plugin that support versioning,
+--     -- have outdated releases, which may break your Neovim install.
+--     version = false, -- always use the latest git commit
+--     -- version = "*", -- try installing the latest stable version for plugins that support semver
+--   },
+--   install = { colorscheme = { "tokyonight", "habamax" } },
+--   checker = {
+--     enabled = true, -- check for plugin updates periodically
+--     notify = false, -- notify on update
+--   }, -- automatically check for plugin updates
+--   performance = {
+--     rtp = {
+--       -- disable some rtp plugins
+--       disabled_plugins = {
+--         "gzip",
+--         -- "matchit",
+--         -- "matchparen",
+--         -- "netrwPlugin",
+--         "tarPlugin",
+--         "tohtml",
+--         "tutor",
+--         "zipPlugin",
+--       },
+--     },
+--   },
+-- })

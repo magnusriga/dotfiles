@@ -111,6 +111,9 @@ vim.g.root_lsp_ignore = { "eslint", "tailwindcss", "copilot" }
 -- Disable for buffer: `vim.b.trouble_lualine = false`.
 vim.g.trouble_lualine = true
 
+-- Template directory for new markdown files, created with `:MarkdownNewTemplate`.
+vim.g.template_dir = MyVim.root() .. "/templates"
+
 -- Used to determine icons in `Lazy` ui.
 vim.g.have_nerd_font = true
 

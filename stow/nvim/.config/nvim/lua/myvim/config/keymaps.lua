@@ -424,70 +424,221 @@ map("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 ---------------------------------
 -- map("x", "<leader>h", "gsah", { desc = "Send gsah keystrokes to selected text" })
 
+-- Function to create a new file from a template using fzf-lua
+-- Templates directory.
+local template_dir = MyVim.root() .. '/templates'
+
+-- Create new file from template.
+local function create_from_template()
+  -- Check if fzf-lua is available.
+  local ok, fzf_lua = pcall(require, 'fzf-lua')
+  if not ok then
+    vim.notify('fzf-lua is not installed', vim.log.levels.ERROR)
+    return
+  end
+
+  -- Handle template selection and file creation.
+  local function handle_template_selection(selected)
+    if not selected or #selected == 0 then
+      return
+    end
+
+    -- Get the selected template path
+    local template_path = selected[1]
+    -- vim.print(template_path)
+
+    -- Make sure template path is absolute.
+    if not vim.fn.fnamemodify(template_path, ':p') == template_path then
+      template_path = vim.fn.fnamemodify(template_dir .. '/' .. template_path, ':p')
+    end
+    
+    -- Check if template file exists before proceeding.
+    if vim.fn.filereadable(template_path) ~= 1 then
+      vim.notify('Template file not found: ' .. template_path, vim.log.levels.ERROR)
+      return
+    end
+
+    -- Prompt for the new file name
+    vim.ui.input({ prompt = 'Enter new file name: ' }, function(new_file_name)
+      if not new_file_name or new_file_name == '' then
+        vim.notify('No file name provided', vim.log.levels.WARN)
+        return
+      end
+
+      -- Expand the path for the new file
+      local new_file_path = vim.fn.expand(new_file_name)
+
+      -- Check if file already exists.
+      if vim.fn.filereadable(new_file_path) == 1 then
+        vim.notify('File already exists: ' .. new_file_path, vim.log.levels.WARN)
+        return
+      end
+
+      -- Read template content.
+      local template_content = vim.fn.readfile(template_path)
+
+      -- Create new buffer.
+      local buf = vim.api.nvim_create_buf(true, false)
+
+      -- Set buffer content with template.
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, template_content)
+
+      -- Process template placeholders.
+      local lines = vim.api.nvim_buf_get_lines(buf, 0, -1, false)
+      for i, line in ipairs(lines) do
+        -- Replace common placeholders.
+        line = line:gsub('{{title}}', vim.fn.fnamemodify(new_file_path, ':t'))
+        line = line:gsub('{{date}}', os.date('%Y-%m-%d'))
+        line = line:gsub('{{datetime}}', os.date('%Y-%m-%d %H:%M:%S'))
+        lines[i] = line
+      end
+      vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+
+      -- Write buffer to new file.
+      local success = pcall(function()
+        vim.api.nvim_buf_call(buf, function()
+          vim.cmd('write ' .. vim.fn.fnameescape(new_file_path))
+        end)
+      end)
+
+      if not success then
+        vim.notify('Failed to write file: ' .. new_file_path, vim.log.levels.ERROR)
+        vim.api.nvim_buf_delete(buf, { force = true })
+        return
+      end
+
+      -- Open newly created file.
+      vim.cmd('edit ' .. vim.fn.fnameescape(new_file_path))
+
+      -- Clean up temporary buffer.
+      vim.api.nvim_buf_delete(buf, { force = true })
+
+      vim.notify('Created new file from template: ' .. new_file_path, vim.log.levels.INFO)
+    end)
+  end
+
+  -- Use fzf-lua to select a template
+  fzf_lua.files({
+    prompt = 'Select Template> ',
+    cwd = template_dir,
+    -- file_icons = false,
+    actions = {
+      ['default'] = function(selected)
+        if selected and #selected > 0 then
+          local template_file = selected[1]
+          vim.notify("Selected template: " .. template_file, vim.log.levels.INFO)
+          
+          -- List files in the template directory to check what's actually there
+          local available_files = vim.fn.readdir(template_dir)
+          vim.notify("Available files: " .. vim.inspect(available_files), vim.log.levels.INFO)
+          
+          -- Look for a matching file in the directory (case-insensitive)
+          local matched_file = nil
+          for _, file in ipairs(available_files) do
+            -- Check if the file contains the selected template name or vice versa
+            -- This handles various icon scenarios by doing direct filename matching
+            if file:lower():find(template_file:lower(), 1, true) or 
+               template_file:lower():find(file:lower(), 1, true) then
+              matched_file = file
+              break
+            end
+          end
+          
+          if matched_file then
+            vim.notify("Matched to actual file: " .. matched_file, vim.log.levels.INFO)
+            handle_template_selection({ template_dir .. '/' .. matched_file })
+          else
+            vim.notify("Couldn't match template to any existing file", vim.log.levels.ERROR)
+          end
+        end
+      end,
+    },
+  })
+end
+
+-- Register command.
+vim.api.nvim_create_user_command('Template', function()
+ create_from_template()
+end, {
+  desc = 'Create a new file from a template'
+})
+
+--  Buffer-local keymap.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "markdown",
+  callback = function(event)
+    -- Set buffer-local keymapping (only available in lua files)
+    vim.keymap.set('n', '<leader>nt', '<cmd>Template<CR>', {
+      desc = 'Create new file from template',
+      -- silent = true
+    })
+  end,
+})
+
 ---------------------------------
 -- Auto-bullet continuation for Markdown files.
 ---------------------------------
-local base_key = "<CR>"
-local function auto_bullet()
-  -- For non-markdown files, just return base key.
-  if vim.bo.filetype ~= 'markdown' then
-    return base_key
-  end
-
-  -- Get current line.
-  local cursor = vim.api.nvim_win_get_cursor(0)
-  local line_num = cursor[1]
-  local line = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
-
-  -- Define patterns for bullets and numbered lists.
-  local bullet_pattern = "^%s*([*-])%s+(.*)$"
-  local numbered_pattern = "^%s*(%d+)%.%s+(.*)$"
-
-  -- Try to match bullet pattern.
-  local bullet_char, bullet_text = line:match(bullet_pattern)
-
-  -- For bullet points.
-  if bullet_char and bullet_text then
-    -- If text after bullet is empty, end list (return base key).
-    if bullet_text:match("^%s*$") then
-      return base_key
-    end
-
-    -- Return base key followed by bullet.
-    return base_key .. bullet_char .. " "
-  end
-
-  -- Try to match numbered list pattern.
-  local num, num_text = line:match(numbered_pattern)
-
-  -- For numbered lists.
-  if num and num_text then
-    -- If text after number is empty, end list (return base key)
-    if num_text:match("^%s*$") then
-      return base_key
-    end
-
-    -- Return CR followed by incremented number.
-    local next_num = tonumber(num) + 1
-    return base_key .. next_num .. ". "
-  end
-
-  -- Default behavior: Return base key.
-  return base_key
-end
-
--- Mappings.
-map('i', '<CR>', function()
-  base_key = "<CR>"
-  return auto_bullet()
-end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
-
-map('n', 'o', function()
-  base_key = "o"
-  return auto_bullet()
-end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
-
-map('n', 'O', function()
-  base_key = "O"
-  return auto_bullet()
-end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
+-- local base_key = "<CR>"
+-- local function auto_bullet()
+--   -- For non-markdown files, just return base key.
+--   if vim.bo.filetype ~= 'markdown' then
+--     return base_key
+--   end
+--
+--   -- Get current line.
+--   local cursor = vim.api.nvim_win_get_cursor(0)
+--   local line_num = cursor[1]
+--   local line = vim.api.nvim_buf_get_lines(0, line_num - 1, line_num, false)[1]
+--
+--   -- Define patterns for bullets and numbered lists.
+--   local bullet_pattern = "^%s*([*-])%s+(.*)$"
+--   local numbered_pattern = "^%s*(%d+)%.%s+(.*)$"
+--
+--   -- Try to match bullet pattern.
+--   local bullet_char, bullet_text = line:match(bullet_pattern)
+--
+--   -- For bullet points.
+--   if bullet_char and bullet_text then
+--     -- If text after bullet is empty, end list (return base key).
+--     if bullet_text:match("^%s*$") then
+--       return base_key
+--     end
+--
+--     -- Return base key followed by bullet.
+--     return base_key .. bullet_char .. " "
+--   end
+--
+--   -- Try to match numbered list pattern.
+--   local num, num_text = line:match(numbered_pattern)
+--
+--   -- For numbered lists.
+--   if num and num_text then
+--     -- If text after number is empty, end list (return base key)
+--     if num_text:match("^%s*$") then
+--       return base_key
+--     end
+--
+--     -- Return CR followed by incremented number.
+--     local next_num = tonumber(num) + 1
+--     return base_key .. next_num .. ". "
+--   end
+--
+--   -- Default behavior: Return base key.
+--   return base_key
+-- end
+--
+-- -- Mappings.
+-- map('i', '<CR>', function()
+--   base_key = "<CR>"
+--   return auto_bullet()
+-- end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
+--
+-- map('n', 'o', function()
+--   base_key = "o"
+--   return auto_bullet()
+-- end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })
+--
+-- map('n', 'O', function()
+--   base_key = "O"
+--   return auto_bullet()
+-- end, { expr = true, noremap = true, silent = true, desc = "Smart bullet continuation for markdown" })

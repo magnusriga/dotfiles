@@ -68,10 +68,12 @@ return {
       },
       -- "onsails/lspkind-nvim", -- Prefer own icons.
       -- "xzbdmw/colorful-menu.nvim", -- Does not work well, avoid.
+      -- "jdrupal-dev/css-vars.nvim",
       "Kaiser-Yang/blink-cmp-git",
       "Kaiser-Yang/blink-cmp-avante",
-      "disrupted/blink-cmp-conventional-commits",
-      "jdrupal-dev/css-vars.nvim",
+
+      -- WARNING: Slows down completion menu, avoid.
+      -- "disrupted/blink-cmp-conventional-commits",
 
       -- "nvim-tree/nvim-web-devicons",
     },
@@ -745,25 +747,26 @@ return {
 
   -- Completion of conventional commits, i.e. `fix`, `feat`, etc.,
   -- in filetypes `gitcommit` | `markdown`.
-  {
-    "saghen/blink.cmp",
-    opts = {
-      sources = {
-        default = { "conventional_commits" },
-        providers = {
-          conventional_commits = {
-            name = "Conventional Commits",
-            module = "blink-cmp-conventional-commits",
-            enabled = function()
-              -- Enable source for filetype: `gitcommit` | `markdown`.
-              return vim.tbl_contains({ "gitcommit", "markdown" }, vim.bo.filetype)
-            end,
-            opts = {},
-          },
-        },
-      },
-    },
-  },
+  -- WARNING: Slows down completion menu, avoid.
+  -- {
+  --   "saghen/blink.cmp",
+  --   opts = {
+  --     sources = {
+  --       default = { "conventional_commits" },
+  --       providers = {
+  --         conventional_commits = {
+  --           name = "Conventional Commits",
+  --           module = "blink-cmp-conventional-commits",
+  --           enabled = function()
+  --             -- Enable source for filetype: `gitcommit` | `markdown`.
+  --             return vim.tbl_contains({ "gitcommit", "markdown" }, vim.bo.filetype)
+  --           end,
+  --           opts = {},
+  --         },
+  --       },
+  --     },
+  --   },
+  -- },
 
   -- Completion of CSS variables.
   -- Scans project for css variables, using ripgrep, on boot.

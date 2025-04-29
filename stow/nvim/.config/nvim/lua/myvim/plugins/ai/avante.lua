@@ -67,7 +67,8 @@ return {
     opts = {
       -- Provider used in Aider mode and planning phase of Cursor Planning mode.
       -- `claude` | `openai` | `azure` | `gemini` | `cohere` | `copilot` | `string`.
-      provider = "claude",
+      -- provider = "claude",
+      provider = "gemini",
 
       -- WARNING: Since auto-suggestions are high-frequency operation and therefore expensive,
       -- currently designating it as `copilot` provider is dangerous because:
@@ -79,29 +80,48 @@ return {
       -- When `nil`, uses `Config.provider` as provider for applying phase.
       cursor_applying_provider = nil,
 
-      claude = {
-        endpoint = "https://api.anthropic.com",
-        model = "claude-3-7-sonnet-20250219",
+      ---@type AvanteSupportedProvider
+      gemini = {
+        endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
+        model = "gemini-2.0-flash",
+        -- model = "gemini-2.5-pro-preview-03-25",
         timeout = 30000,
         temperature = 0,
-        max_tokens = 4096,
-        -- temperature = 1,
-        -- max_tokens = 20000,
-
-        -- Defaults:
-        -- endpoint = "https://api.anthropic.com",
-        -- model = "claude-3-5-sonnet-20241022",
-        -- timeout = 30000, -- Timeout in milliseconds
-        -- temperature = 0,
-        -- max_tokens = 4096,
-
-        -- If model does not support tools.
-        -- disable_tools = true,
-
-        -- Unsure if these settings work.
-        -- thinking = true,
-        -- budget_tokens = 16000,
+        max_tokens = 8192,
       },
+
+      openai = {
+        endpoint = "https://api.openai.com/v1",
+        model = "gpt-4o", -- Desired model.
+        timeout = 30000, -- Timeout in milliseconds.
+        temperature = 0,
+        max_tokens = 4096,
+        -- reasoning_effort = "high" -- Supported for reasoning models (o1, etc.).
+      },
+
+      -- claude = {
+      --   endpoint = "https://api.anthropic.com",
+      --   model = "claude-3-7-sonnet-20250219",
+      --   timeout = 30000,
+      --   temperature = 1,
+      --   max_tokens = 4096,
+      --   -- temperature = 1,
+      --   -- max_tokens = 20000,
+      --
+      --   -- Defaults:
+      --   -- endpoint = "https://api.anthropic.com",
+      --   -- model = "claude-3-5-sonnet-20241022",
+      --   -- timeout = 30000, -- Timeout in milliseconds
+      --   -- temperature = 0,
+      --   -- max_tokens = 4096,
+      --
+      --   -- If model does not support tools.
+      --   -- disable_tools = true,
+      --
+      --   -- Unsure if these settings work.
+      --   -- thinking = true,
+      --   -- budget_tokens = 16000,
+      -- },
       -- provider = "openai",
       -- openai = {
       --   endpoint = "https://api.openai.com/v1",
