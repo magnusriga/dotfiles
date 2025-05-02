@@ -64,6 +64,16 @@ if [ ! -d "$GLOW_HOME" ]; then
   mkdir -p "$GLOW_HOME"
 fi
 
+export MCPHUB_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/mcphub"
+if [ ! -d "$MCPHUB_HOME" ]; then
+  mkdir -p "$MCPHUB_HOME"
+fi
+
+export MARKSMAN_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/marksman"
+if [ ! -d "$MARKSMAN_HOME" ]; then
+  mkdir -p "$MARKSMAN_HOME"
+fi
+
 # Directory for delta repo, with themes.
 # No need, let git clone create directory.
 # export DELTA_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/delta"

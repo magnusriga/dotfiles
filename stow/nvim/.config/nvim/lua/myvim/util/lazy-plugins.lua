@@ -362,6 +362,8 @@ require("lazy").setup({
     { import = "myvim/plugins/dap" },
     { import = "myvim/plugins/lang" },
     { import = "myvim/plugins/ai" },
+    -- Delayed plugins are loaded last, as they require other specific pluings to be loaded first.
+    { import = "myvim/plugins/delayed" },
   },
   -- Load Project specific `.lazy.lua` spec files, always added at end of spec.
   local_spec = true,

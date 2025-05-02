@@ -107,6 +107,14 @@ return {
 
   -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
   {
+    dir = "~/dev/nvim-plugins/markdown-shortcuts.nvim",
+    opts = {
+      picker = "snacks",
+    },
+  },
+
+  -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
+  {
     "iamcco/markdown-preview.nvim",
     cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
     build = "cd app && yarn install",

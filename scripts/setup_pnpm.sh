@@ -15,7 +15,8 @@ esac
 # Install global pnpm packages.
 pnpm add -g node-gyp node-gyp-build \
   neovim \
-  yarn
+  yarn \
+  mcp-hub@latest
 
 pnpm --allow-build=spawn-sync \
   --allow-build=tree-sitter \

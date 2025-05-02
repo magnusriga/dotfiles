@@ -10,7 +10,7 @@
 
 return {
   {
-    "obsidian-nvim/obsidian.nvim",
+    dir = vim.fn.expand("~/dev/nvim-plugins/obsidian.nvim"),
     -- Use latest release instead of latest commit.
     version = "*",
     lazy = true,
@@ -127,6 +127,9 @@ return {
         -- Trigger completion at `x` chars.
         -- Default: `2`.
         min_chars = 2,
+
+        match_case = false,
+        -- match_case = true,
       },
 
       -- Default key mappings.

@@ -6,6 +6,7 @@
 --   LSP client config, so those capabilities are communicated to every used language server.
 -- - See: `https://cmp.saghen.dev/installation`.
 -- - Enabled by adding `blink.cmp` to `dependencies` of `nvim-lspconfig`: `plugins/lsp/init.lua`.
+-- - To make sorting work: `fuzzy.implementation = 'lua'`.
 -- ====================================
 
 -- ====================================
@@ -37,7 +38,8 @@
 -- ====================================
 
 -- Build blink from source, i.e. main branch, to keep up with latest changes.
-vim.g.myvim_blink_main = true
+-- vim.g.myvim_blink_main = true
+vim.g.myvim_blink_main = false
 
 return {
   {
@@ -317,6 +319,8 @@ return {
       },
 
       fuzzy = {
+        -- NOTE: To make sorting work: `fuzzy.implementation = 'lua'`.
+        -- implementation = "lua",
         implementation = "prefer_rust_with_warning",
 
         -- -------------------------------
@@ -411,27 +415,51 @@ return {
         --        thus next entry in `sorts` determines sorting among items with equal
         --        parent weight.
 
-        sorts = {
-          -- Always prioritize exact matches, case-sensitive.
-          -- "exact",
+        -- Boost score of most recently/frequently used items.
+        -- Note: Does not apply when using Lua implementation.
+        -- Default: `true`.
+        -- use_frecency = false,
 
-          -- Pass function for custom behavior.
-          -- function(item_a, item_b)
-          --   return item_a.score > item_b.score
-          -- end,
+        -- Boosts score of items matching nearby words.
+        -- Note: Does not apply when using Lua implementation.
+        -- Default: `true`.
+        -- use_proximity = false,
 
-          -- Sort by Fuzzy matching score.
-          "score",
+        -- UNSAFE!! When enabled, disables lock and fsync when writing to frecency database.
+        -- Should only be used on unsupported platforms (i.e. alpine termux).
+        -- Note: Does not apply when using Lua implementation.
+        -- Default: `false`.
+        -- use_unsafe_no_lock = false,
 
-          -- Sort by `sortText` field from LSP server, defaults to `label`.
-          -- `sortText` often differs from `label`.
-          "sort_text",
+        -- sorts = {
+        -- Always prioritize exact matches, case-sensitive.
+        -- "exact",
 
-          -- Sort by `label` field from LSP server, i.e. name in completion menu.
-          -- Needed to sort results from LSP server by `label`,
-          -- even though protocol specifies default value of `sortText` is `label`.
-          "label",
-        },
+        -- Pass function for custom behavior.
+        -- function(item_a, item_b)
+        --   return item_a.score > item_b.score
+        -- end,
+
+        -- Sort snippets last.
+        -- function(a, b)
+        --   if (a.kind == nil or b.kind == nil) or (a.kind == b.kind) then
+        --     return
+        --   end
+        --   return b.kind == 15
+        -- end,
+
+        -- Sort by Fuzzy matching score.
+        -- "score",
+
+        -- Sort by `sortText` field from LSP server, defaults to `label`.
+        -- `sortText` often differs from `label`.
+        -- "sort_text",
+
+        -- Sort by `label` field from LSP server, i.e. name in completion menu.
+        -- Needed to sort results from LSP server by `label`,
+        -- even though protocol specifies default value of `sortText` is `label`.
+        -- "label",
+        -- },
       },
 
       -- Experimental signature help support.

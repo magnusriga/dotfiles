@@ -67,8 +67,8 @@ return {
     opts = {
       -- Provider used in Aider mode and planning phase of Cursor Planning mode.
       -- `claude` | `openai` | `azure` | `gemini` | `cohere` | `copilot` | `string`.
-      -- provider = "claude",
-      provider = "gemini",
+      provider = "claude",
+      -- provider = "gemini",
 
       -- WARNING: Since auto-suggestions are high-frequency operation and therefore expensive,
       -- currently designating it as `copilot` provider is dangerous because:
@@ -81,15 +81,16 @@ return {
       cursor_applying_provider = nil,
 
       ---@type AvanteSupportedProvider
-      gemini = {
-        endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
-        model = "gemini-2.0-flash",
-        -- model = "gemini-2.5-pro-preview-03-25",
-        timeout = 30000,
-        temperature = 0,
-        max_tokens = 8192,
-      },
+      -- gemini = {
+      --   endpoint = "https://generativelanguage.googleapis.com/v1beta/models",
+      --   model = "gemini-2.0-flash",
+      --   -- model = "gemini-2.5-pro-preview-03-25",
+      --   timeout = 30000,
+      --   temperature = 0,
+      --   max_tokens = 8192,
+      -- },
 
+      ---@type AvanteSupportedProvider
       openai = {
         endpoint = "https://api.openai.com/v1",
         model = "gpt-4o", -- Desired model.

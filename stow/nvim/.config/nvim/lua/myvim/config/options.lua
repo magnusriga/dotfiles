@@ -46,6 +46,24 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
 ---------------------------------------------
+-- AI variables.
+---------------------------------------------
+-- CodeCompanion.
+---------------------------------------------
+-- `vim.g.codecompanion_auto_tool_mode`
+-- - Automatically approves any tool use, instead of prompting user.
+-- - Disables diffs.
+-- - Automatically saves buffers agent has edited.
+-- - `gta`: Toggles same feature in chat buffer.
+vim.g.codecompanion_auto_tool_mode = true
+
+---------------------------------------------
+-- MCPHub.
+---------------------------------------------
+-- Auto approve MCPHub commands, e.g. file CRUD commands.
+vim.g.mcphub_auto_approve = true
+
+---------------------------------------------
 -- Miscellaneous variables.
 ---------------------------------------------
 -- Disable auto format on save.
