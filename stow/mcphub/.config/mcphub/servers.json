@@ -1,1 +1,20 @@
-{"mcpServers":[]}
+{
+  "nativeMCPServers": [
+    
+  ],
+  "mcpServers": {
+    "0": {
+      "disabled_tools": [
+        
+      ],
+      "disabled": true
+    },
+    "1": {
+      "command": "node",
+      "args": [
+        "/home/nfu/.mcphub/servers/fetch-mcp/dist/index.js"
+      ],
+      "name": "github.com/zcaceres/fetch-mcp"
+    }
+  }
+}

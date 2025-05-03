@@ -29,10 +29,12 @@ return {
       },
       -- Prefer formatting with `pretter` and linting with `markdownlint`.
       formatters_by_ft = {
-        -- ["markdown"] = { "prettierd", "markdownlint-cli2", "markdown-toc" },
-        -- ["markdown.mdx"] = { "prettierd", "markdownlint-cli2", "markdown-toc" },
-        ["markdown"] = { "prettierd", "markdownlint", "markdown-toc" },
-        ["markdown.mdx"] = { "prettierd", "markdownlint", "markdown-toc" },
+        ["markdown"] = { "markdownlint-cli2", "markdown-toc" },
+        ["markdown.mdx"] = { "markdownlint-cli2", "markdown-toc" },
+        -- ["markdown"] = { "prettier", "markdownlint", "markdown-toc" },
+        -- ["markdown.mdx"] = { "prettier", "markdownlint", "markdown-toc" },
+        -- ["markdown"] = { "prettierd", "markdownlint", "markdown-toc" },
+        -- ["markdown.mdx"] = { "prettierd", "markdownlint", "markdown-toc" },
       },
     },
   },
@@ -40,7 +42,7 @@ return {
   {
     "williamboman/mason.nvim",
     -- opts = { ensure_installed = { "markdownlint-cli2", "markdown-toc" } },
-    opts = { ensure_installed = { "markdownlint", "markdown-toc" } },
+    opts = { ensure_installed = { "markdownlint-cli2", "markdownlint", "markdown-toc" } },
   },
 
   -- Prefer `nvim-lint`.
@@ -72,24 +74,24 @@ return {
         markdown = { "markdownlint" },
       },
     },
-    init = function()
-      -- local markdownlint = require("lint").linters.markdownlint
-      -- markdownlint.args = {
-      --   "-q",
-      --   -- <- Add a new parameter here
-      --   "--report=json",
-      --   "-",
-      -- }
-      --   -- Disable diagnostics for markdown files, re-enabled with `<leader>ud`.
-      vim.api.nvim_create_autocmd("FileType", {
-        group = vim.api.nvim_create_augroup("disable-diagnostics", { clear = true }),
-        callback = function()
-          if vim.bo.filetype == "markdown" then
-            vim.diagnostic.enable(false)
-          end
-        end,
-      })
-    end,
+    -- init = function()
+    -- local markdownlint = require("lint").linters.markdownlint
+    -- markdownlint.args = {
+    --   "-q",
+    --   -- <- Add a new parameter here
+    --   "--report=json",
+    --   "-",
+    -- }
+    --   -- Disable diagnostics for markdown files, re-enabled with `<leader>ud`.
+    -- vim.api.nvim_create_autocmd("FileType", {
+    --   group = vim.api.nvim_create_augroup("disable-diagnostics", { clear = true }),
+    --   callback = function()
+    --     if vim.bo.filetype == "markdown" then
+    --       vim.diagnostic.enable(false)
+    --     end
+    --   end,
+    -- })
+    -- end,
   },
 
   -- NOTE: Use `obsidian.nvim` because:

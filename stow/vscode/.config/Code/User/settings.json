@@ -1,0 +1,1139 @@
+{
+  // ============================================================
+  // Default settings for all properties:
+  // ============================================================
+  // https://code.visualstudio.com/docs/getstarted/settings#_default-settings
+
+  // ============================================================
+  // ============================================================
+
+  // ============================================================
+  // VSCODE BASIC SETTINGS
+  // ============================================================
+
+  "search.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/node_modules": true,
+    "**/.storybook-static": true,
+    "**/.next": true
+  },
+
+  "debug.javascript.defaultRuntimeExecutable": {
+    "pwa-node": "node"
+  },
+
+  "remote.autoForwardPortsSource": "hybrid",
+
+  // ============================================================
+  // LANGUAGE SETTINGS
+  // ============================================================
+
+  // Enables or disables all (s)css validations (default: true)
+  "css.validate": true,
+  "scss.validate": true,
+
+  // Consumes resources, so turn off.
+  "typescript.tsserver.log": "off",
+
+  // Enable/disable automatic updating of import paths when you rename or move a file in VS Code.
+  //  - prompt (default): Prompt on each rename.
+  //  - always: Always update paths automatically.
+  //  - never: Never rename paths and don't prompt.
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "prompt",
+
+  // ============================================================
+  // VSCODE BASIC SETTINGS: IDE FORMATTING
+  // ============================================================
+
+  // vscode color theme.
+  // Previous theme: "Default Dark+"
+  "workbench.colorTheme": "One Dark Pro Monokai Darker",
+
+  // vscode icon theme.
+  "workbench.iconTheme": "material-icon-theme",
+
+  // Workbench Color Customization
+  "workbench.colorCustomizations": {
+    // "editorError.foreground": "#ffef0f",
+    // "editorWarning.foreground": "#3777ff"
+    "editorError.foreground": "#ff2929",
+    "editorWarning.foreground": "#ffef0f",
+    "editor.background": "#121212",
+    "sideBar.background": "#181A1F",
+
+    "tab.activeBackground": "#282c34",
+    "tab.activeBorder": "#d19a66",
+    "activityBar.background": "#0A0B0E",
+
+    // "terminal.ansiBlack": "#666666",
+    "terminal.ansiRed": "#DA6771",
+    "terminal.ansiGreen": "#4EB071",
+    "terminal.ansiYellow": "#fff099",
+    "terminal.ansiBlue": "#399EF4",
+    // "terminal.ansiMagenta": "#B168DF",
+    "terminal.ansiCyan": "#21C5C7",
+    "terminal.ansiWhite": "#efefef",
+    // "terminal.ansiBrightBlack": "#666666",
+    "terminal.ansiBrightRed": "#DA6771",
+    "terminal.ansiBrightGreen": "#4EB071",
+    "terminal.ansiBrightYellow": "#fff099",
+    "terminal.ansiBrightBlue": "#399EF4",
+    // "terminal.ansiBrightMagenta": "#B168DF",
+    "terminal.ansiBrightCyan": "#21C5C7",
+    "terminal.ansiBrightWhite": "#efefef",
+    "terminal.foreground": "#efefef"
+    // "terminal.background": "#181e29",
+    // "terminalCursor.background": "#ff0000",
+    // "terminalCursor.foreground": "#ff0000",
+    // "terminal.selectionBackground": "#ff0000",
+
+    // Uncomment for green IDE:
+
+    // "activityBar.activeBackground": "#2f7c47",
+    // "activityBar.background": "#2f7c47",
+    // "activityBarBadge.background": "#422c74",
+    // "activityBarBadge.foreground": "#e7e7e7",
+    // "activityBar.foreground": "#e7e7e7",
+    // "activityBar.inactiveForeground": "#e7e7e799",
+    // "sash.hoverBorder": "#2f7c47",
+    // "statusBar.background": "#215732",
+    // "statusBarItem.hoverBackground": "#2f7c47",
+    // "statusBarItem.remoteBackground": "#215732",
+    // "titleBar.activeBackground": "#215732",
+    // "titleBar.inactiveBackground": "#21573299",
+    // "commandCenter.border": "#e7e7e799",
+    // "statusBar.foreground": "#e7e7e7",
+    // "statusBarItem.remoteForeground": "#e7e7e7",
+    // "titleBar.activeForeground": "#e7e7e7",
+    // "titleBar.inactiveForeground": "#e7e7e799"
+  },
+
+  // Controls whether opened editors should show as individual tabs, one single large tab or if the title area should not be shown.
+  //  - multiple (default): Each editor is displayed as a tab in the editor title area.
+  //  - single: The active editor is displayed as a single large tab in the editor title area.
+  //  - none: The editor title area is not displayed, i.e. mimics Vim.
+  // "workbench.editor.showTabs": "multiple",
+  "workbench.editor.showTabs": "none",
+
+  // Controls the location of the primary side bar and activity bar.
+  // They can either show on the left or right of the workbench.
+  // The secondary side bar will show on the opposite side of the workbench.
+  // Default: left
+  "workbench.sideBar.location": "left",
+
+  // Default zoom level for all windows.
+  // Each increment above `0` (e.g. `1`) or below (e.g. `-1`) represents zooming `20%` larger or smaller.
+  // You can also enter decimals to adjust the zoom level with a finer granularity.
+  // Default: 0
+  "window.zoomLevel": 0,
+
+  // Where a "Run" and "Debug" code lens should be shown in your npm scripts.
+  // It may be on "all" scripts, on "top" of the script section, or "never".
+  // Default: top.
+  "debug.javascript.codelens.npmScripts": "top",
+
+  // ============================================================
+  // EDITOR SETTINGS
+  // ============================================================
+
+  // vscode font family.
+  // Default: "Consolas, 'Courier New', monospace"
+  // Alternative: "Hack, Menlo, Monaco, 'Courier New', monospace"
+  // "editor.fontFamily": "'Hack Nerd Font', 'Fira Code', Consolas, monospace",
+  "editor.fontFamily": "Consolas, monospace",
+
+  // Controls the font size in pixels (default: 12).
+  "editor.fontSize": 12, // 14px
+
+  "editor.tabSize": 4,
+
+  // Enable/disable navigation breadcrumbs (default: true).
+  "breadcrumbs.enabled": true,
+
+  // Format a file on save. A formatter must be available,
+  // `files.autoSave` must not be set to `afterDelay`,
+  // and the editor must not be shutting down when formatting.
+  "editor.formatOnSave": true,
+
+  // Defines a default formatter which takes precedence over all other formatter settings.
+  // Must be the identifier of an extension contributing a formatter.
+  // Default: null
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // The width of the vertical scrollbar (default: 14).
+  "editor.scrollbar.verticalScrollbarSize": 14,
+
+  // The height of the horizontal scrollbar (default: 12).
+  "editor.scrollbar.horizontalScrollbarSize": 8,
+
+  // Control the cursor animation style (default: blink).
+  "editor.cursorBlinking": "solid",
+
+  // Enables a pop-up that shows parameter documentation and type information as you type (default: true).
+  "editor.parameterHints.enabled": true,
+
+  // Render vertical rulers after a certain number of monospace characters.
+  // Use multiple values for multiple rulers. No rulers are drawn if array is empty.
+  // Default: []
+  "editor.rulers": [],
+
+  // Controls whether to automatically show inline suggestions in the editor (default: true).
+  "editor.inlineSuggest.enabled": true,
+
+  // Controls diff decorations in the editor.
+  //  - all (default): Show the diff decorations in all available locations.
+  //  - gutter: Show the diff decorations only in the editor gutter.
+  //  - overview: Show the diff decorations only in the overview ruler.
+  //  - minimap: Show the diff decorations only in the minimap.
+  //  - none: Do not show the diff decorations.
+  "scm.diffDecorations": "all",
+
+  // Controls if quick suggestions should show up while typing
+  // Default: "comments": false, "strings": false, "other": true
+  "editor.quickSuggestions": {
+    "comments": "on",
+    "strings": "on",
+    "other": "on"
+  },
+
+  // Controls if suggestions should automatically show up when typing trigger characters (default: true)
+  "editor.suggestOnTriggerCharacters": true,
+
+  // Enable word based suggestions (default: matchingDocuments)
+  "editor.wordBasedSuggestions": "allDocuments",
+
+  // The modifier to be used to add multiple cursors with the mouse.
+  // The Go to Definition and Open Link mouse gestures will adapt such that they do not conflict with the multicursor modifier.
+  // - ctrlCmd: Maps to `Control` on Windows and Linux and to `Command` on macOS.
+  // - alt (default): Maps to `Alt` on Windows and Linux and to `Option` on macOS.
+  "editor.multiCursorModifier": "alt",
+
+  // Controls whether the smooth caret animation should be enabled.
+  //  - off (default): Smooth caret animation is disabled.
+  //  - explicit: Smooth caret animation is enabled only when the user moves the cursor with an explicit gesture.
+  //  - on: Smooth caret animation is always enabled.
+  "editor.cursorSmoothCaretAnimation": "off",
+
+  // Controls whether the editor has code folding enabled (default: true).
+  "editor.folding": true,
+
+  // Controls whether the editor should render the vertical glyph margin. Glyph margin is mostly used for debugging (default: true).
+  "editor.glyphMargin": true,
+
+  // Enables the Code Action lightbulb in the editor.
+  //  - off: Disable the code action menu.
+  //  - onCode: Show the code action menu when the cursor is on lines with code.
+  //  - on (default): Show the code action menu when the cursor is on lines with code or on empty lines.
+  "editor.lightbulb.enabled": "on",
+
+  // Controls whether the minimap is shown (default: true).
+  "editor.minimap.enabled": true,
+
+  // Controls whether the editor will scroll using an animation (default: false).
+  "editor.smoothScrolling": true,
+
+  // Controls how lines should wrap.
+  //  - off (default): Lines will never wrap.
+  //  - on: Lines will wrap at the viewport width.
+  //  - wordWrapColumn: Lines will wrap at `editor.wordWrapColumn`.
+  //  - bounded: Lines will wrap at the minimum of viewport and `editor.wordWrapColumn`.
+  "editor.wordWrap": "on",
+
+  // Controls whether veritcal and horizontal rulers should be shown in the editor.
+  "editor.guides.bracketPairs": "active",
+  "editor.guides.bracketPairsHorizontal": "active",
+
+  // ============================================================
+  // TERMINAL SETTINGS
+  // ============================================================
+
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  // "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.fontFamily": "'Hack Nerd Font', 'Fira Code', Consolas, monospace",
+
+  // Controls the font size in pixels of the terminal (default: 14).
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.lineHeight": 1.4,
+
+  // "terminal.integrated.drawBoldTextInBrightColors": true,
+  "terminal.integrated.minimumContrastRatio": 1,
+  // "terminal.integrated.gpuAcceleration": "on",
+
+  "terminal.integrated.profiles.linux": {
+    // No need to make these run as login shells, as vscode runs them as login
+    // shells by default then spins up a subshell for the integrated terminal,
+    // so that the terminal has access to all the setup done in .[..]profile
+    // files (they all run).
+    // Actually, they do not, so we source .zprofile from .zshrc instead of adding -l arg below.
+    "bash": {
+      "path": "bash",
+      "color": "terminal.ansiRed",
+      "icon": "terminal-bash"
+      // "args": ["-l"]
+    },
+    "zsh": {
+      "path": "zsh",
+      "color": "terminal.ansiGreen",
+      "icon": "ruby" // quote, robot, coffee, rocket, ruby, smiley, sparkle-filled, star-full, target, thumbsup-filled, heart-filled, twitter
+      // "args": ["-l"]
+    },
+    "fish": {
+      "path": "fish"
+    },
+    "tmux": {
+      "path": "tmux",
+      "icon": "terminal-tmux"
+    },
+    "pwsh": {
+      "path": "pwsh",
+      "icon": "terminal-powershell"
+    }
+  },
+
+  // ============================================================
+  // EXPLORER SETTINGS
+  // ============================================================
+
+  // The initial maximum number of editors shown in the Open Editors pane (default: 9).
+  "explorer.openEditors.visible": 9,
+
+  // Controls whether the Explorer should ask for confirmation when deleting a file via the trash.
+  "explorer.confirmDelete": true,
+
+  // Controls whether file decorations should use badges (default: true).
+  "explorer.decorations.badges": true,
+
+  // Controls whether file decorations should use colors (default: true).
+  "explorer.decorations.colors": true,
+
+  // ============================================================
+  // ESLint and Prettier SETTINGS
+  // ============================================================
+
+  // Working directories (also applies to Prettier)
+  "eslint.workingDirectories": [
+    { "pattern": "apps/*/" },
+    { "pattern": "packages/*/" }
+  ],
+
+  "eslint.options": {
+    "extensions": [".js", ".jsx", ".md", ".mdx", ".ts", ".tsx"]
+  },
+
+  "eslint.validate": [
+    "markdown",
+    "mdx",
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  // ============================================================
+  // GIT SETTINGS
+  // ============================================================
+
+  // When set to true, commits will automatically be fetched from the default remote of the current Git repository.
+  // Setting to `all` will fetch from all remotes.
+  // Default: false
+  "git.autofetch": true,
+
+  // Commit all changes when there are no staged changes (default: false).
+  "git.enableSmartCommit": true,
+
+  // Controls whether Git contributes colors and badges to the Explorer and the Open Editors view.
+  // Default: true
+  "git.decorations.enabled": true,
+
+  // ============================================================
+  // SCHEMA SETTINGS
+  // ============================================================
+
+  "json.schemas": [
+    {
+      "url": "https://cdn.jsdelivr.net/npm/tsup/schema.json",
+      "fileMatch": ["tsup.config.json"]
+    }
+  ],
+
+  // ============================================================
+  // FILE SETTINGS
+  // ============================================================
+
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[scss]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[markdown]": {
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    }
+  },
+
+  "[md]": {
+    "editor.quickSuggestions": {
+      "other": "on",
+      "comments": "on",
+      "strings": "on"
+    }
+  },
+
+  "[svg]": {
+    "editor.defaultFormatter": "jock.svg"
+  },
+
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    }
+  },
+
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    }
+  },
+
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+
+  "[dockerfile]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+    "editor.quickSuggestions": {
+      "comments": "on",
+      "strings": "on",
+      "other": "on"
+    }
+  },
+
+  "[dockercompose]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // ============================================================
+  // COLOR THEME CUSTOMIZATION
+  // ============================================================
+
+  "editor.tokenColorCustomizations": {
+    // "[Atom One Dark] [Default Dark+] [*Monokai*]": {
+    "[One Dark Pro Monokai Darker]": {
+      // "comments": "#7F848E",
+
+      "textMateRules": [
+        // {
+        //   "scope": [
+        //     // "string.unquoted.js",
+        //     "string.quoted.double.js",
+        //     "string.quoted.single.js",
+        //     "string.quoted.module.js"
+        //   ],
+        //   "settings": { "foreground": "#98C379" }
+        // },
+        {
+          "scope": ["punctuation.section.embedded"],
+          "settings": { "foreground": "#C678DD" }
+        },
+        {
+          "scope": [
+            "punctuation.definition.template-expression.begin.tsx",
+            "punctuation.definition.template-expression.end.tsx"
+          ],
+          "settings": { "foreground": "#C678DD" }
+        },
+        // {
+        //   // Opposite order of what is shown in "Developer: Inspect Editor Tokens and Scope"
+        //   "scope": ["string.template.tsx variable.other.readwrite.tsx"],
+        //   "settings": { "foreground": "#BBBBBB" }
+        // },
+        // {
+        //   "scope": ["keyword.control"],
+        //   "settings": { "foreground": "#C678DD" }
+        // },
+        // {
+        //   "scope": ["meta.object-literal.key"],
+        //   "settings": { "foreground": "#FC618D" }
+        // },
+        // {
+        //   "scope": ["variable.other.property"],
+        //   "settings": { "foreground": "#FC618D" }
+        // },
+        // {
+        //   "scope": ["meta.object-literal.key"],
+        //   "settings": { "foreground": "#ABB2BF" }
+        // },
+        {
+          "scope": ["variable.other"],
+          "settings": { "foreground": "#ABB2BF" }
+        },
+        // {
+        //   "scope": "entity.name.function",
+        //   // "settings": { "foreground": "#E5C07B" }
+        //   // "settings": { "foreground": "#E5C07B" }
+        //   "settings": { "foreground": "#c379bd" }
+        // },
+        // {
+        //   "scope": ["variable.other"],
+        //   "settings": { "foreground": "#ABB2BF" }
+        // },
+        {
+          "scope": ["variable.other.constant"],
+          "settings": { "foreground": "#61AFEF" }
+        },
+        // {
+        //   "scope": ["variable.other.readwrite.ts"],
+        //   "settings": { "foreground": "#ABB2BF" }
+        // },
+        {
+          "scope": ["meta.brace.round.ts"],
+          "settings": { "foreground": "#C678DD" }
+        },
+        // {
+        //   "scope": "variable.other.property.js",
+        //   "settings": { "foreground": "#ABB2BF" }
+        // },
+        {
+          "scope": ["string.unquoted.js"],
+          "settings": { "foreground": "#ABB2BF" }
+        },
+        // {
+        //   // Does not work, need to set string unquoted to overwrite default.
+        //   "scope": "constant.other.object.key.js",
+        //   "settings": { "foreground": "#C7444A" }
+        // },
+        // {
+        //   "scope": ["keyword.control.module.js"],
+        //   // "settings": { "foreground": "#9872A2" }
+        // },
+        // {
+        //   "scope": "keyword.control.flow.js",
+        //   "settings": { "foreground": "#C678DD" }
+        // },
+        // {
+        //   "scope": "variable.other.constant.js",
+        //   "settings": { "foreground": "#e06c75" }
+        // },
+        // {
+        //   "scope": "meta.brace.curly.litobj.js",
+        //   // Does not work.
+        //   "settings": { "foreground": "#FCE566" }
+        // },
+        // {
+        //   "scope": "meta.brace.curly.js",
+        //   "settings": { "foreground": "#FCE566" }
+        // },
+        // {
+        //   "scope": ["entity.other.attribute-name.jsx"],
+        //   // "settings": { "foreground": "#7b91a3" }
+        //   // "settings": { "foreground": "#BB80B3" }
+        //   "settings": { "foreground": "#ad8662" }
+        //   // "settings": { "foreground": "#ad8662" }
+        //   // "settings": { "foreground": "#BBBBBB" }
+        //   // "settings": { "foreground": "#FC618D" }
+        //   // "settings": { "foreground": "#9CDCFE" }
+        // },
+        // {
+        //   "scope": "storage.type.js",
+        //   "settings": { "foreground": "#C678DD" }
+        // },
+        {
+          "scope": "comment",
+          "settings": { "foreground": "#75777a", "fontStyle": "" }
+        },
+        {
+          "scope": "comment.line.double-slash.js",
+          "settings": { "foreground": "#75777a", "fontStyle": "" }
+        },
+        {
+          "scope": "comment.block.js",
+          "settings": { "foreground": "#75777a", "fontStyle": "" }
+        },
+        {
+          "scope": "comment.line.number-sign.dockerfile",
+          "settings": { "foreground": "#75777a", "fontStyle": "" }
+        },
+        {
+          "scope": "comment.line.number-sign.yaml",
+          "settings": { "foreground": "#75777a", "fontStyle": "" }
+        },
+
+        {
+          "scope": "entity.name.type.instance.jsdoc",
+          "settings": { "foreground": "#E5C07B" }
+        },
+        {
+          "scope": "entity.name.class.jsdoc",
+          "settings": { "foreground": "#E5C07B" }
+        },
+        {
+          "scope": "storage.type.class.jsdoc",
+          "settings": { "foreground": "#C678DD" }
+        },
+
+        // {
+        //   "scope": "keyword.control.module.js",
+        //   // "settings": { "foreground": "#C678DD" }
+        // },
+        // {
+        //   "scope": "variable.other.readwrite.js",
+        //   "settings": { "foreground": "#61AFEF" }
+        // },
+        // {
+        //   "scope": "variable.other.readwrite.shorthandpropertyname.js",
+        //   "settings": { "foreground": "#BBBBBB" }
+        //   // "settings": { "foreground": "#FC618D" }
+        //   // "settings": { "foreground": "#D19A66", "fontStyle": "italic" }
+        // },
+        // {
+        //   "scope": "keyword.operator.accessor.js",
+        //   "settings": { "foreground": "#ABB2BF" }
+        // },
+
+        {
+          "scope": "string.unquoted.plain.in.yaml",
+          "settings": { "foreground": "#98C379" }
+        },
+        {
+          "scope": "string.unquoted.plain.out.yaml",
+          "settings": { "foreground": "#98C379" }
+        },
+        {
+          "scope": "string.quoted.single.yaml",
+          "settings": { "foreground": "#98C379" }
+        },
+        {
+          "scope": "string.quoted.double.yaml",
+          "settings": { "foreground": "#98C379" }
+        },
+        {
+          "scope": "support.type.property-name.json",
+          "settings": { "foreground": "#E06C75" }
+          // "settings": { "foreground": "#C7444A" }
+          // "settings": { "foreground": "#C7444A" }
+          // "settings": { "foreground": "#E06C75" }
+        },
+        {
+          "scope": "string.quoted.double.json",
+          "settings": { "foreground": "#98C379" }
+        },
+        {
+          "scope": "meta.paragraph.mdx",
+          "settings": { "foreground": "#ABB2BF" }
+        },
+        {
+          "scope": "punctuation.definition.link.title.begin.markdown",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "punctuation.definition.link.title.end.markdown",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "punctuation.definition.metadata.markdown",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "punctuation.definition.list.begin.markdown",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "string.other.number.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "punctuation.definition.raw.markdown",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "string.other.begin.code.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "string.other.end.code.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "string.other.begin.link.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "string.other.begin.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "string.other.end.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "markup.inline.raw.string.markdown",
+          "settings": { "foreground": "#FC618D" }
+        },
+        {
+          "scope": "markup.inline.raw.code.mdx",
+          "settings": { "foreground": "#FC618D" }
+        },
+        {
+          "scope": "markup.underline.link.markdown",
+          "settings": { "foreground": "#7BD88F" }
+        },
+        {
+          "scope": "string.other.link.destination",
+          "settings": { "foreground": "#7BD88F" }
+        },
+        {
+          "scope": "string.other.link.title.markdown",
+          "settings": { "foreground": "#E06C75" }
+        },
+        {
+          "scope": "string.other.link.autolink.literal.http.mdx",
+          "settings": { "foreground": "#7BD88F" }
+        },
+        {
+          "scope": "entity.name.section.markdown",
+          "settings": { "foreground": "#61AFEF", "fontStyle": "bold" }
+        },
+        {
+          "scope": "entity.name.section.mdx",
+          "settings": { "foreground": "#61AFEF", "fontStyle": "bold" }
+        },
+        {
+          "scope": "variable.ordered.list.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "punctuation.definition.heading.mdx",
+          "settings": { "foreground": "#FCE566" }
+        },
+        {
+          "scope": "punctuation.definition.heading.markdown",
+          "settings": { "foreground": "#FCE566" }
+        }
+        // {
+        //   "scope": "invalid.illegal.attribute.tsx",
+        //   "settings": { "foreground": "#F44747" }
+        // },
+        // {
+        //   "scope": "punctuation.definition.tag.end.jsx",
+        //   "settings": { "foreground": "#FCE566" }
+        // },
+        // {
+        //   "scope": "punctuation.definition.tag.begin.jsx",
+        //   "settings": { "foreground": "#FCE566" }
+        // }
+      ]
+    }
+  },
+
+  // ============================================================
+  // BUN SETTINGS
+  // ============================================================
+
+  // The path to the `bun` executable.
+  "bun.runtime": "${userHome}/.bun/bin/bun",
+
+  // If support for Bun should be added to the default "JavaScript Debug Terminal".
+  "bun.debugTerminal.enabled": true,
+
+  // If the debugger should stop on the first line of the program.
+  "bun.debugTerminal.stopOnEntry": false,
+
+  // ============================================================
+  // EXTENSION SETTINGS (not ESLint)
+  // ============================================================
+
+  "vsicons.dontShowNewVersionMessage": true,
+
+  "tailwindCSS.experimental.configFile": null,
+
+  // tailwindcss-intellisense: Controls whether the editor should render inline color decorators for Tailwind CSS classes and helper functions. Default: true
+  "tailwindCSS.colorDecorators": true,
+
+  "redhat.telemetry.enabled": false,
+
+  "codesandbox.currentWorkspace": "01629f53-3086-43b8-b442-e0af92967d73",
+
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+
+  "github.copilot.nextEditSuggestions.enabled": true,
+
+  "github.copilot.chat.codesearch.enabled": true,
+
+  // Controls delay in seconds before changes by Edit | Inline Chat are automatically accepted.
+  // 0 (default): Accepted immediately upon completion of stream.
+  // "chat.editing.autoAcceptDelay": 10,
+
+  "github.copilot.chat.languageContext.fix.typescript.enabled": true,
+  "github.copilot.chat.languageContext.inline.typescript.enabled": true,
+  "github.copilot.chat.languageContext.typescript.enabled": true,
+
+  "github.copilot.enable": {
+    "*": true,
+    "yaml": true,
+    "plaintext": true,
+    "markdown": true
+  },
+
+  "better-comments.tags": [
+    // Changes require restart
+    {
+      "tag": "!",
+      "color": "#FF2D00",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    {
+      "tag": "?",
+      "color": "#3498DB",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    },
+    // {
+    //   "tag": "//",
+    //   "color": "#474747",
+    //   "strikethrough": true,
+    //   "underline": false,
+    //   "backgroundColor": "transparent",
+    //   "bold": false,
+    //   "italic": false
+    // },
+    {
+      "tag": "todo",
+      "color": "#FF8C00",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false
+      // "italic": false
+    },
+    // {
+    //   "tag": "*",
+    //   "color": "red",
+    //   "strikethrough": false,
+    //   "underline": false,
+    //   "backgroundColor": "transparent",
+    //   "bold": false,
+    //   "italic": false
+    // },
+    {
+      "tag": "&",
+      "color": "#98C379",
+      "strikethrough": false,
+      "underline": false,
+      "backgroundColor": "transparent",
+      "bold": false,
+      "italic": false
+    }
+  ],
+
+  "todohighlight.keywords": [
+    {
+      "text": "DEBUG:",
+      "color": "white",
+      "backgroundColor": "red",
+      "overviewRulerColor": "grey"
+    },
+    {
+      "text": "NOTE:",
+      "color": "white",
+      // "color": "#181f99",
+      "backgroundColor": "darkblue",
+      // "backgroundColor": "#bda939",
+      "overviewRulerColor": "grey"
+    },
+    {
+      "text": "REVIEW:",
+      "color": "white",
+      "backgroundColor": "darkblue",
+      "overviewRulerColor": "grey"
+    },
+    {
+      "text": "HACK:",
+      "color": "white",
+      "backgroundColor": "red"
+      // "isWholeLine": false,
+    },
+    {
+      "text": "TODO:",
+      "fontStyle": "italic",
+      "color": "#FF8C00",
+      "backgroundColor": "#243f91"
+      // "backgroundColor": "#465da3",
+      // "backgroundColor": "blue",
+      // "italic": true,
+      // "bold": true,
+      // "underline": false,
+      // "strikethrough": true,
+      //other styling properties goes here ...
+    }
+  ],
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+
+  // ============================================================
+  // VIM SETTINGS
+  // ============================================================
+  "vim.autoindent": true,
+  "vim.gdefault": true,
+  "vim.hlsearch": true,
+  "vim.ignorecase": true,
+  "vim.incsearch": true,
+  "vim.inccommand": "replace",
+  // Add two spaces after '.', '?', and '!' when joining or reformatting
+  "vim.joinspaces": true,
+  "vim.leader": "<space>",
+  // Path to the shell to use for ! and :! commands.
+  "vim.shell": "/bin/bash",
+  "vim.smartcase": true,
+  // Width to word-wrap when using gq
+  "vim.textwidth": 80,
+  // Timeout in milliseconds for remapped commands
+  "vim.timeout": 1000,
+  "vim.whichwrap": "b,s",
+  "vim.smartRelativeLine": true,
+  "editor.cursorSurroundingLines": 8,
+
+  // Remove dash (-) from the default list of word separators, to make it easier to select hyphenated words (like CSS tags).
+  "editor.wordSeparators": "`~!@#$%^&*()=+[{]}\\|;:'\",.<>/?",
+
+  // Highlight yanked text briefly.
+  "vim.highlightedyank.enable": true,
+  "vim.highlightedyank.color": "#a9dc7660",
+  "vim.highlightedyank.duration": 250,
+
+  // Use system clipboard for yanking and pasting.
+  "vim.useSystemClipboard": true,
+
+  "vim.easymotion": true,
+  "vim.surround": true,
+  "vim.camelCaseMotion.enable": true,
+
+  "vim.useCtrlKeys": true,
+
+  // "vim.vimrc.enable": true,
+  // "vim.vimrc.path": "~/.vimrc",
+
+  "vim.handleKeys": {
+    "<C-j>": false // Dafult vscode is toggle panel, which is useful. In Vim it is only used to add linebreak in insert mode.i
+    // "<C-f>": false
+  },
+
+  // Improve `vscode-neovim` extension performance.
+  "extensions.experimental.affinity": {
+    "vscodevim.vim": 1,
+    "asvetliakov.vscode-neovim": 1
+  },
+
+  // ============================================================
+  // SHELLCHECK SETTINGS
+  // ============================================================
+  "shellcheck.useWorkspaceRootAsCwd": true,
+  "shellcheck.ignorePatterns": {
+    // "**/*.csh": true,
+    // "**/*.cshrc": true,
+    // "**/*.fish": true,
+    // "**/*.login": true,
+    // "**/*.logout": true,
+    // "**/*.tcsh": true,
+    // "**/*.tcshrc": true,
+    // "**/*.xonshrc": true,
+    // "**/*.xsh": true,
+    // "**/*.zsh": true,
+    // "**/*.zshrc": true,
+    // "**/zshrc": true,
+    // "**/*.zprofile": true,
+    // "**/zprofile": true,
+    // "**/*.zlogin": true,
+    // "**/zlogin": true,
+    // "**/*.zlogout": true,
+    // "**/zlogout": true,
+    // "**/*.zshenv": true,
+    // "**/zshenv": true,
+    // "**/*.zsh-theme": true
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[ignore]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  }
+}
+// ============================================================
+// USER SETTINGS: settings.json
+// ============================================================
+// {
+//   "workbench.iconTheme": "vscode-icons",
+//   "[json]": {
+//     "editor.defaultFormatter": "esbenp.prettier-vscode"
+//   },
+//   "terminal.integrated.defaultProfile.windows": "Git Bash",
+//   // "terminal.integrated.defaultProfile.linux": "zsh",
+//   // "eslint.runtime": "/home/magnus/.nvm/versions/node/v20.1.0/bin/node",
+//   // "eslint.packageManager": "pnpm",
+//   "eslint.workingDirectories": [
+//     { "pattern": "apps/*/" },
+//     { "pattern": "packages/*/" }
+//   ],
+//   "tailwindCSS.experimental.configFile": null,
+//   "security.workspace.trust.untrustedFiles": "open",
+//   "vsicons.dontShowNewVersionMessage": true,
+//   "workbench.colorTheme": "Monokai Pro",
+//   "github.copilot.editor.enableAutoCompletions": true,
+
+//   "vim.vimrc.path": "c:\\Users\\magnu\\.vimrc",
+//   "vim.normalModeKeyBindingsNonRecursive": [
+//     // gd - jump to definition.
+//     // gq - on a visual selection reflow and wordwrap blocks of text, preserving commenting style. Great for formatting documentation comments.
+//     // gb - adds another cursor on the next word it finds which is the same as the word under the cursor.
+//     // af - visual mode command which selects increasingly large blocks of text. For example, if you had "blah (foo [bar 'ba|z'])" then it would select 'baz' first. If you pressed af again, it'd then select [bar 'baz'], and if you did it a third time it would select "(foo [bar 'baz'])".
+//     // gh - equivalent to hovering your mouse over wherever the cursor is. Handy for seeing types and error messages without reaching for the mouse!
+//     {
+//       // Default shortcut must be reset to enable focus on the hover menu.
+//       "before": ["g", "h"],
+//       "commands": ["editor.action.showDefinitionPreviewHover"]
+//     },
+//     {
+//       "before": ["K"],
+//       "commands": ["lineBreakInsert"],
+//       "silent": true
+//     }
+//   ],
+//   "vim.normalModeKeyBindings": [
+//     {
+//       "before": ["<leader>", "p"],
+//       "commands": ["workbench.action.quickOpen"]
+//     },
+// {
+//   "before": ["<leader>", "."],
+//   "commands": ["breadcrumbs.toggleToOn"],
+//   "when": "!config.breadcrumbs.enabled"
+// },
+// {
+//   "before": ["<leader>", "."],
+//   "commands": ["breadcrumbs.focusAndSelect"],
+//   "when": "breadcrumbsPossible && breadcrumbsVisible"
+// },
+// {
+//   "before": ["<leader>", "o"],
+//   "commands": ["workbench.action.gotoSymbol"],
+//   "when": "!accessibilityHelpIsShown && !accessibleViewIsShown"
+// },
+//     {
+//       "before": ["<leader>", "m"],
+//       "commands": ["bookmarks.toggle"]
+//     },
+//     {
+//       "before": ["<leader>", "b"],
+//       "commands": ["bookmarks.list"]
+//     },
+//     {
+//       "before": ["<leader>", "e"],
+//       "commands": ["workbench.view.explorer"],
+//       "when": "viewContainer.workbench.view.explorer.enabled"
+//     },
+//     {
+//       "before": ["g", "p", "d"],
+//       "commands": ["editor.action.peekDefinition"]
+//     },
+//     // {
+//     // Clashes with gi in vim: Go to last insert mark (useful).
+//     //   "before": ["g", "i"],
+//     //   "commands": ["editor.action.goToImplementation"]
+//     // },
+//     {
+//       "before": ["g", "p", "i"],
+//       "commands": ["editor.action.peekImplementation"]
+//     },
+//     {
+//       // Does not clash with gh to reflow text, as that only applies in visual mode.
+//       "before": ["g", "q"],
+//       "commands": ["editor.action.quickFix"]
+//     },
+//     {
+//       "before": ["g", "r"],
+//       "commands": ["editor.action.referenceSearch.trigger"]
+//     },
+//     {
+//       "before": ["g", "t"],
+//       "commands": ["editor.action.goToTypeDefinition"]
+//     },
+//     {
+//       "before": ["g", "p", "t"],
+//       "commands": ["editor.action.peekTypeDefinition"]
+//     }
+//   ],
+//   "vim.operatorPendingModeKeyBindings": [
+//     // Bind L to $ and H to ^ in operator pending mode makes yL and dH work like
+//     // y$ and d^ respectively. Makes it easier to yank or delete to the end or
+//     // beginning of the line.
+//     {
+//       "before": ["L"],
+//       "after": ["$"]
+//     },
+//     {
+//       "before": ["H"],
+//       "after": ["^"]
+//     }
+//   ],
+//   // "vim.insertModeKeyBindings": [
+//     // Use capslock as escape key, instead of this.
+//     // {
+//     //   "before": ["j", "j"],
+//     //   "after": ["<Esc>"]
+//     // }
+//   // ],
+//   // "terminal.external.linuxExec": "warp-terminal",
+//   "editor.occurrencesHighlight": "off",
+//   "editor.renderLineHighlight": "gutter"
+// }

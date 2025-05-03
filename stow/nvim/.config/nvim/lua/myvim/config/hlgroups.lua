@@ -251,6 +251,14 @@ vim.cmd([[
   highlight! link TreesitterContextSeparator LineNr
 ]])
 
+-- `trouble.nvim`.
+vim.cmd([[
+  highlight! link TroubleIndentWs SnacksPickerTree
+  highlight! link TroubleIndentLast SnacksPickerTree
+  highlight! link TroubleIndentFoldOpen SnacksPickerTree
+  highlight TroubleDiagnosticsPos guibg=#1e2030
+]])
+
 -- `render-markdown.nvim`.
 vim.cmd([[
   highlight @markup.list.markdown guifg=#ff966c
@@ -258,6 +266,9 @@ vim.cmd([[
 
   " highlight! link RenderMarkdownDash LineNr
   highlight RenderMarkdownDash guifg=#313741
+
+  highlight RenderMarkdownTableRow guifg=#61afef
+  highlight RenderMarkdownTableHead guifg=#61afef
 
   " highlight @markup.list.markdown guifg=#589ed7
   " highlight RenderMarkdownBullet guifg=#589ed7
@@ -273,8 +284,6 @@ vim.cmd([[
   highlight! link RenderMarkdownLink @markup.link.label
   highlight @markup.link.label guifg=#589ed7
   " highlight @markup.link.label guifg=#65bcff
-
-  highlight RenderMarkdownTableRow guifg=#ff966c
 
   " highlight RenderMarkdownSign guibg=#222436
 

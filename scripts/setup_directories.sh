@@ -74,6 +74,11 @@ if [ ! -d "$MARKSMAN_HOME" ]; then
   mkdir -p "$MARKSMAN_HOME"
 fi
 
+export VSCODE_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/Code"
+if [ ! -d "$VSCODE_HOME" ]; then
+  mkdir -p "$VSCODE_HOME/User"
+fi
+
 # Directory for delta repo, with themes.
 # No need, let git clone create directory.
 # export DELTA_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/delta"
