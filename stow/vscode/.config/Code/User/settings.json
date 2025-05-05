@@ -254,8 +254,9 @@
   // ============================================================
 
   "terminal.integrated.defaultProfile.windows": "Git Bash",
-  "terminal.integrated.defaultProfile.linux": "zsh",
-  // "terminal.integrated.defaultProfile.linux": "bash",
+  // "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.osx": "bash",
   "terminal.integrated.fontFamily": "'Hack Nerd Font', 'Fira Code', Consolas, monospace",
 
   // Controls the font size in pixels of the terminal (default: 14).
@@ -1007,6 +1008,10 @@
   },
   "[ignore]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "makefile.configureOnOpen": true,
+  "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua"
   }
 }
 // ============================================================

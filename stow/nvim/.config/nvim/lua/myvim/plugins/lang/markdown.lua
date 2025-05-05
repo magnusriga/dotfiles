@@ -109,8 +109,8 @@ return {
 
   -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
   {
-    "magnusriga/markdown-tools.nvim",
-    -- dir = "~/dev/nvim-plugins/markdown-tools.nvim",
+    -- "magnusriga/markdown-tools.nvim",
+    dir = "~/dev/nvim-plugins/markdown-tools.nvim",
     opts = {
       -- frontmatter_custom = {
       --   -- Example: Adds a 'status' field and supports {{status}} placeholder
