@@ -109,9 +109,20 @@ return {
 
   -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
   {
-    dir = "~/dev/nvim-plugins/markdown-shortcuts.nvim",
+    "magnusriga/markdown-tools.nvim",
+    -- dir = "~/dev/nvim-plugins/markdown-tools.nvim",
     opts = {
-      picker = "snacks",
+      -- frontmatter_custom = {
+      --   -- Example: Adds a 'status' field and supports {{status}} placeholder
+      --   magnus = function(_opts)
+      --     return "rg"
+      --   end,
+      --   -- Example: Adds a 'related' field (list) and supports {{related}} placeholder
+      --   foo = function(_opts)
+      --     return { "foo", "bar", "baz" }
+      --   end,
+      -- },
+      -- picker = "snacks",
     },
   },
 
@@ -140,6 +151,11 @@ return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     opts = {
+      -- Vim modes that will show rendered view of markdown file, :h mode(), for all enabled components.
+      -- Individual components can be enabled for other modes.
+      -- Remaining modes will be unaffected by this plugin.
+      -- Default: render_modes = { "n", "c", "t" },
+      render_modes = { "n", "c", "t", "i" },
       bullet = {
         -- Default: `{ '●', '○', '◆', '◇' }`.
         -- icons = { "●", "󰧞", "○", "◆", "◇" },
