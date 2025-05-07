@@ -1,14 +1,30 @@
-return {
-  -- Yaml schema support.
-  {
-    "b0o/SchemaStore.nvim",
-    lazy = true,
-    version = false, -- Last release is too old.
-  },
+-- YAML schema support.
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("schemastore_yaml", {
+    clear = true,
+  }),
+  pattern = { "yaml", "yml" },
+  callback = function()
+    vim.lsp.config("yamlls", {
+      settings = {
+        yaml = {
+          schemas = require("schemastore").yaml.schemas(),
+        },
+      },
+    })
+  end,
+})
 
-  -- Correctly setup lspconfig.
+return {
+  -- Correctly setup lspconfig, with schema store.
   {
     "neovim/nvim-lspconfig",
+    dependencies = {
+      {
+        "b0o/SchemaStore.nvim",
+        version = false, -- Last release is too old.
+      },
+    },
     opts = {
       -- Make sure mason installs server.
       servers = {
@@ -22,14 +38,6 @@ return {
               },
             },
           },
-          -- Lazy-load schemastore when needed.
-          on_new_config = function(new_config)
-            new_config.settings.yaml.schemas = vim.tbl_deep_extend(
-              "force",
-              new_config.settings.yaml.schemas or {},
-              require("schemastore").yaml.schemas()
-            )
-          end,
           settings = {
             redhat = { telemetry = { enabled = false } },
             yaml = {

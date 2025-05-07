@@ -451,6 +451,29 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+
+  "[properties]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+
+  "[ignore]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+
+  "[lua]": {
+    "editor.defaultFormatter": "JohnnyMorganz.stylua"
+  }
+
+  "[dotenv]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+
   // ============================================================
   // COLOR THEME CUSTOMIZATION
   // ============================================================
@@ -912,12 +935,6 @@
       //other styling properties goes here ...
     }
   ],
-  "[dotenv]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
-  },
-  "[prisma]": {
-    "editor.defaultFormatter": "Prisma.prisma"
-  },
 
   // ============================================================
   // VIM SETTINGS
@@ -1000,19 +1017,7 @@
     // "**/zshenv": true,
     // "**/*.zsh-theme": true
   },
-  "[toml]": {
-    "editor.defaultFormatter": "tamasfe.even-better-toml"
-  },
-  "[properties]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
-  },
-  "[ignore]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
-  },
   "makefile.configureOnOpen": true,
-  "[lua]": {
-    "editor.defaultFormatter": "JohnnyMorganz.stylua"
-  }
 }
 // ============================================================
 // USER SETTINGS: settings.json
