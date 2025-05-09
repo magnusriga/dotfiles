@@ -46,7 +46,7 @@
   },
   "consoleLogObject": {
     "prefix": "clo",
-    "body": ["console.log('${1:first}', ${2:second})"],
+    "body": ["console.log('${1:first}', ${1:first})"],
     "description": "Logs property with name."
   },
   "consoleLogJson": {

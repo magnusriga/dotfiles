@@ -123,7 +123,7 @@ vim.g.ai_cmp = false
 --   when using `lsp` as root detector, which is default root detector used when
 --   calling `MyVim.root.get()`.
 -- - Important to exclude `copilot`, which uses `cwd` as root.
-vim.g.root_lsp_ignore = { "eslint", "tailwindcss", "copilot" }
+vim.g.root_lsp_ignore = { "biome", "eslint", "tailwindcss", "copilot" }
 
 -- Show current document symbols location from Trouble in `lualine`.
 -- Disable for buffer: `vim.b.trouble_lualine = false`.

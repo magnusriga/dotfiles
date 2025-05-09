@@ -179,7 +179,7 @@ function M.setup()
   --   telling client it now supports given client method.
   -- - Enables inlay hints and codelens refresh, assuming client supports
   --   `textDocument/inlayHint` and `textDocument/codeLens`.
-  MyVim.lsp.on_dynamic_capability(M._check_methods)
+  MyVim.lsp.on_dynamic_capability(MyVim.lsp._check_methods)
 
   -- Setup keymaps when any `client` attaches to any `buffer`,
   -- which combines all keymaps registered on all `nvim_lspconfig` plugins'

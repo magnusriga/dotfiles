@@ -59,13 +59,32 @@ function M.formatexpr()
   return vim.lsp.formatexpr({ timeout_ms = 3000 })
 end
 
--- Returns tables containing `{ active = <boolean>, resolved = <sources> }`,
--- and formatter as metatable `__index`, for all formatters.
+-- Returns list containing all formatters, with shape
+-- `[ { active = <boolean>, resolved = <sources> }, ...]`,
+-- where each table entry has `formatter` table as metatable, i.e. `__index`.
 --
 -- `sources`, and thus `resolved`, has value if `conform`, or LSP formatter,
 -- has formatter for buffer, which depends on e.g. `conform.nvim` configuration,
 -- often set when registering formatter.
 --
+-- `sources`:
+-- - Function receiving buffer id, returning list of LSP client names.
+-- - ONLY includes client:
+--   - Attached to given buffer
+--   - Matching `MyFormatter.filter`
+--   - Supporting `textDocument/formatting` | `textDocument/rangeFormatting`
+-- - Example:
+--   - `{ `eslint` }`.
+--   - `{ `biome` }`.
+-- - > 1 entry, if either:
+--   - `formatter` created by `MyVim.lsp.formatter()` WITHOUT passing in `opts.filter`.
+--   - `formatter` created by `MyVim.lsp.formatter()` WITH `opts.filter`
+--     containing multiple LSP client names.
+--   - More than one LSP client with same name is attached to buffer. Possible?
+-- - If > 1, formatter is used for formatting.
+-- - Thus, `sources` used to choose `formatter` for buffer being formatted.
+--
+-- - When `M.format` runs, it
 -- See: `plugins/formatting.lua`.
 --
 -- Conform formatter registered in `plugins/formatting.lua`, is primary formatter

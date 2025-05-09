@@ -179,6 +179,11 @@ return {
             args = { "format", "$FILENAME" },
             stdin = false,
           },
+          biome = {
+            -- Default: args = { "format", "--stdin-file-path", "$FILENAME" },
+            -- args = { "check", "--stdin-file-path", "$FILENAME" },
+            args = { "format", "--stdin-file-path", "$FILENAME" },
+          },
           -- # Example of using dprint only when a dprint.json file is present
           -- dprint = {
           --   condition = function(ctx)
@@ -195,7 +200,7 @@ return {
 
       --- Add biome as a formatter for supported filetypes.
       for _, ft in ipairs(biome_ft) do
-        opts.formatters_by_ft[ft] = { "prettierd" }
+        opts.formatters_by_ft[ft] = { "biome" }
         -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
         -- table.insert(opts.formatters_by_ft[ft], "prettierd")
         -- table.insert(opts.formatters_by_ft[ft], "prettier")

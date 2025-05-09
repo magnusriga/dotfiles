@@ -244,14 +244,7 @@ end
 
 ---@param opts? lsp.Client.format
 function M.format(opts)
-  opts = vim.tbl_deep_extend(
-    "force",
-    {},
-    opts or {},
-    vim.lsp.buf.format or {},
-    -- MyVim.opts("nvim-lspconfig").format or {},
-    MyVim.opts("conform.nvim").format or {}
-  )
+  opts = vim.tbl_deep_extend("force", {}, opts or {}, vim.lsp.buf.format or {}, MyVim.opts("conform.nvim").format or {})
   local ok, conform = pcall(require, "conform")
   -- Use conform for formatting with LSP when available,
   -- since it has better format diffing.
