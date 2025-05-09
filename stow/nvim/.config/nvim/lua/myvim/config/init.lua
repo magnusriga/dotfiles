@@ -185,10 +185,10 @@ end
 local options
 local neovim_clipboard
 
--- `VeryLazy`: Event fired by `lazy.nvim`, after `lazy.nvim` is done installing and loading plugins.
---
+-- =======================================
+-- Main setup function.
+-- =======================================
 -- 1. If Neovim started with arguments, i.e. files, load autocommands right away: `config/autocmds`.
---
 -- 2. Create autocmd running on `VeryLazy` to:
 --    a. Load autocmds from: `/config/autocmds`.
 --    b. Load keymaps from: `/config/keymaps`.
@@ -198,8 +198,10 @@ local neovim_clipboard
 --    d. Create usercommand to get root of buffer,
 --       and autocommand to delete cache of buffer root paths.
 --    e. Create usercommand to `checkhealth`.
---
 -- 3. Set default colorscheme.
+--
+-- Note(s):
+-- - `VeryLazy`: Event fired by `lazy.nvim`, after `lazy.nvim` is done installing and loading plugins.
 function M.setup(opts)
   options = vim.tbl_deep_extend("force", defaults or {}, opts or {}) or {}
 
@@ -211,8 +213,10 @@ function M.setup(opts)
     M.load("autocmds")
   end
 
+  -- ---------------------------------------
   -- Load autocmds and keymaps after `lazy.nvim` has
   -- installed and loaded all plugins, i.e. at `VeryLazy` event.
+  -- ---------------------------------------
   local group = vim.api.nvim_create_augroup("NeovimSetup", { clear = true })
   vim.api.nvim_create_autocmd("User", {
     group = group,
@@ -284,8 +288,8 @@ M.did_init = false
 --      - Used before `lazy.nvim` installs and loads new colorscheme(s).
 --
 -- 3. Top-level `init.lua` runs: `require('config.lazy-plugins')`.
---    - `lazy.nvim` stores all specs, by running files in `plugins` directory. Order matters?
---    - When importing `plugins/init.lua`, call: `require('config).init()`.
+--    - `lazy.nvim` stores all specs, by running files in `plugins` directory.
+--    - `plugins/init.lua` runs: `require('config).init()`.
 --
 -- 4. `require('config).init()`: See below.
 --
@@ -318,6 +322,9 @@ function M.init()
   end
   M.did_init = true
 
+  -- ---------------------------------------
+  -- Pause notifications.
+  -- ---------------------------------------
   -- Pause all notifications and start check handle, which checks in separate thread,
   -- once per event loop iteration, if `vim.notify` has been replaced.
   --
@@ -329,13 +336,19 @@ function M.init()
   -- replaced `vim.notify`.
   MyVim.lazy_notify()
 
+  -- ---------------------------------------
+  -- Load options.
+  -- ---------------------------------------
   -- Load options here, before `lazy.nvim` installs and loads plugins,
   -- i.e. before cloning from GitHub and subsequently running `require(<name>)`.setup(opts)`.
   -- Must happen before installing plugins, for some reason.
   M.load("options")
 
-  -- - Defer built-in clipboard handling, as "xsel" and "pbcopy" can be slow,
-  --   by saving `vim.opt.clipboard` to `neovim_clipboard`,
+  -- ---------------------------------------
+  -- Defer built-in clipboard handling.
+  -- ---------------------------------------
+  -- - As "xsel" and "pbcopy" can be slow.
+  -- - By saving `vim.opt.clipboard` to `neovim_clipboard`,
   --   and setting `vim.opt.clipboard`  to empty string.
   -- - Later, at `VeryLazy` event, i.e. after plugins installed and loaded,
   --   `vim.opt.clipboard` is set back to original value.
@@ -343,10 +356,29 @@ function M.init()
   neovim_clipboard = vim.opt.clipboard
   vim.opt.clipboard = ""
 
-  -- Creates `LazyFile` and `User LazyFile` events, firing on built-in buffer read|write events:
+  -- ---------------------------------------
+  -- Create `LazyFile` and `User LazyFile` events.
+  -- ---------------------------------------
+  -- - Fires on built-in buffer read|write events.
   -- - `LazyFile`     : `BufReadPost` | `BufNewFile` | `BufWritePre`.
   -- - `User LazyFile`: `LazyFile`.
   MyVim.plugin.setup()
+
+  -- ---------------------------------------
+  -- Setup LSP-related features.
+  -- ---------------------------------------
+  -- - Register LSP formatter.
+  -- - Create LSP-specific keymaps on:
+  --   - LSP client attach.
+  --   - Server sends `client/registerCapability` request to client,
+  --     to dynamically register server's support for specific client method.
+  -- - Add inlayHints and codeLens refresh on:
+  --   - LSP client attach.
+  --   - Server sends `client/registerCapability` request to client,
+  --     to dynamically register server's support for specific client method.
+  -- - Configure diagnostics, inlcuding virutal text format and icons.
+  -- - Replace `vtsls` with `denols` if both active.
+  require("myvim.lsp").setup()
 end
 
 setmetatable(M, {

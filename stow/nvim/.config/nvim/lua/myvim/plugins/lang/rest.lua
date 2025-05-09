@@ -1,3 +1,25 @@
+-- Kulala-ls is not available in Mason registry, installed manually.
+-- Thus, cannot use `mason-lspconfig` to install it.
+-- Thus, enable LSP manually, with `vim.lsp.enable(...)`.
+local lsp_name = "kulala_ls"
+
+vim.lsp.config(lsp_name, {
+  root_dir = function(fname)
+    -- Use cwd as root dir, since Kulala scratchpad does not belong to git directory.
+    -- return vim.fs.dirname(vim.fs.find(".http", { path = fname, upward = true })[1])
+    return vim.fs.dirname(".")
+  end,
+  capabilities = {
+    workspace = {
+      didChangeConfiguration = { dynamicRegistration = true },
+      didChangeWorkspaceFolders = { dynamicRegistration = true },
+    },
+  },
+})
+
+-- Enable manually, since `kulala-ls` is not in Mason registry.
+vim.lsp.enable(lsp_name)
+
 -- Make Neovim recognize files with `.http` extension as HTTP files.
 vim.filetype.add({
   extension = {
@@ -101,27 +123,5 @@ return {
       },
     },
     opts = {},
-  },
-
-  -- Setup LS.
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        kulala_ls = {
-          root_dir = function(fname)
-            -- Use cwd as root dir, since Kulala scratchpad does not belong to git directory.
-            -- return vim.fs.dirname(vim.fs.find(".http", { path = fname, upward = true })[1])
-            return vim.fs.dirname(".")
-          end,
-          capabilities = {
-            workspace = {
-              didChangeConfiguration = { dynamicRegistration = true },
-              didChangeWorkspaceFolders = { dynamicRegistration = true },
-            },
-          },
-        },
-      },
-    },
   },
 }

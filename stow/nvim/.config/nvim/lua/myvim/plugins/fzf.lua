@@ -587,6 +587,106 @@ return {
           return vim.ui.select(...)
         end
       end)
+
+      -- - Overwrite behaviour for built-in LSP keybindings, and/or from `plugins/lsp/keymaps.lua` (not used),
+      --   so `fzf-lua` is used in case LSP command could returns multiple results from language server.
+      -- - `opts` as function, so this just executes right before `opts` is passed to `config`
+      --   function, during `opts` merging.
+      -- - Since below function extends `Keys`, it extends reference to `plugins.lsp.keymaps._keys` table in memory,
+      --   thus it does not matter that this is executed before `nvim-lspconfig` config-function,
+      --   which is where autocmd is set up that creates key bindings from `plugins.lsp.keymaps._keys`.
+      -- - NOTE: When keymap is defined on `lsp.keymaps`, `which-key` does not interpret keybinding as
+      --         being from plugin `fzf-lua`, which is good because keybindings defined in `lsp.keymaps`
+      --         get dynamic icon based on filetype, and not from `which-key` plugin rule for `fzf-lua`.
+      local Keys = require("myvim.lsp.keymaps").get()
+
+      ---------------------------------------------
+      -- Built-in `gr<x>` commands, see: `:h vim-diff`, `:h lsp`.
+      ---------------------------------------------
+      -- - Normal mode:
+      -- - `grn` : `vim.lsp.buf.rename()`
+      -- - `gra` : `vim.lsp.buf.code_action()`, Normal | Visual mode.
+      -- - `grr` : `vim.lsp.buf.references()`.
+      -- - `gri` : `vim.lsp.buf.implementation()`.
+      -- - `gO`  : `vim.lsp.buf.document_symbol()`.
+      -- - `gq`  : Calls function in `opt.formatexpr()`, initially set to `vim.lsp.formatexpr()` by Neovim,
+      --           but remapped to `util/format.lua` > `format()`.
+      -- - `K`   : `vim.lsp.buf.hover()`.
+      -- - CTRL-]: `vim.lsp.tagfunc()` > `textdocument/definition` < `vim.lsp.buf.defitition`.
+      --
+      -- - Insert mode:
+      -- - CTRL-S: `vim.lsp.buf.signature_help()`.
+      --
+      -- Therefore, do not re-create above functionality in new shortcuts,
+      -- except to use `plugins/fzf.lua` if command can return multiple hits, e.g. references.
+      --
+      -- These built-in bindings are remapped to same command, except using `fzf-lua`,
+      -- instead of quickfix list, when language server returns multiple results:
+      -- - `grr`.
+      -- - `gri`.
+      -- - `gO`.
+      --
+      -- These built-in bindings are remapped to same command:
+      -- - `gd` : Built-in behaviour is to go to local declaration, mainly useful in `C`,
+      --          thus remap similar functionality that works across languages,
+      --          i.e. `vim.lsp.buf.definition()`.
+      --
+      -- These built-in bindings are not remapped:
+      -- - `grn`: `vim.lsp.buf.rename()`, no remap needed, cannot return multiple results.
+      -- - `gra`: `vim.lsp.buf.code_action()`, no remap needed, just calls `vim.ui.select`,
+      --          which is overwritten with `fzf-lua` picker.
+      --
+      -- These new bindings are created, following built-in `gr<x>` format, as no built-in binding exists:
+      -- - `grd`: Go to definintion, same as built-in `ctrl-]`.
+      -- - `gry`: Go to type definintion.
+      ---------------------------------------------
+
+      ---------------------------------------------
+      -- Symbols and tags.
+      ---------------------------------------------
+      -- - Tags are defined in tag files, created with `ctags`, `gutentags`, etc.
+      -- - Alternatively, tags can be created on demand, for `{name}` in `:tag {name}`
+      --   or for word under cursor when using `gd` or `ctrl-]`.
+      -- - Tags are created on demand with function defined in `opt.tagfunc`.
+      -- - `opt.tagfunc` is set to `vim.lsp.tagfunc()`, when Neovim's built-in LSP client starts.
+      -- - `vim.lsp.tagfunc()` invokes `textdocument/definition` LSP method when used with Normal mode
+      --   commands, e.g. `gd` or `ctrl-]`, and "workspace/symbol" when used with other tag commands,
+      --   e.g. `:tag` | `:tjump` | `tselect`.
+      -- - Thus, tags are set by LSP response, enabling navigation to function definition.
+      --   - `ctrl-]` : Go to definition.
+      --   - `:tag`   : Go to symbol.
+      -- - Potential ways to continousely update tags, so symbol search is fast:
+      --   - Regularly calling `ctags`.
+      --   - Storing `symbols` for file in table, based on `vim.lsp.buf.document_symbols()`,
+      --     updating it on `InsertLeave`.
+      ---------------------------------------------
+
+      -- stylua: ignore
+      vim.list_extend(Keys, {
+        -- `grr`: Built-in key binding for `vim.lsp.buf.references()`, here overwriting it with same behaviour,
+        --        except using `fzf-lua` instead of default quickfix list when multiple results.
+        { "grr", "<cmd>FzfLua lsp_references jump1 ignore_current_line=true<cr>", desc = "References", nowait = true },
+
+        -- `gri`: Built-in key binding for `vim.lsp.buf.implementation()`, here overwriting it with same behaviour,
+        --        except using `fzf-lua` instead of default quickfix list when multiple results.
+        { "gri", "<cmd>FzfLua lsp_implementations jump1 ignore_current_line=true<cr>", desc = "Goto Implementation" },
+
+        -- `gO` : Built-in key binding for `vim.lsp.buf.document_symbol()`, here overwriting it with same behaviour,
+        --        except using `fzf-lua` instead of default quickfix list.
+        -- `regex_filter`: Filters symbols based on list defined in: `config/init.lua` > `options.<lang>|default`.
+        { "gO", function() require("fzf-lua").lsp_document_symbols({ regex_filter = symbols_filter, }) end, desc = "Goto Symbol" },
+
+        -- `gd` : Built-in key binding to go to local declaration, mostly useful in `C`,
+        --        here overwriting it with almost same behaviour, i.e. `vim.lsp.buf.definition()`.
+        { "gd", "<cmd>FzfLua lsp_definitions jump1 ignore_current_line=true<cr>", desc = "Goto Definition", has = "definition" },
+
+        -- `gry`: Not built-in key binding, thus no overwriting.
+        { "gry", "<cmd>FzfLua lsp_typedefs jump1 ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
+
+      -- LSP symbols, set on `lsp.keymaps` so `which-key` uses dynamic icon based on filetype.
+      { "<leader>ss", function() require("fzf-lua").lsp_document_symbols({ regex_filter = symbols_filter, }) end, desc = "LSP Symbols", has = "documentSymbol" },
+      { "<leader>sS", function() require("fzf-lua").lsp_live_workspace_symbols({ regex_filter = symbols_filter, }) end, desc = "LSP Workspace Symbols", has = "workspace/symbols" },
+      })
     end,
     keys = {
       ---------------------------------------------
@@ -686,110 +786,4 @@ return {
   --     { "<leader>sT", function () require("todo-comments.fzf").todo({ keywords = { "TODO", "FIX", "FIXME" } }) end, desc = "Todo/Fix/Fixme" },
   --   },
   -- },
-
-  {
-    "neovim/nvim-lspconfig",
-
-    -- - Overwrite behaviour for built-in LSP keybindings, and/or from `plugins/lsp/keymaps.lua` (not used),
-    --   so `fzf-lua` is used in case LSP command could returns multiple results from language server.
-    -- - `opts` as function, so this just executes right before `opts` is passed to `config`
-    --   function, during `opts` merging.
-    -- - Since below function extends `Keys`, it extends reference to `plugins.lsp.keymaps._keys` table in memory,
-    --   thus it does not matter that this is executed before `nvim-lspconfig` config-function,
-    --   which is where autocmd is set up that creates key bindings from `plugins.lsp.keymaps._keys`.
-    -- - NOTE: When keymap is defined on `lsp.keymaps`, `which-key` does not interpret keybinding as
-    --         being from plugin `fzf-lua`, which is good because keybindings defined in `lsp.keymaps`
-    --         get dynamic icon based on filetype, and not from `which-key` plugin rule for `fzf-lua`.
-    opts = function()
-      local Keys = require("myvim.plugins.lsp.keymaps").get()
-
-      ---------------------------------------------
-      -- Built-in `gr<x>` commands, see: `:h vim-diff`, `:h lsp`.
-      ---------------------------------------------
-      -- - Normal mode:
-      -- - `grn` : `vim.lsp.buf.rename()`
-      -- - `gra` : `vim.lsp.buf.code_action()`, Normal | Visual mode.
-      -- - `grr` : `vim.lsp.buf.references()`.
-      -- - `gri` : `vim.lsp.buf.implementation()`.
-      -- - `gO`  : `vim.lsp.buf.document_symbol()`.
-      -- - `gq`  : Calls function in `opt.formatexpr()`, initially set to `vim.lsp.formatexpr()` by Neovim,
-      --           but remapped to `util/format.lua` > `format()`.
-      -- - `K`   : `vim.lsp.buf.hover()`.
-      -- - CTRL-]: `vim.lsp.tagfunc()` > `textdocument/definition` < `vim.lsp.buf.defitition`.
-      --
-      -- - Insert mode:
-      -- - CTRL-S: `vim.lsp.buf.signature_help()`.
-      --
-      -- Therefore, do not re-create above functionality in new shortcuts,
-      -- except to use `plugins/fzf.lua` if command can return multiple hits, e.g. references.
-      --
-      -- These built-in bindings are remapped to same command, except using `fzf-lua`,
-      -- instead of quickfix list, when language server returns multiple results:
-      -- - `grr`.
-      -- - `gri`.
-      -- - `gO`.
-      --
-      -- These built-in bindings are remapped to same command:
-      -- - `gd` : Built-in behaviour is to go to local declaration, mainly useful in `C`,
-      --          thus remap similar functionality that works across languages,
-      --          i.e. `vim.lsp.buf.definition()`.
-      --
-      -- These built-in bindings are not remapped:
-      -- - `grn`: `vim.lsp.buf.rename()`, no remap needed, cannot return multiple results.
-      -- - `gra`: `vim.lsp.buf.code_action()`, no remap needed, just calls `vim.ui.select`,
-      --          which is overwritten with `fzf-lua` picker.
-      --
-      -- These new bindings are created, following built-in `gr<x>` format, as no built-in binding exists:
-      -- - `grd`: Go to definintion, same as built-in `ctrl-]`.
-      -- - `gry`: Go to type definintion.
-      ---------------------------------------------
-
-      ---------------------------------------------
-      -- Symbols and tags.
-      ---------------------------------------------
-      -- - Tags are defined in tag files, created with `ctags`, `gutentags`, etc.
-      -- - Alternatively, tags can be created on demand, for `{name}` in `:tag {name}`
-      --   or for word under cursor when using `gd` or `ctrl-]`.
-      -- - Tags are created on demand with function defined in `opt.tagfunc`.
-      -- - `opt.tagfunc` is set to `vim.lsp.tagfunc()`, when Neovim's built-in LSP client starts.
-      -- - `vim.lsp.tagfunc()` invokes `textdocument/definition` LSP method when used with Normal mode
-      --   commands, e.g. `gd` or `ctrl-]`, and "workspace/symbol" when used with other tag commands,
-      --   e.g. `:tag` | `:tjump` | `tselect`.
-      -- - Thus, tags are set by LSP response, enabling navigation to function definition.
-      --   - `ctrl-]` : Go to definition.
-      --   - `:tag`   : Go to symbol.
-      -- - Potential ways to continousely update tags, so symbol search is fast:
-      --   - Regularly calling `ctags`.
-      --   - Storing `symbols` for file in table, based on `vim.lsp.buf.document_symbols()`,
-      --     updating it on `InsertLeave`.
-      ---------------------------------------------
-
-      -- stylua: ignore
-      vim.list_extend(Keys, {
-        -- `grr`: Built-in key binding for `vim.lsp.buf.references()`, here overwriting it with same behaviour,
-        --        except using `fzf-lua` instead of default quickfix list when multiple results.
-        { "grr", "<cmd>FzfLua lsp_references jump1 ignore_current_line=true<cr>", desc = "References", nowait = true },
-
-        -- `gri`: Built-in key binding for `vim.lsp.buf.implementation()`, here overwriting it with same behaviour,
-        --        except using `fzf-lua` instead of default quickfix list when multiple results.
-        { "gri", "<cmd>FzfLua lsp_implementations jump1 ignore_current_line=true<cr>", desc = "Goto Implementation" },
-
-        -- `gO` : Built-in key binding for `vim.lsp.buf.document_symbol()`, here overwriting it with same behaviour,
-        --        except using `fzf-lua` instead of default quickfix list.
-        -- `regex_filter`: Filters symbols based on list defined in: `config/init.lua` > `options.<lang>|default`.
-        { "gO", function() require("fzf-lua").lsp_document_symbols({ regex_filter = symbols_filter, }) end, desc = "Goto Symbol" },
-
-        -- `gd` : Built-in key binding to go to local declaration, mostly useful in `C`,
-        --        here overwriting it with almost same behaviour, i.e. `vim.lsp.buf.definition()`.
-        { "gd", "<cmd>FzfLua lsp_definitions jump1 ignore_current_line=true<cr>", desc = "Goto Definition", has = "definition" },
-
-        -- `gry`: Not built-in key binding, thus no overwriting.
-        { "gry", "<cmd>FzfLua lsp_typedefs jump1 ignore_current_line=true<cr>", desc = "Goto T[y]pe Definition" },
-
-      -- LSP symbols, set on `lsp.keymaps` so `which-key` uses dynamic icon based on filetype.
-      { "<leader>ss", function() require("fzf-lua").lsp_document_symbols({ regex_filter = symbols_filter, }) end, desc = "LSP Symbols", has = "documentSymbol" },
-      { "<leader>sS", function() require("fzf-lua").lsp_live_workspace_symbols({ regex_filter = symbols_filter, }) end, desc = "LSP Workspace Symbols", has = "workspace/symbols" },
-      })
-    end,
-  },
 }

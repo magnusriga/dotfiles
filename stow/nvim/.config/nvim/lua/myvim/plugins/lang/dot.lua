@@ -1,3 +1,18 @@
+local lsp_name = "bashls"
+-- vim.lsp.config(lsp_name, {
+-- settings = {
+--   shellcheck = {
+--     enable = true,
+--     executable = "shellcheck",
+--     lintCommand = "shellcheck -f gcc -x",
+--     lintIgnoreExitCode = true,
+--   },
+--   sh = {
+--     shellcheck = { enable = true },
+--   },
+-- },
+-- })
+
 ---@type string
 local xdg_config = vim.env.XDG_CONFIG_HOME or vim.env.HOME .. "/.config"
 
@@ -8,19 +23,23 @@ end
 
 -- Language support for dotfiles.
 return {
+  -- `mason-lspconfig`:
+  -- - Installs underlying LSP server program.
+  -- - Automatically calls `vim.lsp.enable(..)`.
   {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        bashls = {},
-      },
-    },
+    "mason-org/mason-lspconfig.nvim",
+    -- Using `opts_extend`, see `plugins/mason.lua`.
+    opts = { ensure_installed = { lsp_name } },
   },
 
   -- `shellcheck`: Linting for shell scripts.
   {
-    "williamboman/mason.nvim",
-    opts = { ensure_installed = { "shellcheck" } },
+    "mason-org/mason.nvim",
+    opts = function(_, opts)
+      -- Uses custom `ensure_installed`, see: `plugins/mason.lua`.
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "shellcheck" })
+    end,
   },
 
   -- Add treesitter support, i.e. syntax highlighting, for various dotfiles.

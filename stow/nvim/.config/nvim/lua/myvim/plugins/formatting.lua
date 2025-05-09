@@ -1,22 +1,39 @@
 local M = {}
 
-local prettier_supported = {
+-- Filetypes for which Biome should be used.
+local biome_ft = {
+  "astro",
   "css",
   "graphql",
-  "handlebars",
-  "html",
-  "xhtml",
   "javascript",
   "javascriptreact",
   "json",
   "jsonc",
+  "svelte",
+  "typescript",
+  "typescript.tsx",
+  "typescriptreact",
+  "vue",
+}
+
+-- Using Biome instead, when supported.
+local prettier_ft = {
+  -- "css",
+  -- "graphql",
+  "handlebars",
+  "html",
+  -- "javascript",
+  -- "javascriptreact",
+  -- "json",
+  -- "jsonc",
   "less",
   "markdown",
   "markdown.mdx",
   "scss",
-  "typescript",
-  "typescriptreact",
-  "vue",
+  -- "typescript",
+  -- "typescriptreact",
+  -- "vue",
+  "xhtml",
   "yaml",
 }
 
@@ -35,7 +52,7 @@ end
 function M.has_parser(ctx)
   local ft = vim.bo[ctx.buf].filetype --[[@as string]]
   -- Default filetypes are always supported.
-  if vim.tbl_contains(prettier_supported, ft) then
+  if vim.tbl_contains(prettier_ft, ft) then
     return true
   end
   -- Otherwise, check if a parser can be inferred.
@@ -72,8 +89,12 @@ return {
     "stevearc/conform.nvim",
     dependencies = {
       {
-        "mason.nvim",
-        opts = { ensure_installed = { "prettierd", "kulala-fmt" } },
+        "mason-org/mason.nvim",
+        opts = function(_, opts)
+          -- Uses custom `ensure_installed`, see: `plugins/mason.lua`.
+          opts.ensure_installed = opts.ensure_installed or {}
+          vim.list_extend(opts.ensure_installed, { "biome", "prettierd", "kulala-fmt" })
+        end,
       },
     },
     -- Only load this plugin when `require('conform')`,
@@ -172,12 +193,26 @@ return {
         },
       }
 
-      for _, ft in ipairs(prettier_supported) do
+      --- Add biome as a formatter for supported filetypes.
+      for _, ft in ipairs(biome_ft) do
         opts.formatters_by_ft[ft] = { "prettierd" }
         -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
         -- table.insert(opts.formatters_by_ft[ft], "prettierd")
         -- table.insert(opts.formatters_by_ft[ft], "prettier")
       end
+
+      -- Add prettier as a formatter for supported filetypes.
+      for _, ft in ipairs(prettier_ft) do
+        opts.formatters_by_ft[ft] = { "prettierd" }
+        -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+        -- table.insert(opts.formatters_by_ft[ft], "prettierd")
+        -- table.insert(opts.formatters_by_ft[ft], "prettier")
+      end
+
+      -- Needed for `biome` to work.
+      opts.formatters.biome = {
+        require_cwd = true,
+      }
 
       return opts
     end,

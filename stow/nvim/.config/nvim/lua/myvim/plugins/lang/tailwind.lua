@@ -1,46 +1,72 @@
+local lsp_name = "tailwindcss"
+
+vim.lsp.config(lsp_name, {
+  -- Filetypes copied and adjusted from tailwindcss-intellisense.
+  filetypes = {
+    -- html
+    "aspnetcorerazor",
+    "astro",
+    "astro-markdown",
+    "blade",
+    "clojure",
+    "django-html",
+    "htmldjango",
+    "edge",
+    "eelixir", -- vim ft
+    "elixir",
+    "ejs",
+    "erb",
+    "eruby", -- vim ft
+    "gohtml",
+    "gohtmltmpl",
+    "haml",
+    "handlebars",
+    "hbs",
+    "html",
+    "htmlangular",
+    "html-eex",
+    "heex",
+    "jade",
+    "leaf",
+    "liquid",
+    -- 'markdown', -- Exclude.
+    "mdx",
+    "mustache",
+    "njk",
+    "nunjucks",
+    "php",
+    "razor",
+    "slim",
+    "twig",
+    -- css
+    "css",
+    "less",
+    "postcss",
+    "sass",
+    "scss",
+    "stylus",
+    "sugarss",
+    -- js
+    "javascript",
+    "javascriptreact",
+    "reason",
+    "rescript",
+    "typescript",
+    "typescriptreact",
+    -- mixed
+    "vue",
+    "svelte",
+    "templ",
+  },
+})
+
 return {
+  -- `mason-lspconfig`:
+  -- - Installs underlying LSP server program.
+  -- - Automatically calls `vim.lsp.enable(..)`.
   {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        tailwindcss = {
-          -- Exclude filetype from default_config.
-          filetypes_exclude = { "markdown" },
-          -- Add additional filetypes to default_config.
-          filetypes_include = {},
-          -- Fully override default_config.
-          -- filetypes = {}
-        },
-      },
-      setup = {
-        tailwindcss = function(_, opts)
-          local tw = MyVim.lsp.get_raw_config("tailwindcss")
-          opts.filetypes = opts.filetypes or {}
-
-          -- Add default filetypes.
-          vim.list_extend(opts.filetypes, tw.default_config.filetypes)
-
-          -- Remove excluded filetypes.
-          --- @param ft string
-          opts.filetypes = vim.tbl_filter(function(ft)
-            return not vim.tbl_contains(opts.filetypes_exclude or {}, ft)
-          end, opts.filetypes)
-
-          -- Additional settings for Phoenix projects.
-          opts.settings = {
-            tailwindCSS = {
-              includeLanguages = {
-                elixir = "html-eex",
-                eelixir = "html-eex",
-                heex = "html-eex",
-              },
-            },
-          }
-
-          -- Add additional filetypes.
-          vim.list_extend(opts.filetypes, opts.filetypes_include or {})
-        end,
-      },
-    },
+    "mason-org/mason-lspconfig.nvim",
+    -- Using `opts_extend`, see `plugins/mason.lua`.
+    opts = { ensure_installed = { lsp_name } },
   },
 }

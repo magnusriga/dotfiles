@@ -129,10 +129,12 @@ return {
         markdown = true,
         help = true,
       },
+
+      -- Change function that gets root folder, default directory with `.git`.
+      -- root_dir = function()
+      --   return require("copilot.util").find_git_ancestor(vim.fn.expand("%:p"))
+      -- end,
     },
-    root_dir = function()
-      return vim.fs.dirname(vim.fs.find(".git", { upward = true })[1])
-    end,
   },
 
   -- - `plugins/blink.lua`:

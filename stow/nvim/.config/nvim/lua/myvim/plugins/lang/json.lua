@@ -1,23 +1,21 @@
-vim.api.nvim_create_autocmd("FileType", {
-  group = vim.api.nvim_create_augroup("schemastore_json", {
-    clear = true,
-  }),
-  pattern = { "json", "jsonc", "json5" },
-  callback = function()
-    vim.lsp.config("jsonls", {
-      -- Enable JSON validation.
-      settings = {
-        json = {
-          schemas = require("schemastore").json.schemas(),
-          format = {
-            enable = true,
-          },
-          validate = { enable = true },
-        },
+local lsp_name = "jsonls"
+
+vim.lsp.config(lsp_name, {
+  settings = {
+    json = {
+      format = {
+        enable = true,
       },
-    })
-  end,
+      validate = { enable = true },
+    },
+  },
 })
+
+-- Add schema support to `yamlls`, after `lazy.nvim` has loaded all plugins,
+-- to ensure `SchemaStore.nvim` is available.
+MyVim.on_very_lazy(function()
+  vim.lsp.config[lsp_name].settings.json.schemas = require("schemastore").json.schemas()
+end)
 
 return {
   -- Add json to treesitter.
@@ -26,29 +24,18 @@ return {
     opts = { ensure_installed = { "json5" } },
   },
 
-  -- Correctly setup lspconfig, with schema store.
+  -- YAML and JSON schema support.
   {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-      {
-        "b0o/SchemaStore.nvim",
-        version = false, -- Last release is too old.
-      },
-    },
-    opts = {
-      -- Make sure mason installs server.
-      servers = {
-        jsonls = {
-          settings = {
-            json = {
-              format = {
-                enable = true,
-              },
-              validate = { enable = true },
-            },
-          },
-        },
-      },
-    },
+    "b0o/SchemaStore.nvim",
+    version = false, -- Last release too old.
+  },
+
+  -- `mason-lspconfig`:
+  -- - Installs underlying LSP server program.
+  -- - Automatically calls `vim.lsp.enable(..)`.
+  {
+    "mason-org/mason-lspconfig.nvim",
+    -- Using `opts_extend`, see `plugins/mason.lua`.
+    opts = { ensure_installed = { lsp_name } },
   },
 }

@@ -1,3 +1,7 @@
+local lsp_name = "marksman"
+
+-- vim.lsp.config(lsp_name, { })
+
 MyVim.on_very_lazy(function()
   vim.filetype.add({
     extension = { mdx = "markdown.mdx" },
@@ -40,9 +44,21 @@ return {
   },
 
   {
-    "williamboman/mason.nvim",
-    -- opts = { ensure_installed = { "markdownlint-cli2", "markdown-toc" } },
-    opts = { ensure_installed = { "markdownlint-cli2", "markdownlint", "markdown-toc" } },
+    "mason-org/mason.nvim",
+    opts = function(_, opts)
+      -- Uses custom `ensure_installed`, see: `plugins/mason.lua`.
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "markdownlint-cli2", "markdownlint", "markdown-toc" })
+    end,
+  },
+
+  -- `mason-lspconfig`:
+  -- - Installs underlying LSP server program.
+  -- - Automatically calls `vim.lsp.enable(..)`.
+  {
+    "mason-org/mason-lspconfig.nvim",
+    -- Using `opts_extend`, see `plugins/mason.lua`.
+    opts = { ensure_installed = { lsp_name } },
   },
 
   -- Prefer `nvim-lint`.
@@ -92,19 +108,6 @@ return {
     --   end,
     -- })
     -- end,
-  },
-
-  -- NOTE: Use `obsidian.nvim` because:
-  -- - Links created with completions from `obsidian.nvim` work in Obsidian application.
-  -- - `Obsidian***`: Nice way to create notes with templates and frontmatter.
-  -- - Keep `marksman` for diagnostics, etc.
-  {
-    "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        marksman = {},
-      },
-    },
   },
 
   -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.

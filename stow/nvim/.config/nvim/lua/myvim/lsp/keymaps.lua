@@ -153,10 +153,11 @@ function M.resolve(buffer)
     return {}
   end
   local spec = vim.tbl_extend("force", {}, M.get())
-  local opts = MyVim.opts("nvim-lspconfig")
+  -- local opts = MyVim.opts("nvim-lspconfig")
   local clients = MyVim.lsp.get_clients({ bufnr = buffer })
   for _, client in ipairs(clients) do
-    local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
+    -- local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
+    local maps = {}
     vim.list_extend(spec, maps)
   end
   return Keys.resolve(spec)
@@ -166,11 +167,10 @@ end
 -- i.e. `opts.servers[<client>].keys`,
 -- where each element contains `keys` table with fields `lhs`, `rhs`, `mode` (default to `n`), `id`,
 -- and all other fields from each keymap spec above, e.g. `cond`, `has`, etc.
--- then checks if any attached client supports the `has` method, e.g. `textDocument/codeLens`,
+-- Checks if any attached client supports `has` method, e.g. `textDocument/codeLens`,
 -- and if `cond` returns `true`.
--- If so, save all fields on keymaps above into new `opts`, keeping only those fields whose key is not a number,
--- and skipping `{ mode = true, id = true, ft = true, rhs = true, lhs = true }`,
--- then create keymap passing in `opts`, with current buffer added to `opts`, and `opts.mode` defaulting to `n`.
+-- If so, create keymap with relevant fields from above,
+-- as well as default `opts` for new keymaps from `lazy.core.handler.keys`.
 function M.on_attach(_, buffer)
   local Keys = require("lazy.core.handler.keys")
   local keymaps = M.resolve(buffer)

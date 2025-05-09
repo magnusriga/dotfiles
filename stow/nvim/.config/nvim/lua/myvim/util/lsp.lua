@@ -23,7 +23,7 @@ end
 -- Create autocmd that executes `on_attach(client, buffer)` callback,
 -- when LSP client `client` attaches to buffer `buffer`.
 ---@param on_attach fun(client:vim.lsp.Client, buffer)
----@param name? string
+---@param name? string -- Name of LSP client, used for filtering.
 function M.on_attach(on_attach, name)
   return vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(args)
@@ -36,7 +36,8 @@ function M.on_attach(on_attach, name)
   })
 end
 
--- `_supports_method` example:
+-- `_supports_method` example, numbers in each client entry refers to buffer id,
+-- i.e. buffer where LSP client that supports given method is attached to.
 -- {
 --   "textDocument/inlayHints" = {
 --     eslintClient = { 1 = true, 2 = false, 5 = true }
@@ -46,46 +47,18 @@ end
 ---@type table<string, table<vim.lsp.Client, table<number, boolean>>>
 M._supports_method = {}
 
--- Overwrite handler function, which runs when registering new capability on LSP client,
--- with new function that registers capability on client,
--- and then runs autocmd `LspDyncamicCapability` for every buffer which that client is attached to,
--- with `client.id` and `buffer` passed in.
---
--- It also adds new autocmd which runs when LSP `client` *first* attaches to `buffer`,
--- which executes some function and method previously registered via `on_support_method`,
--- if client supports given method for buffer being attached to.
---
--- Specifically, for every methond in `_supports_method`,
--- if method does not already have entry for attaching client and buffer,
--- or it has entry stating that client does *not* support method for buffer,
--- then check if client supports current method for given buffer with `client.supports_method(method, { buffer })`,
--- and if client indeed supports method, then set `_supports_method.method.client.buffer = true`,
--- and execute `LspSupportsMethod` autocmd with `client.id`, `buffer`, `method`,
--- which executes a previously added function for specific method given at time of registration.
---
--- Finally, it registers same function and method so it can execute upon `User` autocmd `LspDynamicCapability`,
--- in addition to whenever client attaches to buffer,
--- which is executed whenever client registers new capability.
-function M.setup()
-  local register_capability = vim.lsp.handlers["client/registerCapability"]
-  vim.lsp.handlers["client/registerCapability"] = function(err, res, ctx)
-    ---@diagnostic disable-next-line: no-unknown
-    local ret = register_capability(err, res, ctx)
-    local client = vim.lsp.get_client_by_id(ctx.client_id)
-    if client then
-      for buffer in pairs(client.attached_buffers) do
-        vim.api.nvim_exec_autocmds("User", {
-          pattern = "LspDynamicCapability",
-          data = { client_id = client.id, buffer = buffer },
-        })
-      end
-    end
-    return ret
-  end
-  M.on_attach(M._check_methods)
-  M.on_dynamic_capability(M._check_methods)
-end
-
+-- =============================================
+-- CONCLUSIONS: How do these functions work?
+-- =============================================
+-- Called when:
+-- - LSP client attaches to buffer, i.e. `MyVim.on_attach(..)`.
+-- - Server sends request to client, to announce server's support for given client method.
+-- Handles:
+-- - Executing `LspSupportsMethod` autocmd.
+-- - Including enabling inlay hints and codeles refresh.
+-- - Functions called by `LspSupportsMethod`: `plugins/lsp/init.lua`.
+-- Notes:
+-- - Functions called only ONCE, per client-buffer pair.
 ---@param client vim.lsp.Client
 function M._check_methods(client, buffer)
   -- Don't trigger `LspSupportsMethod` on invalid buffers.
@@ -102,6 +75,8 @@ function M._check_methods(client, buffer)
   end
   for method, clients in pairs(M._supports_method) do
     clients[client] = clients[client] or {}
+    -- Runs on both `LspAttach` and `LspDynamicCapability`, thus ensure
+    -- method is only registered once for client and buffer pair.
     if not clients[client][buffer] then
       if client:supports_method(method, buffer) then
         clients[client][buffer] = true
@@ -114,6 +89,36 @@ function M._check_methods(client, buffer)
   end
 end
 
+-- - `client/registerCapability` request is sent from server to client,
+--   to dynamically register server's support for specific client method.
+-- - Callbacks registered with `on_attach`:
+--   - Executes when LSP client attaches to buffer.
+-- - Callbacks registered with `on_dynamic_capability`:
+--   - Executes when server registers new capability.
+-- - Callbacks registered with `on_attach` and `on_dynamic_capability`:
+--   - `MyVim.lsp._check_methods`
+--   - `require("myvim.plugins.lsp.keymaps").on_attach`
+-- - `MyVim.lsp._check_methods`:
+--   - Exexutes `LspSupportsMethod`.
+--   - ONCE for each client and buffer pair.
+--   - ONLY if client supports method.
+-- - `LspSupportsMethod`:
+--   - User command
+--   - Runs callbacks registered with `on_supports_method`.
+-- - Two `LspSupportsMethod`, from `plugins/lsp/init.lua`:
+--   - `vim.lsp.inlay_hint.enable(true, { bufnr = buffer })`
+--   - `vim.lsp.codelens.refresh()`
+--      + autocmd that refreshes codelens upon "BufEnter", "CursorHold", "InsertLeave".
+-- - Conclusion:
+--   - When client attaches to buffer, or server dynamically registers its support for
+--     specific client method, i.e. AFTER LSP client attaches to buffer...
+--   - Client enables inlay hints, if client supports inlay hints.
+--   - Client sets codelens refresh autocmd, if client supports codelens.
+--
+-- - NOTE: Important to only execute `LspSupportsMethod` functions once,
+--   because `_check_methods` runs BOTH when LSP client attaches to buffer,
+--   AND when server dynamically registers new capability on client.
+--
 ---@param fn fun(client:vim.lsp.Client, buffer):boolean?
 ---@param opts? {group?: integer}
 function M.on_dynamic_capability(fn, opts)
@@ -130,15 +135,15 @@ function M.on_dynamic_capability(fn, opts)
   })
 end
 
--- Create autocmd executing given `fn(client, buffer)`,
--- for passed in `client` (id) and `buffer` (id),
--- on event `User` and pattern `LspSupportsMethod`.
--- `LspSupportsMethod` is e.g. executed when any client attaches to any buffer,
--- so that `fn(client, buffer)` is executed for every method in `_supports_methods`
--- that matches method passed into this function,
--- but only when client supports the method for given buffer,
--- and only when method entry is first added to `_supports_method` table,
--- i.e. if `LspSupportsMethod` has not run before.
+-- - Create autocmd executing given `fn(client, buffer)`,
+--   for passed in `client` (id) and `buffer` (id),
+--   on event `User` and pattern `LspSupportsMethod`.
+-- - `LspSupportsMethod` is executed when client attaches to buffer,
+--   or when server dynamically registers its support for client capability,
+--   e.g. `inlayHint`.
+-- - Thus, `fn(client, buffer)` is executed for every method in `_supports_methods`
+--   that matches method passed into this function,
+--   but only if client supports method, and only ONCE for each client and buffer pair.
 ---@param method string
 ---@param fn fun(client:vim.lsp.Client, buffer)
 function M.on_supports_method(method, fn)
@@ -156,17 +161,17 @@ function M.on_supports_method(method, fn)
 end
 
 function M.get_config(server)
-  local configs = require("lspconfig.configs")
-  return rawget(configs, server)
+  return vim.lsp.config[server]
 end
 
 ---@return {default_config:lspconfig.Config}
 function M.get_raw_config(server)
-  local ok, ret = pcall(require, "lspconfig.configs." .. server)
-  if ok then
-    return ret
-  end
-  return require("lspconfig.server_configurations." .. server)
+  return vim.lsp.config[server]
+  -- local ok, ret = pcall(require, "lspconfig.configs." .. server)
+  -- if ok then
+  --   return ret
+  -- end
+  -- return require("lspconfig.server_configurations." .. server)
 end
 
 function M.is_enabled(server)
@@ -177,14 +182,15 @@ end
 ---@param server string
 ---@param cond fun( root_dir, config): boolean
 function M.disable(server, cond)
-  local util = require("lspconfig.util")
-  local def = M.get_config(server)
-  ---@diagnostic disable-next-line: undefined-field
-  def.document_config.on_new_config = util.add_hook_before(def.document_config.on_new_config, function(config, root_dir)
-    if cond(root_dir, config) then
-      config.enabled = false
-    end
-  end)
+  vim.lsp.enable(server, false)
+  -- local util = require("lspconfig.util")
+  -- local def = M.get_config(server)
+  -- ---@diagnostic disable-next-line: undefined-field
+  -- def.document_config.on_new_config = util.add_hook_before(def.document_config.on_new_config, function(config, root_dir)
+  --   if cond(root_dir, config) then
+  --     config.enabled = false
+  --   end
+  -- end)
 end
 
 -- Run when registering LSP formatter, from `plugins/lsp/init.lua` to `util/format.lua`.
@@ -242,7 +248,8 @@ function M.format(opts)
     "force",
     {},
     opts or {},
-    MyVim.opts("nvim-lspconfig").format or {},
+    vim.lsp.buf.format or {},
+    -- MyVim.opts("nvim-lspconfig").format or {},
     MyVim.opts("conform.nvim").format or {}
   )
   local ok, conform = pcall(require, "conform")
