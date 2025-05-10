@@ -4,7 +4,9 @@ vim.lsp.config(lsp_name, {
   settings = {
     json = {
       format = {
-        enable = true,
+        -- enable = true,
+        -- Using: `biome`.
+        enable = false,
       },
       validate = { enable = true },
     },

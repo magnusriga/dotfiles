@@ -155,28 +155,63 @@ return {
     opts = function()
       ---@type conform.setupOpts
       local opts = {
+        -- default_format_opts = {
+        --   timeout_ms = 3000,
+        --   async = false,
+        --   quiet = false,
+        --   lsp_format = "fallback",
+        -- },
         formatters_by_ft = {
           lua = { "stylua" },
           fish = { "fish_indent" },
           sh = { "shfmt" },
           http = { "kulala" },
+          typescript = { "biome" },
         },
 
         -- The options you set here will be merged with the builtin formatters.
         -- You can also define any custom formatters here.
         ---@type table<string, conform.FormatterConfigOverride|fun(bufnr: integer): nil|conform.FormatterConfigOverride>
         formatters = {
-          injected = { options = { ignore_errors = true } },
-          prettier = {
-            condition = prettier_condition,
-          },
+          -- injected = { options = { ignore_errors = true } },
+          -- prettier = {
+          --   condition = prettier_condition,
+          -- },
           kulala = {
             command = "kulala-fmt",
             args = { "format", "$FILENAME" },
             stdin = false,
           },
           biome = {
-            args = { "check", "--write", "--stdin-file-path", "$FILENAME" },
+            inherit = false,
+            meta = {
+              url = "https://github.com/biomejs/biome",
+              description = "A toolchain for web projects, aimed to provide functionalities to maintain them.",
+            },
+            -- command = require("conform.util").from_node_modules("biome"),
+            command = "echo",
+            stdin = true,
+            -- args = { "format", "--stdin-file-path", "$FILENAME" },
+            args = {},
+            cwd = require("conform.util").root_file({
+              "biome.json",
+              "biome.jsonc",
+            }),
+            -- -- command = require("conform.util").from_node_modules("biome"),
+            -- -- command = "pnpm biome check --stdin-file-path='foo.ts' --write",
+            -- command = "echo hello world",
+            -- args = {},
+            -- -- args = { "check", "--stdin-file-path", "$FILENAME", "--write" },
+            -- -- args = { "check", "--write", "$FILENAME" },
+            -- -- args = { "check", "--write", "$FILENAME" },
+            -- stdin = true,
+            -- cwd = require("conform.util").root_file({
+            --   "biome.json",
+            --   "biome.jsonc",
+            -- }),
+            -- Default: args = { "format", "--stdin-file-path", "$FILENAME" },
+            -- args = { "check", "--stdin-file-path", "$FILENAME" },
+            -- args = { "format", "--stdin-file-path", "$FILENAME" },
           },
           -- # Example of using dprint only when a dprint.json file is present
           -- dprint = {
@@ -193,14 +228,25 @@ return {
       }
 
       --- Add biome as a formatter for supported filetypes.
-      for _, ft in ipairs(biome_ft) do
-        opts.formatters_by_ft[ft] = { "biome" }
-      end
+      -- for _, ft in ipairs(biome_ft) do
+      --   opts.formatters_by_ft[ft] = { "biome" }
+      --   -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+      --   -- table.insert(opts.formatters_by_ft[ft], "prettierd")
+      --   -- table.insert(opts.formatters_by_ft[ft], "prettier")
+      -- end
 
       -- Add prettier as a formatter for supported filetypes.
-      for _, ft in ipairs(prettier_ft) do
-        opts.formatters_by_ft[ft] = { "prettierd" }
-      end
+      -- for _, ft in ipairs(prettier_ft) do
+      --   opts.formatters_by_ft[ft] = { "prettierd" }
+      --   -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+      --   -- table.insert(opts.formatters_by_ft[ft], "prettierd")
+      --   -- table.insert(opts.formatters_by_ft[ft], "prettier")
+      -- end
+
+      -- Needed for `biome` to work.
+      opts.formatters.biome = {
+        require_cwd = true,
+      }
 
       return opts
     end,

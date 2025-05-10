@@ -1,9 +1,66 @@
 local lsp_name = "biome"
+-- Manually enable, since not installing executable with `mason-lspconfig`.
+vim.lsp.config(lsp_name, {
+  -- Use `pnpm` to run `biome` executable.
+  cmd = { "pnpm", "biome", "lsp-proxy" },
+})
+vim.lsp.enable(lsp_name)
 
 -- =============================
 -- User commands.
 -- =============================
--- - `conform.nvim` runs `biome format`, or if overwritten then `biome check --write`.
+-- -----------------------------
+-- Helper functions.
+-- -----------------------------
+local function get_biome_config_dir_for_file(file_path_for_context)
+  -- file_path_for_context is expected to be an absolute path to a file
+  local start_dir = vim.fn.fnamemodify(file_path_for_context, ":h")
+
+  if start_dir == "" or start_dir == "." then
+    -- Fallback if path modification results in empty or current dir,
+    -- though callers should provide absolute paths making this unlikely.
+    start_dir = vim.fn.getcwd()
+  end
+
+  local found_config_files = vim.fs.find({ "biome.json", "biome.jsonc" }, {
+    path = start_dir, -- Directory to start searching from
+    upward = true, -- Search upwards towards root
+    type = "file", -- We are looking for files
+    limit = 1, -- Stop after finding the first one
+  })
+
+  if found_config_files and #found_config_files > 0 then
+    -- found_config_files[1] is the full path to the biome.json or biome.jsonc
+    -- --config-path expects the directory containing this file.
+    return vim.fn.fnamemodify(found_config_files[1], ":h")
+  end
+
+  return nil -- No config file found
+end
+
+-- -----------------------------
+-- Actual user commands.
+-- -----------------------------
+vim.api.nvim_create_user_command("BiomeInfo", function()
+  local file_path = vim.fn.expand("%:p")
+  if file_path == "" then
+    vim.notify("No file to process.", vim.log.levels.WARN)
+    return
+  end
+  local command_base = "pnpm biome rage "
+  local config_dir = get_biome_config_dir_for_file(file_path)
+  local config_option = ""
+  if config_dir then
+    config_option = "--config-path " .. vim.fn.shellescape(config_dir)
+  end
+  local command_str = command_base .. config_option
+  vim.cmd("!" .. command_str)
+end, {
+  desc = "Biome information.",
+  nargs = 0,
+})
+
+-- - `conform.nvim` runs `biome format`, or if overwritten then `biome check`.
 -- - Meaning, `conform.nvim` already handles formatting when running `Format` | on save.
 -- - Thus, below autocommands mainly used for:
 --   - Manual formatting with biome only, not really needed.
@@ -14,8 +71,16 @@ vim.api.nvim_create_user_command("BiomeFix", function()
     vim.notify("No file to process.", vim.log.levels.WARN)
     return
   end
-  local command_str = "biome check --write " .. vim.fn.shellescape(file_path)
-  vim.cmd("silent !" .. command_str)
+  local command_base = "pnpm biome check --write "
+  local config_dir = get_biome_config_dir_for_file(file_path)
+  local config_option = ""
+  if config_dir then
+    config_option = "--config-path " .. vim.fn.shellescape(config_dir) .. " "
+  end
+  local command_str = command_base .. config_option .. vim.fn.shellescape(file_path)
+  vim.schedule(function()
+    vim.cmd("silent !" .. command_str)
+  end)
 end, {
   desc = "Format, fix lint issues, fix import order (safe).",
   nargs = 0,
@@ -27,92 +92,29 @@ vim.api.nvim_create_user_command("BiomeFixUnsafe", function()
     vim.notify("No file to process.", vim.log.levels.WARN)
     return
   end
-  local command_str = "biome check --write --unsafe " .. vim.fn.shellescape(file_path)
-  vim.cmd("silent !" .. command_str)
+  local command_base = "pnpm biome check --write --unsafe "
+  local config_dir = get_biome_config_dir_for_file(file_path)
+  local config_option = ""
+  if config_dir then
+    config_option = "--config-path " .. vim.fn.shellescape(config_dir) .. " "
+  end
+  local command_str = command_base .. config_option .. vim.fn.shellescape(file_path)
+  vim.schedule(function()
+    vim.cmd("silent !" .. command_str)
+  end)
 end, {
   desc = "Format, fix lint issues, fix import order (unsafe).",
   nargs = 0,
 })
 
--- ==========================================================
--- Fix lint issues and import order on `:Format` and save.
--- ==========================================================
--- - Register `biome` as formatter, using `formatter` from `MyVim.lsp.formatter`,
---   with `format` function replaced with command `silent biome check --write <file>`.
--- - Thus, formatting buffer with `Format` | save, results in:
---   1. `biome check --write`: Runs if `biome` is attached to buffer.
---   2. `conform.nvim`: Runs `biome` formatter, if applicable filetype.
---
--- - `primary = true`:
---   - Only allowed to have ONE primary formatter.
---   - Below formatter is primary.
---   - `conform` is `primary`, with `priority = 100`, see: `plugins/formatting.lua`.
---   - Below formatter has `priority = 200`.
---   - Thus, only below formatter is `active`.
---
--- NOTE: This custom formatter will not be `active` in buffers where `biome` in
--- not attached, which allows `conform.nvim` to be `active` `primary` formatter.
---
--- - `priority = 200`:
---   - Primary formatter with highest priority applies.
---   - Non-primary formatters run in order of priority, highest first.
---   - Thus, `biome` formatter runs instead of `conform.nvim`.
---
--- `biome check --write`:
--- - Formats document
--- - Fixes safe lint errors
--- - Fixes import statement order
---
--- NOTE:
--- - `biome check --write` also does formatting.
--- - Tried to use `biome check --write` as conform command, without success.
--- - Default `conform.nvim` command for `biome` is:
---   - `command = util.form_node_modules("biome")`
---   - `args = { "format", "--stdin-file-path", "$FILENAME" }`
---   - `cwd = util.root_file({
---       "biome.json",
---       "biome.jsonc",
---     }`
--- - Thus, stick to below custom formatter.
---
-MyVim.on_very_lazy(function()
-  MyVim.format.register({
-    name = "biome-safe-fix",
-    priority = 200,
-    primary = true,
-    format = function(buf)
-      local file_path = vim.api.nvim_buf_get_name(buf)
-      if file_path == "" then
-        vim.notify("No file to process.", vim.log.levels.WARN)
-        return
-      end
-      -- Run in `vim.schedule`, to avoid textlock.
-      vim.schedule(function()
-        local command_str = "biome check --write " .. vim.fn.shellescape(file_path)
-        vim.cmd("silent !" .. command_str)
-      end)
-    end,
-    sources = function(buf)
-      local clients = vim.lsp.get_clients({ bufnr = buf })
-      local ret = vim.tbl_filter(function(client)
-        return client.name == lsp_name
-      end, clients)
-      ---@param client vim.lsp.Client
-      return vim.tbl_map(function(client)
-        return client.name
-      end, ret)
-    end,
-  })
-end)
-
 return {
   -- `mason-lspconfig`:
   -- - Installs underlying LSP server program.
   -- - Automatically calls `vim.lsp.enable(..)`.
-  {
-    "mason-org/mason-lspconfig.nvim",
-    -- Using `opts_extend`, see `plugins/mason.lua`.
-    opts = { ensure_installed = { lsp_name } },
-    init = function() end,
-  },
+  -- - NOTE: Skip, using project-local `biome` executable, installed with `pnpm`.
+  -- {
+  --   "mason-org/mason-lspconfig.nvim",
+  --   -- Using `opts_extend`, see `plugins/mason.lua`.
+  --   opts = { ensure_installed = { lsp_name } },
+  -- },
 }

@@ -211,7 +211,8 @@ opt.cursorline = false
 opt.diffopt:append({ "vertical" })
 
 -- Convert typed tab character to spaces, following `opt.tabstop`.
-opt.expandtab = true
+-- opt.expandtab = true
+opt.expandtab = false
 
 opt.fillchars = {
   -- Fold fill characters.
@@ -308,14 +309,15 @@ opt.linebreak = true
 
 -- Show invisible characters.
 opt.list = true
-opt.listchars = {
-  tab = "!>",
-  space = "·",
-  trail = "·",
-  nbsp = "␣",
-  extends = "▶",
-  precedes = "◀",
-}
+opt.listchars = { tab = ">-", space = "·", trail = "·", nbsp = "␣" }
+-- opt.listchars = {
+--   tab = "» ",
+--   space = "·",
+--   trail = "·",
+--   nbsp = "␣",
+--   extends = "▶",
+--   precedes = "◀",
+-- }
 
 -- Enable mouse in Neovim, default: `nvi`.
 -- - `n`: Normal mode.

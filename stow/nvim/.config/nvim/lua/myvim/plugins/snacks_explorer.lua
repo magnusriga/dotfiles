@@ -13,8 +13,8 @@ return {
         -- ---@type snacks.picker.explorer.Config: snacks.picker.files.Config|{}
         explorer = {
           hidden = true,
-          ignored = false,
-          -- ignored = true,
+          -- ignored = false,
+          ignored = true,
         },
         grep = {
           hidden = true,
