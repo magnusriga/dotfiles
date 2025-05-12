@@ -447,6 +447,7 @@ return {
           -- Exclude comment-heavy filetypes.
           local comment_heavy_filetypes = {
             "markdown",
+            "markdown.mdx",
             "txt",
             "text",
             "help",

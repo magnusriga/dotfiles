@@ -2,26 +2,29 @@ local lsp_name = "cssls"
 
 vim.lsp.config(lsp_name, {
   root_dir = MyVim.root(),
-  -- settings = {
-  --   css = {
-  --     validate = true,
-  --     lint = {
-  --       unknownAtRules = "ignore",
-  --     },
-  --   },
-  --   scss = {
-  --     validate = true,
-  --     lint = {
-  --       unknownAtRules = "ignore",
-  --     },
-  --   },
-  --   less = {
-  --     validate = true,
-  --     lint = {
-  --       unknownAtRules = "ignore",
-  --     },
-  --   },
-  -- },
+  -- Ignore at-rules, to avoid clashes with `tailwind`.
+  settings = {
+    css = {
+      -- Using biome for formatting and linting.
+      validate = false,
+      -- validate = true,
+      -- lint = {
+      --   unknownAtRules = "ignore",
+      -- },
+    },
+    scss = {
+      validate = true,
+      lint = {
+        unknownAtRules = "ignore",
+      },
+    },
+    less = {
+      validate = true,
+      lint = {
+        unknownAtRules = "ignore",
+      },
+    },
+  },
 })
 
 return {

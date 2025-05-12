@@ -3,6 +3,20 @@ local lsp_name = "biome"
 vim.lsp.config(lsp_name, {
   -- Use `pnpm` to run `biome` executable.
   cmd = { "pnpm", "biome", "lsp-proxy" },
+  -- filetypes = {
+  --   "astro",
+  --   "css",
+  --   "graphql",
+  --   "javascript",
+  --   "javascriptreact",
+  --   "json",
+  --   "jsonc",
+  --   "svelte",
+  --   "typescript",
+  --   "typescript.tsx",
+  --   "typescriptreact",
+  --   "vue",
+  -- },
 })
 vim.lsp.enable(lsp_name)
 

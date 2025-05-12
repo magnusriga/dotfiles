@@ -53,8 +53,8 @@ return {
   },
 
   -- `mason-lspconfig`:
-  -- - Installs underlying LSP server program.
-  -- - Automatically calls `vim.lsp.enable(..)`.
+  -- - Installs `marksman` LSP server program.
+  -- - Automatically calls `vim.lsp.enable("marksman")`.
   {
     "mason-org/mason-lspconfig.nvim",
     -- Using `opts_extend`, see `plugins/mason.lua`.
@@ -111,23 +111,23 @@ return {
   },
 
   -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
-  {
-    "magnusriga/markdown-tools.nvim",
-    -- dir = "~/dev/nvim-plugins/markdown-tools.nvim",
-    opts = {
-      -- frontmatter_custom = {
-      --   -- Example: Adds a 'status' field and supports {{status}} placeholder
-      --   magnus = function(_opts)
-      --     return "rg"
-      --   end,
-      --   -- Example: Adds a 'related' field (list) and supports {{related}} placeholder
-      --   foo = function(_opts)
-      --     return { "foo", "bar", "baz" }
-      --   end,
-      -- },
-      -- picker = "snacks",
-    },
-  },
+  -- {
+  --   "magnusriga/markdown-tools.nvim",
+  --   -- dir = "~/dev/nvim-plugins/markdown-tools.nvim",
+  --   opts = {
+  --     -- frontmatter_custom = {
+  --     --   -- Example: Adds a 'status' field and supports {{status}} placeholder
+  --     --   magnus = function(_opts)
+  --     --     return "rg"
+  --     --   end,
+  --     --   -- Example: Adds a 'related' field (list) and supports {{related}} placeholder
+  --     --   foo = function(_opts)
+  --     --     return { "foo", "bar", "baz" }
+  --     --   end,
+  --     -- },
+  --     -- picker = "snacks",
+  --   },
+  -- },
 
   -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
   {
