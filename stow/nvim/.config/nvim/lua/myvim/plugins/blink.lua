@@ -561,16 +561,12 @@ return {
           -- path = {
           --   min_keyword_length = 0,
           -- },
-          -- snippets = {
-          --   min_keyword_length = 1,
-          --   opts = {
-          --     search_paths = { "~/.config/snippets" },
-          --   },
-          -- },
+          --
           -- lsp = {
           --   min_keyword_length = 2, -- Number of characters to trigger porvider
           --   score_offset = 0, -- Boost/penalize the score of the items
           -- },
+          --
           -- buffer = {
           --   min_keyword_length = 5,
           --   max_items = 5,

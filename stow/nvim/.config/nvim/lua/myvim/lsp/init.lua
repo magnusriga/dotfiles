@@ -80,7 +80,7 @@ local opts = {
     enabled = true,
 
     -- Disable inlay hints for specific filetypes.
-    exclude = { "vue", "typescript", "typescriptreact" },
+    exclude = { "vue", "javascript", "typescript", "typescriptreact" },
   },
 
   -- Code lense is information, e.g. references | implementations | etc., above functions.

@@ -5,6 +5,8 @@ vim.lsp.config(lsp_name, {
   cmd = { "pnpm", "biome", "lsp-proxy" },
   -- filetypes = {
   --   "astro",
+  --   -- Both `cssls` and `biome` reports errors on certain tailwind syntax,
+  --   -- e.g. `@import 'tailwindcss' prefix(tw)`, thus might as well keep both for `css`.
   --   "css",
   --   "graphql",
   --   "javascript",

@@ -1,7 +1,5 @@
 local lsp_name = "marksman"
 
--- vim.lsp.config(lsp_name, { })
-
 MyVim.on_very_lazy(function()
   vim.filetype.add({
     extension = { mdx = "markdown.mdx" },
@@ -110,24 +108,24 @@ return {
     -- end,
   },
 
-  -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
-  -- {
-  --   "magnusriga/markdown-tools.nvim",
-  --   -- dir = "~/dev/nvim-plugins/markdown-tools.nvim",
-  --   opts = {
-  --     -- frontmatter_custom = {
-  --     --   -- Example: Adds a 'status' field and supports {{status}} placeholder
-  --     --   magnus = function(_opts)
-  --     --     return "rg"
-  --     --   end,
-  --     --   -- Example: Adds a 'related' field (list) and supports {{related}} placeholder
-  --     --   foo = function(_opts)
-  --     --     return { "foo", "bar", "baz" }
-  --     --   end,
-  --     -- },
-  --     -- picker = "snacks",
-  --   },
-  -- },
+  -- Markdown convenience tools, including creating notes from templates.
+  {
+    "magnusriga/markdown-tools.nvim",
+    -- dir = "~/dev/nvim-plugins/markdown-tools.nvim",
+    opts = {
+      -- frontmatter_custom = {
+      --   -- Example: Adds a 'status' field and supports {{status}} placeholder
+      --   magnus = function(_opts)
+      --     return "rg"
+      --   end,
+      --   -- Example: Adds a 'related' field (list) and supports {{related}} placeholder
+      --   foo = function(_opts)
+      --     return { "foo", "bar", "baz" }
+      --   end,
+      -- },
+      -- picker = "snacks",
+    },
+  },
 
   -- Preview Markdown in browser, with synchronised scrolling and flexible configuration.
   {

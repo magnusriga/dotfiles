@@ -5,12 +5,12 @@ vim.lsp.config(lsp_name, {
   -- Ignore at-rules, to avoid clashes with `tailwind`.
   settings = {
     css = {
-      -- Using biome for formatting and linting.
-      validate = false,
-      -- validate = true,
-      -- lint = {
-      --   unknownAtRules = "ignore",
-      -- },
+      -- Both `cssls` and `biome` reports errors on certain tailwind syntax,
+      -- e.g. `@import 'tailwindcss' prefix(tw)`, thus might as well keep both for `css`.
+      validate = true,
+      lint = {
+        unknownAtRules = "ignore",
+      },
     },
     scss = {
       validate = true,

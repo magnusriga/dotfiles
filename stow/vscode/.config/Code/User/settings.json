@@ -149,7 +149,7 @@
   "editor.fontFamily": "Consolas, monospace",
 
   // Controls the font size in pixels (default: 12).
-  "editor.fontSize": 12, // 14px
+  "editor.fontSize": 11, // 14px
 
   "editor.tabSize": 4,
 
