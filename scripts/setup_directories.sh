@@ -107,6 +107,11 @@ if [ ! -d "$EZA_CONFIG_DIR" ]; then
   mkdir -p "$EZA_CONFIG_DIR"
 fi
 
+export PNPM_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/pnpm"
+if [ ! -d "$PNPM_CONFIG_DIR" ]; then
+  mkdir -p "$PNPM_CONFIG_DIR"
+fi
+
 export TRASH_HOME="$HOME/.local/share/Trash"
 if [ ! -d "$TRASH_HOME" ]; then
   mkdir -p "$TRASH_HOME"
