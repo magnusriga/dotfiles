@@ -1,20 +1,16 @@
 {
-  "nativeMCPServers": [
-    
-  ],
   "mcpServers": {
-    "0": {
-      "disabled_tools": [
-        
-      ],
-      "disabled": true
-    },
-    "1": {
-      "command": "node",
+    "fetch": {
+      "command": "uvx",
       "args": [
-        "/home/nfu/.mcphub/servers/fetch-mcp/dist/index.js"
-      ],
-      "name": "github.com/zcaceres/fetch-mcp"
+        "mcp-server-fetch"
+      ]
+    },
+    "github.com/modelcontextprotocol/servers/tree/main/src/git": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-git"
+      ]
     }
   }
 }

@@ -1,6 +1,12 @@
 local lsp_name = "tailwindcss"
 
 vim.lsp.config(lsp_name, {
+  settings = {
+    tailwindCSS = {
+      -- For autocompletee inside Class Variance Authority (CVA) functions.
+      classFunctions = { "cva", "cx" },
+    },
+  },
   -- Filetypes copied and adjusted from tailwindcss-intellisense.
   filetypes = {
     -- html

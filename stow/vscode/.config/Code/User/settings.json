@@ -465,7 +465,7 @@
 
   "[lua]": {
     "editor.defaultFormatter": "JohnnyMorganz.stylua"
-  }
+  },
 
   "[dotenv]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"

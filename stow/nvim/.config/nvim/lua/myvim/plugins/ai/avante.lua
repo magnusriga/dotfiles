@@ -16,14 +16,14 @@ return {
 
       -- `system_prompt`:
       -- - String | function that returns string.
-      -- - Using function allows dynamically updating  prompt with mcphub.
+      -- - Using function ensures LLM always has latest MCP server state.
+      -- - Evaluated for every message, even in existing chats
       system_prompt = function()
-        local hub = assert(require("mcphub").get_hub_instance())
-        return hub:get_active_servers_prompt()
+        local hub = require("mcphub").get_hub_instance()
+        return hub and hub:get_active_servers_prompt() or ""
       end,
-      -- `custom_tools`:
-      -- - List | function that returns list.
-      -- - Using function prevents requiring mcphub before it is loaded.
+
+      -- Using function prevents requiring mcphub before it is loaded.
       custom_tools = function()
         return {
           require("mcphub.extensions.avante").mcp_tool(),
@@ -32,7 +32,7 @@ return {
 
       -- Using MCPHUB instead.
       disabled_tools = {
-        "list_files",
+        "list_files", -- Built-in file operations.
         "search_files",
         "read_file",
         "create_file",
@@ -41,8 +41,7 @@ return {
         "create_dir",
         "rename_dir",
         "delete_dir",
-        "bash",
-        "str_replace_editor",
+        "bash", -- Built-in terminal access.
       },
     },
     -- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
