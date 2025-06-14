@@ -197,6 +197,7 @@ return {
               "biome.json",
               "biome.jsonc",
             }),
+            require_cwd = true,
             -- -- command = require("conform.util").from_node_modules("biome"),
             -- -- command = "pnpm biome check --stdin-file-path='foo.ts' --write",
             -- command = "echo hello world",
@@ -228,12 +229,12 @@ return {
       }
 
       --- Add biome as a formatter for supported filetypes.
-      -- for _, ft in ipairs(biome_ft) do
-      --   opts.formatters_by_ft[ft] = { "biome" }
-      --   -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
-      --   -- table.insert(opts.formatters_by_ft[ft], "prettierd")
-      --   -- table.insert(opts.formatters_by_ft[ft], "prettier")
-      -- end
+      for _, ft in ipairs(biome_ft) do
+        opts.formatters_by_ft[ft] = { "biome" }
+        -- opts.formatters_by_ft[ft] = opts.formatters_by_ft[ft] or {}
+        -- table.insert(opts.formatters_by_ft[ft], "prettierd")
+        -- table.insert(opts.formatters_by_ft[ft], "prettier")
+      end
 
       -- Add prettier as a formatter for supported filetypes.
       -- for _, ft in ipairs(prettier_ft) do
@@ -242,11 +243,6 @@ return {
       --   -- table.insert(opts.formatters_by_ft[ft], "prettierd")
       --   -- table.insert(opts.formatters_by_ft[ft], "prettier")
       -- end
-
-      -- Needed for `biome` to work.
-      opts.formatters.biome = {
-        require_cwd = true,
-      }
 
       return opts
     end,

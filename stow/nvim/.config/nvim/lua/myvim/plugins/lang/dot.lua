@@ -78,6 +78,7 @@ return {
           [".shrc"] = "sh",
         },
         pattern = {
+          [".*/.vscode/settings.json"] = "jsonc",
           [".*/waybar/config"] = "jsonc",
           [".*/mako/config"] = "dosini",
           [".*/kitty/.+%.conf"] = "kitty",

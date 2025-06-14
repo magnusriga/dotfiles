@@ -175,9 +175,26 @@ return {
             args = { "format", "$FILENAME" },
             stdin = false,
           },
-          biome = {
-            args = { "check", "--write", "--stdin-file-path", "$FILENAME" },
-          },
+          -- biome = {
+          -- Important:
+          -- - `biome` can be run from any directory, it will always use
+          --   config file nearest to file being formatted.
+          -- - In other words, it is irrelevant where `biome` is run from
+          -- - Meaning, Conform's `cwd` is irrelevant.
+          --
+          -- Default command:
+          -- - `command = util.from_node_modules("biome")`
+          -- - Uses `biome` executable in `node_modules` nearest file being formatted.
+          --
+          -- Where command is run from:
+          -- - `cwd = util.root_file({ "biome.json", "biome.jsonc", })`
+          -- - Command run from directory with config file, nearest file being formatted.
+          --
+          -- Config file:
+          -- - `biome` always uses config file nearest to file being formatted,
+          --   regardless of where `biome` is run from.
+          -- },
+          --
           -- # Example of using dprint only when a dprint.json file is present
           -- dprint = {
           --   condition = function(ctx)
@@ -192,12 +209,13 @@ return {
         },
       }
 
-      --- Add biome as a formatter for supported filetypes.
+      --- Add biome as formatter for supported filetypes.
+      --- Use `biome-check` formatter, as it uses `biome check`,
       for _, ft in ipairs(biome_ft) do
-        opts.formatters_by_ft[ft] = { "biome" }
+        opts.formatters_by_ft[ft] = { "biome-check" }
       end
 
-      -- Add prettier as a formatter for supported filetypes.
+      -- Add prettier as formatter for supported filetypes.
       for _, ft in ipairs(prettier_ft) do
         opts.formatters_by_ft[ft] = { "prettierd" }
       end
