@@ -13,8 +13,9 @@ return {
     opts = {
       enable_builtin = true,
       default_to_projects_v2 = true,
-      default_merge_method = "squash",
-      picker = "telescope",
+      default_merge_method = "rebase",
+      default_delete_branch = true,
+      picker = "snacks",
     },
     keys = {
       { "<leader>gi", "<cmd>Octo issue list<CR>", desc = "List Issues (Octo)" },
