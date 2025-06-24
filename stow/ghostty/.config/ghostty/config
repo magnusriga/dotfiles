@@ -476,6 +476,9 @@ keybind = cmd+s>e=equalize_splits
 # keybind = super+shift+s=write_screen_file:open
 # keybind = super+shift+w=close_surface
 
+# Shift+enter, for Claude Code
+keybind = shift+enter=text:\n
+
 # -------------------------
 # Mouse
 # -------------------------

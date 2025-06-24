@@ -29,8 +29,8 @@ pnpm --allow-build=spawn-sync \
   neovim \
   yarn \
   mcp-hub@latest \
-  @mermaid-js/mermaid-cli \
-  @anthropic-ai/claude-code
+  @mermaid-js/mermaid-cli
+# @anthropic-ai/claude-code # Using local version instead.
 
 # pnpm --allow-build=tree-node-cli add -g tree-node-cli
 # pnpm --allow-build=contentful-cli add -g contentful-cli
