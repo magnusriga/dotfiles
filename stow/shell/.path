@@ -22,8 +22,8 @@ fi
 export PNPM_HOME="$HOME/.local/share/pnpm"
 if [ -d "$HOME/.local/share/pnpm" ]; then
   case ":$PATH:" in
-    *":$PNPM_HOME:"*) ;;
-    *) export PATH="$PNPM_HOME:$PATH" ;;
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
   esac
 fi
 
@@ -41,6 +41,14 @@ fi
 export CARGO_HOME="$HOME/.cargo"
 if [ -d "$CARGO_HOME/bin" ]; then
   export PATH="$CARGO_HOME/bin:$PATH"
+fi
+
+# ================================================================
+# Add Claude to Path
+# ================================================================
+export CLAUDE_HOME="$HOME/.claude"
+if [ -d "$CLAUDE_HOME/local" ]; then
+  export PATH="$CLAUDE_HOME/local:$PATH"
 fi
 
 # ================================================================

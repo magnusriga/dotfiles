@@ -211,8 +211,7 @@ opt.cursorline = false
 opt.diffopt:append({ "vertical" })
 
 -- Convert typed tab character to spaces, following `opt.tabstop`.
--- opt.expandtab = true
-opt.expandtab = false
+opt.expandtab = true
 
 opt.fillchars = {
   -- Fold fill characters.

@@ -108,7 +108,7 @@ alias pt="pnpm test"
 # alias n="hcp vault-secrets run -- nvim"
 # alias nvim="hcp vault-secrets run -- nvim"
 
-alias claude="~/.claude/local/claude"
+# alias claude="~/.claude/local/claude"
 
 alias fp="fzf --preview 'bat --style=numbers --color=always --line-range :500 {}'"
 
