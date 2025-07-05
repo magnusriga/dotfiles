@@ -37,10 +37,10 @@ map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = tru
 ---------------------------------
 -- Move to window using `c^hjkl`.
 -- No need, use built-in w-bindings: `<C-W>hjkl`.
--- map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
--- map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
--- map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
--- map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
+map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
+map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
+map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
+map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 
 -- Split window with leader.
 -- No need, use built-in w-bindings: `<C-W>s|w|c`.
@@ -50,10 +50,10 @@ map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = tru
 
 -- Resize window using <ctrl> arrow keys.
 -- No need, not using arrow keys.
--- map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
--- map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
--- map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
--- map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
+map("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase Window Height" })
+map("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease Window Height" })
+map("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease Window Width" })
+map("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase Window Width" })
 
 ---------------------------------
 -- Move lines.
@@ -389,17 +389,15 @@ map("n", "<leader>uI", function() vim.treesitter.inspect_tree() vim.api.nvim_inp
 ---------------------------------
 -- Terminal.
 ---------------------------------
--- Floating terminal keybindings.
--- No need, not using terminal inside Neovim.
--- map("n", "<leader>fT", function() Snacks.terminal() end, { desc = "Terminal (cwd)" })
--- map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
--- map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
--- map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
+-- Snacks terminal keybindings.
+map("n", "<leader>fT", function() Snacks.terminal() end, { desc = "Terminal (cwd)" })
+map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
 
 -- Close current window when in terminal mode.
--- No need, use built-in `:close`.
--- map("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
--- map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
+map("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
 
 -- Exit terminal mode in builtin terminal with shortcut that is easier to remember.
 -- Will not work in all terminal emulators or in tmux.

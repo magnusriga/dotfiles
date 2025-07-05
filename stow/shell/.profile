@@ -124,6 +124,7 @@ unset file
 # ================================================================
 # Load:`nvm`, `node`, `npm`.
 # ================================================================
+echo ".profile > Loading nvm, node, and npm..."
 export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 # Load nvm.
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -133,12 +134,14 @@ export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 # ================================================================
 # Bun completions.
 # ================================================================
+echo ".profile > Loading Bun completions..."
 [ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
 
 # ================================================================
 # Upgrade, aka. update, selected packages.
 # ================================================================
-gh extension upgrade gh-copilot
+# echo ".profile > Update gh-copilot with gh..."
+# gh extension upgrade gh-copilot
 
 # ================================================================
 # Start SSH agent to Avoid Typing Github Password

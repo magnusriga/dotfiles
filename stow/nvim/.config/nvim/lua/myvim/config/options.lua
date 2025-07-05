@@ -142,6 +142,7 @@ vim.g.have_nerd_font = true
 --   * pwsh
 --   * powershell
 -- MyVim.terminal.setup("pwsh")
+-- MyVim.terminal.setup("sh")
 
 --===========================================
 -- Options.

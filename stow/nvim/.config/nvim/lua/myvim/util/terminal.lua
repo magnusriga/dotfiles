@@ -15,7 +15,7 @@
 -- - Not currently used, as defualt $SHELL is OK.
 -- ====================================
 
----@class lazyvim.util.terminal
+---@class myvim.util.terminal
 local M = {}
 
 ---@param shell? string
