@@ -22,6 +22,20 @@ return {
   {
     "snacks.nvim",
     opts = {
+
+      -- `styles`:
+      -- - Set look of Snacks windows, including `terminal` windows.
+      -- - Applied with `opts.win` in `snacks.nvim` sub-modules.
+      -- - Alternatively, overrride `opts.win` directly in sub-module.
+      ---@type table<string, snacks.win.Config>
+      -- styles = {
+      --   terminal = {
+      --     position = "right", -- `left` | `right` | `top` | `bottom`.
+      --     relative = "editor", -- `editor` | `win` | `cursor`.
+      --     width = 0.35, -- Width of terminal window, as fraction of editor width.
+      --   },
+      -- },
+
       -- Adds new filetype `bigfile` to Neovim, that triggers when file is larger than configured size, by default 1.5MB.
       -- Automatically prevents things like LSP and Treesitter attaching to buffer.
       -- Notification is shown when enabled.
@@ -64,11 +78,14 @@ return {
         },
       },
 
-      -- Configuration for Snack's ability to toggle floating | split terminal windows.
-      -- - No cmd: Bottom split, with winbar containing terminal title.
-      -- - Cmd: Floating.
+      -- Configuration for `snacks.nvim` terminal.
       terminal = {
+        ---@type snacks.win.Config|{}
         win = {
+          position = "right", -- `left` | `right` | `top` | `bottom`.
+          relative = "editor", -- `editor` | `win` | `cursor`.
+          width = 0.35, -- Width of terminal window, as fraction of editor width.
+
           -- Keys within terminal, e.g. to change terminal windows.
           keys = {
             -- Avoid these, they interfere with editing.

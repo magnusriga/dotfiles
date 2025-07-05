@@ -12,7 +12,9 @@
       "Bash(SHELL_DEBUG=1 zsh -c 'exit')",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:github.com)",
+      "mcp__ide__getDiagnostics"
     ]
   },
   "enableAllProjectMcpServers": false
