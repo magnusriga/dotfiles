@@ -114,6 +114,9 @@
 # ================================================================
 [[ $- == *i* ]] || [ -n "$PS1" ] || return
 
+echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
+export TERM=xterm-ghostty
+
 # ================================================================
 # Ghostty Shell Integration for ZSH.
 # Must be Placed at Top of `.zshrc`.
@@ -441,7 +444,7 @@ export ZSH_HIGHLIGHT_STYLES["single-quoted-argument"]='fg=green'
 export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 
 # Source script, installed with pacman, as last command in `.zshrc`.
-# . /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+. /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ================================================================
 # oh-my-zsh settings.

@@ -1,4 +1,8 @@
 echo "running zshrc"
+
+echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
+export TERM=xterm-ghostty
+
 # Ghostty shell integration for Bash. This should be at the top of your bashrc!
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
     echo "Ghostty shell integration runs automatically outside SSH, thus not called manyally here."
