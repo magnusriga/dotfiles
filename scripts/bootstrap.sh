@@ -53,7 +53,10 @@ echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME.
 # SCRIPT=$(realpath "$BASH_SOURCE || $0")
 # SCRIPT_PATH=$(dirname "$SCRIPT")
 # echo "SCRIPT_PATH is $SCRIPT_PATH."
-SCRIPTPATH="$( cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1 ; pwd -P )/"
+SCRIPTPATH="$(
+  cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1
+  pwd -P
+)/"
 
 # ==========================================================
 # Change directory to path of current script,
@@ -80,7 +83,11 @@ function doIt() {
   # ==========================================================
   # Save top-level `dotfiles` path.
   # ==========================================================
-  ROOTPATH="$( cd -- "$(dirname "${BASH_SOURCE}")/.." >/dev/null 2>&1 ; pwd -P )"
+  ROOTPATH="$(
+    cd -- "$(dirname "${BASH_SOURCE}")/.." >/dev/null 2>&1
+    pwd -P
+  )"
+  echo "ROOTPATH is $ROOTPATH."
 
   # ==========================================================
   # Setup manual symlinks needed during installation,
@@ -140,9 +147,9 @@ function doIt() {
   # local which_zsh=$(which zsh)
   # Force ZSH verison from pacman.
   local which_zsh="/usr/bin/zsh"
-  sudo cat /etc/shells | grep -q ${which_zsh} || \
-  echo "Adding ${which_zsh} to /etc/shells." && \
-  echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
+  sudo cat /etc/shells | grep -q ${which_zsh} ||
+    echo "Adding ${which_zsh} to /etc/shells." &&
+    echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
   sudo chsh -s "${which_zsh}" "$USER"
   unset which_zsh
 
@@ -150,15 +157,15 @@ function doIt() {
   # Delete old user.
   # ==========================================================
   # if [[ -n "$(id -un $CURRENT_USER)" && "$(id -un $CURRENT_USER)" != $USERNAME && "$(id -un $CURRENT_USER)" != 'root' ]]; then
-    # sudo userdel $CURRENT_USER
-    # rm -rf /home/$CURRENT_USER 
+  # sudo userdel $CURRENT_USER
+  # rm -rf /home/$CURRENT_USER
   # fi
 
   # ==========================================================
   # Do not run zsh scripts from here, as the Zsh commands are
   # not reccognized by bash.
   # ==========================================================
-  
+
   # ==========================================================
   # Success messages and changing directory to $HOME.
   # ==========================================================
