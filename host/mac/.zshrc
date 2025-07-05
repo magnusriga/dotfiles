@@ -34,8 +34,10 @@ bindkey -M viins '^w' backward-kill-word
 bindkey '^P' history-beginning-search-backward
 bindkey '^N' history-beginning-search-forward
 
-# Prevent blinking cursor.
-function __set_beam_cursor {
+# ================================================================
+# Set cursor to non-blinking bar|block, depending on ZSH vi-mode.
+# ================================================================
+function __set_bar_cursor {
     echo -ne '\e[6 q'
 }
 
@@ -43,18 +45,41 @@ function __set_block_cursor {
     echo -ne '\e[2 q'
 }
 
+# - When keymap changes, i.e. when switching between Insert and Normal mode,
+#   set cursor to bar|block, depending on new mode.
+# - `KEYMAP`: Keymap being switched to, i.e. `main` | `viins` | `vicmd`.
+# - Thus, when switching to `vicmd`, set cursor to block, and when switching to
+#  `viins` or `main`, set cursor to bar.
 function zle-keymap-select {
   case $KEYMAP in
     vicmd) __set_block_cursor;;
-    viins|main) __set_beam_cursor;;
+    viins|main) __set_bar_cursor;;
   esac
 }
 zle -N zle-keymap-select
 
-precmd_functions+=(__set_beam_cursor)
+# Start new lines with bar cursor, since, in ZSH vi-mode, each line starts in Insert mode.
+# Not needed, when using `precmd`.
+# function zle-line-init {
+#     __set_bar_cursor
+# }
+# zle -N zle-line-init
+
+# When prompt is redrawn, set cursor to bar.
+precmd_functions+=__set_bar_cursor
+
+# ================================================================
+# iTerm2 Shell Integration for ZSH.
+# ================================================================
+export ZDOTDIR=$HOME
+if [[ -e "${HOME}/.iterm2_shell_integration.zsh" && \
+${TERM} == xterm-256color ]]; then
+  echo "Sourcing iTerm shell integration..."
+  source "${HOME}/.iterm2_shell_integration.zsh"
+fi
 
 # Source environment variables.
-source "$HOME/.env"
+# source "$HOME/.env"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
