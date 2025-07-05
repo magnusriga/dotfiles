@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running .exports..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .exports..."
 
 # ================================================================
 # Set XDG_CONFIG_HOME, used by various programs.

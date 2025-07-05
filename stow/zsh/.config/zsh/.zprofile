@@ -109,8 +109,14 @@
 # ================================================================
 
 # ================================================================
+# Set default debug flag for shell startup output
+# Leave SHELL_DEBUG unset by default for silent startup
+# Set SHELL_DEBUG=1 to enable debug output
+# ================================================================
+
+# ================================================================
 # Source the environment variables and other login-time settings (e.g. ssh-agent) from .profile.
 # Only runs when a login shell is opened (i.e. the first zsh terminal opened after starting vscdoe).
 # ================================================================
-echo "Running .zprofile, about to source .profile..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .zprofile, about to source .profile..."
 source ~/.profile

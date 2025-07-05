@@ -1,4 +1,4 @@
-echo "running zshrc"
+[[ -n "$SHELL_DEBUG" ]] && echo "running zshrc"
 
 # echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
 # export TERM=xterm-ghostty
@@ -8,7 +8,7 @@ echo "running zshrc"
 
 # Ghostty shell integration for Bash. This should be at the top of your bashrc!
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
-    echo "Ghostty shell integration runs automatically outside SSH, thus not called manyally here."
+    [[ -n "$SHELL_DEBUG" ]] && echo "Ghostty shell integration runs automatically outside SSH, thus not called manyally here."
     builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
 fi
 
@@ -19,9 +19,9 @@ bindkey -v
 
 # Bind sequence sent by ghostty for `Ctrl+[`, i.e. `^[[91;5u`,
 # to `vi-cmd-mode`, with added benefit of no `KEYTIMEOUT` delay.
-[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && echo "Setting: bindkey '^[[91;5u' vi-cmd-mode" && bindkey '^[[91;5u' vi-cmd-mode
+[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && { [[ -n "$SHELL_DEBUG" ]] && echo "Setting: bindkey '^[[91;5u' vi-cmd-mode"; bindkey '^[[91;5u' vi-cmd-mode; }
 KEYTIMEOUT=4
-[[ -n "$TMUX" ]] && echo "Setting: KEYTIMEOUT = $KEYTIMEOUT" && export KEYTIMEOUT=$KEYTIMEOUT
+[[ -n "$TMUX" ]] && { [[ -n "$SHELL_DEBUG" ]] && echo "Setting: KEYTIMEOUT = $KEYTIMEOUT"; export KEYTIMEOUT=$KEYTIMEOUT; }
 
 # Ensure `^w` and `^h` deletes past last insert.
 bindkey -M viins '^h' backward-delete-char
@@ -74,7 +74,7 @@ precmd_functions+=__set_bar_cursor
 export ZDOTDIR=$HOME
 if [[ -e "${HOME}/.iterm2_shell_integration.zsh" && \
 ${TERM} == xterm-256color ]]; then
-  echo "Sourcing iTerm shell integration..."
+  [[ -n "$SHELL_DEBUG" ]] && echo "Sourcing iTerm shell integration..."
   source "${HOME}/.iterm2_shell_integration.zsh"
 fi
 

@@ -142,7 +142,7 @@ export GHOSTTY_SHELL_INTEGRATION_NO_CURSOR=1
 # WARNING: Adds small delay, slightly more than `zoxide`.
 if [[ -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration" && \
 ${TERM} == xterm-ghostty ]]; then
-  echo "Sourcing Ghostty shell integration..."
+  [[ -n "$SHELL_DEBUG" ]] && echo "Sourcing Ghostty shell integration..."
   builtin source "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration"
 fi
 
@@ -185,14 +185,14 @@ precmd_functions+=__set_bar_cursor
 # ================================================================
 if [[ -e "${ZDOTDIR}/.iterm2_shell_integration.zsh" && \
 ${TERM} == xterm-256color ]]; then
-  echo "Sourcing iTerm shell integration..."
+  [[ -n "$SHELL_DEBUG" ]] && echo "Sourcing iTerm shell integration..."
   source "${ZDOTDIR}/.iterm2_shell_integration.zsh"
 fi
 
 # ================================================================
 # Run Generic Interactive Shell Configuration.
 # ================================================================
-echo "Running .zshrc, about to source .shrc..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .zshrc, about to source .shrc..."
 source "$HOME/.shrc"
 
 # ==================================
@@ -218,9 +218,9 @@ source "$HOME/.shrc"
 #   - Thus, setting low `KEYTIMEOUT` is probably best solution in tmux.
 # bindkey -rpM viins '^['
 # [[ ${TERM} == xterm-ghostty ]] && echo "Setting ^[[91;5u escape key to vi-cmd-mode." && bindkey '^[[91;5u' vi-cmd-mode
-[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && echo "Setting: bindkey '^[[91;5u' vi-cmd-mode" && bindkey '^[[91;5u' vi-cmd-mode
+[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && { [[ -n "$SHELL_DEBUG" ]] && echo "Setting: bindkey '^[[91;5u' vi-cmd-mode"; bindkey '^[[91;5u' vi-cmd-mode; }
 KEYTIMEOUT=4
-[[ -n "$TMUX" ]] && echo "Setting: KEYTIMEOUT = $KEYTIMEOUT" && export KEYTIMEOUT=$KEYTIMEOUT
+[[ -n "$TMUX" ]] && { [[ -n "$SHELL_DEBUG" ]] && echo "Setting: KEYTIMEOUT = $KEYTIMEOUT"; export KEYTIMEOUT=$KEYTIMEOUT; }
 
 # Ensure `^w` and `^h` deletes past last insert.
 bindkey -M viins '^h' backward-delete-char

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Loading aliases..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Loading aliases..."
 
 # ============================================================
 # Easier navigation: .., ..., ...., ....., ~ and -

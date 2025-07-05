@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running .path..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .path..."
 
 # ================================================================
 # Add User's Private Bin (`~/bin`) to `$PATH`

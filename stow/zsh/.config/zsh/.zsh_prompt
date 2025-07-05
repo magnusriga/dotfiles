@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running .zsh_prompt..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .zsh_prompt..."
 
 # - Starship introduces noticable delay on AMD Linux running on ARM
 #   architcture, thus stick to native architecture, in which case

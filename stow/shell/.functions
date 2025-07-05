@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running .functions..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .functions..."
 
 # Create a new directory and enter it
 function mkd() {

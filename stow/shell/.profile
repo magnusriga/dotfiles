@@ -108,7 +108,7 @@
 #   - Using these startup files is risky, as the shell can be invoked in all sorts of contexts and there's hardly anything you can do that might not break something.
 # ================================================================
 
-echo "Running .profile..."
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .profile..."
 
 # ================================================================
 # Source exported API Keys, environment variables, and PATH.
@@ -117,15 +117,15 @@ echo "Running .profile..."
 # - `.aliases` also sourced in `.shrc`, running later.
 for file in $HOME/.{env,aliases,exports,path,functions}; do
 
-  [ "$file" = "$HOME/.env" ] && [ ! -f "$file" ] && echo "<--- No .env file found, please add it to $HOME, including INFISICAL_TOKEN. --->" && continue
-  [ -r "$file" ] && [ -f "$file" ] && echo ".profile > Sourcing $file..." && source "$file"
+  [ "$file" = "$HOME/.env" ] && [ ! -f "$file" ] && { [[ -n "$SHELL_DEBUG" ]] && echo "<--- No .env file found, please add it to $HOME, including INFISICAL_TOKEN. --->"; continue; }
+  [ -r "$file" ] && [ -f "$file" ] && { [[ -n "$SHELL_DEBUG" ]] && echo ".profile > Sourcing $file..."; source "$file"; }
 done
 unset file
 
 # ================================================================
 # Load:`nvm`, `node`, `npm`.
 # ================================================================
-echo ".profile > Loading nvm, node, and npm..."
+[[ -n "$SHELL_DEBUG" ]] && echo ".profile > Loading nvm, node, and npm..."
 export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 # Load nvm.
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -135,7 +135,7 @@ export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 # ================================================================
 # Bun completions.
 # ================================================================
-echo ".profile > Loading Bun completions..."
+[[ -n "$SHELL_DEBUG" ]] && echo ".profile > Loading Bun completions..."
 [ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
 
 # ================================================================
