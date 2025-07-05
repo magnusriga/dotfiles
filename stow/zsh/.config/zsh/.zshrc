@@ -114,8 +114,8 @@
 # ================================================================
 [[ $- == *i* ]] || [ -n "$PS1" ] || return
 
-echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
-export TERM=xterm-ghostty
+# echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
+# export TERM=xterm-ghostty
 
 # ================================================================
 # Ghostty Shell Integration for ZSH.
