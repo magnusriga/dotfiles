@@ -116,6 +116,21 @@
 
 # echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
 # export TERM=xterm-ghostty
+# export TERM_PROGRAM='ghostty'
+
+# ================================================================
+# Make nvim the default editor.
+# ================================================================
+# - Before, `EDITOR` would be set to `ed`, a line-based text editor,
+#   and `VISUAL` assigned to `vi`, a screen-based editor.
+# - `VISUAL` is used by all modern apps and terminals.
+# - Set up VISUAL to a full-screen editor such as vi/vim, emacs, nano, and so on.
+# - On modern Linux and Unix-like systems, set both `VISUAL` and `EDITOR` to same editor,
+#   e.g. vi/vim, emacs, or nano, as some tools only accept `EDITOR` and may not look for `VISUAL`.
+# - Almost all modern apps look for `VISUAL` first, and if not found look for `EDITOR`.
+# - Avoid differentiating on SSH connection, as we normally develop over SSH.
+export EDITOR='nvim'
+export VISUAL=$EDITOR
 
 # ================================================================
 # Ghostty Shell Integration for ZSH.
