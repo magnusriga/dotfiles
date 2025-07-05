@@ -1,7 +1,10 @@
 echo "running zshrc"
 
-echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
-export TERM=xterm-ghostty
+# echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
+# export TERM=xterm-ghostty
+# echo "Sourcing ghosty shell integration for ZSH: ${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration}"
+# ls -la "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
+# builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
 
 # Ghostty shell integration for Bash. This should be at the top of your bashrc!
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
@@ -16,7 +19,9 @@ bindkey -v
 
 # Bind sequence sent by ghostty for `Ctrl+[`, i.e. `^[[91;5u`,
 # to `vi-cmd-mode`, with added benefit of no `KEYTIMEOUT` delay.
-bindkey -M viins '^[[91;5u' vi-cmd-mode
+[[ ${TERM} == xterm-ghostty && ! -n "$TMUX" ]] && echo "Setting: bindkey '^[[91;5u' vi-cmd-mode" && bindkey '^[[91;5u' vi-cmd-mode
+KEYTIMEOUT=4
+[[ -n "$TMUX" ]] && echo "Setting: KEYTIMEOUT = $KEYTIMEOUT" && export KEYTIMEOUT=$KEYTIMEOUT
 
 # Ensure `^w` and `^h` deletes past last insert.
 bindkey -M viins '^h' backward-delete-char
