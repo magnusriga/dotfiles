@@ -56,8 +56,7 @@ SHELL=$(which zsh)
 export ZSH_HOME="$HOME/.local/share/zsh"
 
 # ================================================================
-# Make vim the default editor in ssh sessions,
-# otherwise make nvim the default editor.
+# Make nvim the default editor.
 # ================================================================
 # - Before, `EDITOR` would be set to `ed`, a line-based text editor,
 #   and `VISUAL` assigned to `vi`, a screen-based editor.
