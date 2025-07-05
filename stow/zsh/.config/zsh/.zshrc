@@ -441,7 +441,7 @@ export ZSH_HIGHLIGHT_STYLES["single-quoted-argument"]='fg=green'
 export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 
 # Source script, installed with pacman, as last command in `.zshrc`.
-. /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+# . /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # ================================================================
 # oh-my-zsh settings.
@@ -549,13 +549,15 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# pnpm
-export PNPM_HOME="/home/nfu/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+# Add pnpm to `PATH`.
+# Already done in `~/.path`, loaded from `~/.profile`, thus not needed here.
+# export PNPM_HOME="/home/nfu/.local/share/pnpm"
+# case ":$PATH:" in
+#   *":$PNPM_HOME:"*) ;;
+#   *) export PATH="$PNPM_HOME:$PATH" ;;
+# esac
 # pnpm end
 
-# bun completions
-[ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
+# Load `bun` completions.
+# Already done in `~/.profile`, thus not needed here.
+# [ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
