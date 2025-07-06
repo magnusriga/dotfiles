@@ -29,26 +29,37 @@ if [ -f "./setup_directories.sh" ]; then
 fi
 
 # ================================================
-# `pacman`: Update registry, upgrade existing packages, install new packages.
+# Package installation: Update registry, upgrade existing packages, install new packages.
 # ================================================
-if [ -f "./setup_packages_pacman.sh" ]; then
-  echo "./setup_packages_pacman.sh found, executing script as sudo."
-  . ./setup_packages_pacman.sh
+if [ -f "./setup_packages.sh" ]; then
+  echo "./setup_packages.sh found, executing script."
+  . ./setup_packages.sh
 
   # Set necessary aliases (later set via dotfiles).
   alias python=python3
 fi
 
 # ================================================
-# Arch User Repository (AUR): Install packages.
+# Arch User Repository (AUR): Install packages, if on Arch Linux.
 # ================================================
-if [ -f "./setup_packages_aur.sh" ]; then
+if [ -f "./setup_packages_aur.sh" ] && [ -f "/etc/arch-release" ]; then
   . ./setup_packages_aur.sh
 fi
 
 # ================================================
+# Install: `snap` packages.
+# ================================================
+sudo snap install dog
+# Install `zig`:
+# - Ubuntu: `snap`
+# - Arch: `pacman`
+if [ -f "/etc/lsb-release" ] && grep -q "Ubuntu" /etc/lsb-release; then
+  snap install zig --classic --beta
+fi
+
+# ================================================
 # Setup: Locale.
-# Done previously, in `setup_packages_pacman.sh`.
+# Done previously, in `setup_packages.sh`.
 # ================================================
 # sudo localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 
@@ -161,11 +172,6 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 # Install: `Starship`.
 # ================================================
 curl -sS https://starship.rs/install.sh | sh -s -- -y
-
-# ================================================
-# Install: `snap` packages.
-# ================================================
-sudo snap install dog
 
 # ================================================
 # Install: `trash-cli`.

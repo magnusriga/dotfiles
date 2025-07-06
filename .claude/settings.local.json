@@ -16,7 +16,10 @@
       "WebFetch(domain:github.com)",
       "mcp__ide__getDiagnostics",
       "Bash(shellcheck:*)",
-      "mcp__fetch__fetch"
+      "mcp__fetch__fetch",
+      "Bash(mv:*)",
+      "WebFetch(domain:infisical.com)",
+      "WebFetch(domain:developer.hashicorp.com)"
     ]
   },
   "enableAllProjectMcpServers": false

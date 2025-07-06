@@ -235,17 +235,19 @@ cd "$CWD" || exit
 # ==================================
 # zig-bin.
 # ==================================
-PACKAGE="zig-bin"
-echo "Installing $PACKAGE"
-rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
-git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
-cd "$BUILD_REPOS/$PACKAGE" || exit
-makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-cd "$BUILD_HOME/packages" || exit
-sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
-echo "Installed zig CLI version: $(zig version)"
-cd "$CWD" || exit
+# - Ubuntu: `setup_main.sh` > `snap`.
+# - Arch: `pacman`.
+# PACKAGE="zig-bin"
+# echo "Installing $PACKAGE"
+# rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+# rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+# git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+# cd "$BUILD_REPOS/$PACKAGE" || exit
+# makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+# cd "$BUILD_HOME/packages" || exit
+# sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
+# echo "Installed zig CLI version: $(zig version)"
+# cd "$CWD" || exit
 
 # ==================================
 # infisical-bin.

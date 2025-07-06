@@ -25,3 +25,4 @@
 - Apply changes with stow commands
 - Check changes with relevant commands
 - Commit with descriptive messages
+- Always check for IDE diagnostics after changes, and fix them.
