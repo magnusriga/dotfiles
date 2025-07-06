@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running print_versions.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running print_versions.sh as $(whoami), with HOME $HOME and USER $USER."
 
 echo -e "\n\n================================\n\
 PACKAGE VERSIONS\

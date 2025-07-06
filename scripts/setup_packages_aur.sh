@@ -186,7 +186,7 @@ PACKAGE="yay"
 echo "Installing $PACKAGE"
 echo "$BUILD_REPOS/$PACKAGE"
 rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 ls -la "$BUILD_REPOS/$PACKAGE"
 ls -la "$BUILD_REPOS/$PACKAGE"
@@ -204,7 +204,7 @@ cd "$CWD" || exit
 PACKAGE="paru-git"
 echo "Installing $PACKAGE"
 rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
 makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
@@ -219,7 +219,7 @@ cd "$CWD" || exit
 PACKAGE="snapd"
 echo "Installing $PACKAGE"
 rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
 makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
@@ -238,7 +238,7 @@ cd "$CWD" || exit
 PACKAGE="zig-bin"
 echo "Installing $PACKAGE"
 rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
 makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
@@ -253,7 +253,7 @@ cd "$CWD" || exit
 PACKAGE="infisical-bin"
 echo "Installing $PACKAGE"
 rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
 makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
@@ -268,7 +268,7 @@ cd "$CWD" || exit
 PACKAGE="hcp-bin"
 echo "Installing $PACKAGE"
 rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
 makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm

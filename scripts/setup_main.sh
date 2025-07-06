@@ -12,11 +12,11 @@ echo "Running setup_main.sh as $(whoami), with HOME $HOME and USER $USER."
 # to execute other scripts with relative path.
 # ==========================================================
 SCRIPTPATH="$(
-  cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1
+  cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 || exit
   pwd -P
 )/"
 echo "cd to SCRIPTPATH: $SCRIPTPATH"
-cd $SCRIPTPATH
+cd "$SCRIPTPATH" || exit
 
 # ================================================
 # Setup: Directories.
@@ -64,7 +64,7 @@ sudo systemctl enable docker.service
 # Setup: Rust toolchain via `rustup`, and add it to path.
 # ================================================
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
-. $HOME/.cargo/env
+. "$HOME/.cargo/env"
 rustup update
 
 # ================================================
@@ -197,6 +197,7 @@ fi
 # Clone: `nfront`.
 # ================================================
 if [ ! -d "$HOME/nfront" ]; then
+  echo "Cloning nfront repository to $HOME/nfront."
   git clone git@github.com:magnusriga/nfront.git "$HOME/nfront"
 fi
 

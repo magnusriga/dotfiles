@@ -147,7 +147,8 @@ function doIt() {
     rm -rf ~/{.gitconfig,.bash*,.profile,.zshrc}
     echo "Running: stow -vv -d $SCRIPTPATH/../stow -t $HOME *"
     cd "$SCRIPTPATH/../stow" || return
-    stow -vv -d "$SCRIPTPATH/../stow" -t "$HOME" -- *
+    # shellcheck disable=SC2035
+    stow -vv -d "$SCRIPTPATH"/../stow -t "$HOME" *
 
     # ==========================================================
     # Set ZSH as default shell.

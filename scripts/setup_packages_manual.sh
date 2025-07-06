@@ -46,7 +46,33 @@
 #                     man pages to directory from MANPATH.
 # ========================================================
 
-echo "Running setup_git_packages.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_packages_manual.sh as $(whoami), with HOME $HOME and USER $USER."
+
+# ================================================
+# Detect system architecture
+# ================================================
+ARCH=$(uname -m)
+case $ARCH in
+x86_64)
+  ARCH_TODOCHECK="x86_64"
+  ARCH_7ZIP="x64"
+  ARCH_GRPCURL="x86_64"
+  ARCH_VAULT="amd64"
+  ;;
+aarch64 | arm64)
+  ARCH_TODOCHECK="arm64"
+  ARCH_7ZIP="arm64"
+  ARCH_GRPCURL="arm64"
+  ARCH_VAULT="arm64"
+  ;;
+*)
+  echo "Unsupported architecture: $ARCH"
+  exit 1
+  ;;
+esac
+
+echo "Detected architecture: $ARCH"
+echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT"
 
 # ================================================
 # Setup directories and variables needed for
@@ -79,8 +105,8 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p $STOWDIR/$PACKAGE/bin
-curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-arm64.sha256"
-if echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status; then
+curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-${ARCH_TODOCHECK}" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-${ARCH_TODOCHECK}.sha256"
+if echo "$(awk '{print $1}' "$TMPDIR/$PACKAGE/$PACKAGE.sha256") $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status; then
   echo "${PACKAGE} checksum verified, moving binary to stow directory, then stowing."
   sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
   chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
@@ -97,7 +123,7 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://github.com/ip7z/7zip/releases/download/${VERSION}/7z${VERSION_NO_DOT}-linux-arm64.tar.xz"
+curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://github.com/ip7z/7zip/releases/download/${VERSION}/7z${VERSION_NO_DOT}-linux-${ARCH_7ZIP}.tar.xz"
 tar xf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE"
 sudo mv "$TMPDIR"/"$PACKAGE"/7zz{,s} "$STOWDIR/$PACKAGE/bin"
 chmod 755 "$STOWDIR/$PACKAGE"/bin/7zz{,s}
@@ -112,7 +138,7 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/fullstorydev/grpcurl/releases/download/v${VERSION}/grpcurl_${VERSION}_linux_arm64.tar.gz"
+curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/fullstorydev/grpcurl/releases/download/v${VERSION}/grpcurl_${VERSION}_linux_${ARCH_GRPCURL}.tar.gz"
 # tar'ed file name: grpcurl.
 tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
 sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
@@ -133,8 +159,8 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p $STOWDIR/$PACKAGE/bin
-curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE.zip" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_linux_arm64.zip" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_SHA256SUMS"
-if echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | grep 'linux_arm64' | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE.zip" | sha256sum --check --status; then
+curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE.zip" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_linux_${ARCH_VAULT}.zip" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_SHA256SUMS"
+if echo "$(grep "linux_${ARCH_VAULT}" "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE.zip" | sha256sum --check --status; then
   unzip "$TMPDIR/$PACKAGE/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
   sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
   chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE

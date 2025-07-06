@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_symlinks.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_symlinks.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # ================================================================
 # Create local bin folder if necessary.
@@ -19,13 +19,13 @@ rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat
 # Remember: Add ~/.local/bin to path.
 # ================================================================
 if [ -n "$(which fdfind 2>/dev/null)" ]; then
-  ln -fs $(which fdfind) ~/.local/bin/fd
+  ln -fs "$(which fdfind)" ~/.local/bin/fd
 fi
 
 if [ -n "$(which ast-grep 2>/dev/null)" ]; then
-  ln -fs $(which ast-grep) ~/.local/bin/sg
+  ln -fs "$(which ast-grep)" ~/.local/bin/sg
 fi
 
 if [ -n "$(which batcat 2>/dev/null)" ]; then
-  ln -fs $(which batcat) ~/.local/bin/bat
+  ln -fs "$(which batcat)" ~/.local/bin/bat
 fi
