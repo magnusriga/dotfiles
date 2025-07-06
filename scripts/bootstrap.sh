@@ -84,7 +84,7 @@ function doIt() {
   # Save top-level `dotfiles` path.
   # ==========================================================
   ROOTPATH="$(
-    cd -- "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 || return
+    cd -- "$(dirname "${BASH_SOURCE[0]}").." >/dev/null 2>&1 || return
     pwd -P
   )"
   echo "ROOTPATH is $ROOTPATH."
