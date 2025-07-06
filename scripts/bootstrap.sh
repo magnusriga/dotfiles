@@ -140,8 +140,12 @@ function doIt() {
     #   instead `stow *` expands to all files and directories in folder except hidden ones,
     #   i.e. those starting at `.`.
     # ==========================================================
-    # First remove existing dotfiles, not created by `stow`.
+    # First, remove:
+    # - Existing dotfiles, not created by `stow`.
+    # - `/usr/local/share/man`, which symlinks to empty `/usr/local/man` on Arch Linux.
     rm -rf ~/{.gitconfig,.bash*,.profile,.zshrc}
+    rm -f /usr/local/share/man
+    # Then, stow all directories in `stow` folder,
     echo "Running: stow -vv -d $SCRIPTPATH/../stow -t $HOME *"
     cd "$SCRIPTPATH/../stow" || return
     # shellcheck disable=SC2035
