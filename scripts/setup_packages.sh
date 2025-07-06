@@ -67,7 +67,7 @@ function setup_ubuntu_repositories() {
 # ==========================================================
 # Define common packages that have identical names
 # ==========================================================
-COMMON_PACKAGES="
+COMMON_PACKAGES=(
   autoconf
   bash
   bat
@@ -110,7 +110,7 @@ COMMON_PACKAGES="
   zoxide
   zsh
   zsh-syntax-highlighting zsh-autosuggestions
-"
+)
 
 # ==========================================================
 # Install packages based on distribution
@@ -120,7 +120,7 @@ if [ "$DISTRO" = "arch" ]; then
 
   # Update system and install common + Arch-specific packages
   sudo pacman -Syu --noconfirm \
-    "$COMMON_PACKAGES" \
+    "${COMMON_PACKAGES[@]}" \
     base-devel \
     devtools postgresql-libs \
     lynx \
@@ -177,7 +177,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   # Update system and install common + Ubuntu-specific packages
   sudo apt-get update && sudo apt-get upgrade -y
   sudo apt-get install -y \
-    "$COMMON_PACKAGES" \
+    "${COMMON_PACKAGES[@]}" \
     build-essential \
     devscripts libpq-dev \
     infisical \
