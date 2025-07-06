@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_directories.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_directories.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # Set needed environment variables.
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -146,11 +146,11 @@ fi
 
 # For trash-cli completion.
 sudo mkdir -p "/usr/share/zsh/site-functions/"
-sudo chown "$(id -u "$USERNAME"):$(id -g "$USERNAME")" "/usr/share/zsh/site-functions/"
+sudo chown "$(id -u "$USER"):$(id -g "$USER")" "/usr/share/zsh/site-functions/"
 sudo mkdir -p "/usr/share/bash-completion/completions"
-sudo chown "$(id -u "$USERNAME"):$(id -g "$USERNAME")" "/usr/share/bash-completion/completions"
+sudo chown "$(id -u "$USER"):$(id -g "$USER")" "/usr/share/bash-completion/completions"
 sudo mkdir -p "/etc/profile.d"
-sudo chown "$(id -u "$USERNAME")":"$(id -g "$USERNAME")" "/etc/profile.d"
+sudo chown "$(id -u "$USER")":"$(id -g "$USER")" "/etc/profile.d"
 
 export RUST_HOME="$HOME/.rustup"
 if [ ! -d "$RUST_HOME" ]; then

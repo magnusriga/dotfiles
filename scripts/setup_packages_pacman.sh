@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_packages_pacman.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_packages_pacman.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # Stop snapd service if it is running, so it can be upgraded.
 # systemctl --quiet is-active snapd.service && sudo service snapd stop
@@ -107,7 +107,7 @@ sudo pacman -Syu --noconfirm \
   tree \
   glow \
   tectonic \
-  fastfetch neofetch \
+  fastfetch \
   docker docker-buildx docker-compose \
   github-cli \
   fzf viu \

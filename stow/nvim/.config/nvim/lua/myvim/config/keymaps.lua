@@ -37,10 +37,10 @@ map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = tru
 ---------------------------------
 -- Move to window using `c^hjkl`.
 -- No need, use built-in w-bindings: `<C-W>hjkl`.
-map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
-map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
-map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
-map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
+-- map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
+-- map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
+-- map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
+-- map("n", "<C-l>", "<C-w>l", { desc = "Go to Right Window", remap = true })
 
 -- Split window with leader.
 -- No need, use built-in w-bindings: `<C-W>s|w|c`.
@@ -389,14 +389,18 @@ map("n", "<leader>uI", function() vim.treesitter.inspect_tree() vim.api.nvim_inp
 ---------------------------------
 -- Terminal.
 ---------------------------------
--- Snacks terminal keybindings.
+-- Open `snacks.nvim` terminal: Leader.
 map("n", "<leader>fT", function() Snacks.terminal() end, { desc = "Terminal (cwd)" })
 map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
-map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+
+-- - Open `snacks.nvim` terminal: CTRL.
+-- - `<c-/>`: Replaced with open `claudecode.nvim`, see `plugins/ai/claude.lua`.
+-- map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
 map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
 
--- Close current window when in terminal mode.
-map("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+-- - Close current window when in terminal mode.
+-- - Also works on `claudecode.nvim`.
+map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
 
 -- Exit terminal mode in builtin terminal with shortcut that is easier to remember.

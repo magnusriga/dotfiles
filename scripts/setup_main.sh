@@ -5,7 +5,7 @@
 # ================================================
 export PATH="$PATH:$HOME/.local/bin"
 
-echo "Running setup_main.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_main.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # ==========================================================
 # Change directory to path of current script,

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # ==========================================================
 # Setup Script Overview.
@@ -43,7 +43,7 @@ echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME.
 # Exit if not run from Bash, since script relies on
 # environment variable `BASH_SOURCE`.
 # ==========================================================
-[[ ! -n ${BASH_SOURCE} ]] && echo "Please re-run from bash, exiting..." && return
+[[ -z ${BASH_SOURCE[0]} ]] && echo "Please re-run from bash, exiting..." && return
 
 # ==========================================================
 # Get Script Path.
@@ -54,7 +54,7 @@ echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME.
 # SCRIPT_PATH=$(dirname "$SCRIPT")
 # echo "SCRIPT_PATH is $SCRIPT_PATH."
 SCRIPTPATH="$(
-  cd -- "$(dirname "$BASH_SOURCE")" >/dev/null 2>&1
+  cd -- "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 || return
   pwd -P
 )/"
 
@@ -63,7 +63,7 @@ SCRIPTPATH="$(
 # to execute other scripts with relative path.
 # ==========================================================
 echo "cd to SCRIPTPATH: $SCRIPTPATH"
-cd $SCRIPTPATH
+cd "$SCRIPTPATH" || return
 
 # ==========================================================
 # Ensure `dotfiles` repo is up-to-date.
@@ -84,7 +84,7 @@ function doIt() {
   # Save top-level `dotfiles` path.
   # ==========================================================
   ROOTPATH="$(
-    cd -- "$(dirname "${BASH_SOURCE}")/.." >/dev/null 2>&1
+    cd -- "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 || return
     pwd -P
   )"
   echo "ROOTPATH is $ROOTPATH."
@@ -98,8 +98,8 @@ function doIt() {
   sudo ln -s "${ROOTPATH}/etc/pacman.conf" /etc
 
   # Link `.stow-global-ignore`, used by `stow`.
-  sudo rm -f $HOME/.stow-global-ignore
-  sudo ln -s "${ROOTPATH}/stow/.stow-global-ignore" $HOME
+  rm -f "$HOME/.stow-global-ignore"
+  ln -s "${ROOTPATH}/stow/.stow-global-ignore" "$HOME"
 
   # ==========================================================
   # Set locale.
@@ -109,89 +109,90 @@ function doIt() {
   source /etc/profile.d/locale.sh
 
   # ==========================================================
-  # Run remaining setup scripts as new user.
-  # Switch manually to new user, before running this file again.
+  # Setup user if it doesn't exist.
   # ==========================================================
-  if [ $(whoami) == "nfu" ] && [ -f "./setup_main.sh" ]; then
-    echo "Running: . ./setup_main.sh."
-    . ./setup_main.sh
+  if ! id "nfu" &>/dev/null && [ -f "./setup_user.sh" ]; then
+    echo "Running: . ./setup_user.sh."
+    . ./setup_user.sh
+    echo "New user created, restart shell as new user and re-run script."
+    return
   fi
 
   # ==========================================================
-  # `stow` system-level files.
+  # Run remaining setup scripts as new user.
+  # Switch manually to new user, before running this file again.
   # ==========================================================
-  # `sshd_config`, used when ssh'ing into this machine.
-  sudo rm -f /etc/ssh/sshd_config
-  sudo stow --no-folding -vv -d $SCRIPTPATH/../etc -t /etc/ssh ssh
+  if [ "$(whoami)" = "nfu" ] && [ -f "./setup_main.sh" ]; then
+    echo "Running: . ./setup_main.sh."
+    . ./setup_main.sh
 
-  # ==========================================================
-  # `stow` user-level files.
-  # - Run `stow -d "$HOME/dotfiles" -t "$HOME"` after installing packages,
-  #   to avoid symlinked `.config` folders, e.g. $HOME/.config/eza,
-  #   being overwritten by install scripts that create e.g. $HOME/.config/eza.
-  # - Uses configuration `dotfiles/.stowrc`, which excludes certain directories.
-  # - Stow is not ignoring top-level dotfiles, like `.git` because of this file,
-  #   instead `stow *` expands to all files and directories in folder except hidden ones,
-  #   i.e. those starting at `.`.
-  # ==========================================================
-  # First remove existing dotfiles, not created by `stow`.
-  rm -rf ~/{.gitconfig,.bash*,.profile,.zshrc}
-  echo "Running: stow -vv -d $SCRIPTPATH/../stow -t $HOME *"
-  cd $SCRIPTPATH/../stow
-  stow -vv -d "$SCRIPTPATH/../stow" -t "$HOME" *
+    # ==========================================================
+    # `stow` system-level files.
+    # ==========================================================
+    # `sshd_config`, used when ssh'ing into this machine.
+    sudo rm -f /etc/ssh/sshd_config
+    sudo stow --no-folding -vv -d "$SCRIPTPATH"/../etc -t /etc/ssh ssh
 
-  # ==========================================================
-  # Set ZSH as default shell.
-  # ==========================================================
-  echo 'Setting ZSH as default shell for current user...'
-  # local which_zsh=$(which zsh)
-  # Force ZSH verison from pacman.
-  local which_zsh="/usr/bin/zsh"
-  sudo cat /etc/shells | grep -q ${which_zsh} ||
-    echo "Adding ${which_zsh} to /etc/shells." &&
-    echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
-  sudo chsh -s "${which_zsh}" "$USER"
-  unset which_zsh
+    # ==========================================================
+    # `stow` user-level files.
+    # - Run `stow -d "$HOME/dotfiles" -t "$HOME"` after installing packages,
+    #   to avoid symlinked `.config` folders, e.g. $HOME/.config/eza,
+    #   being overwritten by install scripts that create e.g. $HOME/.config/eza.
+    # - Uses configuration `dotfiles/.stowrc`, which excludes certain directories.
+    # - Stow is not ignoring top-level dotfiles, like `.git` because of this file,
+    #   instead `stow *` expands to all files and directories in folder except hidden ones,
+    #   i.e. those starting at `.`.
+    # ==========================================================
+    # First remove existing dotfiles, not created by `stow`.
+    rm -rf ~/{.gitconfig,.bash*,.profile,.zshrc}
+    echo "Running: stow -vv -d $SCRIPTPATH/../stow -t $HOME *"
+    cd "$SCRIPTPATH/../stow" || return
+    stow -vv -d "$SCRIPTPATH/../stow" -t "$HOME" -- *
 
-  # ==========================================================
-  # Delete old user.
-  # ==========================================================
-  # if [[ -n "$(id -un $CURRENT_USER)" && "$(id -un $CURRENT_USER)" != $USERNAME && "$(id -un $CURRENT_USER)" != 'root' ]]; then
-  # sudo userdel $CURRENT_USER
-  # rm -rf /home/$CURRENT_USER
-  # fi
+    # ==========================================================
+    # Set ZSH as default shell.
+    # ==========================================================
+    echo 'Setting ZSH as default shell for current user...'
+    # local which_zsh=$(which zsh)
+    # Force ZSH verison from pacman.
+    local which_zsh="/usr/bin/zsh"
+    if ! sudo cat /etc/shells | grep -q "${which_zsh}"; then
+      echo "Adding ${which_zsh} to /etc/shells."
+      echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
+    fi
+    sudo chsh -s "${which_zsh}" "$USER"
+    unset which_zsh
 
-  # ==========================================================
-  # Do not run zsh scripts from here, as the Zsh commands are
-  # not reccognized by bash.
-  # ==========================================================
+    # ==========================================================
+    # Delete old user.
+    # ==========================================================
+    # if [[ -n "$(id -un $CURRENT_USER)" && "$(id -un $CURRENT_USER)" != $USERNAME && "$(id -un $CURRENT_USER)" != 'root' ]]; then
+    # sudo userdel $CURRENT_USER
+    # rm -rf /home/$CURRENT_USER
+    # fi
 
-  # ==========================================================
-  # Success messages and changing directory to $HOME.
-  # ==========================================================
-  echo "Installations and setup now done, restart shell to start using ZSH."
-  echo "Manually delete existing user and its home folder, if desired."
-  cd $HOME
+    # ==========================================================
+    # Do not run zsh scripts from here, as the Zsh commands are
+    # not reccognized by bash.
+    # ==========================================================
+
+    # ==========================================================
+    # Success messages and changing directory to $HOME.
+    # ==========================================================
+    echo "Installations and setup now done, restart shell to start using ZSH."
+    echo "Manually delete existing user and its home folder, if desired."
+    cd "$HOME" || return
+  fi
 }
 
-# ==========================================================
-# Ensure sudo.
-# Not needed, as new, i.e. current, user is added to `/etc/sudoers.d/<username>`,
-# which ensures user can run `sudo` command,
-# and user does not need to type password for any command.
-# ==========================================================
-# if [ "$EUID" -ne 0 ]; then
-#   echo "Please run as root"
-#   exit
-# fi
-
-if [ "$1" = "--force" -o "$1" = "-f" ]; then
+if [ "$1" = "--force" ] || [ "$1" = "-f" ]; then
   doIt
 else
-  read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
+  read -r -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
   echo ""
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     doIt
   fi
 fi
+
 unset doIt
