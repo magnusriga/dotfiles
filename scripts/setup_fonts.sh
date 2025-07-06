@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_fonts.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_fonts.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # Get target root directory.
 if [[ $(uname) == 'Darwin' ]]; then

@@ -15,15 +15,15 @@ git clone https://github.com/boydaihungst/restore.yazi "${YAZI_HOME:-$HOME/.conf
 git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.config/yazi}/flavors/onedark.yazi"
 
 # Install Yazi plugins via cli.
-ya pkg -a yazi-rs/plugins:full-border
-ya pkg -a yazi-rs/plugins:max-preview
-ya pkg -a dedukun/relative-motions
-ya pkg -a Reledia/glow
-ya pkg -a yazi-rs/plugins:jump-to-char
-ya pkg -a dedukun/bookmarks
-ya pkg -a yazi-rs/plugins:chmod
-ya pkg -a Lil-Dank/lazygit
-ya pkg -a yazi-rs/plugins:smart-filter
-ya pkg -a yazi-rs/plugins:git
-ya pkg -a Rolv-Apneseth/starship
-ya pkg -a yazi-rs/plugins:diff
+ya pkg add yazi-rs/plugins:full-border
+ya pkg add yazi-rs/plugins:max-preview
+ya pkg add dedukun/relative-motions
+ya pkg add Reledia/glow
+ya pkg add yazi-rs/plugins:jump-to-char
+ya pkg add dedukun/bookmarks
+ya pkg add yazi-rs/plugins:chmod
+ya pkg add Lil-Dank/lazygit
+ya pkg add yazi-rs/plugins:smart-filter
+ya pkg add yazi-rs/plugins:git
+ya pkg add Rolv-Apneseth/starship
+ya pkg add yazi-rs/plugins:diff

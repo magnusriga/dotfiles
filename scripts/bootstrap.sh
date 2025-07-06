@@ -120,6 +120,10 @@ function doIt() {
   # Switch manually to new user, before running this file again.
   # ==========================================================
   if [ "$(whoami)" = "nfu" ] && [ -f "./setup_main.sh" ]; then
+    # Remove `/usr/local/share/man`, which symlinks to empty `/usr/local/man` on Arch Linux,
+    # as it blocks `setup_packages_manual.sh` > `stow nvim`.
+    rm -f /usr/local/share/man
+
     echo "Running: . ./setup_main.sh."
     . ./setup_main.sh
 
@@ -140,12 +144,9 @@ function doIt() {
     #   instead `stow *` expands to all files and directories in folder except hidden ones,
     #   i.e. those starting at `.`.
     # ==========================================================
-    # First, remove:
-    # - Existing dotfiles, not created by `stow`.
-    # - `/usr/local/share/man`, which symlinks to empty `/usr/local/man` on Arch Linux.
+    # Remove existing dotfiles, not created by `stow`.
     rm -rf ~/{.gitconfig,.bash*,.profile,.zshrc}
-    rm -f /usr/local/share/man
-    # Then, stow all directories in `stow` folder,
+
     echo "Running: stow -vv -d $SCRIPTPATH/../stow -t $HOME *"
     cd "$SCRIPTPATH/../stow" || return
     # shellcheck disable=SC2035
@@ -154,16 +155,22 @@ function doIt() {
     # ==========================================================
     # Set ZSH as default shell.
     # ==========================================================
-    echo 'Setting ZSH as default shell for current user...'
-    # local which_zsh=$(which zsh)
     # Force ZSH verison from pacman.
     local which_zsh="/usr/bin/zsh"
-    if ! sudo cat /etc/shells | grep -q "${which_zsh}"; then
-      echo "Adding ${which_zsh} to /etc/shells."
-      echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
+    local current_shell
+    current_shell=$(getent passwd "$USER" | cut -d: -f7)
+    
+    if [ "$current_shell" != "$which_zsh" ]; then
+      echo 'Setting ZSH as default shell for current user...'
+      if ! sudo cat /etc/shells | grep -q "${which_zsh}"; then
+        echo "Adding ${which_zsh} to /etc/shells."
+        echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
+      fi
+      sudo chsh -s "${which_zsh}" "$USER"
+    else
+      echo "ZSH is already the default shell for current user."
     fi
-    sudo chsh -s "${which_zsh}" "$USER"
-    unset which_zsh
+    unset which_zsh current_shell
 
     # ==========================================================
     # Delete old user.
