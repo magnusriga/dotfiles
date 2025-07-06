@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USERNAME $USERNAME."
+echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # ==================================
 # Set chroot path.

@@ -52,8 +52,9 @@ return {
       -- - No need, use `<c-w>l` | `<c-w>w`.
       { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
 
-      -- Not sure how `--resume` and `--continue` differs from toggling,
-      -- with `ClaudeCode` | keybinding.
+      -- `--continue`: Automaticlly continue most recent conversation.
+      -- `--resume`: Show convestation picker.
+      -- BUG: Does not currently work in `claudecode.nvim`.
       { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
       { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
 
