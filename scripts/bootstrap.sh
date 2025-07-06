@@ -62,6 +62,7 @@ SCRIPTPATH="$(
 # Change directory to path of current script,
 # to execute other scripts with relative path.
 # ==========================================================
+echo "${BASH_SOURCE[0]}"
 echo "cd to SCRIPTPATH: $SCRIPTPATH"
 cd "$SCRIPTPATH" || return
 
@@ -83,6 +84,7 @@ function doIt() {
   # ==========================================================
   # Save top-level `dotfiles` path.
   # ==========================================================
+  echo "${BASH_SOURCE[0]}"
   ROOTPATH="$(cd -- "$(dirname "${BASH_SOURCE[0]}")/.." >/dev/null 2>&1 && pwd -P)"
   echo "ROOTPATH is $ROOTPATH."
 
