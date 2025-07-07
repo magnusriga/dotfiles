@@ -102,7 +102,7 @@ function doIt() {
   # Set locale.
   # ==========================================================
   # Skip locale setup in Docker build, as it is already configured.
-  if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ ! -f /proc/1/cgroup ] || ! grep -q docker /proc/1/cgroup 2>/dev/null; then
+  if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
     echo "Setting locale to en_US.UTF-8."
     sudo localectl set-locale LANG=en_US.UTF-8
     unset LANG
