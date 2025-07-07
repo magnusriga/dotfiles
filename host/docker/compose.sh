@@ -37,7 +37,7 @@ help() {
   echo "  -u  Docker compose up."
   echo "  -d  Docker compose down."
   echo "  -r  Docker compose restart."
-  echo "  -s  Enter container shell (zsh)."
+  echo "  -s  Enter container login shell (\`zsh -l\`)."
   echo "  -l  Show container logs."
   echo "  -c  Show container status."
   echo "  -e  Environment: dev or prod."
@@ -98,8 +98,8 @@ while getopts "hbdurslc" opt; do
     ;;
   s)
     # Enter container shell.
-    echo "Entering container with zsh shell..."
-    docker compose --progress plain --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec nfront zsh
+    echo "Entering container with zsh login shell..."
+    docker compose --progress plain --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec nfront zsh -l
     ;;
   l)
     # Show container logs.
