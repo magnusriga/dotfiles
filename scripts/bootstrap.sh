@@ -101,9 +101,12 @@ function doIt() {
   # ==========================================================
   # Set locale.
   # ==========================================================
-  sudo localectl set-locale LANG=en_US.UTF-8
-  unset LANG
-  source /etc/profile.d/locale.sh
+  # Skip locale setup in Docker build, as it is already configured.
+  if [ ! -f /.dockerenv ]; then
+    sudo localectl set-locale LANG=en_US.UTF-8
+    unset LANG
+    source /etc/profile.d/locale.sh
+  fi
 
   # ==========================================================
   # Setup user if it doesn't exist.
@@ -122,7 +125,7 @@ function doIt() {
   if [ "$(whoami)" = "nfu" ] && [ -f "./setup_main.sh" ]; then
     # Remove `/usr/local/share/man`, which symlinks to empty `/usr/local/man` on Arch Linux,
     # as it blocks `setup_packages_manual.sh` > `stow nvim`.
-    rm -f /usr/local/share/man
+    sudo rm -f /usr/local/share/man
 
     echo "Running: . ./setup_main.sh."
     . ./setup_main.sh
@@ -159,7 +162,7 @@ function doIt() {
     local which_zsh="/usr/bin/zsh"
     local current_shell
     current_shell=$(getent passwd "$USER" | cut -d: -f7)
-    
+
     if [ "$current_shell" != "$which_zsh" ]; then
       echo 'Setting ZSH as default shell for current user...'
       if ! sudo cat /etc/shells | grep -q "${which_zsh}"; then
