@@ -30,12 +30,16 @@
 export OPTIND=0
 
 script_name=$0
-usage() { echo "Usage: $0 [-e <dev|prod>] [-h] -d|u|b" 1>&2; }
+usage() { echo "Usage: $0 [-e <dev|prod>] [-h] -d|u|b|s|l|c" 1>&2; }
 help() {
   echo "  -h  Display help message."
+  echo "  -b  Build Docker image."
   echo "  -u  Docker compose up."
   echo "  -d  Docker compose down."
   echo "  -r  Docker compose restart."
+  echo "  -s  Enter container shell (zsh)."
+  echo "  -l  Show container logs."
+  echo "  -c  Show container status."
   echo "  -e  Environment: dev or prod."
 }
 Exit() {
@@ -63,7 +67,7 @@ echo "ROOTDIR is ${ROOTDIR}."
 echo "Sourcing environment variables, making them accessible in \`docker-compose.yml\`."
 source "${ROOTDIR}/envs/docker-dev.env"
 
-while getopts "hbdur" opt; do
+while getopts "hbdurslc" opt; do
   case ${opt} in
   h)
     usage
@@ -91,6 +95,21 @@ while getopts "hbdur" opt; do
     # Restart containers.
     echo "Restarting docker containers."
     docker compose --progress plain --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" restart
+    ;;
+  s)
+    # Enter container shell.
+    echo "Entering container with zsh shell..."
+    docker compose --progress plain --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec nfront zsh
+    ;;
+  l)
+    # Show container logs.
+    echo "Showing container logs..."
+    docker compose --progress plain --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" logs -f nfront
+    ;;
+  c)
+    # Show container status.
+    echo "Container status:"
+    docker compose --progress plain --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" ps
     ;;
   \?)
     echo "Invalid option: $OPTARG" 1>&2

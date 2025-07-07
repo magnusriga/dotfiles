@@ -8,7 +8,12 @@ echo "Running setup_packages.sh as $(whoami), with HOME $HOME and USER $USER."
 function detect_distro() {
   if [ -f /etc/os-release ]; then
     . /etc/os-release
-    echo "$ID"
+    # Handle Arch Linux ARM which has ID=archarm but ID_LIKE=arch
+    if [ "$ID" = "archarm" ] && [ "$ID_LIKE" = "arch" ]; then
+      echo "arch"
+    else
+      echo "$ID"
+    fi
   elif [ -f /etc/arch-release ]; then
     echo "arch"
   elif [ -f /etc/debian_version ]; then

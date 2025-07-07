@@ -19,7 +19,14 @@
       "mcp__fetch__fetch",
       "Bash(mv:*)",
       "WebFetch(domain:infisical.com)",
-      "WebFetch(domain:developer.hashicorp.com)"
+      "WebFetch(domain:developer.hashicorp.com)",
+      "Bash(chmod:*)",
+      "Bash(./build-dotfiles.sh build:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(docker run:*)",
+      "Bash(sed:*)",
+      "Bash(rm:*)"
     ]
   },
   "enableAllProjectMcpServers": false
