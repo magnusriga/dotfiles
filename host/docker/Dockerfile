@@ -98,7 +98,7 @@ RUN mkdir -p /home/$USERNAME/dotfiles && \
 WORKDIR /home/$USERNAME/dotfiles
 
 # Run bootstrap script with bind mount to access full git repo
-RUN --mount=type=bind,source=.,target=/home/$USERNAME/dotfiles \
+RUN --mount=type=bind,source=.,target=/home/$USERNAME/dotfiles,rw \
   chmod +x scripts/bootstrap.sh && \
   ./scripts/bootstrap.sh --force && \
   echo "Bootstrap completed successfully"
