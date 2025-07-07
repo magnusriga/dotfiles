@@ -92,7 +92,13 @@ function doIt() {
   # ==========================================================
   # Link `pacman.conf`, used by `pacman`.
   sudo rm -f /etc/pacman.conf
-  sudo ln -s "${ROOTPATH}/etc/pacman.conf" /etc
+  if [ -n "$DOCKER_BUILD" ]; then
+    # In Docker build, use the pacman.conf from `host/docker` directory.
+    sudo ln -s "${ROOTPATH}/host/docker/pacman.conf" /etc
+  else
+    # In normal setup, use the pacman.conf from `etc` directory.
+    sudo ln -s "${ROOTPATH}/etc/pacman.conf" /etc
+  fi
 
   # Link `.stow-global-ignore`, used by `stow`.
   rm -f "$HOME/.stow-global-ignore"

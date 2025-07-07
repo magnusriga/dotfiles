@@ -100,6 +100,10 @@ services:
       - type: bind
         source: ~/nfront
         target: /home/nfu/nfront
+      # Bind mount dotfiles for development and configuration access
+      - type: bind
+        source: ../..
+        target: /home/nfu/dotfiles
       # Forward the Docker socket by mounting it in the container using the mounts property.
       - type: bind
         source: /var/run/docker.sock

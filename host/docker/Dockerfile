@@ -12,7 +12,9 @@
 # 2) cypress:included
 # And many others. Full list: https://hub.docker.com
 
-# FROM archlinux:latest AS builder
+# ================================================
+# Stage 1: Build environment with dotfiles
+# ================================================
 FROM menci/archlinuxarm AS builder
 # FROM mcr.microsoft.com/devcontainers/universal
 # FROM mcr.microsoft.com/devcontainers/javascript-node
@@ -99,16 +101,13 @@ ENV LC_ALL en_US.UTF-8
 # ================================================
 WORKDIR /home/$USERNAME/dotfiles
 RUN . ./scripts/bootstrap.sh --force && \
-  echo "Bootstrap completed successfully"
-
-# ================================================
-# Bootstrap script handles all tool installation and PATH setup
-# ================================================
+  echo "Bootstrap completed successfully" && \
+  rm -rf /home/$USERNAME/dotfiles && \
+  echo "Dotfiles cleaned up"
 
 # ================================================
 # Container entrypoint and CMD
 # ================================================
-
 COPY --chmod=0755 host/docker/docker-init.sh "/usr/local/share/"
 ENTRYPOINT [ "/usr/local/share/docker-init.sh" ]
 CMD [ "sleep", "infinity" ]
