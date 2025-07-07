@@ -30,15 +30,15 @@ sudoIf() { if [ "$(id -u)" -ne 0 ]; then sudo "$@"; else "$@"; fi; }
 # In normal docker situations, SOCKET_GID will be 1001, because docker.sock file is created by default user in image, which is "ubuntu", whose GID is 1001.
 SOCKET_GID=$(stat -c '%g' /var/run/docker.sock)
 
-# if [ "" != '0' ] will always be true, because "" is not equal to '0'.
-if [ "" != '0' ]; then
+# Check if SOCKET_GID is not 0 (root)
+if [ "${SOCKET_GID}" != '0' ]; then
   # If the group with GID SOCKET_GID, i.e. 1001, does not exist in /etc/group, create it with group name "docker-host".
   # In our standard docker image, SOCKET_GID is 1001, which does exist in /etc/group with group name "ubuntu" and one member with username "nfu".
-  if [ "$(cat /etc/group | grep :${SOCKET_GID}:)" = '' ]; then sudoIf groupadd --gid ${SOCKET_GID} docker-host; fi
+  if [ "$(grep ":${SOCKET_GID}:" /etc/group)" = '' ]; then sudoIf groupadd --gid "${SOCKET_GID}" docker-host; fi
   # If user nfu's group ID does NOT match SOCKET_ID, which it does not because GID of nfu is 1000 and not 1001,
   # then ADD user nfu to group with GID SOCKET_GID, i.e. 1001, which is the group "ubuntu".
   # Result: Group ubuntu has two members, its primary member "ubuntu" and a supplementary member "nfu".
-  if [ "$(id nfu | grep -E "groups=.*(=|,)${SOCKET_GID}\(")" = '' ]; then sudoIf usermod -aG ${SOCKET_GID} nfu; fi
+  if [ "$(id nfu | grep -E "groups=.*(=|,)${SOCKET_GID}\\(")" = '' ]; then sudoIf usermod -aG "${SOCKET_GID}" nfu; fi
 fi
 
 # - Finally, we execute the command passed in as argument to this script, which for docker is: sleep infinity.

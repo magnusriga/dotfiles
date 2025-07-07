@@ -1,0 +1,37 @@
+# Docker ignore file for dotfiles
+# This file is used when building with context: ../..
+
+# Git files
+.git/
+.gitignore
+
+# Documentation that's not needed in container (except in host/docker)
+README.md
+host/mac/
+host/wezterm/
+host/**/*.md
+!host/docker/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.log
+*.tmp
+
+# Cache directories
+node_modules/
+.npm/
+.cache/
+
+# Temporary files
+tmp/
+temp/

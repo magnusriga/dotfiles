@@ -36,14 +36,14 @@ services:
     # Both image and build are present:
     # - Compose attempts to find image locally or in registry (Docker Hub or local registry)
     # - If not found, it builds image as specified by "build"
-    image: 127.0.0.1:5000/nfront
+    image: 127.0.0.1:5000/nfront-dev
     build:
       # context path is relative to this compose file.
       # When sending compose file in as stdin, it used path of shell (/dev),
       # thus we set aboulute path here instead.
-      context: ${ROOTDIR}
+      context: ../..
       # dockerfile path is relative to context path.
-      dockerfile: ./Dockerfile
+      dockerfile: ./host/docker/Dockerfile
       ulimits:
         nofile:
           soft: 1048576
