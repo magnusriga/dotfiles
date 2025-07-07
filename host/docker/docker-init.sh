@@ -68,4 +68,8 @@ fi
 # - Preferrably, execute the command: docker exec -it <containerId> zsh, to open a ZSH shell with a terminal inside the container,
 #   then cd to the project folder, then run nvim from there.
 # - Type "exit" to get out of the container.
+
+# Start SSH daemon
+sudoIf /usr/sbin/sshd -D &
+
 exec "$@"

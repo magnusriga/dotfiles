@@ -46,7 +46,7 @@ COPY host/docker/pacman.conf /etc/pacman.conf
 RUN pacman-key --init && pacman-key --populate archlinux
 
 # Install sudo and git, needed for initial setup.
-RUN pacman -Syu --noconfirm sudo git glibc-locales
+RUN pacman -Syu --noconfirm sudo git glibc-locales openssh
 
 # ================================================
 # Install Docker Compose.
@@ -73,6 +73,15 @@ RUN groupadd --gid $USER_GID $USERNAME \
 # Setting passwords to same as username, in case needed.
 RUN echo 'root:root' | chpasswd; \
   echo "$USERNAME:$USERNAME" | chpasswd
+
+# Generate SSH host keys.
+RUN ssh-keygen -A
+
+# Configure SSH daemon for container use.
+RUN sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config && \
+  sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+  sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+  sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
 # ================================================
 # Switch to new, non-root, user for rest of setup.
