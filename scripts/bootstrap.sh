@@ -68,7 +68,7 @@ cd "$SCRIPTPATH" || return
 # ==========================================================
 # Ensure `dotfiles` repo is up-to-date.
 # ==========================================================
-git pull origin main
+[ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && git pull origin main
 
 function doIt() {
   # ==========================================================

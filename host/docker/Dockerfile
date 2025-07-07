@@ -78,6 +78,11 @@ RUN echo 'root:root' | chpasswd; \
 USER $USERNAME
 
 # ================================================
+# Copy dotfiles directly to final location
+# ================================================
+COPY --chown=$USERNAME:$USERNAME . /home/$USERNAME/dotfiles/
+
+# ================================================
 # Set environment variables
 # ================================================
 ENV USER=$USERNAME
@@ -90,17 +95,10 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 # ================================================
-# Create dotfiles directory and run bootstrap with bind mount
+# Run comprehensive Docker bootstrap script
 # ================================================
-RUN mkdir -p /home/$USERNAME/dotfiles && \
-  chown $USERNAME:$USERNAME /home/$USERNAME/dotfiles
-
 WORKDIR /home/$USERNAME/dotfiles
-
-# Run bootstrap script with bind mount to access full git repo
-RUN --mount=type=bind,source=.,target=/home/$USERNAME/dotfiles,rw \
-  chmod +x scripts/bootstrap.sh && \
-  ./scripts/bootstrap.sh --force && \
+RUN . ./scripts/bootstrap.sh --force && \
   echo "Bootstrap completed successfully"
 
 # ================================================
