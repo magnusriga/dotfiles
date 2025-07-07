@@ -44,8 +44,7 @@ COPY host/docker/pacman.conf /etc/pacman.conf
 RUN pacman-key --init && pacman-key --populate archlinux
 
 # Install sudo and git, needed for initial setup.
-# Skip full system upgrade to avoid disk space issues in build
-RUN pacman -Sy --noconfirm sudo git glibc-locales
+RUN pacman -Syu --noconfirm sudo git glibc-locales
 
 # ================================================
 # Install Docker Compose.
@@ -81,10 +80,7 @@ USER $USERNAME
 # ================================================
 # Copy dotfiles directly to final location
 # ================================================
-COPY --chown=$USERNAME:$USERNAME scripts/ /home/$USERNAME/dotfiles/scripts/
-COPY --chown=$USERNAME:$USERNAME stow/ /home/$USERNAME/dotfiles/stow/
-COPY --chown=$USERNAME:$USERNAME etc/ /home/$USERNAME/dotfiles/etc/
-COPY --chown=$USERNAME:$USERNAME stow/.stow-global-ignore /home/$USERNAME/dotfiles/.stow-global-ignore
+COPY --chown=$USERNAME:$USERNAME . /home/$USERNAME/dotfiles/
 
 # ================================================
 # Set environment variables
@@ -100,9 +96,9 @@ ENV LC_ALL en_US.UTF-8
 # ================================================
 # Run comprehensive Docker bootstrap script
 # ================================================
-WORKDIR /home/$USERNAME/dotfiles/scripts
-RUN chmod +x bootstrap.sh && \
-  ./bootstrap.sh --force && \
+WORKDIR /home/$USERNAME/dotfiles
+RUN chmod +x scripts/bootstrap.sh && \
+  ./scripts/bootstrap.sh --force && \
   echo "Bootstrap completed successfully"
 
 # ================================================
