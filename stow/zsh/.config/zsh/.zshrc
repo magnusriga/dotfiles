@@ -171,11 +171,12 @@ function zle-keymap-select {
 zle -N zle-keymap-select
 
 # Start new lines with bar cursor, since, in ZSH vi-mode, each line starts in Insert mode.
-# Not needed, when using `precmd`.
-# function zle-line-init {
-#     __set_bar_cursor
-# }
-# zle -N zle-line-init
+# For some reason, only needed in Docker dev container.
+# Otherwise, not needed when using `precmd`.
+function zle-line-init {
+    __set_bar_cursor
+}
+zle -N zle-line-init
 
 # When prompt is redrawn, set cursor to bar.
 precmd_functions+=__set_bar_cursor
