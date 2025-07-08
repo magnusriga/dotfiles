@@ -46,7 +46,9 @@ services:
       dockerfile: ./host/docker/Dockerfile
       args:
         DISTRO: ${DISTRO:-arch}
-        ARCH_IMAGE: ${ARCH_IMAGE:-menci/archlinuxarm}
+        TARGETARCH: ${TARGETARCH:-amd64}
+        ARCH_IMAGE_AMD64: ${ARCH_IMAGE_AMD64:-archlinux:latest}
+        ARCH_IMAGE_ARM64: ${ARCH_IMAGE_ARM64:-menci/archlinuxarm}
         UBUNTU_IMAGE: ${UBUNTU_IMAGE:-ubuntu:24.04}
       ulimits:
         nofile:

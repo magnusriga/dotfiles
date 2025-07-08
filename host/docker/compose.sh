@@ -104,10 +104,28 @@ echo "ROOTDIR is ${ROOTDIR}."
 echo "Sourcing environment variables, making them accessible in \`docker-compose.yml\`."
 source "${ROOTDIR}/envs/docker-dev.env"
 
+# ================================================
+# Detect host architecture and set TARGETARCH
+# ================================================
+HOST_ARCH=$(uname -m)
+case $HOST_ARCH in
+  x86_64)
+    export TARGETARCH="amd64"
+    ;;
+  aarch64|arm64)
+    export TARGETARCH="arm64"
+    ;;
+  *)
+    print_warning "Unsupported architecture: $HOST_ARCH, defaulting to amd64"
+    export TARGETARCH="amd64"
+    ;;
+esac
+print_info "Host architecture: $HOST_ARCH -> Docker TARGETARCH: $TARGETARCH"
+
 # Initialize variables
 VERBOSE=false
 PUSH_IMAGE=false
-PROGRESS_FLAG="--progress plain"
+PROGRESS_FLAG=(--progress plain)
 
 while getopts "hbdurslct:vp" opt; do
   case ${opt} in
@@ -119,13 +137,13 @@ while getopts "hbdurslct:vp" opt; do
   b)
     # Build Docker image.
     if [[ "$VERBOSE" == "true" ]]; then
-      PROGRESS_FLAG="--progress plain"
+      PROGRESS_FLAG=(--progress plain)
       print_step "Building Docker image with verbose output for distribution: ${DISTRO:-arch}"
     else
       print_step "Building Docker image for distribution: ${DISTRO:-arch}"
     fi
     
-    if docker compose $PROGRESS_FLAG -f "${ROOTDIR}/docker-compose.yml" build --no-cache; then
+    if docker compose "${PROGRESS_FLAG[@]}" -f "${ROOTDIR}/docker-compose.yml" build --no-cache; then
       print_info "Build completed successfully!"
       
       # Show image info
@@ -150,7 +168,7 @@ while getopts "hbdurslct:vp" opt; do
   d)
     # Stop containers.
     print_step "Taking down docker container."
-    if docker compose $PROGRESS_FLAG --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" down; then
+    if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" down; then
       print_info "Container stopped successfully."
     else
       print_error "Failed to stop container."
@@ -159,7 +177,7 @@ while getopts "hbdurslct:vp" opt; do
   u)
     # Start docker containers.
     print_step "Starting docker containers for distribution: ${DISTRO:-arch}"
-    if docker compose $PROGRESS_FLAG --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" up -d; then
+    if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" up -d; then
       print_info "Container started successfully."
     else
       print_error "Failed to start container."
@@ -168,7 +186,7 @@ while getopts "hbdurslct:vp" opt; do
   r)
     # Restart containers.
     print_step "Restarting docker containers."
-    if docker compose $PROGRESS_FLAG --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" restart; then
+    if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" restart; then
       print_info "Container restarted successfully."
     else
       print_error "Failed to restart container."
@@ -177,17 +195,19 @@ while getopts "hbdurslct:vp" opt; do
   s)
     # Enter container shell.
     print_step "Entering container with zsh login shell..."
-    docker compose $PROGRESS_FLAG --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec nfront zsh -l
+    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec nfront zsh -l
     ;;
   l)
     # Show container logs.
     print_step "Showing container logs..."
-    docker compose $PROGRESS_FLAG --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" logs -f nfront
+    # shellcheck disable=SC2068,SC2086
+    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" logs -f nfront
     ;;
   c)
     # Show container status.
     print_info "Container status:"
-    docker compose $PROGRESS_FLAG --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" ps
+    # shellcheck disable=SC2068,SC2086
+    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" ps
     ;;
   t)
     # Set distribution
