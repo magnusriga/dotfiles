@@ -26,7 +26,8 @@
       "Bash(ls:*)",
       "Bash(docker run:*)",
       "Bash(sed:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(awk:*)"
     ]
   },
   "enableAllProjectMcpServers": false

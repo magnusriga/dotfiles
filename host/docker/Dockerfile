@@ -13,17 +13,24 @@
 # And many others. Full list: https://hub.docker.com
 
 # ================================================
-# Multi-distribution support configuration.
+# Multi-distribution and multi-architecture support configuration.
 # ================================================
 ARG DISTRO=arch
-ARG ARCH_IMAGE=menci/archlinuxarm
+ARG TARGETARCH
+ARG ARCH_IMAGE_AMD64=archlinux:latest
+ARG ARCH_IMAGE_ARM64=menci/archlinuxarm
 ARG UBUNTU_IMAGE=ubuntu:24.04
 
 # ================================================
 # Stage 1: Build environment with dotfiles.
 # ================================================
-FROM ${ARCH_IMAGE} AS arch-base
-FROM ${UBUNTU_IMAGE} AS ubuntu-base
+FROM ${ARCH_IMAGE_AMD64} AS arch-base-amd64
+FROM ${ARCH_IMAGE_ARM64} AS arch-base-arm64
+FROM ${UBUNTU_IMAGE} AS ubuntu-base-amd64
+FROM ${UBUNTU_IMAGE} AS ubuntu-base-arm64
+
+FROM arch-base-${TARGETARCH} AS arch-base
+FROM ubuntu-base-${TARGETARCH} AS ubuntu-base
 
 FROM ${DISTRO}-base AS builder
 
@@ -67,7 +74,12 @@ RUN set -ex; \
 # Install Docker Compose.
 # ================================================
 RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/compose/releases/latest" | grep -o -P '(?<="tag_name": ").+(?=")') \
-  && curl -sSL "https://github.com/docker/compose/releases/download/${LATEST_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+  && case "${TARGETARCH}" in \
+    "amd64") COMPOSE_ARCH="x86_64" ;; \
+    "arm64") COMPOSE_ARCH="aarch64" ;; \
+    *) COMPOSE_ARCH="$(uname -m)" ;; \
+  esac \
+  && curl -sSL "https://github.com/docker/compose/releases/download/${LATEST_COMPOSE_VERSION}/docker-compose-$(uname -s)-${COMPOSE_ARCH}" -o /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
 
 # ================================================
