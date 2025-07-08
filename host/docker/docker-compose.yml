@@ -44,6 +44,10 @@ services:
       context: ../..
       # dockerfile path is relative to context path.
       dockerfile: ./host/docker/Dockerfile
+      args:
+        DISTRO: ${DISTRO:-arch}
+        ARCH_IMAGE: ${ARCH_IMAGE:-menci/archlinuxarm}
+        UBUNTU_IMAGE: ${UBUNTU_IMAGE:-ubuntu:24.04}
       ulimits:
         nofile:
           soft: 1048576
