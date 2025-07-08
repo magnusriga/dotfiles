@@ -13,14 +13,22 @@
 # And many others. Full list: https://hub.docker.com
 
 # ================================================
-# Stage 1: Build environment with dotfiles
+# Multi-distribution support configuration.
 # ================================================
-FROM menci/archlinuxarm AS builder
-# FROM mcr.microsoft.com/devcontainers/universal
-# FROM mcr.microsoft.com/devcontainers/javascript-node
+ARG DISTRO=arch
+ARG ARCH_IMAGE=menci/archlinuxarm
+ARG UBUNTU_IMAGE=ubuntu:24.04
 
-# Prevent dialog during apt install
-# ENV DEBIAN_FRONTEND noninteractive
+# ================================================
+# Stage 1: Build environment with dotfiles.
+# ================================================
+FROM ${ARCH_IMAGE} AS arch-base
+FROM ${UBUNTU_IMAGE} AS ubuntu-base
+
+FROM ${DISTRO}-base AS builder
+
+# Prevent dialog during apt install (Ubuntu only)
+ENV DEBIAN_FRONTEND=noninteractive
 
 # The below will replace the shell used when running this Dockerfile,
 # from ["/bin/sh", "-c"] to ["bin/bash", ...], so we can source files.
@@ -35,18 +43,25 @@ FROM menci/archlinuxarm AS builder
 SHELL ["/bin/bash", "-exo", "pipefail", "-c" ]
 
 # ================================================
-# Setup pacman and install initial packages.
+# Distribution-specific initial setup.
 # ================================================
-# Replace pacman.conf with custom one, e.g. to disable sandboxing,
-# which does not work on ARM version of Arch Linux.
-RUN rm -f /etc/pacman.conf
-COPY host/docker/pacman.conf /etc/pacman.conf
+COPY host/docker/pacman.conf /tmp/pacman.conf
 
-# Setup pacman keyring and populate it.
-RUN pacman-key --init && pacman-key --populate archlinux
-
-# Install sudo and git, needed for initial setup.
-RUN pacman -Syu --noconfirm sudo git glibc-locales openssh
+# Install base packages needed for setup
+RUN set -ex; \
+    if [ "$DISTRO" = "arch" ]; then \
+        rm -f /etc/pacman.conf && \
+        cp /tmp/pacman.conf /etc/pacman.conf && \
+        pacman-key --init && \
+        pacman-key --populate archlinux && \
+        pacman -Syu --noconfirm sudo git glibc-locales openssh curl; \
+    elif [ "$DISTRO" = "ubuntu" ]; then \
+        apt-get update && \
+        apt-get install -y sudo git locales openssh-server curl && \
+        locale-gen en_US.UTF-8 && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*; \
+    fi
 
 # ================================================
 # Install Docker Compose.
@@ -74,14 +89,14 @@ RUN groupadd --gid $USER_GID $USERNAME \
 RUN echo 'root:root' | chpasswd; \
   echo "$USERNAME:$USERNAME" | chpasswd
 
-# Generate SSH host keys.
-RUN ssh-keygen -A
-
-# Configure SSH daemon for container use.
-RUN sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config && \
-  sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-  sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-  sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+# ================================================
+# Configure SSH
+# ================================================
+RUN ssh-keygen -A && \
+    sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config && \
+    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+    sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
 # ================================================
 # Switch to new, non-root, user for rest of setup.
@@ -98,6 +113,7 @@ COPY --chown=$USERNAME:$USERNAME . /home/$USERNAME/dotfiles/
 # ================================================
 ENV USER=$USERNAME
 ENV DOCKER_BUILD=1
+ENV DISTRO=$DISTRO
 
 # ================================================
 # Setup: Locale.
@@ -110,7 +126,7 @@ ENV LC_ALL en_US.UTF-8
 # ================================================
 WORKDIR /home/$USERNAME/dotfiles
 RUN . ./scripts/bootstrap.sh --force && \
-  echo "Bootstrap completed successfully" && \
+  echo "Bootstrap completed successfully for $DISTRO" && \
   rm -rf /home/$USERNAME/dotfiles && \
   echo "Dotfiles cleaned up"
 
