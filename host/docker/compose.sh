@@ -127,6 +127,31 @@ VERBOSE=false
 PUSH_IMAGE=false
 PROGRESS_FLAG=(--progress plain)
 
+# First pass: process -t option to set DISTRO before other actions
+while getopts "hbdurslct:vp" opt; do
+  case ${opt} in
+  t)
+    # Set distribution
+    DISTRO="$OPTARG"
+    if [[ "$DISTRO" != "arch" && "$DISTRO" != "ubuntu" ]]; then
+      print_error "Invalid distribution '$DISTRO'. Must be 'arch' or 'ubuntu'."
+      Exit 1 || return 1
+    fi
+    export DISTRO
+    print_info "Target distribution set to: $DISTRO"
+    ;;
+  esac
+done
+
+# Ensure DISTRO is set (use default from env file if not set by -t option)
+if [[ -z "$DISTRO" ]]; then
+  export DISTRO
+fi
+
+# Reset OPTIND for second pass
+OPTIND=1
+
+# Second pass: process all other options
 while getopts "hbdurslct:vp" opt; do
   case ${opt} in
   h)
@@ -210,14 +235,7 @@ while getopts "hbdurslct:vp" opt; do
     docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" ps
     ;;
   t)
-    # Set distribution
-    DISTRO="$OPTARG"
-    if [[ "$DISTRO" != "arch" && "$DISTRO" != "ubuntu" ]]; then
-      print_error "Invalid distribution '$DISTRO'. Must be 'arch' or 'ubuntu'."
-      Exit 1 || return 1
-    fi
-    export DISTRO
-    print_info "Target distribution set to: $DISTRO"
+    # Skip, already processed in first pass
     ;;
   v)
     # Enable verbose output
