@@ -1,0 +1,17 @@
+_=/usr/bin/env
+HOME=/home/nfu
+LANG=en_US.UTF-8
+LOGNAME=nfu
+MAIL=/var/spool/mail/nfu
+MOTD_SHOWN=pam
+OLDPWD=/home/nfu
+PATH=/usr/local/sbin:/usr/local/bin:/usr/bin
+PWD=/home/nfu
+SHELL=/usr/bin/zsh
+SHLVL=0
+SSH_AUTH_SOCK=/tmp/ssh-XXXXuTz49q/agent.49605
+SSH_CLIENT=192.168.97.0 50882 2222
+SSH_CONNECTION=192.168.97.0 50882 192.168.97.2 2222
+TERM_PROGRAM=ghostty
+USER=nfu
+ZDOTDIR=/home/nfu/.config/zsh

@@ -5,7 +5,7 @@
 # ================================================================================================
 # Features:
 # - Multi-distribution support (Arch Linux, Ubuntu)
-# - Registry push functionality  
+# - Registry push functionality
 # - Colored output for better UX
 # - Verbose build options
 # - Image information display
@@ -109,16 +109,16 @@ source "${ROOTDIR}/envs/docker-dev.env"
 # ================================================
 HOST_ARCH=$(uname -m)
 case $HOST_ARCH in
-  x86_64)
-    export TARGETARCH="amd64"
-    ;;
-  aarch64|arm64)
-    export TARGETARCH="arm64"
-    ;;
-  *)
-    print_warning "Unsupported architecture: $HOST_ARCH, defaulting to amd64"
-    export TARGETARCH="amd64"
-    ;;
+x86_64)
+  export TARGETARCH="amd64"
+  ;;
+aarch64 | arm64)
+  export TARGETARCH="arm64"
+  ;;
+*)
+  print_warning "Unsupported architecture: $HOST_ARCH, defaulting to amd64"
+  export TARGETARCH="amd64"
+  ;;
 esac
 print_info "Host architecture: $HOST_ARCH -> Docker TARGETARCH: $TARGETARCH"
 
@@ -142,14 +142,14 @@ while getopts "hbdurslct:vp" opt; do
     else
       print_step "Building Docker image for distribution: ${DISTRO:-arch}"
     fi
-    
+
     if docker compose "${PROGRESS_FLAG[@]}" -f "${ROOTDIR}/docker-compose.yml" build --no-cache; then
       print_info "Build completed successfully!"
-      
+
       # Show image info
       print_info "Image details:"
       docker images "127.0.0.1:5000/nfront-dev" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
-      
+
       # Push if requested
       if [[ "$PUSH_IMAGE" == "true" ]]; then
         print_step "Pushing image to registry..."
@@ -195,7 +195,7 @@ while getopts "hbdurslct:vp" opt; do
   s)
     # Enter container shell.
     print_step "Entering container with zsh login shell..."
-    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec nfront zsh -l
+    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec -e TERM -e DISPLAY nfront zsh -l
     ;;
   l)
     # Show container logs.

@@ -112,6 +112,7 @@
 # Set default debug flag for shell startup output
 # Leave SHELL_DEBUG unset by default for silent startup
 # Set SHELL_DEBUG=1 to enable debug output
+SHELL_DEBUG=1
 # ================================================================
 
 # ================================================================
