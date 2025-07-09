@@ -114,6 +114,12 @@
 # ================================================================
 [[ $- == *i* ]] || [ -n "$PS1" ] || return
 
+# `TERM`:
+# - Needed to ensure correct `infocmp`, i.e. ghostty's,
+#   and to run ghostty shell integration.
+# - Passed automatically from client to server by SSH.
+# - Passed manually into docker container by `. ~/dotfiles/host/docker/compose.sh`.
+# - Thus, do not set here.
 # echo "Setting TERM to 'xterm-ghostty' manually, as Neovim termial otherwise uses 'xterm-256color'."
 # export TERM=xterm-ghostty
 # export TERM_PROGRAM='ghostty'
