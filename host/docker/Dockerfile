@@ -34,6 +34,9 @@ FROM ubuntu-base-${TARGETARCH} AS ubuntu-base
 
 FROM ${DISTRO}-base AS builder
 
+# Re-declare ARG after FROM to make it available in this stage.
+ARG DISTRO=arch
+
 # Prevent dialog during apt install (Ubuntu only)
 ENV DEBIAN_FRONTEND=noninteractive
 
