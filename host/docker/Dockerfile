@@ -99,7 +99,6 @@ ARG USER_GID=$USER_UID
 RUN groupadd --gid $USER_GID $USERNAME \
   && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
   # Update sudoers file so $USERNAME does not have to type password for sudo commands.
-  && mkdir -p /etc/sudoers.d \
   && echo "User_Alias ADMIN = #$USER_UID, %#$USER_GID, $USERNAME, %$USERNAME : FULLTIMERS = $USERNAME, %$USERNAME" >> "/etc/sudoers.d/$USERNAME" \
   && echo 'ADMIN, FULLTIMERS ALL = NOPASSWD: ALL' >> "/etc/sudoers.d/$USERNAME" \
   && chmod 0440 /etc/sudoers.d/$USERNAME
@@ -144,7 +143,9 @@ ENV LC_ALL en_US.UTF-8
 # Run comprehensive Docker bootstrap script
 # ================================================
 WORKDIR /home/$USERNAME/dotfiles
-RUN . ./scripts/bootstrap.sh --force && \
+RUN chmod +x ./scripts/bootstrap.sh && \
+  echo "Running bootstrap script for $DISTRO..." && \
+  ./scripts/bootstrap.sh --force && \
   echo "Bootstrap completed successfully for $DISTRO" && \
   rm -rf /home/$USERNAME/dotfiles && \
   echo "Dotfiles cleaned up"
