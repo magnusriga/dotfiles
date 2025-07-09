@@ -68,6 +68,9 @@ RUN set -ex; \
         locale-gen en_US.UTF-8 && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*; \
+    else \
+        echo "Error: DISTRO variable not set or unsupported value: $DISTRO" && \
+        exit 1; \
     fi
 
 # ================================================
