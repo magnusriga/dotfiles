@@ -54,6 +54,8 @@ services:
         nofile:
           soft: 1048576
           hard: 1048576
+    cap_add:
+      - SYS_ADMIN
     # Overrides default command so things don't shut down after the process ends.
     # command: /bin/sh -c "while sleep 1000; do :; done"
     # IMPORTANT: Container port (target) MUST match port used by next-server, which is 3000

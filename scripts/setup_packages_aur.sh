@@ -192,7 +192,6 @@ ls -la "$BUILD_REPOS/$PACKAGE"
 ls -la "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
 makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-# makepkg -sci --noconfirm
 cd "$BUILD_HOME/packages" || exit
 sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
 echo "Installed $PACKAGE version: $($PACKAGE --version)"
@@ -227,8 +226,12 @@ cd "$BUILD_HOME/packages" || exit
 sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
 echo "Installed snap version: $(snap --version)"
 # Enable systemd unit that manages main snap communication socket.
-sudo systemctl enable --now snapd.socket
-sudo systemctl enable --now snapd.apparmor.service
+if [ ! -f /.dockerenv ]; then
+  sudo systemctl enable --now snapd.socket
+  sudo systemctl enable --now snapd.apparmor.service
+else
+  echo "Skipping systemd commands for snapd in container environment"
+fi
 sudo ln -fs /var/lib/snapd/snap /snap
 cd "$CWD" || exit
 
