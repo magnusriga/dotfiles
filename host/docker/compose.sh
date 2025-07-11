@@ -143,7 +143,7 @@ while getopts "hbdurslct:vp" opt; do
       print_step "Building Docker image for distribution: ${DISTRO:-arch}"
     fi
 
-    if (cd "${ROOTDIR}" && docker buildx bake --allow=fs.read=/Users -f host/docker/docker-bake.hcl nfront --no-cache); then
+    if (cd "${ROOTDIR}/../.." && docker buildx bake --allow=fs.read=/Users -f host/docker/docker-bake.hcl nfront --no-cache); then
       print_info "Build completed successfully!"
 
       # Show image info
