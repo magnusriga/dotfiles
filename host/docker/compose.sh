@@ -143,7 +143,7 @@ while getopts "hbdurslct:vp" opt; do
       print_step "Building Docker image for distribution: ${DISTRO:-arch}"
     fi
 
-    if docker compose "${PROGRESS_FLAG[@]}" -f "${ROOTDIR}/docker-compose.yml" build --no-cache; then
+    if docker buildx bake -f "${ROOTDIR}/docker-bake.hcl" --no-cache; then
       print_info "Build completed successfully!"
 
       # Show image info

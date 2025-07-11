@@ -27,7 +27,13 @@
       "Bash(docker run:*)",
       "Bash(sed:*)",
       "Bash(rm:*)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "Bash(sudo mkdir:*)",
+      "Bash(sudo systemctl:*)",
+      "Bash(sudo journalctl:*)",
+      "Bash(sudo dockerd:*)",
+      "Bash(sudo rm:*)",
+      "Bash(sudo cp:*)"
     ]
   },
   "enableAllProjectMcpServers": false
