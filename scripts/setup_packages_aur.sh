@@ -3,20 +3,15 @@
 echo "Running setup_packages_aur.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # ==================================
-# Set chroot path.
+# Detect Docker environment
 # ==================================
-export CHROOT=$HOME/chroot
-
-function makeCleanChroot() {
-  sudo rm -rf "$CHROOT"
-  mkdir "$CHROOT"
-  LC_ALL=C.UTF-8 mkarchroot "$CHROOT/root" base-devel
-}
-
-# ==================================
-# Create clean root once.
-# ==================================
-makeCleanChroot
+IS_DOCKER=false
+if [ -f /.dockerenv ] || [ -n "$DOCKER_BUILD" ]; then
+  IS_DOCKER=true
+  echo "Docker environment detected - using makepkg directly"
+else
+  echo "Host environment detected - using makechrootpkg"
+fi
 
 # ==================================
 # Stow `makepkg` configuration into correct folder
@@ -25,63 +20,74 @@ makeCleanChroot
 stow --no-folding -vv -d "$HOME/dotfiles/stow" -t "$HOME" pacman
 
 # ==================================
-# Adjust mirrorlist in `$CHROOT/root/etc/pacman.d/mirrorlist`,
-# to allow `makechrootpkg` to install from those repositories.
-# Only necessary on `aarch64`, i.e. ARM, because on `x86_64`
-# `arch-nspawn` handles it automatically.
+# Setup chroot and arch-nspawn (only for non-Docker environments).
 # ==================================
-# shellcheck disable=SC2016
-[[ $(uname -m) == "aarch64" ]] && echo 'Server = http://mirror.archlinuxarm.org/$arch/$repo/' | sudo tee "$CHROOT/root/etc/pacman.d/mirrorlist" 1>/dev/null
+if [ "$IS_DOCKER" = false ]; then
+  export CHROOT=$HOME/chroot
+
+  function makeCleanChroot() {
+    sudo rm -rf "$CHROOT"
+    mkdir "$CHROOT"
+    LC_ALL=C.UTF-8 mkarchroot "$CHROOT/root" base-devel
+  }
+
+  # ==================================
+  # Create clean root once.
+  # ==================================
+  makeCleanChroot
+
+  # ==================================
+  # Adjust mirrorlist in `$CHROOT/root/etc/pacman.d/mirrorlist`,
+  # to allow `makechrootpkg` to install from those repositories.
+  # Only necessary on `aarch64`, i.e. ARM, because on `x86_64`
+  # `arch-nspawn` handles it automatically.
+  # ==================================
+  # shellcheck disable=SC2016
+  [[ $(uname -m) == "aarch64" ]] && echo 'Server = http://mirror.archlinuxarm.org/$arch/$repo/' | sudo tee "$CHROOT/root/etc/pacman.d/mirrorlist" 1>/dev/null
+
+  # ==================================
+  # For ARM architecture, `stow` updated `arch-nspawn` that does not overwrite
+  # `$CHROOT/root/etc/pacman.d/mirrorlist`
+  # ==================================
+  sudo rm -f "/usr/local/bin/arch-nspawn"
+  [[ $(uname -m) == "aarch64" ]] && sudo stow --no-folding -vv -d "$HOME/dotfiles" -t /usr/local pacman
+
+  # ==================================
+  # Ensure base chroot ($CHROOT/root) is up to date.
+  # ==================================
+  arch-nspawn "$CHROOT/root" pacman -Syy
+fi
 
 # ==================================
-# For ARM architecture, `stow` updated `arch-nspawn` that does not overwrite
-# `$CHROOT/root/etc/pacman.d/mirrorlist`
-# ==================================
-sudo rm -f "/usr/local/bin/arch-nspawn"
-[[ $(uname -m) == "aarch64" ]] && sudo stow --no-folding -vv -d "$HOME/dotfiles" -t /usr/local pacman
-
-# ==================================
-# Ensure base chroot ($CHROOT/root) is up to date.
-# ==================================
-arch-nspawn "$CHROOT/root" pacman -Syy
-
-# ==================================
-# Build and Intstall Package.
+# Build and Install Package.
 # ==================================
 # Pre-requisites:
 # - Manually download `PKGBUILD` file, and other files needed for build.
 #    - Done with `git clone <repo>`, using `<repo>` found in e.g. AUR.
 #    - Use target directory: `$HOME/build/repositories/<package>`.
 #    - Command : `git clone <url> $HOME/build/repositories/$PACKAGE`.
-# - Create clean chroot.
-#    - Run `makeCleanChroot`, defined above.
-#    - Only run once, as `makechrootpkg -c` will automatically clean chroot folder before building.
 #
 # Steps:
-# 1) Build inside clean chroot: `makechrootpkg -c -r $CHROOT -- -sc --noconfirm`.
-#    IMPORTANT: `makechrootpkg` must be run as normal user, NOT as root, i.e. not with `sudo`.
-#    a) `makechrootpkg` reads `PKGBUILD` to identify url of source files.
-#    b) `makechrootpkg` downloads source files into `SRCDEST`.
-#    c) `makechrootpkg` compiles source files into installable `.pkg.tar.zst` package.
+# For Docker: Use `makepkg -si --noconfirm` (Docker provides isolation)
+# For Host: Use `makechrootpkg -c -r $CHROOT -- -sc --noconfirm` (requires chroot)
 #
-# 2) Install:
-#    - Install package with: `pacman -U <pkgname-pkgver>.pkg.tar.zst` OR `makepkg -i | --install`.
-#    - Prefer `pacman`, because it does not install all packages in directory, only those explicitly specified.
-#    - Moves executable files, man pages, etc., to specific directory.
-#    - Alternatively, to skip this step, call `makepkg` with `-i` flag initially.
-#
-# 3) Clean:
-#    - `makepkg -c | --clean` cleans up `$srcdest` directory
-#    - `$srcdest` stores temporary files needed during build.
-#    - `$srcdest` often defined in `PKGBUILD` file.
-#
-# Alternative step (1):
-# 1) Build in current directory: `makepkg -srci`
-#    - Avoid, use clean chroot approach instead.
-#    - IMPORTANT: `makepkg` must be run as normal user, NOT as root, i.e. not with `sudo`.
-#    a) `makekpkg` reads `PKGBUILD` to identify url of source files.
-#    b) `makekpkg` downloads source files into `SRCDEST`.
-#    c) `makekpkg` compiles source files into installable `.pkg.tar.zst` package.
+# ==================================
+# Build function that chooses appropriate method
+# ==================================
+function build_and_install_package() {
+  local package_name="$1"
+
+  if [ "$IS_DOCKER" = true ]; then
+    echo "Building $package_name with makepkg (Docker environment)"
+    makepkg -si --noconfirm
+  else
+    echo "Building $package_name with makechrootpkg (Host environment)"
+    makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+    cd "$BUILD_HOME/packages" || exit
+    sudo pacman -U --noconfirm "$package_name"-[0-9]*
+    cd "$BUILD_REPOS/$package_name" || exit
+  fi
+}
 #
 # ==================================
 # Update Package.
@@ -107,22 +113,18 @@ arch-nspawn "$CHROOT/root" pacman -Syy
 #   and installs resulting package.
 #
 # ==================================
-# `makechrootpkg` command.
+# Build commands (Docker vs Host).
 # ==================================
-# - Run `makechrootpkg` script in directory containing PKGBUILD, to build a package inside a clean chroot.
-# - Arguments passed to this script after end-of-options marker (--) will be passed to makepkg.
-# - This script reads {SRC,SRCPKG,PKG,LOG}DEST, MAKEFLAGS and PACKAGER from makepkg.conf(5),
-#   if those variables are not part of the environment.
-# - Common `makechrootpkg` options:
-#   - `-c`: Working chroot ($CHROOT/$USER) is cleaned before building, thus no need to recreate $CHROOT directory each time.
-#   - `-r`: Chroot directory to use.
-# - Default arguments passed to `makepkg`:
-#   - `--syncdeps`.
-#   - `--noconfirm`.
-#   - `--log`.
-#   - `--holdver`.
-#   - `--skipinteg`.
-# - Suggested full command: `makechrootpkg -c -r $CHROOT -- -sc --noconfirm`.
+# Docker: `makepkg -si --noconfirm`
+# - `-s`: Install build dependencies automatically.
+# - `-i`: Install package after building.
+# - `--noconfirm`: Skip confirmations.
+#
+# Host: `makechrootpkg -c -r $CHROOT -- -sc --noconfirm`
+# - `-c`: Clean working chroot before building.
+# - `-r`: Chroot directory to use.
+# - `--`: Arguments passed to makepkg.
+# - `-sc`: Sync dependencies and clean up after build.
 #
 # ==================================
 # Configuration Notes: `makepkg`.
@@ -146,7 +148,8 @@ arch-nspawn "$CHROOT/root" pacman -Syy
 CWD=$(pwd)
 
 # Where final packages are placed by `makepkg` | `makechrootpkg`
-# to be installed by `pacman -U <pkg>` | `makepkg -i`.
+# Docker: installed automatically with `makepkg -si`
+# Host: built to `$BUILD_HOME/packages` and installed with `pacman -U`
 export BUILD_HOME="${BUILD_HOME:-$HOME/build}"
 
 # Where `PKGBUILD` files are manually placed with `git clone`.
@@ -191,49 +194,53 @@ git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 ls -la "$BUILD_REPOS/$PACKAGE"
 ls -la "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
-makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-cd "$BUILD_HOME/packages" || exit
-sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
+build_and_install_package "$PACKAGE"
 echo "Installed $PACKAGE version: $($PACKAGE --version)"
 cd "$CWD" || exit
 
 # ==================================
-# paru.
+# paru:
+# Use 'yay' instead.
+# Also, needs rust to install, with two options,
+# `rust` and `rustup`, with `rust` chosen as default,
+# which clashes with later `rustup` installation.
 # ==================================
-PACKAGE="paru-git"
-echo "Installing $PACKAGE"
-rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
-git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
-cd "$BUILD_REPOS/$PACKAGE" || exit
-makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-cd "$BUILD_HOME/packages" || exit
-sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
-echo "Installed $PACKAGE version: $(paru --version)"
-cd "$CWD" || exit
+# PACKAGE="paru-git"
+# echo "Installing $PACKAGE"
+# rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+# rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+# git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+# cd "$BUILD_REPOS/$PACKAGE" || exit
+# build_and_install_package "$PACKAGE"
+# echo "Installed $PACKAGE version: $(paru --version)"
+# cd "$CWD" || exit
 
 # ==================================
-# snapd.
+# snap(d):
+# - Ubuntu: `snap` already pre-installed, not re-installed here.
+# - Arch: `snap` only installed, below, outside Docker.
+# - `dog`:
+#   - Only package installed with `snap`.
+#   - Only installed outside Docker.
+#   - Thus, `dog` available everywhere, except in Docker.
 # ==================================
-PACKAGE="snapd"
-echo "Installing $PACKAGE"
-rm -rf "${BUILD_REPOS:?}/$PACKAGE"
-rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
-git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
-cd "$BUILD_REPOS/$PACKAGE" || exit
-makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-cd "$BUILD_HOME/packages" || exit
-sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
-echo "Installed snap version: $(snap --version)"
-# Enable systemd unit that manages main snap communication socket.
-if [ ! -f /.dockerenv ]; then
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+  PACKAGE="snapd"
+  echo "Installing $PACKAGE"
+  rm -rf "${BUILD_REPOS:?}/$PACKAGE"
+  rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
+  git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
+  cd "$BUILD_REPOS/$PACKAGE" || exit
+  build_and_install_package "$PACKAGE"
+  echo "Installed snap version: $(snap --version)"
+  # Enable systemd unit that manages main snap communication socket.
   sudo systemctl enable --now snapd.socket
   sudo systemctl enable --now snapd.apparmor.service
+  sudo ln -fs /var/lib/snapd/snap /snap
+  cd "$CWD" || exit
 else
-  echo "Skipping systemd commands for snapd in container environment"
+  echo "In container, skipping install of snapd."
 fi
-sudo ln -fs /var/lib/snapd/snap /snap
-cd "$CWD" || exit
 
 # ==================================
 # zig-bin.
@@ -246,7 +253,7 @@ cd "$CWD" || exit
 # rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 # git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 # cd "$BUILD_REPOS/$PACKAGE" || exit
-# makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
+# makepkg -si --noconfirm
 # cd "$BUILD_HOME/packages" || exit
 # sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
 # echo "Installed zig CLI version: $(zig version)"
@@ -261,9 +268,7 @@ rm -rf "${BUILD_REPOS:?}/$PACKAGE"
 rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
-makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-cd "$BUILD_HOME/packages" || exit
-sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
+build_and_install_package "$PACKAGE"
 echo "Installed infisical CLI version: $(infisical --version)"
 cd "$CWD" || exit
 
@@ -276,9 +281,7 @@ rm -rf "${BUILD_REPOS:?}/$PACKAGE"
 rm -f "$BUILD_HOME/packages/$PACKAGE"-[0-9]*
 git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
 cd "$BUILD_REPOS/$PACKAGE" || exit
-makechrootpkg -c -r "$CHROOT" -- -sc --noconfirm
-cd "$BUILD_HOME/packages" || exit
-sudo pacman -U --noconfirm "$PACKAGE"-[0-9]*
+build_and_install_package "$PACKAGE"
 echo "Installed hcp CLI version: $(hcp version)"
 cd "$CWD" || exit
 

@@ -33,7 +33,8 @@
       "Bash(sudo journalctl:*)",
       "Bash(sudo dockerd:*)",
       "Bash(sudo rm:*)",
-      "Bash(sudo cp:*)"
+      "Bash(sudo cp:*)",
+      "Bash(./compose.sh:*)"
     ]
   },
   "enableAllProjectMcpServers": false

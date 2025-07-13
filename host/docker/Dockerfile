@@ -59,31 +59,31 @@ COPY host/docker/pacman.conf /tmp/pacman.conf
 
 # Install base packages needed for setup
 RUN set -ex; \
-    if [ "$DISTRO" = "arch" ]; then \
-        rm -f /etc/pacman.conf && \
-        cp /tmp/pacman.conf /etc/pacman.conf && \
-        pacman-key --init && \
-        pacman-key --populate archlinux && \
-        pacman -Syu --noconfirm sudo git glibc-locales openssh curl; \
-    elif [ "$DISTRO" = "ubuntu" ]; then \
-        apt-get update && \
-        apt-get install -y sudo git locales openssh-server curl && \
-        locale-gen en_US.UTF-8 && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/*; \
-    else \
-        echo "Error: DISTRO variable not set or unsupported value: $DISTRO" && \
-        exit 1; \
-    fi
+  if [ "$DISTRO" = "arch" ]; then \
+  rm -f /etc/pacman.conf && \
+  cp /tmp/pacman.conf /etc/pacman.conf && \
+  pacman-key --init && \
+  pacman-key --populate archlinux && \
+  pacman -Syu --noconfirm sudo git glibc-locales openssh curl; \
+  elif [ "$DISTRO" = "ubuntu" ]; then \
+  apt-get update && \
+  apt-get install -y sudo git locales openssh-server curl && \
+  locale-gen en_US.UTF-8 && \
+  apt-get clean && \
+  rm -rf /var/lib/apt/lists/*; \
+  else \
+  echo "Error: DISTRO variable not set or unsupported value: $DISTRO" && \
+  exit 1; \
+  fi
 
 # ================================================
 # Install Docker Compose.
 # ================================================
 RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/compose/releases/latest" | grep -o -P '(?<="tag_name": ").+(?=")') \
   && case "${TARGETARCH}" in \
-    "amd64") COMPOSE_ARCH="x86_64" ;; \
-    "arm64") COMPOSE_ARCH="aarch64" ;; \
-    *) COMPOSE_ARCH="$(uname -m)" ;; \
+  "amd64") COMPOSE_ARCH="x86_64" ;; \
+  "arm64") COMPOSE_ARCH="aarch64" ;; \
+  *) COMPOSE_ARCH="$(uname -m)" ;; \
   esac \
   && curl -sSL "https://github.com/docker/compose/releases/download/${LATEST_COMPOSE_VERSION}/docker-compose-$(uname -s)-${COMPOSE_ARCH}" -o /usr/local/bin/docker-compose \
   && chmod +x /usr/local/bin/docker-compose
@@ -111,10 +111,10 @@ RUN echo 'root:root' | chpasswd; \
 # Configure SSH
 # ================================================
 RUN ssh-keygen -A && \
-    sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config && \
-    sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
-    sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+  sed -i 's/#Port 22/Port 22/' /etc/ssh/sshd_config && \
+  sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config && \
+  sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
+  sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
 
 # ================================================
 # Switch to new, non-root, user for rest of setup.
@@ -130,8 +130,9 @@ COPY --chown=$USERNAME:$USERNAME . /home/$USERNAME/dotfiles/
 # Set environment variables
 # ================================================
 ENV USER=$USERNAME
-ENV DOCKER_BUILD=1
 ENV DISTRO=$DISTRO
+# `DOCKER_BUILD=1`: Needed in setup scripts.
+ENV DOCKER_BUILD=1
 
 # ================================================
 # Setup: Locale.
@@ -140,9 +141,22 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
 # ================================================
-# Run comprehensive Docker bootstrap script
+# Run package install scripts as root.
 # ================================================
+USER root
+
 WORKDIR /home/$USERNAME/dotfiles
+
+RUN chmod +x ./scripts/setup_packages.sh && \
+  echo "Running setup_packages.sh script as root, for $DISTRO..." && \
+  ./scripts/setup_packages.sh && \
+  echo "Completed running setup_packages.sh as root, for $DISTRO"
+
+# ================================================
+# Run remaining setup scripts as non-root user.
+# ================================================
+USER $USERNAME
+
 RUN chmod +x ./scripts/bootstrap.sh && \
   echo "Running bootstrap script for $DISTRO..." && \
   ./scripts/bootstrap.sh --force && \

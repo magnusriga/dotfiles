@@ -58,12 +58,16 @@ x86_64)
   ARCH_7ZIP="x64"
   ARCH_GRPCURL="x86_64"
   ARCH_VAULT="amd64"
+  ARCH_NEOVIM="x86_64"
+  ARCH_ZIG="x86_64"
   ;;
 aarch64 | arm64)
   ARCH_TODOCHECK="arm64"
   ARCH_7ZIP="arm64"
   ARCH_GRPCURL="arm64"
   ARCH_VAULT="arm64"
+  ARCH_NEOVIM="arm64"
+  ARCH_ZIG="aarch64"
   ;;
 *)
   echo "Unsupported architecture: $ARCH"
@@ -72,7 +76,7 @@ aarch64 | arm64)
 esac
 
 echo "Detected architecture: $ARCH"
-echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT"
+echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG"
 
 # ================================================
 # Setup directories and variables needed for
@@ -95,6 +99,50 @@ sudo mkdir -p $STOWDIR
 # Set permissions.
 sudo chown -R "$USER":"$USER" $TARGETDIR $STOWDIR
 sudo chmod -R 755 $TARGETDIR
+
+# ================================================
+# Setup packages not relating to specific repos.
+# ================================================
+# Install tectonic via official installer.
+if ! command -v tectonic &>/dev/null; then
+  curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh
+  sudo mv tectonic /usr/local/bin/
+fi
+
+# Install `github-cli` extension: `Copilot`.
+if command -v gh &>/dev/null; then
+  gh extension install github/gh-copilot
+fi
+
+# Install luasocket.
+if command -v luarocks &>/dev/null; then
+  sudo luarocks install luasocket
+fi
+
+# ================================================
+# Install eza theme.
+# ================================================
+# eza uses the theme.yml file stored in $EZA_CONFIG_DIR, or if that is not defined then in $XDG_CONFIG_HOME/eza.
+# Download theme repo as reference, but do not symlink $EZA_CONFIG_DIR/theme to it,
+# instead just keep own theme from dotfiles sync.
+rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
+git clone https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
+
+# ================================================
+# Install eza completions.
+# ================================================
+# `eza` software itself is installed with `cargo`.
+rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza"
+git clone https://github.com/eza-community/eza.git "${EZA_HOME:-$HOME/.local/share/eza}/eza"
+
+# ================================================
+# Manually install tmux plugins, including tmux plugin manager.
+# ================================================
+rm -rf "${TMUX_HOME:-$HOME/.config/tmux}/plugins"
+git clone https://github.com/tmux-plugins/tpm "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tpm"
+git clone -b v2.1.1 https://github.com/catppuccin/tmux.git "${TMUX_HOME:-$HOME/.config/tmux}/plugins/catppuccin/tmux"
+git clone https://github.com/tmux-plugins/tmux-battery "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-battery"
+git clone https://github.com/tmux-plugins/tmux-cpu "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-cpu"
 
 # ================================================
 # Install todocheck (Note: Architecture).
@@ -159,7 +207,7 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p $STOWDIR/$PACKAGE/bin
-curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE.zip" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_linux_${ARCH_VAULT}.zip" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_SHA256SUMS"
+curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE.zip" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_linux_${ARCH_VAULT}.zip" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_SHA256SUMS"
 if echo "$(grep "linux_${ARCH_VAULT}" "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE.zip" | sha256sum --check --status; then
   unzip "$TMPDIR/$PACKAGE/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
   sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
@@ -168,31 +216,36 @@ if echo "$(grep "linux_${ARCH_VAULT}" "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '
 fi
 
 # ================================================
-# Install neovim.
-# Use `pacman -Syu neovim` instead.
+# Install neovim (Note: Architecture).
 # ================================================
-PACKAGE=neovim
-BUILD_TYPE=Release
-# `$TMPDIR/$PACKAGE/build` holds CMake cache,
-# which must be cleared before rebuilding.
+PACKAGE="neovim"
 sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
-mkdir "$STOWDIR/$PACKAGE"
-git clone https://github.com/neovim/neovim "$TMPDIR/$PACKAGE"
-cd "$TMPDIR/$PACKAGE" || exit
-# make: Downloads and builds dependencies,
-# and puts nvim executable in `build/nvim`.
-make CMAKE_BUILD_TYPE=$BUILD_TYPE CMAKE_EXTRA_FLAGS="-DCMAKE_INSTALL_PREFIX=$STOWDIR/$PACKAGE"
-# After building, nvim executable can be run with
-# `VIMRUNTIME=runtime ./build/bin/nvim`.
-# Instead, run `make install`, to copy package files (bin, lib, share, ...),
-# to install location, set with flag in `make` step,
-# including copying binary to directory in PATH (e.g. `/usr/local/bin`),
-# man pages to directory in MANPATH, etc.
-make install
-cd "$CURRENTDIR" || exit
+mkdir -p "$STOWDIR/$PACKAGE"
+curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${ARCH_NEOVIM}.tar.gz"
+tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE" --strip-components=1
+# Copy the extracted files to stow directory
+sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
+sudo chmod 755 "$STOWDIR/$PACKAGE/bin/nvim"
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+
+# ================================================
+# Install zig (Note: Architecture).
+# Needed for `ghostty`.
+# ================================================
+PACKAGE="zig"
+VERSION=$(curl -s "https://api.github.com/repos/ziglang/zig/releases/latest" | \grep -Po '"tag_name": *"\K[^"]*')
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir -p "$TMPDIR/$PACKAGE/bin"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://ziglang.org/download/${VERSION}/zig-${ARCH_ZIG}-linux-${VERSION}.tar.xz"
+tar xf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE" --strip-components=1
+sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$TMPDIR/$PACKAGE/bin/$PACKAGE"
+sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
+chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 
 # ================================================
 # Install ghostty from source.

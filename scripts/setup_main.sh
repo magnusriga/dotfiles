@@ -32,8 +32,12 @@ fi
 # Package installation: Update registry, upgrade existing packages, install new packages.
 # ================================================
 if [ -f "./setup_packages.sh" ]; then
-  echo "./setup_packages.sh found, executing script."
-  . ./setup_packages.sh
+  if [ -f /.dockerenv ] || [ -n "$DOCKER_BUILD" ]; then
+    echo "Skipping ./setup_packages.sh in Docker environment (already run as root)"
+  else
+    echo "./setup_packages.sh found, executing script."
+    . ./setup_packages.sh
+  fi
 
   # Set necessary aliases (later set via dotfiles).
   alias python=python3
@@ -43,18 +47,23 @@ fi
 # Arch User Repository (AUR): Install packages, if on Arch Linux.
 # ================================================
 if [ -f "./setup_packages_aur.sh" ] && [ -f "/etc/arch-release" ]; then
+  echo "Running: . ./setup_packages_aur.sh."
   . ./setup_packages_aur.sh
 fi
 
 # ================================================
-# Install: `snap` packages.
+# Install: `snap` packages, if not Docker.
+# snap(d):
+# - Ubuntu: `snap` pre-installed.
+# - Arch: `snap` installed via AUR, only outside Docker.
+# - `dog`:
+#   - Only package installed with `snap`.
+#   - Only installed outside Docker.
+#   - Thus, `dog` available everywhere, except in Docker.
 # ================================================
-sudo snap install dog
-# Install `zig`:
-# - Ubuntu: `snap`
-# - Arch: `pacman`
-if [ -f "/etc/lsb-release" ] && grep -q "Ubuntu" /etc/lsb-release; then
-  snap install zig --classic --beta
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+  echo "Not in container, installing dog and zig via snap."
+  sudo snap install dog
 fi
 
 # ================================================
@@ -66,14 +75,18 @@ fi
 # ================================================
 # Setup: Docker (installed with `pacman`).
 # ================================================
-# Start Docker engine now.
-sudo systemctl start docker.service
-# Ensure Docker engine starts on system boot.
-sudo systemctl enable docker.service
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+  echo "Not in container, starting docker service."
+  # Start Docker engine now.
+  sudo systemctl start docker.service
+  # Ensure Docker engine starts on system boot.
+  sudo systemctl enable docker.service
+fi
 
 # ================================================
 # Setup: Rust toolchain via `rustup`, and add it to path.
 # ================================================
+echo "Setup rust toolchain via rustup and add it to path."
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --no-modify-path -y
 . "$HOME/.cargo/env"
 rustup update
@@ -117,7 +130,7 @@ curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https:/
 # ================================================
 rm -rf "${GHOSTTY_HOME:-${BUILD_HOME:-$HOME/build}/repositories/ghostty}"
 rm -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
-git clone git@github.com:ghostty-org/ghostty.git "$GHOSTTY_HOME"
+git clone git@github.com:ghostty-org/ghostty.git "${GHOSTTY_HOME:-${BUILD_HOME:-$HOME/build}/repositories/ghostty}"
 ln -s "${BUILD_HOME:-$HOME/build}/repositories/ghostty/src" "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
 
 # ================================================

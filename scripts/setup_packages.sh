@@ -221,49 +221,10 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
     libevent-dev libncurses-dev bison pkgconf
 
-  # Install tectonic via official installer.
-  if ! command -v tectonic &>/dev/null; then
-    curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh
-    sudo mv tectonic /usr/local/bin/
-  fi
-
   # Clean apt cache
   sudo apt-get autoremove -y
   sudo apt-get autoclean
-
 fi
-
-# ==========================================================
-# Setup above packages and install related tools.
-# ==========================================================
-# Install `github-cli` extension: `Copilot`.
-if command -v gh &>/dev/null; then
-  gh extension install github/gh-copilot
-fi
-
-# Install luasocket.
-if command -v luarocks &>/dev/null; then
-  sudo luarocks install luasocket
-fi
-
-# Install eza theme.
-# eza uses the theme.yml file stored in $EZA_CONFIG_DIR, or if that is not defined then in $XDG_CONFIG_HOME/eza.
-# Download theme repo as reference, but do not symlink $EZA_CONFIG_DIR/theme to it,
-# instead just keep own theme from dotfiles sync.
-rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
-git clone https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
-
-# Install eza completions.
-# `eza` software itself is installed with `cargo`.
-rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza"
-git clone https://github.com/eza-community/eza.git "${EZA_HOME:-$HOME/.local/share/eza}/eza"
-
-# Manually install tmux plugins, including tmux plugin manager.
-rm -rf "${TMUX_HOME:-$HOME/.config/tmux}/plugins"
-git clone https://github.com/tmux-plugins/tpm "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tpm"
-git clone -b v2.1.1 https://github.com/catppuccin/tmux.git "${TMUX_HOME:-$HOME/.config/tmux}/plugins/catppuccin/tmux"
-git clone https://github.com/tmux-plugins/tmux-battery "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-battery"
-git clone https://github.com/tmux-plugins/tmux-cpu "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-cpu"
 
 # Clean up functions
 unset -f detect_distro
