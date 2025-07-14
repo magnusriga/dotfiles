@@ -203,8 +203,12 @@ while getopts "hbdurslct:vp" opt; do
   b)
     # Build Docker image.
     # Ensure `dotfiles` and `nfront` repositories are up to date.
-    ensure_repo "dotfiles" "$HOME/dotfiles" "git@github.com:magnusriga/dotfiles.git"
-    ensure_repo "nfront" "$HOME/nfront" "git@github.com:magnusriga/nfront.git"
+    if ! ensure_repo "dotfiles" "$HOME/dotfiles" "git@github.com:magnusriga/dotfiles.git"; then
+      Exit 1 || return 1
+    fi
+    if ! ensure_repo "nfront" "$HOME/nfront" "git@github.com:magnusriga/nfront.git"; then
+      Exit 1 || return 1
+    fi
 
     if [[ "$VERBOSE" == "true" ]]; then
       PROGRESS_FLAG=(--progress plain)
