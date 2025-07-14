@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Do not use vscode versions, the ones without are newer
 
 # IMAGES FOR GITHUB CODESPACES
@@ -127,6 +128,15 @@ USER $USERNAME
 COPY --chown=$USERNAME:$USERNAME . /home/$USERNAME/dotfiles/
 
 # ================================================
+# Setup SSH known_hosts for common Git providers
+# ================================================
+RUN mkdir -p -m 0700 /home/$USERNAME/.ssh && \
+  ssh-keyscan github.com >> /home/$USERNAME/.ssh/known_hosts && \
+  ssh-keyscan gitlab.com >> /home/$USERNAME/.ssh/known_hosts && \
+  ssh-keyscan bitbucket.org >> /home/$USERNAME/.ssh/known_hosts && \
+  chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh
+
+# ================================================
 # Set environment variables
 # ================================================
 ENV USER=$USERNAME
@@ -147,7 +157,7 @@ USER root
 
 WORKDIR /home/$USERNAME/dotfiles
 
-RUN chmod +x ./scripts/setup_packages.sh && \
+RUN --mount=type=ssh chmod +x ./scripts/setup_packages.sh && \
   echo "Running setup_packages.sh script as root, for $DISTRO..." && \
   ./scripts/setup_packages.sh && \
   echo "Completed running setup_packages.sh as root, for $DISTRO"
@@ -157,7 +167,7 @@ RUN chmod +x ./scripts/setup_packages.sh && \
 # ================================================
 USER $USERNAME
 
-RUN chmod +x ./scripts/bootstrap.sh && \
+RUN --mount=type=ssh chmod +x ./scripts/bootstrap.sh && \
   echo "Running bootstrap script for $DISTRO..." && \
   ./scripts/bootstrap.sh --force && \
   echo "Bootstrap completed successfully for $DISTRO" && \

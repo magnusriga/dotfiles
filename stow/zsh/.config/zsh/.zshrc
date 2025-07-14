@@ -586,3 +586,11 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 # Load `bun` completions.
 # Already done in `~/.profile`, thus not needed here.
 # [ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
+
+# pnpm
+export PNPM_HOME="/home/nfu/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

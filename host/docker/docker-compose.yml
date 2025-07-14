@@ -44,6 +44,8 @@ services:
       context: ../..
       # dockerfile path is relative to context path.
       dockerfile: ./host/docker/Dockerfile
+      ssh:
+        - default
       args:
         DISTRO: ${DISTRO:-arch}
         TARGETARCH: ${TARGETARCH:-amd64}

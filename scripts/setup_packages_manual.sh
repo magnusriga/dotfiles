@@ -244,7 +244,7 @@ curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://ziglang.org/download/${VERSION}/zig-
 tar xf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE" --strip-components=1
 sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$TMPDIR/$PACKAGE/bin/$PACKAGE"
 sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
-chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+sudo chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
 stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 
 # ================================================

@@ -85,6 +85,51 @@ Exit() {
   return 1
 }
 
+# Function to prepare containers after build.
+finalize_container() {
+  print_step "Preparing containers..."
+
+  # Create SSH key if it does not exist.
+  if [ ! -f "$HOME"/.ssh/nfu_docker_ed25519 ]; then
+    print_info "Creating SSH key for Docker container..."
+    mkdir -p "$HOME"/.ssh
+    ssh-keygen -t ed25519 -f "$HOME"/.ssh/nfu_docker_ed25519 -N "" -C "nfu-docker-key"
+  fi
+
+  # Ensure SSH config symlinks to dotfiles.
+  if [ ! -L "$HOME"/.ssh/config ]; then
+    print_info "Setting up SSH config symlink..."
+    if [ -f "$HOME"/.ssh/config ]; then
+      mv "$HOME"/.ssh/config "$HOME"/.ssh/config.backup
+    fi
+    ln -s "$HOME"/dotfiles/host/.ssh/config "$HOME"/.ssh/config
+  fi
+
+  # Start containers.
+  print_info "Starting containers..."
+  . "$HOME"/dotfiles/host/docker/compose.sh -u
+
+  # Remove old known hosts.
+  print_info "Removing old known hosts..."
+  rm -f "$HOME"/.ssh/known_hosts
+
+  # Adding SSH key to ssh-agent.
+  print_info "Adding SSH key to ssh-agent..."
+  ssh-add "$HOME"/.ssh/nfu_docker_ed25519
+
+  # Copy SSH public key to server.
+  print_info "Copying SSH public key to server..."
+  ssh-copy-id -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$HOME"/.ssh/nfu_docker_ed25519.pub nfu-docker
+
+  # Copy terminfo to server.
+  print_info "Copying terminfo to server..."
+  infocmp -x | ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null nfu-docker -- tic -x -
+
+  # SSH into container.
+  print_info "Connecting to container..."
+  ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null nfu-docker
+}
+
 # Abort if option not set.
 if [ $# -eq 0 ]; then
   echo "Error: No option set."
@@ -136,6 +181,21 @@ while getopts "hbdurslct:vp" opt; do
     ;;
   b)
     # Build Docker image.
+    # First, ensure dotfiles repository is up to date
+    if [ -d "$HOME/dotfiles" ]; then
+      print_step "Updating dotfiles repository..."
+      if ! (cd "$HOME/dotfiles" && git pull); then
+        print_error "Failed to update dotfiles repository"
+        Exit 1 || return 1
+      fi
+    else
+      print_step "Cloning dotfiles repository..."
+      if ! git clone git@github.com:magnusriga/dotfiles.git "$HOME/dotfiles"; then
+        print_error "Failed to clone dotfiles repository"
+        Exit 1 || return 1
+      fi
+    fi
+
     if [[ "$VERBOSE" == "true" ]]; then
       PROGRESS_FLAG=(--progress plain)
       print_step "Building Docker image with verbose output for distribution: ${DISTRO:-arch}"
@@ -146,11 +206,11 @@ while getopts "hbdurslct:vp" opt; do
     if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" build --no-cache; then
       print_info "Build completed successfully!"
 
-      # Show image info
+      # Show image info.
       print_info "Image details:"
       docker images "127.0.0.1:5000/nfront-dev" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
 
-      # Push if requested
+      # Push if requested.
       if [[ "$PUSH_IMAGE" == "true" ]]; then
         print_step "Pushing image to registry..."
         if docker push "127.0.0.1:5000/nfront-dev"; then
@@ -160,6 +220,9 @@ while getopts "hbdurslct:vp" opt; do
           Exit 1 || return 1
         fi
       fi
+
+      # Prepare containers
+      finalize_container
     else
       print_error "Build failed!"
       Exit 1 || return 1

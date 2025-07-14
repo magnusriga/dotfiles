@@ -34,7 +34,18 @@
       "Bash(sudo dockerd:*)",
       "Bash(sudo rm:*)",
       "Bash(sudo cp:*)",
-      "Bash(./compose.sh:*)"
+      "Bash(./compose.sh:*)",
+      "Bash(echo:*)",
+      "Bash(if [ -f \"$HOME/.local/share/pnpm/global/5/node_modules/tree-sitter/binding.gyp\" ])",
+      "Bash(then)",
+      "Bash(else)",
+      "Bash(fi)",
+      "WebFetch(domain:docs.docker.com)",
+      "Bash(source:*)",
+      "Bash(finalize_container)",
+      "Bash(./test_finalize.sh:*)",
+      "Bash(ssh:*)",
+      "Bash(ln:*)"
     ]
   },
   "enableAllProjectMcpServers": false

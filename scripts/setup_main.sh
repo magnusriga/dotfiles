@@ -130,7 +130,7 @@ curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https:/
 # ================================================
 rm -rf "${GHOSTTY_HOME:-${BUILD_HOME:-$HOME/build}/repositories/ghostty}"
 rm -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
-git clone git@github.com:ghostty-org/ghostty.git "${GHOSTTY_HOME:-${BUILD_HOME:-$HOME/build}/repositories/ghostty}"
+git clone https://github.com/ghostty-org/ghostty.git "${GHOSTTY_HOME:-${BUILD_HOME:-$HOME/build}/repositories/ghostty}"
 ln -s "${BUILD_HOME:-$HOME/build}/repositories/ghostty/src" "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
 
 # ================================================
