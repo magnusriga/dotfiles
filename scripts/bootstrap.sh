@@ -66,9 +66,30 @@ echo "cd to SCRIPTPATH: $SCRIPTPATH"
 cd "$SCRIPTPATH" || return
 
 # ==========================================================
-# Ensure `dotfiles` repo is up-to-date.
+# Ensure `dotfiles` repo is up-to-date, if not Docker.
+# Docker: `dotfiles` and `nfront` are bind-mounted from host.
 # ==========================================================
 [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && git pull origin main
+
+# ==========================================================
+# Ensure `nfront` repo is up-to-date, if not Docker.
+# Docker: `dotfiles` and `nfront` are bind-mounted from host.
+# ==========================================================
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+  if [ -d "$HOME/nfront" ]; then
+    echo "Updating nfront repository..."
+    if ! git -C "$HOME/nfront" pull origin main; then
+      echo "ERROR: Failed to update nfront repository. Please ensure SSH keys are set up correctly."
+      return 1
+    fi
+  else
+    echo "Cloning nfront repository..."
+    if ! git clone git@github.com:magnusriga/nfront.git "$HOME/nfront"; then
+      echo "ERROR: Failed to clone nfront repository. Please ensure SSH keys are set up correctly."
+      return 1
+    fi
+  fi
+fi
 
 function doIt() {
   # ==========================================================
@@ -138,11 +159,22 @@ function doIt() {
     . ./setup_main.sh
 
     # ==========================================================
-    # `stow` system-level files.
+    # `stow` and symlink system-level files.
     # ==========================================================
-    # `sshd_config`, used when ssh'ing into this machine.
+    # `sshd_config`, used when ssh'ing into this machine | container.
+    echo "Stowing /etc/ssh/sshd_config, from dotfiles."
     sudo rm -f /etc/ssh/sshd_config
     sudo stow --no-folding -vv -d "$SCRIPTPATH"/../etc -t /etc/ssh ssh
+
+    # Ensure SSH config symlinks to dotfiles.
+    # Docker: `compose.sh` ensures same symlink on host.
+    if [ ! -L "$HOME"/.ssh/config ]; then
+      echo "Symlinking: ~/.ssh/config --> ~/dotfiles/host/.ssh/config."
+      if [ -f "$HOME"/.ssh/config ]; then
+        mv "$HOME"/.ssh/config "$HOME"/.ssh/config.backup
+      fi
+      ln -s "$HOME"/dotfiles/host/.ssh/config "$HOME"/.ssh/config
+    fi
 
     # ==========================================================
     # `stow` user-level files.

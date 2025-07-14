@@ -85,6 +85,27 @@ Exit() {
   return 1
 }
 
+# Function to ensure repository is up to date
+ensure_repo() {
+  local repo_name="$1"
+  local repo_path="$2"
+  local repo_url="$3"
+
+  if [ -d "$repo_path" ]; then
+    print_step "Updating $repo_name repository..."
+    if ! (cd "$repo_path" && git pull); then
+      print_error "Failed to update $repo_name repository"
+      Exit 1 || return 1
+    fi
+  else
+    print_step "Cloning $repo_name repository..."
+    if ! git clone "$repo_url" "$repo_path"; then
+      print_error "Failed to clone $repo_name repository"
+      Exit 1 || return 1
+    fi
+  fi
+}
+
 # Function to prepare containers after build.
 finalize_container() {
   print_step "Preparing containers..."
@@ -181,20 +202,9 @@ while getopts "hbdurslct:vp" opt; do
     ;;
   b)
     # Build Docker image.
-    # First, ensure dotfiles repository is up to date
-    if [ -d "$HOME/dotfiles" ]; then
-      print_step "Updating dotfiles repository..."
-      if ! (cd "$HOME/dotfiles" && git pull); then
-        print_error "Failed to update dotfiles repository"
-        Exit 1 || return 1
-      fi
-    else
-      print_step "Cloning dotfiles repository..."
-      if ! git clone git@github.com:magnusriga/dotfiles.git "$HOME/dotfiles"; then
-        print_error "Failed to clone dotfiles repository"
-        Exit 1 || return 1
-      fi
-    fi
+    # Ensure `dotfiles` and `nfront` repositories are up to date.
+    ensure_repo "dotfiles" "$HOME/dotfiles" "git@github.com:magnusriga/dotfiles.git"
+    ensure_repo "nfront" "$HOME/nfront" "git@github.com:magnusriga/nfront.git"
 
     if [[ "$VERBOSE" == "true" ]]; then
       PROGRESS_FLAG=(--progress plain)

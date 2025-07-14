@@ -213,9 +213,10 @@ if [ -f "./setup_yazi.sh" ]; then
 fi
 
 # ================================================
-# Clone: `nfront`.
+# Clone: `nfront`, if not in Docker.
+# Docker: `dotfiles` and `nfront` are bind-mounted from host.
 # ================================================
-if [ ! -d "$HOME/nfront" ]; then
+if [ ! -d "$HOME/nfront" ] && [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
   echo "Cloning nfront repository to $HOME/nfront."
   git clone git@github.com:magnusriga/nfront.git "$HOME/nfront"
 fi
