@@ -1,88 +1,125 @@
 # README
 
-## Setup Host (once)
+## Setup Linux | Development Container
 
-0. Install terminal.
-1. Install JetBrains Mono Nerd Font
-2. `ssh-keygen`, save as `~/.ssh/nfu_ed25519`, and add to `IdentityFile` in `~/.ssh/config`, alongside: `Host: 127.0.0.1 Port: 2222 User nfu ForwardAgent Yes` (see: `dotfiles/_unused/.ssh/config`).
-3. Repeat for `~/.ssh/github_ed25519`, with: `Host: github.com User git`.
-4. Add keys to ssh agent, so they can be forwarded to server: `ssh-add ~/.ssh/github_ed25519`.
-5. Add `~/.ssh/github_ed25519.pub` to GitHub.
+### Host Pre-Requisites
 
-## Setup Linux
+1. Install terminal.
+2. Install JetBrains Mono Nerd Font.
+3. Create SSH key: `ssh-keygen -t ed25519 -f "$HOME"/.ssh/magnusriga_ed25519`.
+4. Add SSH key to `magnusriga` GitHub.
+5. Add SSH key to agent: `ssh-add "$HOME"/.ssh/magnusriga_ed25519`.
+6. Install `git`:
+   a. Arch: `sudo pacman -Syu <pkg>`
+   b. Ubuntu: `sudo apt update && sudo apt upgrade -y && sudo apt install -y <pkg>`.
+7. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git`.
+8. Clone nfront: `git clone git@github.com:magnusriga/nfront.git`.
 
-1. Create new arch AMD machine, named `arch`, which will get default user `magnus`.
-2. Host: `orb -u root -m <new_machine_name>`, `passwd magnus`, and set password to `magnus`.
-3. `sudo pacman-key init && sudo pacman-key --populate && sudo pacman -Syu --noconfirm archlinux-keyring && sudo pacman -Syu --noconfirm which openssh vim git`,
-    then
+### Normal (non-docker)
 
-1. Modify `sshd` config, `sudo vim /etc/ssh/sshd_config`, to listen to port 2222 (see: `dotfiles/_unused/etc/ssh/sshd_config`). Note: File is replaced later, during install.
-4. Start `sshd`: `sudo systemctl start sshd && sudo systemctl enable sshd && sudo systemctl reload sshd`, and `sudo systemctl reload sshd` every time `/etc/ssh/sshd_config` changes.
+Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
-1. Create new ssh keys on host:
-   - `ssh-keygen -t ed25519 -f ~/.ssh/<user_machine>_ed25519`
+1. Create user: `. ~/dotfiles/scripts/bootstrap.sh`.
+2. Switch to new user: `nfu`.
+3. Re-run script to prepare machine: `~/dotfiles/scripts/bootstrap.sh`.
 
-1. Host: Add entry to `~/.ssh/config` for new machine, e.g.:
+### Docker
 
-   ```
-   Host <user>-<machine>
-     HostName 198.19.249.136 # From OrbStack
-     Port 2222
-     User nfu
-     IdentityFile ~/.ssh/<user_machine>_ed25519
-     ForwardAgent yes
-     SendEnv TERM_PROGRAM
-     SendEnv DISPLAY
-   ```
+Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
-5. Host: `ssh-copy-id -i ~/.ssh/<user_machine>_ed25519.pub <host>`, where `<host>` is from `~/ssh/config`. Type password to remote user, e.g. `magnus` as set above | `nfu`.
+1. `. ~/dotfiles/host/docker/manage-container.sh -b`.
+2. Everything else is automatic.
 
-3. `ssh-add ~/.ssh/<user_machine>_ed25519`, to add key to ssh-agent on host, to avoid typing passphrase and to forward key to server.
+## Attach to Development Container
 
-6. Host: Copy terminfo to default user: `infocmp -x | ssh magnus@nfu -- tic -x -`.
+1. Start containers: `. ~/dotfiles/host/docker/manage-container.sh -u`.
+1. Enter development container, either:
+   a. `ssh nfu-docker`.
+   b. `. ~/dotfiles/host/docker/manage-container.sh -s`.
 
-7. `ssh magnus@nfu`. If it fails, log in to server with `orb`, and check that `~/.ssh` has permissions 700, and `~/.ssh/authorization_keys` has 600.
-8. `cd ~ && git clone git@github.com:magnusriga/dotfiles.git`.
-9. `. ~/dotfiles/scripts/setup_user`.
-10. Host: `ssh-copy-id -i ~/.ssh/nfu_ed25519.pub nfu`, type password to remote user `nfu`, which is also `nfu`.
-11. Host: Copy terminfo to new user: `infocmp -x | ssh nfu -- tic -x -`.
-12. Login with new user, `ssh nfu`, then delete OrbStack `ssh_config`: `sudo rm -rf /etc/ssh/ssh_config.d/10-orbstack.conf`.
-13. `cd ~ & git clone git@github.com:magnusriga/dotfiles.git`.
-14. `. ~/dotfiles/scripts/bootstrap.sh`.
+## Notes: Key Steps - Incomplete, Only for Information Purposes
 
-## Setup Development Container
+**Host**:
 
-### Create and Attach to Development Container
+- Install Linux | OrbStack container or machine.
+- Open new machine | container: `orb -u root -m <new_machine_name>`.
+- Set password to `magnus`: `passwd magnus`.
+- Setup package manager.
+  - `sudo pacman-key init && sudo pacman-key --populate && sudo pacman -Syu --noconfirm archlinux-keyring`.
+- Install initial packages: `sudo pacman -Syu --noconfirm which openssh vim git`.
 
-1. Build image from Linux (once): `~/dotfiles/host/docker/compose-build.sh -e dev`
-2. Deploy stack from Linux (every time container runs): `./.devcontainer/compose-up.sh -e dev`
-3. If `vscode`, attach to running `nfront` container.
-4. Manually run `pnpm i` and `pnpm dev`, as needed.
+**Docker | VM**:
 
-### Install and Run Pre-Commit Hooks
+- Open container | machine.
+  - `orb -m <machine-name>`.
+- Symlink `/etc/ssh/sshd_config` to `~/dotfiles/etc/ssh/sshd_config`.
+  - Result: Listen to port `2222`.
+- Start `sshd`.
+  - `sudo systemctl start sshd && sudo systemctl enable sshd && sudo systemctl reload sshd`.
+  - Every time `/etc/ssh/sshd_config` changes: `sudo systemctl reload sshd`.
 
-1. Add hooks to `.git/hooks`, by running: `pre-commit install`
-2. Run the added hooks on all files: `pre-commit run --all-files`
+**Host**:
 
-### Other Required Setup
+- Create SSH keys.
+  - `ssh-keygen -t ed25519 -f ~/.ssh/<user>-<machine>_ed25519`
+- Update `~/.ssh/config`.
 
-1. Install dotfiles (e.g. magnusriga/dotfiles) to get the necessary environment
-   variables (pnpm, node, etc.), and for a better terminal experience.
-2. Install Hack Nerd Font for the terminal to display icons correctly.
+  ```bash
+  Host <user>-<machine>
+    HostName 198.19.249.136 # From OrbStack
+    Port 2222
+    User nfu
+    IdentityFile ~/.ssh/<user>-<machine>_ed25519
+    ForwardAgent yes
+    SendEnv TERM_PROGRAM
+    SendEnv DISPLAY
+  ```
+
+- Add SSH key to agent.
+  - `ssh-add ~/.ssh/<user>-<machine>_ed25519`.
+  - Avoids typing passphrase and forwards key to container.
+- Test SSH connection, with password.
+  - `ssh <user>-<machine>`.
+- Copy SSH key to container.
+  - `ssh-copy-id -i ~/.ssh/<user>-<machine>_ed25519.pub <host>`.
+  - `<host>`: `<user>-<machine>` from `~/ssh/config`.
+  - Type password to remote user, e.g. `nfu`.
+- Test SSH connection, with SSH agent.
+  - `ssh <user>-<machine>`.
+- Copy terminfo to container.
+  - `infocmp -x | ssh <user>-<machine> -- tic -x -`.
+- If `ssh` fails:
+  - Log in to server with `orb`.
+  - Check permissions: `~/.ssh` has 700.
+  - Check permissions: `~/.ssh/authorization_keys` has 600.
 
 ### Do NOT Use Docker Swarm Mode for Development Containers
 
-- Docker swarm mode should not be used for development containers, because the containers are recreated when the host restarts.
-- Therefore, do not use: `./.devcontainer/stack-build.sh -e dev` and `./.devcontainer/stack-deploy.sh -e dev`
-- Instead, use docker compose build and docker compose up.
+- Docker swarm mode should not be used for development containers.
+- Containers are recreated when host restarts.
+- Therefore, do not use:
+  - `./.devcontainer/stack-build.sh -e dev`.
+  - `./.devcontainer/stack-deploy.sh -e dev`.
+- Instead, use `docker compose build` and `docker compose up`.
+
+## Install and Run Pre-Commit Hooks
+
+- Not needed, automatic during `nfront` > `pnpm i`.
+- Before:
+  - Add hooks to `.git/hooks`, by running: `pre-commit install`
+  - Run added hooks on all files: `pre-commit run --all-files`
 
 ## Running Production Containers
+
+- Not setup yet.
+
+### Preliminary Notes
 
 1. Build image from Linux (once): `./scripts/compose-build.sh -e prod`
 2. Deploy stack from Linux (every time we run container): `./scripts/stack-deploy.sh -e prod`
 3. Check by visiting: [localhost](http://localhost:3000)
 
-If git clone does not work:
+If `git clone` does not work:
 
 1. Host: `ssh-add -L`, to check public key in ssh-agent.
 2. Remote: `ssh-add -L`, to check it matches public key in ssh-agent in Host.

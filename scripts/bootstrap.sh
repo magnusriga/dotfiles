@@ -195,6 +195,11 @@ function doIt() {
     stow -vv -d "$SCRIPTPATH"/../stow -t "$HOME" *
 
     # ==========================================================
+    # Sart `sshd`.
+    # ==========================================================
+    sudo systemctl start sshd && sudo systemctl enable sshd && sudo systemctl reload sshd
+
+    # ==========================================================
     # Set ZSH as default shell.
     # ==========================================================
     # Force ZSH verison from pacman.
