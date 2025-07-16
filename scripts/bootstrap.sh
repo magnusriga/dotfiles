@@ -199,7 +199,11 @@ function doIt() {
     # Sart `sshd` with `systemd`, when not in Docker.
     # ==========================================================
     if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
-      sudo systemctl start sshd && sudo systemctl enable ssh && sudo systemctl reload sshd
+      echo "Starting, enabling (on boot), and re-starting, sshd service with systemd."
+      sudo systemctl start sshd
+      sudo systemctl enable ssh
+      sudo systemctl reload sshd  # Keep running, reload config files.
+      sudo systemctl restart sshd # Start + stop, safer than reload.
     fi
 
     # ==========================================================
