@@ -176,6 +176,17 @@ if [ "$DISTRO" = "arch" ]; then
 elif [ "$DISTRO" = "ubuntu" ]; then
   echo "Installing packages for Ubuntu..."
 
+  # Modernize package sources.
+  apt modernize-sources
+
+  # Update local package list with latest information about
+  # available packages and their versions from configured repositories,
+  # then upgrade installed packages.
+  sudo apt-get update && apt-get upgrade -y
+
+  # Install packages needed to update repositories.
+  sudo apt-get install -y gnupg wget software-properties-common
+
   # Setup repositories
   setup_ubuntu_repositories
 

@@ -153,7 +153,7 @@ function doIt() {
   if [ "$(whoami)" = "nfu" ] && [ -f "./setup_main.sh" ]; then
     # Remove `/usr/local/share/man`, which symlinks to empty `/usr/local/man` on Arch Linux,
     # as it blocks `setup_packages_manual.sh` > `stow nvim`.
-    sudo rm -f /usr/local/share/man
+    sudo rm -rf /usr/local/share/man
 
     echo "Running: . ./setup_main.sh."
     . ./setup_main.sh
