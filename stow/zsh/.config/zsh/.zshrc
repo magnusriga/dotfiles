@@ -386,7 +386,7 @@ eval "$(zoxide init zsh)"
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=243"
 
 # Activate `zsh-autosuggestions`.
-. /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
 # Use key bindings similar to Neovim completion mode,
 # where `^y` is accept match, and `^e` is stop completion and
@@ -466,7 +466,7 @@ export ZSH_HIGHLIGHT_STYLES["single-quoted-argument"]='fg=green'
 export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 
 # Source script, installed with pacman, as last command in `.zshrc`.
-. /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # ================================================================
 # oh-my-zsh settings.

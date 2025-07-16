@@ -37,22 +37,21 @@ Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
 Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
-Also need right permissions on SSH sockets on host:
-
-- `sudo chmod 766 /opt/orbstack-guest/run/*`
-- `sudo chmod 766 /opt/containerd`
-- Must be re-run every time OrbStack restarts.
-
 1. Enter machine with default user: `orb -m <machine>`.
-1. Install `git`:
+2. Install `git`:
    a. Arch: `sudo pacman -Syu git`
    b. Ubuntu: `sudo apt -y modernize-sources && sudo apt update && sudo apt upgrade -y && sudo apt install -y git`.
-1. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
-1. Create user: `. ~/dotfiles/scripts/bootstrap.sh`.
-1. Switch to new user: `orb -m <machine> -u nfu`.
-1. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
-1. Re-run script to prepare machine: `. ~/dotfiles/scripts/bootstrap.sh`.
-1. **HOST**:
+3. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
+4. Create user: `. ~/dotfiles/scripts/bootstrap.sh`.
+5. Set socket permissions:
+   a. `sudo chmod 766 /opt/orbstack-guest/run/*`
+   b. `sudo chmod 766 /opt/containerd`
+   c. Must be re-run every time OrbStack restarts.
+   d. Fixes ssh agent permission issues on new user.
+6. Switch to new user: `orb -m <machine> -u nfu`.
+7. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
+8. Re-run script to prepare machine: `. ~/dotfiles/scripts/bootstrap.sh`.
+9. **HOST**:
    a. Create SSH keys: `ssh-keygen -t ed25519 -f ~/.ssh/<user>-<machine>_ed25519`
    b. Update SSH config:
 
@@ -83,7 +82,7 @@ g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
 - If `ssh` fails:
   - Log in to server with `orb`.
   - Check permissions: `~/.ssh` has 700.
-  - Check permissions: `~/.ssh/authorization_keys` has 600.
+  - Check permissions: `~/.ssh/authorization_keys` has 600, created with `ssh-copy-id`.
 
 ## Attach to Development Container
 
@@ -111,6 +110,7 @@ g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
   - Result: Listen to port `2222`.
 - Start `sshd`.
   - `sudo systemctl start sshd && sudo systemctl enable sshd && sudo systemctl reload sshd`.
+  - OR without `d` on enable: `sudo systemctl start sshd && sudo systemctl enable ssh && sudo systemctl reload sshd`.
   - Every time `/etc/ssh/sshd_config` changes: `sudo systemctl reload sshd`.
 
 **Host**:

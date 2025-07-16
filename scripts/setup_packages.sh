@@ -38,8 +38,8 @@ fi
 function setup_ubuntu_repositories() {
   echo "Setting up Ubuntu repositories..."
 
-  # Ensure `~/.gnupg` directory is owned by user executing below commands.
-  sudo chown -R "$USER":"$USER" "$HOME"/.gnupg
+  # Ensure `~/.gnupg` directory is owned by user executing below commands, i.e. root.
+  # sudo chown -R root:root "$HOME"/.gnupg
 
   # Stop snapd service if it is running, so it can be upgraded.
   systemctl --quiet is-active snapd.service && sudo service snapd stop

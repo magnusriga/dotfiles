@@ -29,14 +29,12 @@ git clone https://github.com/zsh-users/zsh-completions "${ZSH_HOME:-$HOME/.local
 # git clone https://github.com/jeffreytse/zsh-vi-mode.git ${ZSH_HOME:-$HOME/.local/share/zsh}/.zsh-vi-mode
 
 # `zsh-autosuggestions`.
-# - Installed with pacman.
-# rm -rf "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions"
-# git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions
+rm -rf "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions"
+git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-autosuggestions"
 
 # `zsh-syntax-highlighting`.
-# - Installed with pacman.
 # - zsh-syntax-highlighting registers a zle-line-pre-redraw hook.
 # - ZLE hooks run in order of registration.
 # - zsh-syntax-highlighting must be installed / registered after all other ZLE hooks that change the command-line buffer,
-#   so syntax highlighting is added to all text. 
-#git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting"
+#   so syntax highlighting is added to all text.
+git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting"

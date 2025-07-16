@@ -39,7 +39,11 @@ Port 2222
 #LoginGraceTime 2m
 #PermitRootLogin prohibit-password
 #StrictModes yes
-#MaxAuthTries 6
+
+# NOTE: `MaxAuthTries (default: 6)` must be larger than number of keys in SSH agent,
+# otherwise it never gets to password attemtp.
+MaxAuthTries 15 
+
 #MaxSessions 10
 
 #PubkeyAuthentication yes
