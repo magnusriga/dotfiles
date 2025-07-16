@@ -182,7 +182,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   # Update local package list with latest information about
   # available packages and their versions from configured repositories,
   # then upgrade installed packages.
-  sudo apt-get update && apt-get upgrade -y
+  sudo apt-get update && sudo apt-get upgrade -y
 
   # Install packages needed to update repositories.
   sudo apt-get install -y gnupg wget software-properties-common
