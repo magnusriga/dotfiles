@@ -52,7 +52,7 @@ function setup_ubuntu_repositories() {
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
 
   # glow.
-  curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg
+  curl -fsSL https://repo.charm.sh/apt/gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/charm.gpg --yes
   echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/charm.gpg] https://repo.charm.sh/apt/ * *" | sudo tee /etc/apt/sources.list.d/charm.list >/dev/null
 
   # fastfetch.
@@ -177,7 +177,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   echo "Installing packages for Ubuntu..."
 
   # Modernize package sources.
-  sudo apt modernize-sources
+  sudo apt -y modernize-sources
 
   # Update local package list with latest information about
   # available packages and their versions from configured repositories,
