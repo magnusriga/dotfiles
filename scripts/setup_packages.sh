@@ -62,7 +62,7 @@ function setup_ubuntu_repositories() {
   curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | sudo -E bash
 
   # HashiCorp HCP CLI.
-  wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg --yes
   echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
   # Update package lists
@@ -90,9 +90,9 @@ COMMON_PACKAGES=(
   fzf
   gawk
   git
-  lazygit
   glow
   gnupg
+  # lazygit
   lsb-release
   luarocks
   make
@@ -213,18 +213,18 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     gh \
     fd-find \
     poppler-utils poppler-data \
-    harfbuzz-utils \
+    libharfbuzz-bin \
     librrd-dev \
     vulkan-tools \
     freeglut3-dev \
     libnotify-bin \
     libgdk-pixbuf2.0-dev gimp default-jre \
     libwmf-dev libopenraw-dev libavif-dev libheif-dev libjxl-dev librsvg2-dev \
-    python3-setuptools python3-keyring python3-xdg python3 python3-pip python3-pipx \
+    python3-setuptools python3-keyring python3-xdg python3 python3-pip pipx \
     lua5.4 \
     libgtk-4-dev libadwaita-1-dev libxml2-utils \
     libjpeg-turbo8-dev libpng-dev zlib1g-dev \
-    libva-drv-video libvdpau-va-gl1 \
+    va-driver-all libva-utils intel-media-va-driver i965-va-driver libvdpau-va-gl1 \
     opencl-headers \
     libfftw3-mpi-dev libusb-1.0-0-dev \
     libgl1-mesa-dev libnss-nis libxss1 libxtst6 \
