@@ -38,6 +38,9 @@ fi
 function setup_ubuntu_repositories() {
   echo "Setting up Ubuntu repositories..."
 
+  # Ensure `~/.gnupg` directory is owned by user executing below commands.
+  sudo chown -R "$USER":"$USER" "$HOME"/.gnupg
+
   # Stop snapd service if it is running, so it can be upgraded.
   systemctl --quiet is-active snapd.service && sudo service snapd stop
 
@@ -225,7 +228,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     lua5.4 \
     libgtk-4-dev libgtk4-layer-shell-dev libadwaita-1-dev libxml2-utils \
     libjpeg-turbo8-dev libpng-dev zlib1g-dev \
-    va-driver-all vainfo intel-media-va-driver i965-va-driver libvdpau-va-gl1 \
+    va-driver-all vainfo libvdpau-va-gl1 \
     opencl-headers \
     libfftw3-mpi-dev libusb-1.0-0-dev \
     libgl1-mesa-dev libnss-nis libxss1 libxtst6 \

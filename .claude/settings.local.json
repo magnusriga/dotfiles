@@ -45,7 +45,8 @@
       "Bash(finalize_container)",
       "Bash(./test_finalize.sh:*)",
       "Bash(ssh:*)",
-      "Bash(ln:*)"
+      "Bash(ln:*)",
+      "WebFetch(domain:packages.ubuntu.com)"
     ]
   },
   "enableAllProjectMcpServers": false
