@@ -37,6 +37,12 @@ Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
 Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
+Also need right permissions on SSH sockets on host:
+
+- `sudo chmod 766 /opt/orbstack-guest/run/*`
+- `sudo chmod 766 /opt/containerd`
+- Must be re-run every time OrbStack restarts.
+
 1. Enter machine with default user: `orb -m <machine>`.
 1. Install `git`:
    a. Arch: `sudo pacman -Syu git`
