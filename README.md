@@ -83,6 +83,8 @@ g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
   - Log in to server with `orb`.
   - Check permissions: `~/.ssh` has 700.
   - Check permissions: `~/.ssh/authorization_keys` has 600, created with `ssh-copy-id`.
+  - Ensure SSH agent does not contain more keys than `MaxAuthTries` in `/etc/ssh/sshd_config`,
+    because SSH will never get to password prompt then.
 
 ## Attach to Development Container
 

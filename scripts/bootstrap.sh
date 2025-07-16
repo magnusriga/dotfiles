@@ -196,9 +196,11 @@ function doIt() {
     stow -vv -d "$SCRIPTPATH"/../stow -t "$HOME" *
 
     # ==========================================================
-    # Sart `sshd`.
+    # Sart `sshd` with `systemd`, when not in Docker.
     # ==========================================================
-    sudo systemctl start sshd && sudo systemctl enable sshd && sudo systemctl reload sshd
+    if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+      sudo systemctl start sshd && sudo systemctl enable ssh && sudo systemctl reload sshd
+    fi
 
     # ==========================================================
     # Set ZSH as default shell.
