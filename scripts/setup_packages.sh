@@ -185,7 +185,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   sudo apt-get update && sudo apt-get upgrade -y
 
   # Install packages needed to update repositories.
-  sudo apt-get install -y gnupg wget software-properties-common
+  sudo apt-get install -y gnupg wget software-properties-common apt-transport-https
 
   # Setup repositories
   setup_ubuntu_repositories
@@ -211,6 +211,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     cron \
     docker.io docker-buildx docker-compose \
     gh \
+    snapd \
     fd-find \
     poppler-utils poppler-data \
     libharfbuzz-bin \
@@ -224,7 +225,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     lua5.4 \
     libgtk-4-dev libadwaita-1-dev libxml2-utils \
     libjpeg-turbo8-dev libpng-dev zlib1g-dev \
-    va-driver-all libva-utils intel-media-va-driver i965-va-driver libvdpau-va-gl1 \
+    va-driver-all vainfo intel-media-va-driver i965-va-driver libvdpau-va-gl1 \
     opencl-headers \
     libfftw3-mpi-dev libusb-1.0-0-dev \
     libgl1-mesa-dev libnss-nis libxss1 libxtst6 \
