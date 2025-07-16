@@ -82,7 +82,7 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
   # Ensure Docker engine starts on system boot.
   sudo systemctl enable docker.service
   # Reload all service files and update its internal configuration.
-  systemctl daemon-reload
+  sudo systemctl daemon-reload
 fi
 
 # ================================================

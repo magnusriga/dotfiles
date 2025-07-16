@@ -237,7 +237,7 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
   sudo systemctl enable --now snapd.apparmor.service
   sudo ln -fs /var/lib/snapd/snap /snap
   # Reload all service files and update its internal configuration.
-  systemctl daemon-reload
+  sudo systemctl daemon-reload
   echo "Installed snap version: $(snap --version)"
   cd "$CWD" || exit
 else

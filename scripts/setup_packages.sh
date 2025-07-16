@@ -223,7 +223,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     libwmf-dev libopenraw-dev libavif-dev libheif-dev libjxl-dev librsvg2-dev \
     python3-setuptools python3-keyring python3-xdg python3 python3-pip pipx \
     lua5.4 \
-    libgtk-4-dev libadwaita-1-dev libxml2-utils \
+    libgtk-4-dev libgtk4-layer-shell-dev libadwaita-1-dev libxml2-utils \
     libjpeg-turbo8-dev libpng-dev zlib1g-dev \
     va-driver-all vainfo intel-media-va-driver i965-va-driver libvdpau-va-gl1 \
     opencl-headers \
