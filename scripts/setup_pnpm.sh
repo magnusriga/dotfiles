@@ -15,9 +15,7 @@ case ":$PATH:" in
 esac
 
 function install_global_packages() {
-  local silent_errors="$1"
-
-  local cmd="pnpm --allow-build=spawn-sync \
+  pnpm --allow-build=spawn-sync \
     --allow-build=tree-sitter \
     --allow-build=@mistweaverco/tree-sitter-graphql \
     --allow-build=@mistweaverco/tree-sitter-kulala \
@@ -34,30 +32,30 @@ function install_global_packages() {
     neovim \
     yarn \
     mcp-hub@latest \
-    @mermaid-js/mermaid-cli"
-
-  if [ "$silent_errors" = "true" ]; then
-    eval "$cmd >/dev/null 2>&1 || true"
-  else
-    eval "$cmd"
-  fi
+    @mermaid-js/mermaid-cli
 }
 
+source "$HOME"/.bashrc
+
+pnpm add -g neovim
+
 # Install packages before fixing tree-sitter.
-echo "Installing global packages with pnpm, output silenced due to expected error from @mistweaverco/tree-sitter, might take time."
-install_global_packages true
+echo "Installing global packages with pnpm, error expected from @mistweaverco/tree-sitter, might take time."
+install_global_packages
 
 # Fix tree-sitter binding.gyp to use C++20 instead of C++17
 # NOTE: Necessary, until https://github.com/tree-sitter/node-tree-sitter/issues/238 is fixed.
 if [[ "$OSTYPE" == "darwin"* ]]; then
+  echo "On MacOS, replacing c++17 with c++20 in tree-sitter's binding.gyp, to be able to install it with Node 20+."
   sed -i '' 's/c++17/c++20/g' "$PNPM_HOME"/global/5/.pnpm/tree-sitter@*/node_modules/tree-sitter/binding.gyp
 else
+  echo "Not on MacOS, replacing c++17 with c++20 in tree-sitter's binding.gyp, to be able to install it with Node 20+."
   sed -i 's/c++17/c++20/g' "$PNPM_HOME"/global/5/.pnpm/tree-sitter@*/node_modules/tree-sitter/binding.gyp
 fi
 
 # Install packages again after fixing tree-sitter.
 echo "Re-installing global packages with pnpm, after fixing tree-sitter."
-install_global_packages false
+install_global_packages
 
 # Clean up function
 unset install_global_packages

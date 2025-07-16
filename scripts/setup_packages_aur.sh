@@ -232,11 +232,13 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
   git clone https://aur.archlinux.org/$PACKAGE.git "$BUILD_REPOS/$PACKAGE"
   cd "$BUILD_REPOS/$PACKAGE" || exit
   build_and_install_package "$PACKAGE"
-  echo "Installed snap version: $(snap --version)"
   # Enable systemd unit that manages main snap communication socket.
   sudo systemctl enable --now snapd.socket
   sudo systemctl enable --now snapd.apparmor.service
   sudo ln -fs /var/lib/snapd/snap /snap
+  # Reload all service files and update its internal configuration.
+  systemctl daemon-reload
+  echo "Installed snap version: $(snap --version)"
   cd "$CWD" || exit
 else
   echo "In container, skipping install of snapd."

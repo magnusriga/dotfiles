@@ -10,10 +10,11 @@
 4. Add SSH key to `magnusriga` GitHub.
 5. Add SSH key to agent: `ssh-add "$HOME"/.ssh/magnusriga_ed25519`.
 6. Install `git`:
-   a. Arch: `sudo pacman -Syu <pkg>`
-   b. Ubuntu: `sudo apt update && sudo apt upgrade -y && sudo apt install -y <pkg>`.
-7. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git`.
+   a. Arch: `sudo pacman -Syu git`
+   b. Ubuntu: `sudo apt update && sudo apt upgrade -y && sudo apt install -y git`.
+7. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
 8. Clone nfront: `git clone git@github.com:magnusriga/nfront.git`.
+9. Symlink SSH config: `ln -s "$HOME"/dotfiles/host/.ssh/config "$HOME"/.ssh/config`.
 
 ### Normal (non-docker)
 
@@ -21,14 +22,62 @@ Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
 1. Create user: `. ~/dotfiles/scripts/bootstrap.sh`.
 2. Switch to new user: `nfu`.
-3. Re-run script to prepare machine: `~/dotfiles/scripts/bootstrap.sh`.
+3. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
+4. Re-run script to prepare machine: `. ~/dotfiles/scripts/bootstrap.sh`.
 
 ### Docker
 
 Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
-1. `. ~/dotfiles/host/docker/manage-container.sh -b`.
-2. Everything else is automatic.
+1. Build and access: `. ~/dotfiles/host/docker/manage-container.sh -b`.
+2. Re-access: `ssh nfu-docker`.
+3. Everything else is automatic.
+
+### OrbStack Linux Machine
+
+Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
+
+1. Enter machine with default user: `orb -m <machine>`.
+1. Install `git`:
+   a. Arch: `sudo pacman -Syu git`
+   b. Ubuntu: `sudo apt update && sudo apt upgrade -y && sudo apt install -y git`.
+1. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
+1. Create user: `. ~/dotfiles/scripts/bootstrap.sh`.
+1. Switch to new user: `orb -m <machine> -u nfu`.
+1. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
+1. Re-run script to prepare machine: `. ~/dotfiles/scripts/bootstrap.sh`.
+1. **HOST**:
+   a. Create SSH keys: `ssh-keygen -t ed25519 -f ~/.ssh/<user>-<machine>_ed25519`
+   b. Update SSH config:
+
+   ```bash
+   Host <user>-<machine>
+     HostName 198.19.249.136 # From OrbStack
+     Port 2222
+     User nfu
+     IdentityFile ~/.ssh/<user>-<machine>_ed25519
+     ForwardAgent yes
+     SendEnv TERM_PROGRAM
+     SendEnv DISPLAY
+   ```
+
+c. Add SSH key to agent: `ssh-add ~/.ssh/<user>-<machine>_ed25519`.
+d. Test SSH connection, with password: `ssh <user>-<machine>`.
+e. Copy SSH key to container: `ssh-copy-id -i ~/.ssh/<user>-<machine>_ed25519.pub <user>-<machine>`, with password `nfu`.
+f. Test SSH connection, with SSH agent: `ssh <user>-<machine>`.
+g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
+
+- General notes:
+  - Sometimes step (6) hangs first time, just try step (6) again.
+- OrbStack Linux machine notes:
+  - SSH agent is forwarded automatically to Linux machine.
+  - Thus: Skip above steps 1-5 inside Linux machine.
+  - But: Still need above pre-requisites on host machine.
+  - Alternative: Use Docker container for easy setup, see below.
+- If `ssh` fails:
+  - Log in to server with `orb`.
+  - Check permissions: `~/.ssh` has 700.
+  - Check permissions: `~/.ssh/authorization_keys` has 600.
 
 ## Attach to Development Container
 
@@ -74,24 +123,6 @@ Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
     SendEnv TERM_PROGRAM
     SendEnv DISPLAY
   ```
-
-- Add SSH key to agent.
-  - `ssh-add ~/.ssh/<user>-<machine>_ed25519`.
-  - Avoids typing passphrase and forwards key to container.
-- Test SSH connection, with password.
-  - `ssh <user>-<machine>`.
-- Copy SSH key to container.
-  - `ssh-copy-id -i ~/.ssh/<user>-<machine>_ed25519.pub <host>`.
-  - `<host>`: `<user>-<machine>` from `~/ssh/config`.
-  - Type password to remote user, e.g. `nfu`.
-- Test SSH connection, with SSH agent.
-  - `ssh <user>-<machine>`.
-- Copy terminfo to container.
-  - `infocmp -x | ssh <user>-<machine> -- tic -x -`.
-- If `ssh` fails:
-  - Log in to server with `orb`.
-  - Check permissions: `~/.ssh` has 700.
-  - Check permissions: `~/.ssh/authorization_keys` has 600.
 
 ### Do NOT Use Docker Swarm Mode for Development Containers
 

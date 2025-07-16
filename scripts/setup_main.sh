@@ -62,7 +62,7 @@ fi
 #   - Thus, `dog` available everywhere, except in Docker.
 # ================================================
 if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
-  echo "Not in container, installing dog and zig via snap."
+  echo "Not in container, installing dog via snap."
   sudo snap install dog
 fi
 
@@ -81,6 +81,8 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
   sudo systemctl start docker.service
   # Ensure Docker engine starts on system boot.
   sudo systemctl enable docker.service
+  # Reload all service files and update its internal configuration.
+  systemctl daemon-reload
 fi
 
 # ================================================
