@@ -133,7 +133,8 @@ function doIt() {
     echo "Setting locale to en_US.UTF-8."
     sudo localectl set-locale LANG=en_US.UTF-8
     unset LANG
-    source /etc/profile.d/locale.sh
+    # `/etc/profile.d/locale.sh` only exists on Arch, not Ubuntu.
+    [ -f /etc/profile.d/locale.sh ] && source /etc/profile.d/locale.sh
   fi
 
   # ==========================================================

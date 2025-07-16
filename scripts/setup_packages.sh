@@ -177,7 +177,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   echo "Installing packages for Ubuntu..."
 
   # Modernize package sources.
-  apt modernize-sources
+  sudo apt modernize-sources
 
   # Update local package list with latest information about
   # available packages and their versions from configured repositories,
