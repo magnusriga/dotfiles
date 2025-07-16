@@ -40,7 +40,7 @@ Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 1. Enter machine with default user: `orb -m <machine>`.
 1. Install `git`:
    a. Arch: `sudo pacman -Syu git`
-   b. Ubuntu: `sudo apt modernize-sources && sudo apt update && sudo apt upgrade -y && sudo apt install -y git`.
+   b. Ubuntu: `sudo apt -y modernize-sources && sudo apt update && sudo apt upgrade -y && sudo apt install -y git`.
 1. Clone dotfiles: `git clone git@github.com:magnusriga/dotfiles.git "$HOME"/dotfiles`.
 1. Create user: `. ~/dotfiles/scripts/bootstrap.sh`.
 1. Switch to new user: `orb -m <machine> -u nfu`.
