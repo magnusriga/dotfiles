@@ -46,7 +46,9 @@
       "Bash(./test_finalize.sh:*)",
       "Bash(ssh:*)",
       "Bash(ln:*)",
-      "WebFetch(domain:packages.ubuntu.com)"
+      "WebFetch(domain:packages.ubuntu.com)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(claude migrate-installer:*)"
     ]
   },
   "enableAllProjectMcpServers": false

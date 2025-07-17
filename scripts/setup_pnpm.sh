@@ -32,12 +32,12 @@ function install_global_packages() {
     neovim \
     yarn \
     mcp-hub@latest \
-    @mermaid-js/mermaid-cli
+    @mermaid-js/mermaid-cli \
+    @anthropic-ai/claude-code
 }
 
-source "$HOME"/.bashrc
-
-pnpm add -g neovim
+# Necessary?
+# source "$HOME"/.bashrc
 
 # Install packages before fixing tree-sitter.
 echo "Installing global packages with pnpm, error expected from @mistweaverco/tree-sitter, might take time."
@@ -59,7 +59,9 @@ install_global_packages
 
 # Clean up function
 unset install_global_packages
-# @anthropic-ai/claude-code # Using local version instead.
+
+# Migrate to local `claude` installation.
+# Note: Run 'claude migrate-installer' manually if needed
 
 # pnpm --allow-build=tree-node-cli add -g tree-node-cli
 # pnpm --allow-build=contentful-cli add -g contentful-cli

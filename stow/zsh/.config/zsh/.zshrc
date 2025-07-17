@@ -594,3 +594,5 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+alias claude="/home/nfu/.claude/local/claude"
