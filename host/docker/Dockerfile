@@ -96,6 +96,14 @@ ARG USERNAME=nfu
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+# Check if UID/GID 1000 exist and change them to 2000 if they do.
+RUN if getent passwd 1000 >/dev/null 2>&1; then \
+  usermod -u 2000 $(getent passwd 1000 | cut -d: -f1); \
+  fi \
+  && if getent group 1000 >/dev/null 2>&1; then \
+  groupmod -g 2000 $(getent group 1000 | cut -d: -f1); \
+  fi
+
 # Create new group, and new user within it.
 RUN groupadd --gid $USER_GID $USERNAME \
   && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
