@@ -70,3 +70,13 @@ fi
 if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
   export PATH="${PATH:+${PATH}:}$HOME/.fzf/bin"
 fi
+
+# ================================================================
+# Add OrbStack guest tools to PATH.
+# ================================================================
+if [ -d "/opt/orbstack-guest/bin" ]; then
+  case ":$PATH:" in
+  *":/opt/orbstack-guest/bin:"*) ;;
+  *) export PATH="/opt/orbstack-guest/bin:$PATH" ;;
+  esac
+fi
