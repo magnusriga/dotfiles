@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/magnus/dotfiles show HEAD:scripts/setup_packages_aur.sh)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:ziglang.org)"
+    ],
+    "deny": []
+  }
+}
