@@ -70,6 +70,11 @@ fi
 # - Type "exit" to get out of the container.
 
 # Start SSH daemon
+echo "Manually creating /var/run/sshd, since running sshd without systemd."
+sudoIf mkdir /var/run/sshd
+sudoIf chmod 0755 /var/run/sshd
+
+echo "Starting SSH deamon in background, with: /usr/sbin/sshd -D"
 sudoIf /usr/sbin/sshd -D &
 
 exec "$@"
