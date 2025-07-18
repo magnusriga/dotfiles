@@ -23,6 +23,31 @@ function detect_distro() {
   fi
 }
 
+# ==========================================================
+# Check Ubuntu version for conditional package installation
+# ==========================================================
+function check_ubuntu_version() {
+  if [ "$DISTRO" = "ubuntu" ] && [ -f /etc/os-release ]; then
+    . /etc/os-release
+    # Extract major and minor version numbers.
+    # shellcheck disable=SC2153
+    local version_id="$VERSION_ID"
+    local major_version
+    local minor_version
+    major_version=$(echo "$version_id" | cut -d'.' -f1)
+    minor_version=$(echo "$version_id" | cut -d'.' -f2)
+
+    # Check if version is 24.10 or later.
+    if [ "$major_version" -gt 24 ] || { [ "$major_version" -eq 24 ] && [ "$minor_version" -ge 10 ]; }; then
+      echo "true"
+    else
+      echo "false"
+    fi
+  else
+    echo "false"
+  fi
+}
+
 DISTRO=$(detect_distro)
 echo "Detected distribution: $DISTRO"
 
@@ -146,7 +171,6 @@ if [ "$DISTRO" = "arch" ]; then
     iproute2 iputils \
     netcat \
     cronie \
-    tectonic \
     docker docker-buildx docker-compose \
     github-cli \
     fd \
@@ -192,8 +216,11 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   # Install packages needed to update repositories.
   sudo apt-get install -y gnupg wget software-properties-common apt-transport-https
 
-  # Setup repositories
+  # Setup repositories.
   setup_ubuntu_repositories
+
+  # Check Ubuntu version for conditional packages.
+  UBUNTU_24_10_OR_LATER=$(check_ubuntu_version)
 
   # Update system and install common + Ubuntu-specific packages.
   sudo apt-get update && sudo apt-get upgrade -y
@@ -238,6 +265,14 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
     libevent-dev libncurses-dev bison pkgconf
 
+  # Install libgtk4-layer-shell-dev only on Ubuntu 24.10 or later
+  if [ "$UBUNTU_24_10_OR_LATER" = "true" ]; then
+    echo "Installing libgtk4-layer-shell-dev for Ubuntu 24.10 or later..."
+    sudo apt-get install -y libgtk4-layer-shell-dev
+  else
+    echo "Skipping libgtk4-layer-shell-dev (requires Ubuntu 24.10 or later)."
+  fi
+
   # Clean apt cache.
   sudo apt-get autoremove -y
   sudo apt-get autoclean
@@ -246,5 +281,6 @@ fi
 # Clean up functions.
 unset -f detect_distro
 unset -f setup_ubuntu_repositories
+unset -f check_ubuntu_version
 
 echo "Package installation completed for $DISTRO!"

@@ -60,6 +60,7 @@ x86_64)
   ARCH_VAULT="amd64"
   ARCH_NEOVIM="x86_64"
   ARCH_ZIG="x86_64"
+  ARCH_TECTONIC="x86_64"
   ;;
 aarch64 | arm64)
   ARCH_TODOCHECK="arm64"
@@ -68,6 +69,7 @@ aarch64 | arm64)
   ARCH_VAULT="arm64"
   ARCH_NEOVIM="arm64"
   ARCH_ZIG="aarch64"
+  ARCH_TECTONIC="aarch64"
   ;;
 *)
   echo "Unsupported architecture: $ARCH"
@@ -76,7 +78,7 @@ aarch64 | arm64)
 esac
 
 echo "Detected architecture: $ARCH"
-echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG"
+echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC"
 
 # ================================================
 # Setup directories and variables needed for
@@ -103,11 +105,6 @@ sudo chmod -R 755 $TARGETDIR
 # ================================================
 # Setup packages not relating to specific repos.
 # ================================================
-# Install tectonic via official installer.
-if ! command -v tectonic &>/dev/null; then
-  curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh
-  sudo mv tectonic /usr/local/bin/
-fi
 
 # Install `github-cli` extension: `Copilot`.
 if command -v gh &>/dev/null; then
@@ -143,6 +140,27 @@ git clone https://github.com/tmux-plugins/tpm "${TMUX_HOME:-$HOME/.config/tmux}/
 git clone -b v2.1.1 https://github.com/catppuccin/tmux.git "${TMUX_HOME:-$HOME/.config/tmux}/plugins/catppuccin/tmux"
 git clone https://github.com/tmux-plugins/tmux-battery "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-battery"
 git clone https://github.com/tmux-plugins/tmux-cpu "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-cpu"
+
+# ================================================
+# Install tectonic (Note: Architecture).
+# ================================================
+PACKAGE="tectonic"
+VERSION=$(curl -s "https://api.github.com/repos/tectonic-typesetting/tectonic/releases/latest" | \grep -Po '"tag_name": *"tectonic@\K[^"]*')
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p $STOWDIR/$PACKAGE/bin
+# Choose appropriate Linux variant based on architecture
+if [ "$ARCH_TECTONIC" = "aarch64" ]; then
+  LINUX_VARIANT="unknown-linux-musl"
+else
+  LINUX_VARIANT="unknown-linux-gnu"
+fi
+curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE.tar.gz" "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic@${VERSION}/tectonic-${VERSION}-${ARCH_TECTONIC}-${LINUX_VARIANT}.tar.gz"
+tar xzf "$TMPDIR/$PACKAGE/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
+stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
 # Install todocheck (Note: Architecture).
