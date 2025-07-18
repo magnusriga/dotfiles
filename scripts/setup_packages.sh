@@ -8,7 +8,7 @@ echo "Running setup_packages.sh as $(whoami), with HOME $HOME and USER $USER."
 function detect_distro() {
   if [ -f /etc/os-release ]; then
     . /etc/os-release
-    # Handle Arch Linux ARM which has ID=archarm but ID_LIKE=arch
+    # Handle Arch Linux ARM which has ID=archarm but ID_LIKE=arch.
     if [ "$ID" = "archarm" ] && [ "$ID_LIKE" = "arch" ]; then
       echo "arch"
     else
@@ -42,7 +42,9 @@ function setup_ubuntu_repositories() {
   # sudo chown -R root:root "$HOME"/.gnupg
 
   # Stop snapd service if it is running, so it can be upgraded.
-  systemctl --quiet is-active snapd.service && sudo service snapd stop
+  if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+    systemctl --quiet is-active snapd.service && sudo service snapd stop
+  fi
 
   # Create public key directory.
   sudo mkdir -p -m 755 /etc/apt/keyrings
@@ -126,7 +128,7 @@ COMMON_PACKAGES=(
 if [ "$DISTRO" = "arch" ]; then
   echo "Installing packages for Arch Linux..."
 
-  # Update system and install common + Arch-specific packages
+  # Update system and install common + Arch-specific packages.
   sudo pacman -Syu --noconfirm \
     "${COMMON_PACKAGES[@]}" \
     base-devel \
@@ -173,7 +175,7 @@ if [ "$DISTRO" = "arch" ]; then
     libxcb \
     libevent ncurses bison pkgconf
 
-  # Clean cache for unused packages
+  # Clean cache for unused packages.
   # sudo pacman -Sc --noconfirm
 
 elif [ "$DISTRO" = "ubuntu" ]; then
@@ -193,7 +195,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   # Setup repositories
   setup_ubuntu_repositories
 
-  # Update system and install common + Ubuntu-specific packages
+  # Update system and install common + Ubuntu-specific packages.
   sudo apt-get update && sudo apt-get upgrade -y
   sudo apt-get install -y \
     "${COMMON_PACKAGES[@]}" \
@@ -226,7 +228,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     libwmf-dev libopenraw-dev libavif-dev libheif-dev libjxl-dev librsvg2-dev \
     python3-setuptools python3-keyring python3-xdg python3 python3-pip pipx \
     lua5.4 \
-    libgtk-4-dev libgtk4-layer-shell-dev libadwaita-1-dev libxml2-utils \
+    libgtk-4-dev libadwaita-1-dev libxml2-utils \
     libjpeg-turbo8-dev libpng-dev zlib1g-dev \
     va-driver-all vainfo libvdpau-va-gl1 \
     opencl-headers \
@@ -236,12 +238,12 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
     libevent-dev libncurses-dev bison pkgconf
 
-  # Clean apt cache
+  # Clean apt cache.
   sudo apt-get autoremove -y
   sudo apt-get autoclean
 fi
 
-# Clean up functions
+# Clean up functions.
 unset -f detect_distro
 unset -f setup_ubuntu_repositories
 
