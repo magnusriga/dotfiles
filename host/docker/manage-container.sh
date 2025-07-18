@@ -106,6 +106,55 @@ ensure_repo() {
   fi
 }
 
+# Function to get container IP address
+get_container_ip() {
+  local container_name="$1"
+  local ip_address
+  
+  # Get the container IP using docker inspect
+  ip_address=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$container_name" 2>/dev/null)
+  
+  if [ -z "$ip_address" ] || [ "$ip_address" = "<no value>" ]; then
+    # Try alternative method for Docker Compose containers
+    ip_address=$(docker compose --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec "$container_name" hostname -I 2>/dev/null | awk '{print $1}')
+  fi
+  
+  if [ -z "$ip_address" ] || [ "$ip_address" = "<no value>" ]; then
+    print_error "Failed to get IP address for container: $container_name"
+    return 1
+  fi
+  
+  echo "$ip_address"
+}
+
+# Function to update SSH config with container IP
+update_ssh_config() {
+  local host_name="$1"
+  local new_ip="$2"
+  local config_file="$HOME/dotfiles/host/.ssh/config"
+  
+  if [ ! -f "$config_file" ]; then
+    print_error "SSH config file not found: $config_file"
+    return 1
+  fi
+  
+  # Create a backup
+  cp "$config_file" "$config_file.backup"
+  
+  # Update the HostName for the specified host
+  if grep -q "^Host $host_name$" "$config_file"; then
+    # Use sed to update the HostName line following the Host entry
+    sed -i.tmp "/^Host $host_name$/,/^Host / {
+      s/^  HostName .*/  HostName $new_ip/
+    }" "$config_file"
+    rm -f "$config_file.tmp"
+    print_info "Updated SSH config for $host_name with IP: $new_ip"
+  else
+    print_warning "Host $host_name not found in SSH config"
+    return 1
+  fi
+}
+
 # Function to prepare containers after build.
 finalize_container() {
   print_step "Preparing containers..."
@@ -128,7 +177,20 @@ finalize_container() {
 
   # Start containers.
   print_info "Starting containers..."
-  . "$HOME"/dotfiles/host/docker/compose.sh -u
+  if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" up -d; then
+    print_info "Container started successfully."
+  else
+    print_error "Failed to start container."
+    Exit 1 || return 1
+  fi
+
+  # Get container IP and update SSH config
+  print_info "Getting container IP and updating SSH config..."
+  if container_ip=$(get_container_ip "nfront_devcontainer-nfront-1") && [ -n "$container_ip" ]; then
+    update_ssh_config "nfu-docker" "$container_ip"
+  else
+    print_warning "Failed to get container IP, SSH config not updated"
+  fi
 
   # Remove old known hosts.
   print_info "Removing old known hosts..."
