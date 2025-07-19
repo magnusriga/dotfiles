@@ -31,5 +31,6 @@ if [ -n "$(which batcat 2>/dev/null)" ]; then
 fi
 
 if [ -f "$HOME/dotfiles/usr/local/bin/rpbcopy" ]; then
-  ln -fs "$HOME/dotfiles/usr/local/bin/rpbcopy" ~/.local/bin/pbcopy
+  chmod a+x "$HOME/dotfiles/usr/local/bin/rpbcopy"
+  ln -fs "$HOME/dotfiles/usr/local/bin/rpbcopy" ~/.local/bin/rpbcopy
 fi
