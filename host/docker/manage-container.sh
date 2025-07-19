@@ -264,11 +264,14 @@ while getopts "hbdurslct:vp" opt; do
     ;;
   b)
     # Build Docker image.
-    # Ensure `dotfiles` and `nfront` repositories are up to date.
+    # Ensure `dotfiles`, `nfront`, and `video-scraper` repositories are up to date.
     if ! ensure_repo "dotfiles" "$HOME/dotfiles" "git@github.com:magnusriga/dotfiles.git"; then
       Exit 1 || return 1
     fi
     if ! ensure_repo "nfront" "$HOME/nfront" "git@github.com:magnusriga/nfront.git"; then
+      Exit 1 || return 1
+    fi
+    if ! ensure_repo "video-scraper" "$HOME/video-scraper" "git@github.com:magnusriga/video-scraper.git"; then
       Exit 1 || return 1
     fi
 

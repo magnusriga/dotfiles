@@ -215,12 +215,30 @@ if [ -f "./setup_yazi.sh" ]; then
 fi
 
 # ================================================
-# Clone: `nfront`, if not in Docker.
-# Docker: `dotfiles` and `nfront` are bind-mounted from host.
+# Clone/Update repos, if not in Docker.
+# Docker: All repos are bind-mounted from host.
 # ================================================
-if [ ! -d "$HOME/nfront" ] && [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
-  echo "Cloning nfront repository to $HOME/nfront."
-  git clone git@github.com:magnusriga/nfront.git "$HOME/nfront"
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+  # `nfront` repository.
+  if [ -d "$HOME/nfront" ]; then
+    echo "Updating nfront repository at $HOME/nfront."
+    cd "$HOME/nfront" && git pull origin main
+  else
+    echo "Cloning nfront repository to $HOME/nfront."
+    git clone git@github.com:magnusriga/nfront.git "$HOME/nfront"
+  fi
+
+  # `video-scraper` repository.
+  if [ -d "$HOME/video-scraper" ]; then
+    echo "Updating video-scraper repository at $HOME/video-scraper."
+    cd "$HOME/video-scraper" && git pull origin main
+  else
+    echo "Cloning video-scraper repository to $HOME/video-scraper."
+    git clone git@github.com:magnusriga/video-scraper.git "$HOME/video-scraper"
+  fi
+
+  # Return to script directory.
+  cd "$SCRIPTPATH" || exit
 fi
 
 # ================================================
