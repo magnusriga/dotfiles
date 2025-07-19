@@ -16,7 +16,6 @@ git clone https://github.com/BennyOe/onedark.yazi.git "${YAZI_HOME:-$HOME/.confi
 
 # Install Yazi plugins via cli.
 ya pkg add yazi-rs/plugins:full-border
-ya pkg add yazi-rs/plugins:max-preview
 ya pkg add dedukun/relative-motions
 ya pkg add Reledia/glow
 ya pkg add yazi-rs/plugins:jump-to-char

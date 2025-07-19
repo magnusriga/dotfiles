@@ -221,6 +221,8 @@ function doIt() {
         echo "${which_zsh}" | sudo tee -a /etc/shells 1>/dev/null
       fi
       sudo chsh -s "${which_zsh}" "$USER"
+      export SHELL="${which_zsh}"
+      echo "Updated SHELL environment variable to ${which_zsh}"
     else
       echo "ZSH is already the default shell for current user."
     fi

@@ -151,6 +151,7 @@ ENV USER=$USERNAME
 ENV DISTRO=$DISTRO
 # `DOCKER_BUILD=1`: Needed in setup scripts.
 ENV DOCKER_BUILD=1
+ENV SHELL=/bin/bash
 
 # ================================================
 # Setup: Locale.
