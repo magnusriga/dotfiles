@@ -12,7 +12,7 @@ fi
 # ================================================================
 # Remove existing symlinks.
 # ================================================================
-rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat
+rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat ~/.local/bin/pbcopy
 
 # ================================================================
 # Add software symlinks.
@@ -28,4 +28,8 @@ fi
 
 if [ -n "$(which batcat 2>/dev/null)" ]; then
   ln -fs "$(which batcat)" ~/.local/bin/bat
+fi
+
+if [ -f "$HOME/dotfiles/usr/local/bin/rpbcopy" ]; then
+  ln -fs "$HOME/dotfiles/usr/local/bin/rpbcopy" ~/.local/bin/pbcopy
 fi

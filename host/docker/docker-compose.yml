@@ -86,6 +86,9 @@ services:
       # Makes life easier, as we can save URL as fixed browser bookmark.
       - target: 3000
         published: 3000
+      # Also forward `2224` for copy/paste functionality with `netcat`.
+      - target: 2224
+        published: 2224
     # depends_on:
     #   # depends_on is ignored when deploying stack in swarm mode with version 3 Compose file.
     #   db:

@@ -228,13 +228,17 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
     git clone git@github.com:magnusriga/nfront.git "$HOME/nfront"
   fi
 
-  # `video-scraper` repository.
-  if [ -d "$HOME/video-scraper" ]; then
-    echo "Updating video-scraper repository at $HOME/video-scraper."
-    cd "$HOME/video-scraper" && git pull origin main
+  # `video-scraper` repository, only if username includes "magnus".
+  if [[ "$USER" == *"magnus"* ]]; then
+    if [ -d "$HOME/video-scraper" ]; then
+      echo "Updating video-scraper repository at $HOME/video-scraper."
+      cd "$HOME/video-scraper" && git pull origin main
+    else
+      echo "Cloning video-scraper repository to $HOME/video-scraper."
+      git clone git@github.com:magnusriga/video-scraper.git "$HOME/video-scraper"
+    fi
   else
-    echo "Cloning video-scraper repository to $HOME/video-scraper."
-    git clone git@github.com:magnusriga/video-scraper.git "$HOME/video-scraper"
+    echo "Skipping video-scraper repository (username does not include 'magnus')."
   fi
 
   # Return to script directory.

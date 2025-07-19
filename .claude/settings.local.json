@@ -48,7 +48,8 @@
       "Bash(ln:*)",
       "WebFetch(domain:packages.ubuntu.com)",
       "WebFetch(domain:docs.anthropic.com)",
-      "Bash(claude migrate-installer:*)"
+      "Bash(claude migrate-installer:*)",
+      "WebFetch(domain:gist.github.com)"
     ]
   },
   "enableAllProjectMcpServers": false
