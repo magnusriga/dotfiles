@@ -29,7 +29,7 @@ Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
 Pre-Requisites: [Host Pre-Requisites](#host-pre-requisites)
 
-1. Build and access: `. ~/dotfiles/host/docker/manage-container.sh -b`.
+1. Build and access: `. ~/dotfiles/host/docker/manage-container.sh -b [-t ubuntu]`.
 2. Re-access: `ssh nfu-docker`.
 3. Everything else is automatic.
 
