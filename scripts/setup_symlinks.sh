@@ -12,7 +12,7 @@ fi
 # ================================================================
 # Remove existing symlinks.
 # ================================================================
-rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat ~/.local/bin/pbcopy
+rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat ~/.local/bin/pbcopy ~/.local/bin/pbpaste
 
 # ================================================================
 # Add software symlinks.
@@ -32,5 +32,10 @@ fi
 
 if [ -f "$HOME/dotfiles/usr/local/bin/rpbcopy" ]; then
   chmod a+x "$HOME/dotfiles/usr/local/bin/rpbcopy"
-  ln -fs "$HOME/dotfiles/usr/local/bin/rpbcopy" ~/.local/bin/rpbcopy
+  ln -fs "$HOME/dotfiles/usr/local/bin/rpbcopy" ~/.local/bin/pbcopy
+fi
+
+if [ -f "$HOME/dotfiles/usr/local/bin/rpbpaste" ]; then
+  chmod a+x "$HOME/dotfiles/usr/local/bin/rpbpaste"
+  ln -fs "$HOME/dotfiles/usr/local/bin/rpbpaste" ~/.local/bin/pbpaste
 fi

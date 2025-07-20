@@ -3,7 +3,7 @@
 [ -n "$SSH_CLIENT" ] && SESSION_TYPE="remote"
 
 if [[ $SESSION_TYPE == "remote" ]]; then
-  cat | nc -q1 localhost 2224
+  nc localhost 2225
 else
-  cat | pbcopy
+  pbpaste
 fi

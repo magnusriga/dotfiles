@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Service wrapper for pbpaste to handle socket connections.
+/usr/bin/pbpaste
