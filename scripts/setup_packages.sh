@@ -267,10 +267,10 @@ elif [ "$DISTRO" = "ubuntu" ]; then
 
   # Install libgtk4-layer-shell-dev only on Ubuntu 24.10 or later
   if [ "$UBUNTU_24_10_OR_LATER" = "true" ]; then
-    echo "Installing libgtk4-layer-shell-dev for Ubuntu 24.10 or later..."
-    sudo apt-get install -y libgtk4-layer-shell-dev
+    echo "Ubuntu 24.10 or later, Installing libgtk4-layer-shell-dev and lazygit."
+    sudo apt-get install -y libgtk4-layer-shell-dev lazygit
   else
-    echo "Skipping libgtk4-layer-shell-dev (requires Ubuntu 24.10 or later)."
+    echo "Skipping libgtk4-layer-shell-dev and lazygit, require Ubuntu 24.10 or later."
   fi
 
   # Clean apt cache.

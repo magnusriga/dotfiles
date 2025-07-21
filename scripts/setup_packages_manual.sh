@@ -49,7 +49,7 @@
 echo "Running setup_packages_manual.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # ================================================
-# Detect system architecture
+# Detect system architecture and Ubuntu version
 # ================================================
 ARCH=$(uname -m)
 case $ARCH in
@@ -76,6 +76,15 @@ aarch64 | arm64)
   exit 1
   ;;
 esac
+
+# Detect Ubuntu version if on Ubuntu
+if [ -f /etc/os-release ]; then
+  . /etc/os-release
+  if [ "$ID" = "ubuntu" ]; then
+    UBUNTU_VERSION="$VERSION_ID"
+    echo "Detected Ubuntu version: $UBUNTU_VERSION"
+  fi
+fi
 
 echo "Detected architecture: $ARCH"
 echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC"
@@ -352,17 +361,70 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # ================================================
 # Install lazygit (Note: Architecture).
-# Use `pacman -Syu stow` instead.
+# Arch: `pacman -Syu lazygit`.
+# Ubuntu 25.10+: `sudo apt install lazygit`.
+# Ubuntu 25.04 and earlier: Use manual build below.
 # ================================================
-# PACKAGE="lazygit"
-# VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-# sudo rm -rf "$TMPDIR/$PACKAGE"
-# sudo rm -rf "$STOWDIR/$PACKAGE"
-# curl -Lo $TMPDIR/$PACKAGE.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
-# # tar'ed file name: lazygit.
-# tar xzf $TMPDIR/$PACKAGE.tar.gz -C $TMPDIR
-# sudo install $TMPDIR/$PACKAGE -D -t $STOWDIR/$PACKAGE/bin
-# stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+
+# Function to compare version numbers
+function version_compare() {
+  if [ "$1" = "$2" ]; then
+    return 0  # equal
+  fi
+  
+  local IFS=.
+  local i
+  local -a ver1 ver2
+  read -ra ver1 <<< "$1"
+  read -ra ver2 <<< "$2"
+  
+  # fill empty fields in ver1 with zeros
+  for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+    ver1[i]=0
+  done
+  for ((i=0; i<${#ver1[@]}; i++)); do
+    if [[ -z ${ver2[i]} ]]; then
+      ver2[i]=0
+    fi
+    if ((10#${ver1[i]} > 10#${ver2[i]})); then
+      return 1  # ver1 > ver2
+    fi
+    if ((10#${ver1[i]} < 10#${ver2[i]})); then
+      return 2  # ver1 < ver2
+    fi
+  done
+  return 0  # equal
+}
+
+# Only install lazygit on Ubuntu 25.04 or earlier
+INSTALL_LAZYGIT=false
+if [ "$ID" = "ubuntu" ] && [ -n "$UBUNTU_VERSION" ]; then
+  version_compare "$UBUNTU_VERSION" "25.04"
+  version_result=$?
+  if [ $version_result -eq 2 ] || [ $version_result -eq 0 ]; then  # Ubuntu version <= 25.04
+    INSTALL_LAZYGIT=true
+    echo "Ubuntu $UBUNTU_VERSION detected - installing lazygit manually"
+  else
+    echo "Ubuntu $UBUNTU_VERSION detected - skipping manual lazygit install (use 'sudo apt install lazygit' instead)"
+  fi
+elif [ "$ID" != "ubuntu" ]; then
+  # Not Ubuntu, install lazygit
+  INSTALL_LAZYGIT=true
+  echo "Non-Ubuntu system detected - install lazygit with package manager."
+fi
+
+if [ "$INSTALL_LAZYGIT" = true ]; then
+  PACKAGE="lazygit"
+  VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$STOWDIR/$PACKAGE"
+  curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
+  # tar'ed file name: lazygit.
+  tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR"
+  sudo install "$TMPDIR/$PACKAGE" -D -t "$STOWDIR/$PACKAGE/bin"
+  stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+fi
+unset -f version_compare
 
 # ================================================
 # Install fzf.

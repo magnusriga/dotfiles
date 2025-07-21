@@ -116,14 +116,18 @@ services:
       - type: bind
         source: ~/nfront
         target: /home/nfu/nfront
-      # Bind mount dotfiles for development and configuration access
+      # Bind mount dotfiles for development and configuration access.
       - type: bind
         source: ../..
         target: /home/nfu/dotfiles
-      # Bind mount video-scraper for development access
+      # Bind mount video-scraper for development access.
       - type: bind
         source: ~/video-scraper
         target: /home/nfu/video-scraper
+      # Bind mount Downloads folder for file access.
+      - type: bind
+        source: ~/Downloads
+        target: /host/downloads
       # Forward the Docker socket by mounting it in the container using the mounts property.
       - type: bind
         source: /var/run/docker.sock
