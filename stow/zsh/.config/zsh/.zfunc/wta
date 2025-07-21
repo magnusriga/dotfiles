@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+# Worktree Add - Creates new git worktree and initializes it.
+function wta() {
+  if [ $# -eq 0 ]; then
+    echo "Usage: wta <branch-name>"
+    echo "Creates a new git worktree with the specified branch name"
+    return 1
+  fi
+
+  # Check if in git repository.
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: Not in a git repository"
+    return 1
+  fi
+
+  # Check if at root of git repository.
+  if [ "$(git rev-parse --show-toplevel)" != "$(pwd)" ]; then
+    echo "Error: Must be at the root of the git repository"
+    echo "Current directory: $(pwd)"
+    echo "Git root: $(git rev-parse --show-toplevel)"
+    return 1
+  fi
+
+  local branch_name="$1"
+  local worktree_path
+  worktree_path="../$(basename "$(pwd)")-${branch_name}"
+
+  # Create worktree with new branch.
+  echo "Creating worktree at ${worktree_path} with branch ${branch_name}..."
+  if ! git worktree add "${worktree_path}" -b "${branch_name}"; then
+    echo "Error: Failed to create worktree"
+    return 1
+  fi
+
+  # Navigate to worktree directory.
+  echo "Navigating to worktree directory..."
+  cd "${worktree_path}" || {
+    echo "Error: Failed to navigate to worktree directory"
+    return 1
+  }
+
+  # Install dependencies if package.json exists.
+  if [ -f "package.json" ]; then
+    echo "Installing dependencies with pnpm..."
+    pnpm i || {
+      echo "Warning: pnpm install failed, continuing anyway"
+    }
+  fi
+
+  echo "Worktree created and initialized at ${worktree_path}"
+  return 0
+}

@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+
+# Worktree Clean - removes current worktree, returns to main, and merges branch.
+function wtc() {
+  # Check if we are in a git repository
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: Not in a git repository"
+    return 1
+  fi
+
+  # Get current branch name.
+  local current_branch
+  current_branch=$(git branch --show-current)
+  if [ -z "$current_branch" ]; then
+    echo "Error: Could not determine current branch"
+    return 1
+  fi
+
+  # Get main worktree path.
+  local main_worktree
+  main_worktree=$(git worktree list | head -n1 | awk '{print $1}')
+  if [ -z "$main_worktree" ]; then
+    echo "Error: Could not determine main worktree path"
+    return 1
+  fi
+
+  # Check if in worktree, not main one.
+  local current_worktree
+  current_worktree=$(pwd)
+  if [ "$current_worktree" = "$main_worktree" ]; then
+    echo "Error: Already in main worktree. Use this command from a feature worktree."
+    return 1
+  fi
+
+  echo "Current branch: $current_branch"
+  echo "Main worktree: $main_worktree"
+  echo "Current worktree: $current_worktree"
+
+  # Stage all changes and commit.
+  echo "Staging all changes..."
+  git add --all || {
+    echo "Error: Failed to stage changes"
+    return 1
+  }
+
+  # Check if there are changes to commit.
+  if ! git diff --cached --quiet; then
+    echo "Committing changes..."
+    git commit --no-verify || {
+      echo "Error: Failed to commit changes"
+      return 1
+    }
+  else
+    echo "No changes to commit"
+  fi
+
+  # Navigate to main worktree.
+  echo "Navigating to main worktree..."
+  cd "$main_worktree" || {
+    echo "Error: Failed to navigate to main worktree"
+    return 1
+  }
+
+  # Get current branch in main worktree.
+  local target_branch
+  target_branch=$(cd "$main_worktree" && git branch --show-current)
+  if [ -z "$target_branch" ]; then
+    echo "Error: Could not determine current branch in main worktree"
+    return 1
+  fi
+
+  echo "Target branch in main worktree: $target_branch"
+
+  # Remove worktree.
+  echo "Removing worktree at $current_worktree..."
+  git worktree remove "$current_worktree" || {
+    echo "Error: Failed to remove worktree"
+    return 1
+  }
+
+  # Merge branch.
+  echo "Merging branch $current_branch into $target_branch..."
+  git merge "$current_branch" || {
+    echo "Error: Failed to merge branch $current_branch"
+    echo "You may need to resolve conflicts manually"
+    return 1
+  }
+
+  echo "Successfully merged $current_branch into $target_branch and cleaned up worktree"
+  return 0
+}

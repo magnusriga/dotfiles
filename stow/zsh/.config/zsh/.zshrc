@@ -278,7 +278,7 @@ setopt EXTENDED_HISTORY
 # Autoload Own and Built-In Functions.
 # ================================================================
 fpath=(${ZDOTDIR:-$HOME}/.zfunc $fpath)
-autoload -U rgf y
+autoload -U rgf y wta wtc
 
 # ================================================================
 # ZSH Completetions.
