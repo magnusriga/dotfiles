@@ -79,23 +79,23 @@ return {
       },
 
       -- Configuration for `snacks.nvim` terminal.
-      terminal = {
-        ---@type snacks.win.Config|{}
-        win = {
-          position = "right", -- `left` | `right` | `top` | `bottom`.
-          relative = "editor", -- `editor` | `win` | `cursor`.
-          width = 0.35, -- Width of terminal window, as fraction of editor width.
-
-          -- Keys within terminal, e.g. to change terminal windows.
-          keys = {
-            -- Avoid these, they interfere with editing.
-            -- nav_h = { "<C-h>", term_nav("h"), desc = "Go to Left Window", expr = true, mode = "t" },
-            -- nav_j = { "<C-j>", term_nav("j"), desc = "Go to Lower Window", expr = true, mode = "t" },
-            -- nav_k = { "<C-k>", term_nav("k"), desc = "Go to Upper Window", expr = true, mode = "t" },
-            -- nav_l = { "<C-l>", term_nav("l"), desc = "Go to Right Window", expr = true, mode = "t" },
-          },
-        },
-      },
+      -- terminal = {
+      --   ---@type snacks.win.Config|{}
+      --   win = {
+      --     position = "right", -- `left` | `right` | `top` | `bottom`.
+      --     relative = "editor", -- `editor` | `win` | `cursor`.
+      --     width = 0.35, -- Width of terminal window, as fraction of editor width.
+      --
+      --     -- Keys within terminal, e.g. to change terminal windows.
+      --     keys = {
+      --       -- Avoid these, they interfere with editing.
+      --       -- nav_h = { "<C-h>", term_nav("h"), desc = "Go to Left Window", expr = true, mode = "t" },
+      --       -- nav_j = { "<C-j>", term_nav("j"), desc = "Go to Lower Window", expr = true, mode = "t" },
+      --       -- nav_k = { "<C-k>", term_nav("k"), desc = "Go to Upper Window", expr = true, mode = "t" },
+      --       -- nav_l = { "<C-l>", term_nav("l"), desc = "Go to Right Window", expr = true, mode = "t" },
+      --     },
+      --   },
+      -- },
     },
 
     -- Keybindings to open scratch buffers, for testing code, creating notes, etc.

@@ -400,7 +400,8 @@ map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) e
 
 -- - Close current window when in terminal mode.
 -- - Also works on `claudecode.nvim`.
-map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+-- - Skip `<c-/>` to avoid conflict with `claudecode.nvim`.
+-- map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
 
 -- Exit terminal mode in builtin terminal with shortcut that is easier to remember.
