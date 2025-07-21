@@ -395,13 +395,13 @@ map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = MyVim.root() }) e
 
 -- - Open `snacks.nvim` terminal: CTRL.
 -- - `<c-/>`: Replaced with open `claudecode.nvim`, see `plugins/ai/claude.lua`.
+-- - Also need "<c-_>", as `<c-/>` is not recognized on macOS.
 -- map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
-map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
+-- map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
 
 -- - Close current window when in terminal mode.
 -- - Also works on `claudecode.nvim`.
--- - Skip `<c-/>` to avoid conflict with `claudecode.nvim`.
--- map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
 
 -- Exit terminal mode in builtin terminal with shortcut that is easier to remember.

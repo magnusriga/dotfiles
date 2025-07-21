@@ -20,6 +20,7 @@ return {
   {
     "coder/claudecode.nvim",
     dependencies = { "folke/snacks.nvim" },
+    lazy = false, -- Load immediately.
     opts = {
       terminal = {
         split_width_percentage = 0.35,
@@ -31,7 +32,8 @@ return {
 
       -- Launch ClaudeCode.
       { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
-      { "<c-/>", "<cmd>ClaudeCode<cr>", mode = "n", desc = "Toggle Claude" },
+      { "<c-/>", "<cmd>ClaudeCodeAdd %<cr>", mode = "n", desc = "Toggle Claude" },
+      { "<c-_>", "<cmd>ClaudeCodeAdd %<cr>", mode = "n", desc = "Toggle Claude" },
 
       -- - Swap to left window, with standard Neovim keybinding.
       -- - Removes `<c-w` to delete word in terminal, when in insert mode,
