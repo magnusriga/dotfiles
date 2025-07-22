@@ -86,6 +86,13 @@ function wtc() {
     return 1
   }
 
+  # Delete branch after successful merge.
+  echo "Deleting branch $current_branch..."
+  git branch -d "$current_branch" || {
+    echo "Warning: Failed to delete branch $current_branch"
+    echo "Branch may still have unmerged changes or be checked out elsewhere"
+  }
+
   echo "Successfully merged $current_branch into $target_branch and cleaned up worktree"
   return 0
 }

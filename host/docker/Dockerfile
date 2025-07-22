@@ -68,8 +68,9 @@ RUN set -ex; \
   pacman -Syu --noconfirm sudo git glibc-locales openssh curl; \
   elif [ "$DISTRO" = "ubuntu" ]; then \
   apt-get update && \
-  apt-get install -y sudo git locales openssh-server curl && \
+  apt-get install -y sudo git locales openssh-server curl unminimize && \
   locale-gen en_US.UTF-8 && \
+  yes | unminimize && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*; \
   else \

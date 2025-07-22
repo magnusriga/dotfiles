@@ -393,4 +393,4 @@
   name = Magnus
   email = magnus.rinnan@gmail.com
 [credential]
- helper = "!f() { /home/nfu/.vscode-server/bin/7adae6a56e34cb64d08899664b814cf620465925/node /tmp/vscode-remote-containers-f32b065a-b8ac-4080-911f-76a4872612bd.js git-credential-helper $*; }; f"
+	helper = "!f() { /home/nfu/.vscode-server/bin/7adae6a56e34cb64d08899664b814cf620465925/node /tmp/vscode-remote-containers-2cca3b22-9359-4111-adc1-290c1a05cf0a.js git-credential-helper $*; }; f"
