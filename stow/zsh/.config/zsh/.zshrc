@@ -280,6 +280,12 @@ setopt EXTENDED_HISTORY
 fpath=(${ZDOTDIR:-$HOME}/.zfunc $fpath)
 autoload -U rgf y wta wtc
 
+# ================================================
+# Change ANSI color "dark gray", so it does not match background color.
+# Relevant for some commands, e.g. `pnpm list`.
+# ================================================
+echo -e "\033]4;8;#5c6370\007"   
+
 # ================================================================
 # ZSH Completetions.
 # ================================================================
