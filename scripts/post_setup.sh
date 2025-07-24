@@ -16,7 +16,27 @@ cd "$SCRIPTPATH" || return
 # ==========================================================
 # Move Claude Code to Local Install
 # ==========================================================
-echo "Starting Claude Code migration..."
+echo "Starting Claude Code migration to local install..."
+
+# ---------------------------------------------------------
+# Check and Install Claude if needed
+# ---------------------------------------------------------
+echo "Checking for Claude installation..."
+
+# Check if claude is installed globally
+if ! pnpm list -g | grep -q 'claude'; then
+  echo "Claude not found. Installing Claude..."
+  pnpm add -g --allow-build=@anthropic-ai/claude-code @anthropic-ai/claude-code
+else
+  echo "Claude is installed, proceeding with migration."
+fi
+
+# Check if already migrated.
+MIGRATION_CHECK=$(claude migrate-installer 2>&1 | head -n1)
+if [[ "$MIGRATION_CHECK" == *"Already running from local installation"* ]]; then
+  echo "Already running from local installation. No migration needed."
+  return 0
+fi
 
 tmux new-session -d -s migrate 'claude migrate-installer'
 
@@ -26,4 +46,11 @@ for i in {1..3}; do
     tmux send-keys -t migrate Enter
 done
 
-echo "Migration completed! Session will close automatically."
+# Show results.
+# echo "Migration output:"
+# tmux capture-pane -t migrate -p
+
+# End session.
+echo "Migration completed, ending session."
+tmux kill-session -t migrate
+
