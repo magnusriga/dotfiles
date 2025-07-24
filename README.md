@@ -93,46 +93,7 @@ g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
    a. `ssh nfu-docker`.
    b. `. ~/dotfiles/host/docker/manage-container.sh -s`.
 
-## Notes: Key Steps - Incomplete, Only for Information Purposes
-
-**Host**:
-
-- Install Linux | OrbStack container or machine.
-- Open new machine | container: `orb -u root -m <new_machine_name>`.
-- Set password to `magnus`: `passwd magnus`.
-- Setup package manager.
-  - `sudo pacman-key init && sudo pacman-key --populate && sudo pacman -Syu --noconfirm archlinux-keyring`.
-- Install initial packages: `sudo pacman -Syu --noconfirm which openssh vim git`.
-
-**Docker | VM**:
-
-- Open container | machine.
-  - `orb -m <machine-name>`.
-- Symlink `/etc/ssh/sshd_config` to `~/dotfiles/etc/ssh/sshd_config`.
-  - Result: Listen to port `2222`.
-- Start `sshd`.
-  - `sudo systemctl start sshd && sudo systemctl enable sshd && sudo systemctl reload sshd`.
-  - OR without `d` on enable: `sudo systemctl start sshd && sudo systemctl enable ssh && sudo systemctl reload sshd`.
-  - Every time `/etc/ssh/sshd_config` changes: `sudo systemctl reload sshd`.
-
-**Host**:
-
-- Create SSH keys.
-  - `ssh-keygen -t ed25519 -f ~/.ssh/<user>-<machine>_ed25519`
-- Update `~/.ssh/config`.
-
-  ```bash
-  Host <user>-<machine>
-    HostName 198.19.249.136 # From OrbStack
-    Port 2222
-    User nfu
-    IdentityFile ~/.ssh/<user>-<machine>_ed25519
-    ForwardAgent yes
-    SendEnv TERM_PROGRAM
-    SendEnv DISPLAY
-  ```
-
-### Do NOT Use Docker Swarm Mode for Development Containers
+## Do NOT Use Docker Swarm Mode for Development Containers
 
 - Docker swarm mode should not be used for development containers.
 - Containers are recreated when host restarts.
@@ -140,6 +101,16 @@ g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
   - `./.devcontainer/stack-build.sh -e dev`.
   - `./.devcontainer/stack-deploy.sh -e dev`.
 - Instead, use `docker compose build` and `docker compose up`.
+
+## Post Setup Configuration
+
+- Transition `claude` to local install: `yes | pnpm claude migrate-installer`.
+- Login to `claude`: `claude`, then follow steps.
+- Login to `gh`: `gh auth login`, then follow steps.
+- Login to `Copilot` in Neovim, for shadow-text, i.e. smart auto-complete:
+  - `nvim`
+  - `:Copilot auth`
+  - Follow steps
 
 ## Install and Run Pre-Commit Hooks
 
