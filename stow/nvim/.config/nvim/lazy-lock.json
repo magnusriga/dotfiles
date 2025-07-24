@@ -11,7 +11,7 @@
   "conform.nvim": { "branch": "master", "commit": "973f3cb73887d510321653044791d7937c7ec0fa" },
   "copilot.lua": { "branch": "master", "commit": "14bf786180b2ca4578915c56989b6d676dddc6f3" },
   "friendly-snippets": { "branch": "main", "commit": "572f5660cf05f8cd8834e096d7b4c921ba18e175" },
-  "fzf-lua": { "branch": "main", "commit": "cdfac04b264cd924173e7f63a00b4883e2b98564" },
+  "fzf-lua": { "branch": "main", "commit": "262a22d43e343c47ca92bf870d83ffd5a7561183" },
   "gitsigns.nvim": { "branch": "main", "commit": "1fcaddcc427ff5802b6602f46de37a5352d0f9e0" },
   "grug-far.nvim": { "branch": "main", "commit": "45981a9af7f4e666a3cdaedb1d21d2ab926727a2" },
   "kulala.nvim": { "branch": "main", "commit": "6b6e1c8b538cce6654cfc5fb3e4a3acfa316ce57" },

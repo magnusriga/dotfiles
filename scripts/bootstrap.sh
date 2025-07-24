@@ -242,10 +242,18 @@ function doIt() {
     # ==========================================================
 
     # ==========================================================
+    # Run post-setup script.
+    # ==========================================================
+    if [ -f "./post_setup.sh" ]; then
+      echo "Running: . ./post_setup.sh."
+      . ./post_setup.sh
+    fi
+
+    # ==========================================================
     # Success messages and changing directory to $HOME.
     # ==========================================================
     echo "Installations and setup now done, restart shell to start using ZSH."
-    echo "Manually delete existing user and its home folder, if desired."
+    echo "Next: Manually authenticate tools, including gh auth login, :Copilot auth in nvim, and claude."
     cd "$HOME" || return
   fi
 }
