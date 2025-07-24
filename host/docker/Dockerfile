@@ -20,7 +20,7 @@ ARG DISTRO=arch
 ARG TARGETARCH
 ARG ARCH_IMAGE_AMD64=archlinux:latest
 ARG ARCH_IMAGE_ARM64=menci/archlinuxarm
-ARG UBUNTU_IMAGE=ubuntu:devel
+ARG UBUNTU_IMAGE=ubuntu:rolling
 
 # ================================================
 # Stage 1: Build environment with dotfiles.
