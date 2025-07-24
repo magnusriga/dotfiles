@@ -70,7 +70,7 @@ RUN set -ex; \
   apt-get update && \
   apt-get install -y sudo git locales openssh-server curl unminimize && \
   locale-gen en_US.UTF-8 && \
-  yes | unminimize && \
+  echo "y" | unminimize || true && \
   apt-get clean && \
   rm -rf /var/lib/apt/lists/*; \
   else \
