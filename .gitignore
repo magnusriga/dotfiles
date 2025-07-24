@@ -12,3 +12,8 @@ Thumbs.db
 # Files that might appear on external disks.
 .Spotlight-V100
 .Trashes
+
+# Zsh compiled files and cache
+.zcompdump
+.zcompdump-*
+*.zwc
