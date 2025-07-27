@@ -116,21 +116,26 @@ services:
       # - In this case, workspace is not installed or copied into container, it is only bind mounted,
       #   including `node_modules`.
       # - Thus, container immediately gets all files from host (source path below).
+      # Bind mount `nfront`.
       - type: bind
         source: ~/nfront
         target: /home/nfu/nfront
-      # Bind mount dotfiles for development and configuration access.
+      # Bind mount `dotfiles`.
       - type: bind
         source: ../..
         target: /home/nfu/dotfiles
-      # Bind mount video-scraper for development access.
+      # Bind mount `video-scraper`.
       - type: bind
         source: ~/video-scraper
         target: /home/nfu/video-scraper
-      # Bind mount Downloads folder for file access.
+      # Bind mount `Downloads`, for AI to read screenshots.
       - type: bind
         source: ~/Downloads
         target: /host/downloads
+      # Bind mount `notes`.
+      - type: bind
+        source: ~/Documents/Documents/Notes/vaults
+        target: /home/nfu/notes/vaults
       # Forward the Docker socket by mounting it in the container using the mounts property.
       - type: bind
         source: /var/run/docker.sock
