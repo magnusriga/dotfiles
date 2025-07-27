@@ -137,6 +137,9 @@ if [ ! -d "$BUILD_HOME" ]; then
   mkdir -p "$BUILD_HOME/makepkglogs"
 fi
 
+export NOTES_HOME="${NOTES_HOME:-$HOME/notes/vaults}"
+[ ! -d "$NOTES_HOME" ] && mkdir -p "$NOTES_HOME"
+
 # For `makepkg` configuration: `$HOME/.config/pacman/makepkg.conf`.
 # Pacman configuration must be placed separately in: `/etc/pacman.conf`.
 export PACMAN_HOME="${PACMAN_HOME:-${XDG_CONFIG_HOME:-$HOME/.config}/pacman}"
