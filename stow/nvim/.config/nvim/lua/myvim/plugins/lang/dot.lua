@@ -33,12 +33,13 @@ return {
   },
 
   -- `shellcheck`: Linting for shell scripts.
+  -- `shfmt`: Used by `bashls` for formatting.
   {
     "mason-org/mason.nvim",
     opts = function(_, opts)
       -- Uses custom `ensure_installed`, see: `plugins/mason.lua`.
       opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "shellcheck" })
+      vim.list_extend(opts.ensure_installed, { "shellcheck", "shfmt" })
     end,
   },
 
