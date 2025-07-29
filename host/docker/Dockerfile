@@ -81,14 +81,16 @@ RUN set -ex; \
 # ================================================
 # Install Docker Compose.
 # ================================================
-RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/compose/releases/latest" | grep -o -P '(?<="tag_name": ").+(?=")') \
-  && case "${TARGETARCH}" in \
-  "amd64") COMPOSE_ARCH="x86_64" ;; \
-  "arm64") COMPOSE_ARCH="aarch64" ;; \
-  *) COMPOSE_ARCH="$(uname -m)" ;; \
-  esac \
-  && curl -sSL "https://github.com/docker/compose/releases/download/${LATEST_COMPOSE_VERSION}/docker-compose-$(uname -s)-${COMPOSE_ARCH}" -o /usr/local/bin/docker-compose \
-  && chmod +x /usr/local/bin/docker-compose
+# - Note: This installs `docker-compose` binary, not `docker compose` plugin.
+# - Prefer `docker compose`, installed in `setup_packages.sh`.
+# RUN LATEST_COMPOSE_VERSION=$(curl -sSL "https://api.github.com/repos/docker/compose/releases/latest" | grep -o -P '(?<="tag_name": ").+(?=")') \
+#   && case "${TARGETARCH}" in \
+#   "amd64") COMPOSE_ARCH="x86_64" ;; \
+#   "arm64") COMPOSE_ARCH="aarch64" ;; \
+#   *) COMPOSE_ARCH="$(uname -m)" ;; \
+#   esac \
+#   && curl -sSL "https://github.com/docker/compose/releases/download/${LATEST_COMPOSE_VERSION}/docker-compose-$(uname -s)-${COMPOSE_ARCH}" -o /usr/local/bin/docker-compose \
+#   && chmod +x /usr/local/bin/docker-compose
 
 # ================================================
 # Create new group and user, and add user to sudoers file.

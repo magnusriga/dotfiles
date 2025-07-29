@@ -98,6 +98,15 @@ function setup_ubuntu_repositories() {
   wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg --yes
   echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
+  # Docker Engine (following https://docs.docker.com/engine/install/ubuntu/)
+  sudo install -m 0755 -d /etc/apt/keyrings
+  sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  sudo chmod a+r /etc/apt/keyrings/docker.asc
+  echo \
+    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+    $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |
+    sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+
   # Update package lists
   sudo apt-get update
 }
@@ -217,7 +226,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
   sudo apt-get update && sudo apt-get upgrade -y
 
   # Install packages needed to update repositories.
-  sudo apt-get install -y gnupg wget software-properties-common apt-transport-https
+  sudo apt-get install -y gnupg wget curl software-properties-common apt-transport-https ca-certificates
 
   # Setup repositories.
   setup_ubuntu_repositories
@@ -245,7 +254,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     iproute2 iputils-ping \
     netcat-openbsd \
     cron \
-    docker.io docker-buildx docker-compose \
+    docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin \
     gh \
     snapd \
     fd-find \
