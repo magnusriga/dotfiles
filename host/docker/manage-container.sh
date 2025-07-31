@@ -254,7 +254,9 @@ print_info "Host architecture: $HOST_ARCH -> Docker TARGETARCH: $TARGETARCH"
 VERBOSE=false
 PUSH_IMAGE=false
 PROGRESS_FLAG=(--progress plain)
+ACTION=""
 
+# First pass: Parse all options
 while getopts "hbdurslct:vp" opt; do
   case ${opt} in
   h)
@@ -263,93 +265,25 @@ while getopts "hbdurslct:vp" opt; do
     Exit 0 || return 0
     ;;
   b)
-    # Build Docker image.
-    # Ensure `dotfiles`, `nfront`, and `video-scraper` repositories are up to date.
-    if ! ensure_repo "dotfiles" "$HOME/dotfiles" "git@github.com:magnusriga/dotfiles.git"; then
-      Exit 1 || return 1
-    fi
-    if ! ensure_repo "nfront" "$HOME/nfront" "git@github.com:magnusriga/nfront.git"; then
-      Exit 1 || return 1
-    fi
-    if ! ensure_repo "video-scraper" "$HOME/video-scraper" "git@github.com:magnusriga/video-scraper.git"; then
-      Exit 1 || return 1
-    fi
-
-    if [[ "$VERBOSE" == "true" ]]; then
-      PROGRESS_FLAG=(--progress plain)
-      print_step "Building Docker image with verbose output for distribution: ${DISTRO:-arch}"
-    else
-      print_step "Building Docker image for distribution: ${DISTRO:-arch}"
-    fi
-
-    if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" build --no-cache; then
-      print_info "Build completed successfully!"
-
-      # Show image info.
-      print_info "Image details:"
-      docker images "127.0.0.1:5000/nfront-dev" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
-
-      # Push if requested.
-      if [[ "$PUSH_IMAGE" == "true" ]]; then
-        print_step "Pushing image to registry..."
-        if docker push "127.0.0.1:5000/nfront-dev"; then
-          print_info "Push completed successfully!"
-        else
-          print_error "Push failed!"
-          Exit 1 || return 1
-        fi
-      fi
-
-      # Prepare containers
-      finalize_container
-    else
-      print_error "Build failed!"
-      Exit 1 || return 1
-    fi
+    ACTION="build"
     ;;
   d)
-    # Stop containers.
-    print_step "Taking down docker container."
-    if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" down; then
-      print_info "Container stopped successfully."
-    else
-      print_error "Failed to stop container."
-    fi
+    ACTION="down"
     ;;
   u)
-    # Start docker containers.
-    print_step "Starting docker containers for distribution: ${DISTRO:-arch}"
-    if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" up -d; then
-      print_info "Container started successfully."
-    else
-      print_error "Failed to start container."
-    fi
+    ACTION="up"
     ;;
   r)
-    # Restart containers.
-    print_step "Restarting docker containers."
-    if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" restart; then
-      print_info "Container restarted successfully."
-    else
-      print_error "Failed to restart container."
-    fi
+    ACTION="restart"
     ;;
   s)
-    # Enter container shell.
-    print_step "Entering container with zsh login shell..."
-    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec -e TERM -e DISPLAY nfront zsh -l
+    ACTION="shell"
     ;;
   l)
-    # Show container logs.
-    print_step "Showing container logs..."
-    # shellcheck disable=SC2068,SC2086
-    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" logs -f nfront
+    ACTION="logs"
     ;;
   c)
-    # Show container status.
-    print_info "Container status:"
-    # shellcheck disable=SC2068,SC2086
-    docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" ps
+    ACTION="status"
     ;;
   t)
     # Set distribution
@@ -364,6 +298,7 @@ while getopts "hbdurslct:vp" opt; do
   v)
     # Enable verbose output
     VERBOSE=true
+    PROGRESS_FLAG=(--progress plain)
     print_info "Verbose output enabled."
     ;;
   p)
@@ -383,6 +318,98 @@ while getopts "hbdurslct:vp" opt; do
     ;;
   esac
 done
+
+# Second pass: Execute the action
+case ${ACTION} in
+build)
+  # Build Docker image.
+  # Ensure `dotfiles`, `nfront`, and `video-scraper` repositories are up to date.
+  if ! ensure_repo "dotfiles" "$HOME/dotfiles" "git@github.com:magnusriga/dotfiles.git"; then
+    Exit 1 || return 1
+  fi
+  if ! ensure_repo "nfront" "$HOME/nfront" "git@github.com:magnusriga/nfront.git"; then
+    Exit 1 || return 1
+  fi
+  if ! ensure_repo "video-scraper" "$HOME/video-scraper" "git@github.com:magnusriga/video-scraper.git"; then
+    Exit 1 || return 1
+  fi
+
+  if [[ "$VERBOSE" == "true" ]]; then
+    print_step "Building Docker image with verbose output for distribution: ${DISTRO:-arch}"
+  else
+    print_step "Building Docker image for distribution: ${DISTRO:-arch}"
+  fi
+
+  if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" build --no-cache; then
+    print_info "Build completed successfully!"
+
+    # Show image info.
+    print_info "Image details:"
+    docker images "127.0.0.1:5000/nfront-dev" --format "table {{.Repository}}\t{{.Tag}}\t{{.Size}}\t{{.CreatedAt}}"
+
+    # Push if requested.
+    if [[ "$PUSH_IMAGE" == "true" ]]; then
+      print_step "Pushing image to registry..."
+      if docker push "127.0.0.1:5000/nfront-dev"; then
+        print_info "Push completed successfully!"
+      else
+        print_error "Push failed!"
+        Exit 1 || return 1
+      fi
+    fi
+
+    # Prepare containers
+    finalize_container
+  else
+    print_error "Build failed!"
+    Exit 1 || return 1
+  fi
+  ;;
+down)
+  # Stop containers.
+  print_step "Taking down docker container."
+  if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" down; then
+    print_info "Container stopped successfully."
+  else
+    print_error "Failed to stop container."
+  fi
+  ;;
+up)
+  # Start docker containers.
+  print_step "Starting docker containers for distribution: ${DISTRO:-arch}"
+  if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" up -d; then
+    print_info "Container started successfully."
+  else
+    print_error "Failed to start container."
+  fi
+  ;;
+restart)
+  # Restart containers.
+  print_step "Restarting docker containers."
+  if docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" restart; then
+    print_info "Container restarted successfully."
+  else
+    print_error "Failed to restart container."
+  fi
+  ;;
+shell)
+  # Enter container shell.
+  print_step "Entering container with zsh login shell..."
+  docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" exec -e TERM -e DISPLAY nfront zsh -l
+  ;;
+logs)
+  # Show container logs.
+  print_step "Showing container logs..."
+  # shellcheck disable=SC2068,SC2086
+  docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" logs -f nfront
+  ;;
+status)
+  # Show container status.
+  print_info "Container status:"
+  # shellcheck disable=SC2068,SC2086
+  docker compose "${PROGRESS_FLAG[@]}" --project-name nfront_devcontainer -f "${ROOTDIR}/docker-compose.yml" ps
+  ;;
+esac
 
 # List docker containers.
 docker ps -a
