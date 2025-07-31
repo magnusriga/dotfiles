@@ -193,6 +193,7 @@ if [ "$DISTRO" = "arch" ]; then
     dav1d dav1d-doc \
     rrdtool \
     valkey \
+    redis \
     vulkan-driver \
     freeglut \
     libnotify \
@@ -261,6 +262,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     poppler-utils poppler-data \
     libharfbuzz-bin \
     librrd-dev \
+    redis-tools \
     vulkan-tools \
     freeglut3-dev \
     libnotify-bin \
