@@ -92,6 +92,8 @@ services:
       # Also forward `2224` for copy/paste functionality with `netcat`.
       - target: 2224
         published: 2224
+      - target: 5544
+        published: 5555
     # depends_on:
     #   # depends_on is ignored when deploying stack in swarm mode with version 3 Compose file.
     #   db:
