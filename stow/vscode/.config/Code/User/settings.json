@@ -1018,6 +1018,8 @@
     // "**/*.zsh-theme": true
   },
   "makefile.configureOnOpen": true,
+  "chat.mcp.autostart": "newAndOutdated",
+  "chat.editing.confirmEditRequestRetry": false,
 }
 // ============================================================
 // USER SETTINGS: settings.json

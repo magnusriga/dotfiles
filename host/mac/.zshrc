@@ -97,3 +97,14 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+alias claude="/Users/magnus/.claude/local/claude"
+
+# bun completions
+[ -s "/Users/magnus/.bun/_bun" ] && source "/Users/magnus/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+. "$HOME/.local/bin/env"

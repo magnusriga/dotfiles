@@ -33,7 +33,8 @@ function install_global_packages() {
     yarn \
     mcp-hub@latest \
     @mermaid-js/mermaid-cli \
-    @anthropic-ai/claude-code
+    @anthropic-ai/claude-code \
+    @openai/codex
 }
 
 # Necessary?
@@ -59,6 +60,10 @@ install_global_packages
 
 # Clean up function
 unset install_global_packages
+
+# Install Playwright and its dependencies, including browser binaries.
+pnpm install --save-dev @playwright/test@latest
+pnpm exec playwright install --with-deps
 
 # Migrate to local `claude` installation.
 # Note: Run 'claude migrate-installer' manually if needed
