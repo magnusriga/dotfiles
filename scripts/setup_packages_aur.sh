@@ -293,9 +293,11 @@ cd "$CWD" || exit
 # NOTE: Do not use `sudo` with `yay`.
 # `-u`: Ugrade all installed packages, both from official repositories and AUR.
 # `-a`: Ugrade only AUR packages.
-echo 'Done with aur installs.'
+echo 'Done with aur installs, proceding with yay.'
 # echo 'done with aur installs, executing: yay -Sua'
 # yay -Sua
+yay -Sy catppuccin-gtk-theme-mocha \
+  zen-browser-bin
 
 # ==================================
 # `paru`: Install AUR packages.

@@ -181,6 +181,17 @@ if [ "$DISTRO" = "arch" ]; then
     ctags \
     openssh \
     iproute2 iputils \
+    ttf-font-awesome \
+    ttf-jetbrains-mono-nerd \
+    ttf-cascadia-code-nerd \
+    hyprland hyprpaper hypridle hyprlock \
+    hyprshot hyprpicker \
+    nwg-look \
+    waybar \
+    wofi \
+    swaync \
+    kitty \
+    firefox \
     netcat \
     cronie \
     docker docker-buildx docker-compose \

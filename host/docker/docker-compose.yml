@@ -85,10 +85,10 @@ services:
       # However, in dev mode we only want one replica anyways, so OK to set published (host) port.
       # Makes life easier, as we can save URL as fixed browser bookmark.
       - target: 3000
-        published: 3000
+        published: 4000
       # Forward port 3001 for additional services
       - target: 3001
-        published: 3001
+        published: 4001
       # Also forward `2224` for copy/paste functionality with `netcat`.
       - target: 2224
         published: 2224

@@ -79,6 +79,21 @@ if [ ! -d "$VSCODE_HOME" ]; then
   mkdir -p "$VSCODE_HOME/User"
 fi
 
+export HYPR_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/hypr"
+if [ ! -d "$HYPR_HOME" ]; then
+  mkdir -p "$HYPR_HOME"
+fi
+
+export WOFI_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/wofi"
+if [ ! -d "$WOFI_HOME" ]; then
+  mkdir -p "$WOFI_HOME"
+fi
+
+export WAYBAR_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/waybar"
+if [ ! -d "$WAYBAR_HOME" ]; then
+  mkdir -p "$WAYBAR_HOME"
+fi
+
 # Directory for delta repo, with themes.
 # No need, let git clone create directory.
 # export DELTA_HOME="${XDG_CONFIG_HOME:-$HOME/.config}/delta"
