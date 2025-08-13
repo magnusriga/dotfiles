@@ -59,4 +59,9 @@ if [ ! -e "/etc/sudoers.d/$USERNAME" ] || ! sudo grep -iFq "User_Alias NEW_ADMIN
 fi
 
 # Add user to docker group, to allow running docker commands without sudo.
-sudo usermod -aG docker "${USERNAME}"
+if getent group docker >/dev/null 2>&1; then
+  sudo usermod -aG docker "${USERNAME}"
+  echo "Added ${USERNAME} to docker group."
+else
+  echo "Docker group does not exist, skipping docker group assignment."
+fi
