@@ -1,6 +1,31 @@
 #!/usr/bin/env bash
 
+# ==========================================================
+# Parse command line arguments
+# ==========================================================
+TARGET_USERNAME="nfu"  # Default username
+FORCE_FLAG=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -u)
+      TARGET_USERNAME="$2"
+      shift 2
+      ;;
+    --force|-f)
+      FORCE_FLAG="true"
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: $0 [-u username] [--force|-f]"
+      return 1
+      ;;
+  esac
+done
+
 echo "Running bootstrap.sh as $(whoami), with HOME $HOME and USER $USER."
+echo "Target username: $TARGET_USERNAME"
 
 # ==========================================================
 # Setup Script Overview.
@@ -148,10 +173,10 @@ function doIt() {
   fi
 
   # ==========================================================
-  # Run remaining setup scripts as new user.
-  # Switch manually to new user, before running this file again.
+  # Run remaining setup scripts as target user.
+  # Switch manually to target user, before running this file again.
   # ==========================================================
-  if [ "$(whoami)" = "nfu" ] && [ -f "./setup_main.sh" ]; then
+  if [ "$(whoami)" = "$TARGET_USERNAME" ] && [ -f "./setup_main.sh" ]; then
     # Remove `/usr/local/share/man`, which symlinks to empty `/usr/local/man` on Arch Linux,
     # as it blocks `setup_packages_manual.sh` > `stow nvim`.
     sudo rm -rf /usr/local/share/man
@@ -258,7 +283,7 @@ function doIt() {
   fi
 }
 
-if [ "$1" = "--force" ] || [ "$1" = "-f" ]; then
+if [ "$FORCE_FLAG" = "true" ]; then
   doIt
 else
   read -r -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1
