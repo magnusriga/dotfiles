@@ -580,25 +580,4 @@ source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-h
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# Add pnpm to `PATH`.
-# Already done in `~/.path`, loaded from `~/.profile`, thus not needed here.
-# export PNPM_HOME="/home/nfu/.local/share/pnpm"
-# case ":$PATH:" in
-#   *":$PNPM_HOME:"*) ;;
-#   *) export PATH="$PNPM_HOME:$PATH" ;;
-# esac
-# pnpm end
-
-# Load `bun` completions.
-# Already done in `~/.profile`, thus not needed here.
-# [ -s "/home/nfu/.bun/_bun" ] && source "/home/nfu/.bun/_bun"
-
-# pnpm
-export PNPM_HOME="/home/nfu/.local/share/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
-alias claude="/home/nfu/.claude/local/claude"
+alias claude="$HOME/.claude/local/claude"
