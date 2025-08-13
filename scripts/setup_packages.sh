@@ -191,7 +191,7 @@ if [ "$DISTRO" = "arch" ]; then
     wofi \
     swaync \
     kitty \
-    thunar \
+    nautilus \
     firefox \
     netcat \
     cronie \
