@@ -221,12 +221,17 @@ function doIt() {
     stow -vv -d "$SCRIPTPATH"/../stow -t "$HOME" *
 
     # ==========================================================
-    # Sart `sshd` with `systemd`, when not in Docker.
+    # Start `sshd` with `systemd`, when not in Docker.
     # ==========================================================
     if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
       echo "Starting, enabling (on boot), and re-starting, sshd service with systemd."
       sudo systemctl start sshd
-      sudo systemctl enable ssh
+      # Enable SSH service - service name differs between distros
+      if [ -f /etc/arch-release ]; then
+        sudo systemctl enable sshd  # Arch uses 'sshd'
+      else
+        sudo systemctl enable ssh   # Ubuntu/Debian uses 'ssh'
+      fi
       sudo systemctl reload sshd  # Keep running, reload config files.
       sudo systemctl restart sshd # Start + stop, safer than reload.
     fi

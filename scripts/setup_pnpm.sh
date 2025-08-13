@@ -63,7 +63,18 @@ unset install_global_packages
 
 # Install Playwright and its dependencies, including browser binaries.
 pnpm install --save-dev @playwright/test@latest
-pnpm exec playwright install --with-deps
+
+# Install Playwright browsers - handle dependencies differently per distro
+if [ -f /etc/arch-release ]; then
+  echo "Installing Playwright browsers on Arch (system deps should be installed via pacman)..."
+  # On Arch, system deps like chromium libs should be installed via pacman
+  # Just install the browser binaries without system deps
+  pnpm exec playwright install
+else
+  echo "Installing Playwright browsers with system dependencies on Ubuntu/Debian..."
+  # On Ubuntu/Debian, let Playwright install system deps via apt
+  pnpm exec playwright install --with-deps
+fi
 
 # Migrate to local `claude` installation.
 # Note: Run 'claude migrate-installer' manually if needed
