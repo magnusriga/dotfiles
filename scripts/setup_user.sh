@@ -11,8 +11,16 @@
 
 # New user details.
 export USERNAME="nfu"
-export USER_UID="1000"
-export USER_GID=$USER_UID
+
+# Check if UID 1000 or GID 1000 exists, if so use 1001 for both
+if id -u 1000 >/dev/null 2>&1 || getent group 1000 >/dev/null 2>&1; then
+  export USER_UID="1001"
+  export USER_GID="1001"
+else
+  export USER_UID="1000"
+  export USER_GID="1000"
+fi
+
 GROUPNAME=$USERNAME
 PASSWORD=$USERNAME
 
