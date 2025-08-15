@@ -62,8 +62,8 @@ fi
 #   - Thus, `dog` available everywhere, except in Docker.
 # ================================================
 if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
-  echo "Not in container, installing dog via snap."
-  sudo snap install dog
+  echo "Not in container, installing snap packages."
+  sudo snap install dog spotify
 fi
 
 # ================================================

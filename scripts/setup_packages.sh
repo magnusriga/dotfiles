@@ -193,6 +193,7 @@ if [ "$DISTRO" = "arch" ]; then
     kitty \
     nautilus \
     firefox \
+    brightnessctl \
     netcat \
     cronie \
     docker docker-buildx docker-compose \

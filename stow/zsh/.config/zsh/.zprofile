@@ -119,5 +119,9 @@
 # Source the environment variables and other login-time settings (e.g. ssh-agent) from .profile.
 # Only runs when a login shell is opened (i.e. the first zsh terminal opened after starting vscdoe).
 # ================================================================
-[[ -n "$SHELL_DEBUG" ]] && echo "Running .zprofile, about to source .profile..."
-source ~/.profile
+# Check if .profile hasn't been sourced already (from .zshenv for non-login shells)
+if [ -z "$ZSH_PROFILE_SOURCED" ]; then
+  [[ -n "$SHELL_DEBUG" ]] && echo "Running .zprofile, about to source .profile..."
+  source ~/.profile
+  export ZSH_PROFILE_SOURCED=1
+fi

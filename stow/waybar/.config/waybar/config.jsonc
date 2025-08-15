@@ -2,7 +2,7 @@
   "position": "top",
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["hyprland/window"],
-  "modules-right": ["network", "pulseaudio", "battery", "clock"],
+  "modules-right": ["custom/settings", "network", "pulseaudio", "battery", "clock"],
   "clock": {
     "format": "<span foreground='#f5c2e7'>   </span>{:%a %d %H:%M}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
@@ -23,11 +23,15 @@
     "tooltip-format": "{time}"
   },
   "network": {
+    "interface": "wlan0",
     "format-wifi": "<span size='13000' foreground='#f5e0dc'>  </span>{essid}",
     "format-ethernet": "<span size='13000' foreground='#f5e0dc'>󰤭  </span>{ifname}",
     "format-linked": "{ifname} (No IP) ",
     "format-disconnected": "<span size='13000' foreground='#f5e0dc'>  </span>Disconnected",
-    "tooltip-format-wifi": "Signal Strenght: {signalStrength}%"
+    "format-disabled": "<span size='13000' foreground='#f5e0dc'>  </span>Disabled",
+    "tooltip-format-wifi": "Signal Strength: {signalStrength}% | {ipaddr}",
+    "tooltip-format-ethernet": "{ifname}: {ipaddr}",
+    "interval": 5
   },
   "pulseaudio": {
       "format": "{icon}  {volume}%",
@@ -36,5 +40,12 @@
           "default": ["", "", " "]
       },
       "on-click": "pavucontrol"
+  },
+  "custom/settings": {
+      "format": "󰒓",
+      "tooltip": true,
+      "tooltip-format": "System Settings",
+      "on-click": "/home/magnus/.config/waybar/scripts/settings-menu.sh",
+      "interval": "once"
   }
 }
