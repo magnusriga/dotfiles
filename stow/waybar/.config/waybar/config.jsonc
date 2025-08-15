@@ -42,7 +42,7 @@
       "on-click": "pavucontrol"
   },
   "custom/settings": {
-      "format": "󰒓",
+      "format": " 󰒓 ",
       "tooltip": true,
       "tooltip-format": "System Settings",
       "on-click": "/home/magnus/.config/waybar/scripts/settings-menu.sh",
