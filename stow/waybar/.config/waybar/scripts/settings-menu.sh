@@ -42,7 +42,9 @@ case $chosen in
     fi
     ;;
   "󰍁  Display Settings")
-    if command -v wdisplays &> /dev/null; then
+    if command -v nwg-displays &> /dev/null; then
+      nwg-displays &
+    elif command -v wdisplays &> /dev/null; then
       wdisplays &
     elif command -v arandr &> /dev/null; then
       arandr &

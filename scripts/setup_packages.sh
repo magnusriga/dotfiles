@@ -194,6 +194,8 @@ if [ "$DISTRO" = "arch" ]; then
     nautilus \
     firefox \
     brightnessctl \
+    pavucontrol \
+    nwg-displays \
     netcat \
     cronie \
     docker docker-buildx docker-compose \
