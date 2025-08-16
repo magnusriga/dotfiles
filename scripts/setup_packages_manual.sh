@@ -327,6 +327,25 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # ================================================
+# Install Sequoia SDDM theme.
+# ================================================
+PACKAGE="sddm-sequoia"
+THEME_URL="https://github.com/WillPower3309/sddm-sequoia/archive/refs/heads/master.zip"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+mkdir -p "$TMPDIR/$PACKAGE"
+curl -Lo "$TMPDIR/$PACKAGE.zip" "$THEME_URL"
+unzip -q "$TMPDIR/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
+# Create themes directory if it doesn't exist
+sudo mkdir -p /usr/share/sddm/themes
+# Remove old installation if exists
+sudo rm -rf /usr/share/sddm/themes/sequoia
+# Move theme to final location
+sudo mv "$TMPDIR/$PACKAGE/sddm-sequoia-master" /usr/share/sddm/themes/sequoia
+# Set permissions
+sudo chmod -R 755 /usr/share/sddm/themes/sequoia
+echo "Sequoia SDDM theme installed to /usr/share/sddm/themes/sequoia"
+
+# ================================================
 # Install Stow (needs `autoconf` pre-installed).
 # Use `pacman -Syu stow` instead.
 # ================================================

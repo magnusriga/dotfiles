@@ -1,0 +1,75 @@
+/**
+ * - Define quick links for `waybar` here.
+ * - Use icons from: https://fontawesome.com/search?ic=free.
+ * - Reload waybar with: SUPER + SHIFT + B.
+ */
+{
+  "custom/quicklink_browser": {
+    "format": "",
+    "on-click": "firefox",
+    "tooltip-format": "Open Browser"
+  },
+
+  "custom/quicklink_calculator": {
+    "format": "",
+    "on-click": "gnome-calculator",
+    "tooltip-format": "Open calculator"
+  },
+
+  "custom/quicklink_chromium": {
+    "format": "",
+    "on-click": "chromium",
+    "tooltip-format": "Open Chromium"
+  },
+
+  "custom/quicklink_edge": {
+    "format": "",
+    "on-click": "edge",
+    "tooltip-format": "Open Edge"
+  },
+
+  "custom/quicklink_email": {
+    "format": "",
+    "on-click": "evolution",
+    "tooltip-format": "Open Email Client"
+  },
+
+  "custom/quicklink_filemanager": {
+    "format": "",
+    "on-click": "nautilut --new-window",
+    "tooltip-format": "Open Filemanager"
+  },
+
+  "custom/quicklink_firefox": {
+    "format": "",
+    "on-click": "firefox",
+    "tooltip-format": "Open Firefox"
+  },
+
+  "custom/quicklink_thunderbird": {
+    "format": "",
+    "on-click": "thunderbird",
+    "tooltip-format": "Open Thunderbird"
+  },
+
+  /**
+   * Do not remove `quicklinkempty`.
+   */
+  "custom/quicklinkempty": {},
+
+  /**
+   * Add quicklinks in desired order.
+   */
+  "group/quicklinks": {
+    "modules": [
+      "custom/quicklink_browser",
+      "custom/quicklink_email",
+      "custom/quicklink_filemanager",
+      /**
+       * Do not remove `quicklinkempty`.
+       */
+      "custom/quicklinkempty"
+    ],
+    "orientation": "horizontal"
+  }
+}

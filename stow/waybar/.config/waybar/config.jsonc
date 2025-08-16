@@ -1,57 +1,66 @@
+// __        __          _
+// \ \      / /_ _ _   _| |__   __ _ _ __
+//  \ \ /\ / / _` | | | | '_ \ / _` | '__|
+//   \ V  V / (_| | |_| | |_) | (_| | |
+//    \_/\_/ \__,_|\__, |_.__/ \__,_|_|
+//                 |___/
+//
+// by MRG
+// -----------------------------------------------------
+//
 {
-  "position": "top",
-  "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["hyprland/window"],
-  "modules-right": ["tray", "custom/settings", "network", "pulseaudio", "battery", "clock"],
-  "clock": {
-    "format": "<span foreground='#f5c2e7'>   </span>{:%a %d %H:%M}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
-  },
-  "battery": {
-    "states": {
-      "warning": 30,
-      "critical": 15
-    },
-    "format": "<span size='13000' foreground='#a6e3a1'>{icon} </span> {capacity}%",
-    "format-warning": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {capacity}%",
-    "format-critical": "<span size='13000' foreground='#E38C8F'>{icon} </span> {capacity}%",
-    "format-charging": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-plugged": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-alt": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {time}",
-    "format-full": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-icons": ["", "", "", "", ""],
-    "tooltip-format": "{time}"
-  },
-  "network": {
-    "interface": "wlan0",
-    "format-wifi": "<span size='13000' foreground='#f5e0dc'>  </span>{essid}",
-    "format-ethernet": "<span size='13000' foreground='#f5e0dc'>󰤭  </span>{ifname}",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "<span size='13000' foreground='#f5e0dc'>  </span>Disconnected",
-    "format-disabled": "<span size='13000' foreground='#f5e0dc'>  </span>Disabled",
-    "tooltip-format-wifi": "Signal Strength: {signalStrength}% | {ipaddr}",
-    "tooltip-format-ethernet": "{ifname}: {ipaddr}",
-    "on-click": "hyprctl keyword windowrulev2 'float,class:(com.mitchellh.ghostty),title:(NetworkManager)' && hyprctl keyword windowrulev2 'center,class:(com.mitchellh.ghostty),title:(NetworkManager)' && hyprctl keyword windowrulev2 'size 1100 700,class:(com.mitchellh.ghostty),title:(NetworkManager)' && ghostty --title='NetworkManager' -e /home/magnus/.config/waybar/scripts/nmtui-with-scan.sh && hyprctl keyword windowrulev2 'unset,class:(com.mitchellh.ghostty),title:(NetworkManager)' &",
-    "interval": 5
-  },
-  "pulseaudio": {
-      "format": "{icon}  {volume}%",
-      "format-muted": "",
-      "format-icons": {
-          "default": ["", "", " "]
-      },
-      "on-click": "pavucontrol"
-  },
-  "custom/settings": {
-      "format": " 󰒓 ",
-      "tooltip": true,
-      "tooltip-format": "System Settings",
-      "on-click": "/home/magnus/.config/waybar/scripts/settings-menu.sh",
-      "interval": "once"
-  },
-  "tray": {
-      "icon-size": 22,
-      "spacing": 8,
-      "show-passive-items": true
-  }
+  // General Settings
+  "layer": "top",
+  "margin-top": 0,
+  "margin-bottom": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+  "spacing": 0,
+
+  // Load Modules
+  "include": [
+    "~/.config/waybar/modules/waybar-quicklinks.jsonc",
+    "~/.config/waybar/modules/main.jsonc"
+  ],
+
+  // Modules Left
+  "modules-left": [
+    "custom/appmenu",
+    "hyprland/workspaces",
+    "group/links",
+    //"wlr/taskbar",
+    "group/quicklinks",
+    "custom/empty"
+  ],
+  // "modules-left": ["hyprland/workspaces"],
+
+  // Modules Center
+  "modules-center": ["hyprland/window", "custom/empty"],
+  // "modules-center": ["hyprland/window"],
+
+  // Modules Right
+  "modules-right": [
+    // "custom/updates",
+    "pulseaudio",
+    //"backlight",
+    "bluetooth",
+    "network",
+    "battery",
+    "power-profiles-daemon",
+    "group/hardware",
+    "group/tools",
+    "tray",
+    "custom/notification",
+    "custom/exit",
+    // "custom/ml4w-welcome",
+    "clock"
+  ]
+  // "modules-right": [
+  //   "tray",
+  //   "custom/settings",
+  //   "network",
+  //   "pulseaudio",
+  //   "battery",
+  //   "clock"
+  // ]
 }

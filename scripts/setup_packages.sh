@@ -197,6 +197,8 @@ if [ "$DISTRO" = "arch" ]; then
     pavucontrol \
     nwg-displays \
     network-manager-applet \
+    qalculate-gtk \
+    sddm qt6-svg qt6-declarative \
     pasystray \
     wl-clipboard \
     cliphist \

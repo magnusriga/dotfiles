@@ -297,7 +297,10 @@ echo 'Done with aur installs, proceding with yay.'
 # echo 'done with aur installs, executing: yay -Sua'
 # yay -Sua
 yay -Syu --cleanafter --nodiffmenu --nocleanmenu --noconfirm catppuccin-gtk-theme-mocha \
-  zen-browser-bin
+  zen-browser-bin \
+  hyprshade \
+  wlogout \
+  sddm-sugar-candy-git
 
 # ==================================
 # `paru`: Install AUR packages.

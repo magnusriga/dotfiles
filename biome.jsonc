@@ -1,0 +1,183 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  /*
+   * =========================
+   * Biome Configuration Notes
+   * =========================
+   * - Tools:
+   *   - `formatter`
+   *   - `linter`
+   *   - `assist`
+   *
+   * - All tools are enabled by default, no need to set `enabled: true` for each.
+   *
+   * - `vcs` (Version Control System):
+   *   - Disabled by default.
+   *   - Enable: `enabled: true` + `clientKind: "git"`.
+   *   - Each functionality must be explicitly enabled.
+   *   - `useIgnoreFile: true`: Prevent Biome from operating on files in `.gitignore`.
+   *   - `defaultBranch: "main"` + `--changed` | `--staged`: Only operate on changes since last commmit.
+   *
+   * - `root`:
+   *   - Whether configuration file is root of project.
+   *   - Default: `true`.
+   *   - Set  to `false` in nested monorepo packages.
+   *
+   * - `linter` + `assist` enabled by default, for all languages:
+   *   - `javascript`
+   *   - `json`
+   *   - `css`
+   *   - `graphql`
+   *   - `grit`
+   *
+   * - `formatter` enabled by default for all languages, except:
+   *   - `css`
+   *   - `graphql`
+   *   - `grit`
+   *
+   * - Global `formatter` options:
+   *   - `indentStyle: "tab"`: Use spaces or tabs for indentation.
+   *   - `indentWidth: 2`: Number of spaces per indentation level.
+   *   - `lineWidth: 80`: Column widht at which Biome wraps lines.
+   *
+   * - Specify per-laguage`formatter` options, to:
+   *   - Override above defaults.
+   *   - Override global `formatter` options.
+   *   - Set language-specific `formatter` options, not available globally.
+   *
+   * - CLI:
+   *   - `biome format`: Format.
+   *   - `biome lint`: Format.
+   *   - `biome check`: Lint + Format + Assist, i.e. ALL tools.
+   *   - `biome ci`: Like `biome check`, but for CI environments.
+   *     - No `--write`.
+   *     - Control threads.
+   *     - Integrates with `GitHub Actions`, for better print output.
+   *   - `--write`: Write format | lint | assist changes to file.
+   *     - Without `--write`, Biome only reports changes / lint issues.
+   *
+   * - Assist options, in `assist.actions`:
+   *   - `organizeImports` (`javascript` only): Organize imports.
+   *   - `useSortedAttributes` (`javascript only`): Enforce ordering of JSX attributes.
+   *   - `useSortedKeys` (`json` only): Enforce ordering of object keys in JSON files.
+   *   - `useSortedProperties` (`css` only): Enforce ordering of CSS properties and nested rules.
+   *
+   * - `files.includes`:
+   *   - Glob patterns to include | exclude files.
+   *   - Checked in order, left to right, last match wins.
+   *   - Default: `["**"]`, i.e. all files.
+   *   - If setting this, MUST list `"**"` first.
+   *   - No need to exclude `node_modules`, ignored due to `vcs.useIgnoreFile`.
+   *
+   * - `linter` rules are grouped into categories:
+   *   - Accessibility: Prevent accessibility problems.
+   *   - Complexity: Inspect and simplify complex code.
+   *   - Correctness: Detect incorrect code.
+   *   - Nursery:
+   *     - New rules still under development.
+   *     - Require explicit opt-in, since still bugs.
+   *     - Promoted to other groups, once stable.
+   *   - Performance: Detect speed | efficiency problems.
+   *   - Security: Detect security flaws.
+   *   - Style: Enforce consistent and idiomatic code style.
+   *   - Suspicious: Detect code likely to be incorrect or useless.
+   *
+   * - What to enable:
+   *   - `linter.rules.recommended`:
+   *     - Enable recommended rules for ALL groups, except Nursery and Style.
+   *   - Thus, only explicitly enable:
+   *     - `linter.rules.reccommended`
+   *     - `linter.rules.style.recommended`
+   */
+
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on", // `javascript`
+        "useSortedAttributes": "on", // `javascript`
+        "useSortedKeys": "off", // `json`
+        "useSortedProperties": "off" // `css`
+      }
+    }
+  },
+
+  "css": {
+    "formatter": {
+      "enabled": true // Default: `false`
+    }
+  },
+
+  "files": {
+    "includes": [
+      "**",
+      "!_unused",
+      "!.vscode/settings.json",
+      "!.next",
+      "!dist",
+      "!coverage",
+      "!.vercel",
+      "!**/migrations",
+      "!.claude",
+      "!**/test-results/*",
+      "!**/playwright-report/*",
+      "!**/contentful/*"
+    ]
+  },
+
+  "formatter": {
+    "indentStyle": "space" // Default: `tab`
+  },
+
+  "graphql": {
+    "formatter": {
+      "enabled": true // Default: `false`
+    }
+  },
+
+  "grit": {
+    "formatter": {
+      "enabled": true // Default: `false`
+    }
+  },
+
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single" // Default: `tab`
+    }
+  },
+
+  "linter": {
+    "rules": {
+      // "nursery": {
+      //   "useUniqueElementIds": "info"
+      // },
+      "recommended": true,
+      "style": {
+        "recommended": true, // Style rules `off` by default.
+        "useConsistentArrayType": {
+          "level": "warn",
+          "options": {
+            "syntax": "generic"
+          }
+        }
+      }
+    }
+  },
+
+  "overrides": [
+    {
+      "includes": ["package.json"],
+      "json": {
+        "formatter": {
+          "expand": "auto"
+        }
+      }
+    }
+  ],
+
+  "vcs": {
+    "clientKind": "git",
+    "enabled": true,
+    "useIgnoreFile": true
+  }
+}
