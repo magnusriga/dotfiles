@@ -136,8 +136,8 @@ services:
         target: /host/downloads
       # Bind mount `notes`.
       - type: bind
-        source: ~/Documents/Documents/Notes/vaults
-        target: /home/nfu/notes/vaults
+        source: ~/Documents/Documents/Notes
+        target: /home/nfu/notes
       # Forward the Docker socket by mounting it in the container using the mounts property.
       - type: bind
         source: /var/run/docker.sock

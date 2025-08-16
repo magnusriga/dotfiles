@@ -1,0 +1,42 @@
+# Wofi configuration file.
+# NOTE: Inline comments break config parsing.
+
+# Window dimensions | Default: 50% width, 40% height
+width=500
+height=400
+
+# Window position | Default: center
+location=center
+
+# Mode selection | Default: drun
+# Options: drun (desktop apps), run (executables), dmenu (stdin), window (window switcher)
+show=drun
+
+# Search prompt text | Default: mode name from 'show'
+prompt=Applications
+
+# Allow HTML-like markup in entries | Default: false
+allow_markup=true
+
+# Hide arrow indicators for multi-action entries | Default: false
+no_actions=true
+
+# Case-insensitive search | Default: false
+insensitive=true
+
+# Show application icons | Default: false
+allow_images=true
+
+# Icon size in pixels | Default: 32
+image_size=20
+
+# Vim-style navigation keybindings
+key_up=Ctrl-p
+key_down=Ctrl-n
+key_left=Ctrl-h
+key_right=Ctrl-l
+key_submit=Ctrl-y
+key_exit=Ctrl-e
+
+# check all apps and learn
+# google symlink, and setup shared drive, access from terminal?

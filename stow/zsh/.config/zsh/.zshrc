@@ -146,10 +146,10 @@ export VISUAL=$EDITOR
 # https://github.com/ghostty-org/ghostty/discussions/5892
 export GHOSTTY_SHELL_INTEGRATION_NO_CURSOR=1
 # WARNING: Adds small delay, slightly more than `zoxide`.
-if [[ -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration" && \
+if [[ -f "${GHOSTTY_RESOURCES_DIR:-/usr/local/share/ghostty}/shell-integration/zsh/ghostty-integration" && \
 ${TERM} == xterm-ghostty ]]; then
   [[ -n "$SHELL_DEBUG" ]] && echo "Sourcing Ghostty shell integration..."
-  builtin source "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}/shell-integration/zsh/ghostty-integration"
+  builtin source "${GHOSTTY_RESOURCES_DIR:-/usr/local/share/ghostty}/shell-integration/zsh/ghostty-integration"
 fi
 
 # ================================================================

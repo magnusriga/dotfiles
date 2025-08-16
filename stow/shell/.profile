@@ -116,7 +116,6 @@
 # - Source `.aliases` here, since `.exports` uses `secrets` alias.
 # - `.aliases` also sourced in `.shrc`, running later.
 for file in $HOME/.{env,aliases,exports,path,functions}; do
-
   [ "$file" = "$HOME/.env" ] && [ ! -f "$file" ] && {
     [[ -n "$SHELL_DEBUG" ]] && echo "<--- No .env file found, please add it to $HOME, including INFISICAL_TOKEN. --->"
     continue

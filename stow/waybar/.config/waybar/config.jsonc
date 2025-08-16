@@ -2,7 +2,7 @@
   "position": "top",
   "modules-left": ["hyprland/workspaces"],
   "modules-center": ["hyprland/window"],
-  "modules-right": ["custom/settings", "network", "pulseaudio", "battery", "clock"],
+  "modules-right": ["tray", "custom/settings", "network", "pulseaudio", "battery", "clock"],
   "clock": {
     "format": "<span foreground='#f5c2e7'>   </span>{:%a %d %H:%M}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
@@ -31,6 +31,7 @@
     "format-disabled": "<span size='13000' foreground='#f5e0dc'>  </span>Disabled",
     "tooltip-format-wifi": "Signal Strength: {signalStrength}% | {ipaddr}",
     "tooltip-format-ethernet": "{ifname}: {ipaddr}",
+    "on-click": "hyprctl keyword windowrulev2 'float,class:(com.mitchellh.ghostty),title:(NetworkManager)' && hyprctl keyword windowrulev2 'center,class:(com.mitchellh.ghostty),title:(NetworkManager)' && hyprctl keyword windowrulev2 'size 1100 700,class:(com.mitchellh.ghostty),title:(NetworkManager)' && ghostty --title='NetworkManager' -e /home/magnus/.config/waybar/scripts/nmtui-with-scan.sh && hyprctl keyword windowrulev2 'unset,class:(com.mitchellh.ghostty),title:(NetworkManager)' &",
     "interval": 5
   },
   "pulseaudio": {
@@ -47,5 +48,10 @@
       "tooltip-format": "System Settings",
       "on-click": "/home/magnus/.config/waybar/scripts/settings-menu.sh",
       "interval": "once"
+  },
+  "tray": {
+      "icon-size": 22,
+      "spacing": 8,
+      "show-passive-items": true
   }
 }

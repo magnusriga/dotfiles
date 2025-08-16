@@ -130,10 +130,10 @@ curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https:/
 # ================================================
 # Setup Ghostty shell integration.
 # ================================================
-rm -rf "${GHOSTTY_HOME:-${BUILD_HOME:-$HOME/build}/repositories/ghostty}"
-rm -f "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
-git clone https://github.com/ghostty-org/ghostty.git "${GHOSTTY_HOME:-${BUILD_HOME:-$HOME/build}/repositories/ghostty}"
-ln -s "${BUILD_HOME:-$HOME/build}/repositories/ghostty/src" "${GHOSTTY_RESOURCES_DIR:-$HOME/.local/share/ghostty}"
+# Ghostty previously built in `/usr/local/stow/ghostty`,
+# then stowed to `/usr/local/bin/ghostty` and `/usr/local/share/ghostty`,
+# latter holding ghostty resources.
+export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
 
 # ================================================
 # Clone `delta` repo for themes.

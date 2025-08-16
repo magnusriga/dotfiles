@@ -40,7 +40,10 @@ if [ ! -d "$WEZTERM_HOME" ]; then
   mkdir -p "$WEZTERM_HOME"
 fi
 
-export GHOSTTY_RESOURCES_DIR="$HOME/.local/share/ghostty"
+# Directory for ghostty resources, created by stowing ghostty to
+# `/usr/local/bin/ghostty` and `/usr/local/share/ghostty` (resources dir),
+# after installing to `/usr/local/stow/ghostty` in `setup_packages_manual.sh`.
+export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
 export GHOSTTY_HOME="${BUILD_HOME:-$HOME/build}/repositories/ghostty"
 # Let git make the folder.
 
@@ -152,8 +155,8 @@ if [ ! -d "$BUILD_HOME" ]; then
   mkdir -p "$BUILD_HOME/makepkglogs"
 fi
 
-export NOTES_HOME="${NOTES_HOME:-$HOME/notes/vaults}"
-[ ! -d "$NOTES_HOME" ] && mkdir -p "$NOTES_HOME"
+export NOTES_HOME="${NOTES_HOME:-$HOME/notes}"
+# Let git make the folder.
 
 # For `makepkg` configuration: `$HOME/.config/pacman/makepkg.conf`.
 # Pacman configuration must be placed separately in: `/etc/pacman.conf`.
@@ -192,3 +195,8 @@ if [ ! -d "$COMMAND_HISTORY_DIR" ]; then
   sudo touch $COMMAND_HISTORY_DIR/.zsh_history
 fi
 sudo chown -R "$USER":"$USER" $COMMAND_HISTORY_DIR
+
+export APPLICATIONS_HOME="$HOME/.local/share/applications"
+if [ ! -d "$APPLICATIONS_HOME" ]; then
+  mkdir -p "$APPLICATIONS_HOME"
+fi

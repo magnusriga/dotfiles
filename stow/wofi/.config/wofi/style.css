@@ -105,8 +105,12 @@ window {
 }
 
 #input * {
-  outline: 4px solid @red!important;
+  outline: 4px solid @red !important;
 }
+
+#input:focus {
+  box-shadow: 0 0 0 2px @red;
+} 
 
 /* Text */
 #text {
@@ -117,6 +121,11 @@ window {
 
 #entry {
   background-color: @base;
+  padding: 8px;
+}
+
+#entry image {
+  margin-right: 10px;
 }
 
 #entry arrow {
@@ -134,5 +143,5 @@ window {
 }
 
 #entry:drop(active) {
-  background-color: @lavender!important;
+  background-color: @lavender !important;
 }

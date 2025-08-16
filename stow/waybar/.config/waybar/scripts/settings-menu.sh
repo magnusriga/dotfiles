@@ -8,6 +8,7 @@ options="󰤨  WiFi Settings
 ✈  Airplane Mode
 󰍁  Display Settings
 󰕾  Sound Settings
+󰒓  System Settings
 󰌾  Lock Screen
 󰗼  Logout
 󰜉  Reboot
@@ -17,12 +18,16 @@ chosen="$(echo -e "$options" | wofi --dmenu --prompt "Settings" --width 300 --he
 
 case $chosen in
   "󰤨  WiFi Settings")
-    # Use terminal-based nmtui if GUI tool not available
-    if command -v nm-connection-editor &> /dev/null; then
-      nm-connection-editor &
-    else
-      ghostty -e nmtui &
-    fi
+    # Apply window rules for NetworkManager before launching
+    hyprctl keyword windowrulev2 "float,class:(com.mitchellh.ghostty),title:(NetworkManager)"
+    hyprctl keyword windowrulev2 "center,class:(com.mitchellh.ghostty),title:(NetworkManager)"
+    hyprctl keyword windowrulev2 "size 1100 700,class:(com.mitchellh.ghostty),title:(NetworkManager)"
+    
+    # Launch nmtui with NetworkManager title
+    ghostty --title="NetworkManager" -e nmtui
+    
+    # Clean up the rules after nmtui exits
+    hyprctl keyword windowrulev2 "unset,class:(com.mitchellh.ghostty),title:(NetworkManager)" &
     ;;
   "󰂲  Bluetooth")
     if command -v blueman-manager &> /dev/null; then
@@ -43,7 +48,7 @@ case $chosen in
     ;;
   "󰍁  Display Settings")
     if command -v nwg-displays &> /dev/null; then
-      nwg-displays &
+      nwg-displays > /tmp/nwg-displays.log 2>&1 &
     elif command -v wdisplays &> /dev/null; then
       wdisplays &
     elif command -v arandr &> /dev/null; then
@@ -54,6 +59,9 @@ case $chosen in
     ;;
   "󰕾  Sound Settings")
     pavucontrol &
+    ;;
+  "󰒓  System Settings")
+    XDG_CURRENT_DESKTOP=GNOME gnome-control-center &
     ;;
   "󰌾  Lock Screen")
     hyprlock &

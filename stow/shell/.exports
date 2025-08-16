@@ -100,7 +100,7 @@ export WEZTERM_HOME="$HOME/.local/share/wezterm"
 # Used for shell integrations, themes, and more.
 # ================================================================
 export GHOSTTY_HOME="${BUILD_HOME:-$HOME/build}/repositories/ghostty"
-export GHOSTTY_RESOURCES_DIR="$HOME/.local/share/ghostty"
+export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
 
 # ================================================================
 # Export EZA_HOME shell variable.
@@ -185,7 +185,7 @@ export LC_ALL='en_US.UTF-8'
 # ================================================================
 # Set notes directory.
 # ================================================================
-export NOTES_HOME="${NOTES_HOME:-$HOME/notes/vaults}"
+export NOTES_HOME="${NOTES_HOME:-$HOME/notes}"
 
 # ================================================================
 # Define colors for terminal output.

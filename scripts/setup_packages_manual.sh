@@ -369,31 +369,31 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Function to compare version numbers
 function version_compare() {
   if [ "$1" = "$2" ]; then
-    return 0  # equal
+    return 0 # equal
   fi
-  
+
   local IFS=.
   local i
   local -a ver1 ver2
-  read -ra ver1 <<< "$1"
-  read -ra ver2 <<< "$2"
-  
+  read -ra ver1 <<<"$1"
+  read -ra ver2 <<<"$2"
+
   # fill empty fields in ver1 with zeros
-  for ((i=${#ver1[@]}; i<${#ver2[@]}; i++)); do
+  for ((i = ${#ver1[@]}; i < ${#ver2[@]}; i++)); do
     ver1[i]=0
   done
-  for ((i=0; i<${#ver1[@]}; i++)); do
+  for ((i = 0; i < ${#ver1[@]}; i++)); do
     if [[ -z ${ver2[i]} ]]; then
       ver2[i]=0
     fi
     if ((10#${ver1[i]} > 10#${ver2[i]})); then
-      return 1  # ver1 > ver2
+      return 1 # ver1 > ver2
     fi
     if ((10#${ver1[i]} < 10#${ver2[i]})); then
-      return 2  # ver1 < ver2
+      return 2 # ver1 < ver2
     fi
   done
-  return 0  # equal
+  return 0 # equal
 }
 
 # Only install lazygit on Ubuntu 25.04 or earlier
@@ -401,7 +401,7 @@ INSTALL_LAZYGIT=false
 if [ "$ID" = "ubuntu" ] && [ -n "$UBUNTU_VERSION" ]; then
   version_compare "$UBUNTU_VERSION" "25.04"
   version_result=$?
-  if [ $version_result -eq 2 ] || [ $version_result -eq 0 ]; then  # Ubuntu version <= 25.04
+  if [ $version_result -eq 2 ] || [ $version_result -eq 0 ]; then # Ubuntu version <= 25.04
     INSTALL_LAZYGIT=true
     echo "Ubuntu $UBUNTU_VERSION detected - installing lazygit manually"
   else

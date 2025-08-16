@@ -196,6 +196,12 @@ if [ "$DISTRO" = "arch" ]; then
     brightnessctl \
     pavucontrol \
     nwg-displays \
+    network-manager-applet \
+    pasystray \
+    wl-clipboard \
+    cliphist \
+    mpv \
+    file-roller \
     netcat \
     cronie \
     docker docker-buildx docker-compose \
