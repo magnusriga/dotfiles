@@ -18,10 +18,10 @@
       "urgent": "",
       "active": "",
       "default": ""
-    },
-    "persistent-workspaces": {
-      "*": 5
     }
+    // "persistent-workspaces": {
+    //   "*": 5
+    // }
   },
 
   // Taskbar - Lists open applications.
@@ -77,8 +77,9 @@
   // Wallpaper
   "custom/wallpaper": {
     "format": "",
-    "on-click": "~/.config/hypr/scripts/wallpaper.sh",
-    "tooltip-format": "Select wallpaper"
+    "on-click": "waypaper",
+    "on-click-right": "~/.config/hypr/scripts/wallpaper-effect.sh",
+    "tooltip-format": "Left: Select wallpaper\nRight: Select wallpaper effect"
   },
 
   // Settings
@@ -100,6 +101,27 @@
   "custom/keybindings": {
     "format": "",
     "on-click": "~/.config/hypr/scripts/keybindings.sh",
+    "tooltip": false
+  },
+
+  // Filemanager Launcher
+  "custom/filemanager": {
+    "format": "",
+    "on-click": "~/.config/hypr/settings/filemanager.sh",
+    "tooltip": false
+  },
+
+  // Browser Launcher
+  "custom/browser": {
+    "format": "",
+    "on-click": "~/.config/hypr/settings/browser.sh",
+    "tooltip": false
+  },
+
+  // AI Launcher
+  "custom/ai": {
+    "format": "",
+    "on-click": "chromium --app=https://claude.ai/chat",
     "tooltip": false
   },
 
@@ -163,7 +185,7 @@
     "format": "",
     "tooltip-format": "Left: Open hyprshade\nRight: Select hyprshade filter",
     "on-click": "sleep 0.5; ~/.config/hypr/scripts/hyprshade.sh",
-    "on-click-right": "sleep 0.5; ~/.config/hypr/scripts/hyprshade.sh rofi"
+    "on-click-right": "sleep 0.5; ~/.config/hypr/scripts/hyprshade.sh wofi"
   },
 
   // Hypridle inhibitor - Toggle hypridle
@@ -174,7 +196,8 @@
     "exec-on-event": true,
     "interval": 60,
     "exec": "~/.config/hypr/scripts/hypridle.sh status",
-    "on-click": "~/.config/hypr/scripts/hypridle.sh toggle"
+    "on-click": "~/.config/hypr/scripts/hypridle.sh toggle",
+    "on-click-right": "hyprlock"
   },
 
   // Keyboard State
@@ -204,7 +227,7 @@
     // "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
     "format": "{:%H:%M %a}",
     "tooltip": false,
-    "timezone": "",
+    // "timezone": "",
     "on-click": "sleep 0.1 && gnome-calendar"
     // "on-click": "flatpak run com.ml4w.calendar",
   },
@@ -269,7 +292,7 @@
   // Group Links
   "group/links": {
     "orientation": "horizontal",
-    "modules": ["custom/chatgpt", "custom/empty"]
+    "modules": ["custom/ai", "custom/empty"]
   },
 
   // Group Settings
@@ -346,6 +369,21 @@
       "balanced": "",
       "power-saver": ""
     }
+  },
+
+  // Power Profiles (tuned-ppd)
+  "custom/power-profiles": {
+    "exec": "~/.config/hypr/scripts/power-profiles.sh",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{icon}",
+    "format-icons": {
+      "performance": "",
+      "balanced": "",
+      "power-saver": ""
+    },
+    "on-click": "~/.config/hypr/scripts/power-profiles.sh toggle",
+    "tooltip": true
   },
 
   // Pulseaudio

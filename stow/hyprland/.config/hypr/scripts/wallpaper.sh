@@ -4,7 +4,7 @@
 # Wallpaper selector script for hyprland using wofi
 # ==========
 
-WALLPAPER_DIR="$HOME/.config/backgrounds"
+WALLPAPER_DIR="$HOME/.config/my/wallpapers"
 
 # Check if wallpaper directory exists
 if [ ! -d "$WALLPAPER_DIR" ]; then
@@ -41,16 +41,16 @@ selected=$(echo "$wallpapers" | sed "s|$WALLPAPER_DIR/||g" | wofi --dmenu --prom
 
 if [ -n "$selected" ]; then
   NEW_WALL="$WALLPAPER_DIR/$selected"
-  
+
   # Check if selected file exists
   if [ ! -f "$NEW_WALL" ]; then
     notify-send "Wallpaper Error" "Selected wallpaper not found: $NEW_WALL"
     exit 1
   fi
-  
+
   # Get currently loaded wallpaper
   OLD_WALL=$(hyprctl hyprpaper listloaded 2>/dev/null | head -1)
-  
+
   # Set new wallpaper
   if hyprctl hyprpaper preload "$NEW_WALL" 2>/dev/null; then
     if hyprctl hyprpaper wallpaper ",$NEW_WALL" 2>/dev/null; then
@@ -68,3 +68,4 @@ if [ -n "$selected" ]; then
     exit 1
   fi
 fi
+

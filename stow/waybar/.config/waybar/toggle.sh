@@ -7,7 +7,7 @@
 #            |___/ |___/                         |___/
 #
 
-if [ -f "$HOME/.config/ml4w/settings/waybar-disabled" ]; then
+if [ -f "$HOME/.config/hypr/settings/waybar-disabled" ]; then
   rm "$HOME/.config/waybar/waybar-disabled"
 else
   touch "$HOME/.config/waybar/waybar-disabled"

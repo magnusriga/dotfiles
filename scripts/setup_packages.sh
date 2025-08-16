@@ -181,12 +181,16 @@ if [ "$DISTRO" = "arch" ]; then
     ctags \
     openssh \
     iproute2 iputils \
-    ttf-font-awesome \
+    woff2-font-awesome \
     ttf-jetbrains-mono-nerd \
     ttf-cascadia-code-nerd \
+    ttf-fira-sans ttf-fira-code ttf-firacode-nerd ttf-dejavu \
+    noto-fonts noto-fonts-emoji noto-fonts-cjk noto-fonts-extra \
     hyprland hyprpaper hypridle hyprlock \
     hyprshot hyprpicker \
     nwg-look \
+    nwg-displays \
+    nwg-dock-hyprland \
     waybar \
     wofi \
     swaync \
@@ -195,15 +199,29 @@ if [ "$DISTRO" = "arch" ]; then
     firefox \
     brightnessctl \
     pavucontrol \
-    nwg-displays \
     network-manager-applet \
     qalculate-gtk \
-    sddm qt6-svg qt6-declarative \
+    sddm qt6-svg qt6-declarative qt6ct \
+    qt5-wayland qt6-wayland \
+    hyprpolkitagent \
+    papirus-icon-theme \
+    breeze \
+    flatpak gvfs \
+    uwsm \
+    blueman \
+    nm-connection-editor \
+    htop btop \
+    figlet \
+    gum \
+    xdg-user-dirs \
+    xdg-desktop-portal xdg-desktop-portal-hyprland \
     pasystray \
     wl-clipboard \
     cliphist \
     mpv \
+    vlc \
     file-roller \
+    tumbler \
     netcat \
     cronie \
     docker docker-buildx docker-compose \
@@ -224,6 +242,7 @@ if [ "$DISTRO" = "arch" ]; then
     gdk-pixbuf2 gimp java-runtime \
     libwmf libopenraw libavif libheif libjxl librsvg webp-pixbuf-loader \
     python-setuptools python-keyring python-xdg python python-pip python-pipx \
+    python-gobject \
     lua \
     gtk4 gtk4-layer-shell libadwaita \
     libjpeg-turbo libpng zlib \

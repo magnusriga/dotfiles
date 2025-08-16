@@ -304,6 +304,26 @@ cd "$CURRENTDIR" || exit
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
+# Install Sequoia SDDM theme.
+# ================================================
+PACKAGE="sddm-sequoia"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+git clone https://codeberg.org/minMelody/sddm-sequoia.git "$TMPDIR/$PACKAGE"
+# Create themes directory if it doesn't exist
+sudo mkdir -p /usr/share/sddm/themes
+# Remove old installation if exists
+sudo rm -rf /usr/share/sddm/themes/sequoia
+# Move theme to final location
+sudo cp -r "$TMPDIR/$PACKAGE" /usr/share/sddm/themes/sequoia
+# Set permissions
+sudo chmod -R 755 /usr/share/sddm/themes/sequoia
+echo "Sequoia SDDM theme installed to /usr/share/sddm/themes/sequoia"
+echo "Remember to:"
+echo "  1. Install required packages: qt6 qt6-declarative qt6-5compat"
+echo "  2. Install a Nerd Font (v3.0+) system-wide"
+echo "  3. Edit SDDM config to set Current=sequoia under [Theme] section"
+
+# ================================================
 # Install yazi from source.
 # Use manual build instead of `pacman -Syu yazi`.
 # ================================================
@@ -325,25 +345,6 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # Install uv, python package manager.
 # ================================================
 curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# ================================================
-# Install Sequoia SDDM theme.
-# ================================================
-PACKAGE="sddm-sequoia"
-THEME_URL="https://github.com/WillPower3309/sddm-sequoia/archive/refs/heads/master.zip"
-sudo rm -rf "$TMPDIR/$PACKAGE"
-mkdir -p "$TMPDIR/$PACKAGE"
-curl -Lo "$TMPDIR/$PACKAGE.zip" "$THEME_URL"
-unzip -q "$TMPDIR/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
-# Create themes directory if it doesn't exist
-sudo mkdir -p /usr/share/sddm/themes
-# Remove old installation if exists
-sudo rm -rf /usr/share/sddm/themes/sequoia
-# Move theme to final location
-sudo mv "$TMPDIR/$PACKAGE/sddm-sequoia-master" /usr/share/sddm/themes/sequoia
-# Set permissions
-sudo chmod -R 755 /usr/share/sddm/themes/sequoia
-echo "Sequoia SDDM theme installed to /usr/share/sddm/themes/sequoia"
 
 # ================================================
 # Install Stow (needs `autoconf` pre-installed).

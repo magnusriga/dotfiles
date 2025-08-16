@@ -165,18 +165,18 @@ opt.breakindent = true
 -- opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus"
 opt.clipboard = "unnamedplus"
 
-vim.g.clipboard = {
-  name = "myClipboard",
-  copy = {
-    ["+"] = { "pbcopy", "-" },
-    ["*"] = { "pbcopy", "-" },
-  },
-  paste = {
-    ["+"] = { "pbpaste" },
-    ["*"] = { "pbpaste" },
-  },
-  cache_enabled = 1,
-}
+-- vim.g.clipboard = {
+--   name = "myClipboard",
+--   copy = {
+--     ["+"] = { "pbcopy", "-" },
+--     ["*"] = { "pbcopy", "-" },
+--   },
+--   paste = {
+--     ["+"] = { "pbpaste" },
+--     ["*"] = { "pbpaste" },
+--   },
+--   cache_enabled = 1,
+-- }
 
 -- vim.g.clipboard = [[{
 --           \   'name': 'myClipboard',

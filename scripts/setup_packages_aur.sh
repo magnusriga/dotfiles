@@ -300,7 +300,11 @@ yay -Syu --cleanafter --nodiffmenu --nocleanmenu --noconfirm catppuccin-gtk-them
   zen-browser-bin \
   hyprshade \
   wlogout \
-  sddm-sugar-candy-git
+  waypaper \
+  sddm-sugar-candy-git \
+  python-screeninfo \
+  python-pywalfox \
+  bibata-cursor-theme
 
 # ==================================
 # `paru`: Install AUR packages.
