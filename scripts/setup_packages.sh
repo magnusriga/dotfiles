@@ -180,14 +180,14 @@ if [ "$DISTRO" = "arch" ]; then
     libxkbcommon-x11 wayland waypipe \
     ctags \
     openssh \
-    iproute2 iputils \
+    iproute2 iputils dnsutils \
     woff2-font-awesome \
     ttf-jetbrains-mono-nerd \
     ttf-cascadia-code-nerd \
     ttf-fira-sans ttf-fira-code ttf-firacode-nerd ttf-dejavu \
     noto-fonts noto-fonts-emoji noto-fonts-cjk noto-fonts-extra \
     hyprland hyprpaper hypridle hyprlock \
-    hyprshot hyprpicker \
+    hyprshot hyprpicker hyprsunset \
     nwg-look \
     nwg-displays \
     nwg-dock-hyprland \

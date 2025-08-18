@@ -19,7 +19,7 @@
 
   // Load Modules
   "include": [
-    "~/.config/waybar/modules/waybar-quicklinks.jsonc",
+    "~/.config/waybar/modules/quicklinks.jsonc",
     "~/.config/waybar/modules/main.jsonc"
   ],
 

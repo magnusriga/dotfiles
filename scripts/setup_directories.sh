@@ -155,6 +155,18 @@ if [ ! -d "$BUILD_HOME" ]; then
   mkdir -p "$BUILD_HOME/makepkglogs"
 fi
 
+export CACHE_HOME="${MY_CACHE:-$HOME/.cache}"
+if [ ! -d "$CACHE_HOME" ]; then
+  mkdir -p "$CACHE_HOME"
+  mkdir -p "$CACHE_HOME/wal"
+fi
+
+export CACHE_MY="${CACHE_MY:-$CACHE_HOME/my}"
+if [ ! -d "$CACHE_MY" ]; then
+  mkdir -p "$CACHE_MY"
+  mkdir -p "$CACHE_MY/hyprland-dotfiles/"
+fi
+
 export NOTES_HOME="${NOTES_HOME:-$HOME/notes}"
 # Let git make the folder.
 

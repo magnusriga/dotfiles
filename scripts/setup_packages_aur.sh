@@ -298,13 +298,15 @@ echo 'Done with aur installs, proceding with yay.'
 # yay -Sua
 yay -Syu --cleanafter --nodiffmenu --nocleanmenu --noconfirm catppuccin-gtk-theme-mocha \
   zen-browser-bin \
+  google-chrome \
   hyprshade \
   wlogout \
   waypaper \
   sddm-sugar-candy-git \
   python-screeninfo \
   python-pywalfox \
-  bibata-cursor-theme
+  bibata-cursor-theme \
+  matugen-bin
 
 # ==================================
 # `paru`: Install AUR packages.

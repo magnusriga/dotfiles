@@ -15,9 +15,9 @@
     "all-outputs": true,
     "format": "{}",
     "format-icons": {
-      "urgent": "",
-      "active": "",
-      "default": ""
+      "urgent": "!",
+      "active": "●",
+      "default": "○"
     }
     // "persistent-workspaces": {
     //   "*": 5
@@ -44,6 +44,7 @@
   // Hyprland window
   "hyprland/window": {
     "max-length": 60,
+    "swap-icon-label": false,
     "rewrite": {
       "(.*) - Brave": "$1",
       "(.*) - Chromium": "$1",
@@ -54,9 +55,10 @@
     "separate-outputs": true
   },
 
-  // Empty
+  // Empty spacer
   "custom/empty": {
-    "format": ""
+    "format": " ",
+    "tooltip": false
   },
 
   // Tools
@@ -68,9 +70,9 @@
   // Cliphist
   "custom/cliphist": {
     "format": "",
-    "on-click": "sleep 0.1 && ~/.config/hypr/scripts/cliphist.sh",
-    "on-click-right": "sleep 0.1 && ~/.config/hypr/scripts/cliphist.sh d",
-    "on-click-middle": "sleep 0.1 && ~/.config/hypr/scripts/cliphist.sh w",
+    "on-click": "sleep 0.1 && ~/.config/my/scripts/cliphist.sh",
+    "on-click-right": "sleep 0.1 && ~/.config/my/scripts/cliphist.sh d",
+    "on-click-middle": "sleep 0.1 && ~/.config/my/scripts/cliphist.sh w",
     "tooltip-format": "Left: Open clipboard Manager\nRight: Delete an entry\nMiddle: Clear list"
   },
 
@@ -378,9 +380,9 @@
     "interval": 2,
     "format": "{icon}",
     "format-icons": {
-      "performance": "",
-      "balanced": "",
-      "power-saver": ""
+      "performance": "🔥",
+      "balanced": "⚖️",
+      "power-saver": "🔋"
     },
     "on-click": "~/.config/hypr/scripts/power-profiles.sh toggle",
     "tooltip": true
@@ -417,11 +419,11 @@
   // Bluetooth
   "bluetooth": {
     "format": " {status}",
-    "format-disabled": "",
-    "format-off": "",
+    "format-disabled": " Disabled",
+    "format-off": " Off",
     "interval": 30,
     "on-click": "sleep 0.1 && ~/.config/hypr/settings/bluetooth.sh",
-    "format-no-controller": ""
+    "format-no-controller": " No Controller"
   },
 
   // Other

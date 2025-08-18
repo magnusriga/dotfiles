@@ -30,13 +30,14 @@ allow_images=true
 # Icon size in pixels | Default: 32
 image_size=20
 
-# Vim-style navigation keybindings
+# Vim-style navigation keybindings  
 key_up=Ctrl-p
 key_down=Ctrl-n
-key_left=Ctrl-h
-key_right=Ctrl-l
 key_submit=Ctrl-y
 key_exit=Ctrl-e
+
+# Note: wofi may not support custom backspace keybinding
+# key_remove=Ctrl-h
 
 # check all apps and learn
 # google symlink, and setup shared drive, access from terminal?

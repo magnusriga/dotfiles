@@ -1,0 +1,3 @@
+# Dock is disabled by default
+# To enable dock: rm ~/.config/hypr/settings/dock-disabled
+# To disable dock: touch ~/.config/hypr/settings/dock-disabled
