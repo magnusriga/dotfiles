@@ -72,6 +72,16 @@ if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
 fi
 
 # ================================================================
+# Add `opt/google/chrome` to PATH.
+# ================================================================
+if [ -d "/opt/google/chrome" ]; then
+  case ":$PATH:" in
+  *":/opt:"*) ;;
+  *) export PATH="/opt/google/chrome:$PATH" ;;
+  esac
+fi
+
+# ================================================================
 # Add OrbStack guest tools to PATH.
 # ================================================================
 if [ -d "/opt/orbstack-guest/bin" ]; then

@@ -197,6 +197,7 @@ if [ "$DISTRO" = "arch" ]; then
     kitty \
     nautilus \
     firefox \
+    chromium \
     brightnessctl \
     pavucontrol \
     network-manager-applet \
@@ -291,6 +292,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     ninja-build qt6-base-dev qt6-5compat-dev libasound2-dev gettext \
     git-delta \
     zsh-doc \
+    chromium-browser \
     libxkbcommon-x11-0 libwayland-client0 waypipe \
     exuberant-ctags \
     openssh-client openssh-server \
