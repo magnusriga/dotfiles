@@ -1,21 +1,40 @@
 # yazi.toml
-[manager]
+[mgr]
 show_hidden = true
+sort_dir_first = true
+show_symlink = true
 
-[[plugin.prepend_previewers]]
-name = "*.md"
-run = "glow"
+[plugin]
+prepend_previewers = [
+  { name = "*.md", run = "glow" },
+  # { name = "*/", run = "eza-preview" },
+]
+prepend_fetchers = [
+  { id = "git", name = "*", run = "git" },
+  { id = "git", name = "*/", run = "git" },
+]
+prepend_preloaders = [
+  { name= "/remote/**", run = "noop"},
+  { name= "/google/**", run = "noop"},
+  { name= "~/remote/**", run = "noop"},
+  { name= "~/google/**", run = "noop"},
+]
 
-# [[plugin.prepend_previewers]]
-# name = "*/"
-# run = "eza-preview"
+[opener]
+set-wallpaper = [
+  { run = 'waypaper --wallpaper , "$0"', for = "linux", desc = "Set as wallpaper" }
+]
+add-sub = [
+  { run=''' echo sub-add "'$0'" | socat - /tmp/mpv.sock ''' , for = "linux", desc = "Add sub to MPV" }
+]
 
-[[plugin.prepend_fetchers]]
-id = "git"
-name = "*"
-run = "git"
+[open]
+preped_rules = [
+  { mime = "image/*", use = [ "set-wallpaper", "open" ] },
+  { name = "*.{ass,srt,ssa,sty,sup,vtt}", use = [ "add-sub", "edit" ] }
+] 
 
-[[plugin.prepend_fetchers]]
-id = "git"
-name = "*/"
-run = "git"
+[preview]
+# Change to desired values.
+max_width  = 1000
+max_height = 1000

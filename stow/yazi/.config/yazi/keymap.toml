@@ -1,143 +1,55 @@
-[[manager.prepend_keymap]]
-on = "!"
-run = 'shell "$SHELL" --block --confirm'
-desc = "Open shell here"
+# ================================================================
+# NOTES
+# ================================================================
+# - Yazi, just GTK file manager, already integrates with trash-cli,
+# - thus no need for custom keymaps to delete files/directories.
+# ================================================================
 
-# Do not use, as normal mode in search boxes is needed.
-# [[input.prepend_keymap]]
-# on = "<Esc>"
-# run = "close"
-# desc = "Cancel input"
+[mgr]
+prepend_keymap = [
+  { on = "!", for = "unix", run = 'shell "$SHELL" --block', desc = "Open $SHELL here" },
 
-[[manager.prepend_keymap]]
-on = "y"
-run = ['''
-  shell 'echo "$@" | xclip -i -selection clipboard -t text/uri-list' --confirm
-''', "yank"]
+  { on = "p", run = "plugin smart-paste", desc = "Paste into the hovered directory or CWD" },
 
-[[manager.prepend_keymap]]
-on = ["g", "r"]
-run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"'
+  { on = ["g", "r"], run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"', desc = "Go to git root directory" },
+  { on = ["g", "g"], run = 'shell -- ya emit cd "$HOME/google"', desc = "Go to git root directory" },
+  { on = ["g", "n"], run = 'shell -- ya emit cd "$HOME/google/nfront-shared/"', desc = "Go to git root directory" },
 
-[[manager.prepend_keymap]]
-on = "k"
-run = "plugin arrow -1"
+  # Drag and drop selected files, via `ripdrag`, e.g. `ripdrag $(fzf)`.
+  { on = [ "<C-n>" ], run = '''
+      shell 'ripdrag "$@" -x 2>/dev/null &' --confirm
+  ''' },
 
-[[manager.prepend_keymap]]
-on = "j"
-run = "plugin arrow 1"
+  # Copy selected files to the system clipboard while yanking.
+  { on = ["y"], run = [ 'shell -- for path in "$@"; do echo "file://$path"; done | wl-copy -t text/uri-list', "yank" ] , desc = "Yank selected file paths to clipboard" },
 
-# No need to remap this to match `fzf-lua.nvim`, just use `fzf` in yazi instead (`Z`),
-# which searces both files and directories.
-# [[manager.prepend_keymap]]
-# on = "f"
-# run = "search fd --hidden"
-# [[manager.prepend_keymap]]
-# on = "s"
-# run = "search rg --hidden"
+  # Hide | Show preview.
+  { on = ["T"], run = "plugin toggle-pane min-preview", desc = "Show or hide preview pane" },
 
-# [manager]
-# keymap = [
-#   { on = [
-#     "E",
-#   ], run = "plugin eza-preview", desc = "Toggle tree/list dir preview" },
-# ]
+  # Maximize | Restore preview.
+  { on = ["T"], run = "plugin toggle-pane max-preview", desc = "Maximize or restore preview pane" },
 
-[[manager.prepend_keymap]]
-on = ["1"]
-run = "plugin relative-motions 1"
-desc = "Move in relative steps"
+  # Restore last deleted file|directory.
+  { on = ["d", "u"], run = "plugin restore", desc = "Restore last deleted files/folders" },
+  # Throw error if file|directory exists.
+  { on = [ "d", "U" ], run = "plugin restore -- --interactive", desc = "Restore deleted files/folders (Interactive)" },
 
-[[manager.prepend_keymap]]
-on = ["2"]
-run = "plugin relative-motions 2"
-desc = "Move in relative steps"
+  { on = ["m"], run = "plugin bookmarks save", desc = "Save current position as a bookmark" },
+  { on = ["'"], run = "plugin bookmarks jump", desc = "Jump to a bookmark" },
+  { on = ["b", "d"], run = "plugin bookmarks delete", desc = "Delete a bookmark" },
+  { on = ["b", "D"], run = "plugin bookmarks delete_all", desc = "Delete all bookmarks" },
+  
+  { on = ["c", "m"], run = "plugin chmod", desc = "Chmod on selected files" },
+  { on = ["g", "i"], run = "plugin lazygit", desc = "run lazygit" },
+  { on = ["g", "d"], run = "plugin diff", desc = "Diff the selected with the hovered file" },
 
-[[manager.prepend_keymap]]
-on = ["3"]
-run = "plugin relative-motions 3"
-desc = "Move in relative steps"
-
-[[manager.prepend_keymap]]
-on = ["4"]
-run = "plugin relative-motions 4"
-desc = "Move in relative steps"
-
-[[manager.prepend_keymap]]
-on = ["5"]
-run = "plugin relative-motions 5"
-desc = "Move in relative steps"
-
-[[manager.prepend_keymap]]
-on = ["6"]
-run = "plugin relative-motions 6"
-desc = "Move in relative steps"
-
-[[manager.prepend_keymap]]
-on = ["7"]
-run = "plugin relative-motions 7"
-desc = "Move in relative steps"
-
-[[manager.prepend_keymap]]
-on = ["8"]
-run = "plugin relative-motions 8"
-desc = "Move in relative steps"
-
-[[manager.prepend_keymap]]
-on = ["9"]
-run = "plugin relative-motions 9"
-desc = "Move in relative steps"
-
-# [[manager.prepend_keymap]]
-# on = "f"
-# run = "plugin jump-to-char"
-# desc = "Jump to char"
-
-[[manager.prepend_keymap]]
-on = ["m"]
-run = "plugin bookmarks save"
-desc = "Save current position as a bookmark"
-
-[[manager.prepend_keymap]]
-on = ["'"]
-run = "plugin bookmarks jump"
-desc = "Jump to a bookmark"
-
-[[manager.prepend_keymap]]
-on = ["b", "d"]
-run = "plugin bookmarks delete"
-desc = "Delete a bookmark"
-
-[[manager.prepend_keymap]]
-on = ["b", "D"]
-run = "plugin bookmarks delete_all"
-desc = "Delete all bookmarks"
-
-[[manager.prepend_keymap]]
-on = ["c", "m"]
-run = "plugin chmod"
-desc = "Chmod on selected files"
-
-[[manager.prepend_keymap]]
-on = ["g", "i"]
-run = "plugin lazygit"
-desc = "run lazygit"
-
-[[manager.prepend_keymap]]
-on = ["g", "d"]
-run = "plugin diff"
-desc = "Diff the selected with the hovered file"
-
-[[manager.prepend_keymap]]
-on = ["u"]
-run = "plugin restore"
-desc = "Restore last deleted files/folders"
-
-[[manager.prepend_keymap]]
-on = "<C-y>"
-run = ["plugin system-clipboard"]
-
-[[manager.prepend_keymap]]
-on = "F"
-run = "plugin smart-filter"
-desc = "Smart filter"
+  # { on = ["1"], run = "plugin relative-motions 1", desc = "Move in relative steps" },
+  # { on = ["2"], run = "plugin relative-motions 2", desc = "Move in relative steps" },
+  # { on = ["3"], run = "plugin relative-motions 3", desc = "Move in relative steps" },
+  # { on = ["4"], run = "plugin relative-motions 4", desc = "Move in relative steps" },
+  # { on = ["5"], run = "plugin relative-motions 5", desc = "Move in relative steps" },
+  # { on = ["6"], run = "plugin relative-motions 6", desc = "Move in relative steps" },
+  # { on = ["7"], run = "plugin relative-motions 7", desc = "Move in relative steps" },
+  # { on = ["8"], run = "plugin relative-motions 8", desc = "Move in relative steps" },
+  # { on = ["9"], run = "plugin relative-motions 9", desc = "Move in relative steps" },
+]

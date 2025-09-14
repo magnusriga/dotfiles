@@ -135,7 +135,7 @@
 if [[ -f $WEZTERM_HOME/shell-integration/wezterm.sh &&
   ${TERM_PROGRAM} == WezTerm ]]; then
   [[ -n "$SHELL_DEBUG" ]] && echo "Sourcing Wezterm shell integration..."
-  source $WEZTERM_HOME/shell-integration/wezterm.sh
+  source "$WEZTERM_HOME/shell-integration/wezterm.sh"
 fi
 
 # ================================================================
@@ -156,6 +156,15 @@ export FD_DEFAULT_OPTIONS=(--hidden --no-ignore --follow
   --exclude .history
   --exclude .rustup
   --exclude .cargo
+  --exclude .local
+  --exclude .mozilla
+  --exclude .zen
+  --exclude build
+  --exclude chroot
+  --exclude .claude
+  --exclude .npm
+  --exclude .nvm
+  --exclude .config/google-chrome
   --exclude .cache)
 
 export EZA_OPTIONS=(-la --color=always --icons=always --git --git-repos --hyperlink --header --grid --octal-permissions --no-permissions --time-style=relative)
@@ -169,21 +178,37 @@ export FZF_DEFAULT_OPTS="--ansi --height=90% --layout=reverse --info=inline --bo
   --prompt 'All> '
   --header 'CTRL-T: Files/Directories | CTRL-R: All'
   --bind 'ctrl-t:transform:[[ {fzf:prompt} =~ Files ]] && echo \"change-prompt(Directories> )+reload(fd $FD_DEFAULT_OPTIONS --type d)+change-preview-window(up,60%,border-bottom)\" || echo \"change-prompt(Files> )+reload(fd $FD_DEFAULT_OPTIONS --type f)+change-preview-window(right,70%,border-left)\"'
-  --bind 'ctrl-r:transform:echo \"change-prompt(All> )+reload(fd $FD_DEFAULT_OPTIONS)\"'
-  --preview '[[ {fzf:prompt} =~ Directories ]] && eza $EZA_OPTIONS {} || bat --color=always {}'
+  --bind 'ctrl-r:transform:echo \"change-prompt(All> )+reload(fd $FD_DEFAULT_OPTIONS)+change-preview-window(right,70%,border-left)\"'
+  --bind 'ctrl-d:half-page-down' 
+  --bind 'ctrl-u:half-page-up'
+  --preview '[[ {fzf:prompt} =~ Directories ]] && eza $EZA_OPTIONS {} || ([[ -d {} ]] && eza $EZA_OPTIONS {} || bat --color=always {})'
   --preview-window 'right'
   "
 
 export FZF_DEFAULT_COMMAND="fd $FD_DEFAULT_OPTIONS"
+
 # ================================================================
 # Options for fzf in <c-t> | <m-c> | <c-r> mode.
 # FZF_DEFAULT_OPTS also apply here, so overwrite its options if
 # necessary to deviate from general settings.
 # ================================================================
+# - `CTRL-T`: Setup further in `.zshrc`, after sourcing `fzf`.
+# - `ALT-C`: Uses `find` by default, override for `fd`.
+# --prompt 'Directories> '
+# --preview-window 'up,60%,border-bottom'
+# export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND --type d"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_CTRL_T_OPTS="
-  --bind 'enter:execute(nvim {+})'"
-# export FZF_ALT_C_COMMAND="fd $FZF_DEFAULT_OPTS --type d"
+  --bind 'enter:accept'
+  --bind 'ctrl-o:execute(nvim {})'
+  --bind 'ctrl-e:execute-silent(echo {} | wl-copy && command -v notify-send >/dev/null && notify-send \"Clipboard\" \"Copied: {}\")'
+  --header 'CTRL-T: Files/Dirs | CTRL-R: All | ENTER: Smart Open | CTRL-O: Force Nvim | CTRL-E: Copy Path'"
+
+export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND --type d"
+export FZF_ALT_C_OPTS="
+  --prompt 'Directories> '
+  --preview-window 'up,60%,border-bottom'"
+
 export FZF_CTRL_R_OPTS="--prompt 'Commands> ' --header '' --preview ''"
 
 # ================================================================

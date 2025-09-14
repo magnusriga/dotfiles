@@ -353,6 +353,50 @@ if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
 fi
 source <(fzf --zsh)
 
+# - Need to override `fzf`'s `fzf-file-widget` widget,
+#   to enable `cd` when directory selected, without spawning subshell.
+# - Done after `fzf` sourced, not in `.shrc`.
+# - Maintains `fzf` environment variables, in `shrc`.
+  fzf-file-widget() {
+    setopt localoptions pipefail no_aliases 2> /dev/null
+    local selected="$(
+      FZF_DEFAULT_COMMAND=${FZF_CTRL_T_COMMAND:-} \
+      FZF_DEFAULT_OPTS=$(__fzf_defaults "--reverse --walker=file,dir,follow,hidden --scheme=path" "${FZF_CTRL_T_OPTS-}") \
+      FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) < /dev/tty)"
+    if [[ -z "$selected" ]]; then
+      zle redisplay
+      return 0
+    fi
+
+    zle push-line # Clear buffer. Auto-restored on next prompt.
+
+    # Handle multiple selections (if tab was used)
+    local -a items
+    items=(${(f)selected})  # Split on newlines into array
+
+    if [[ ${#items[@]} -eq 1 ]]; then
+      # Single selection - smart behavior
+      if [[ -d "$selected" ]]; then
+        BUFFER="builtin cd -- ${(q)selected:a}"
+      else
+        BUFFER="nvim ${(q)selected:a}"
+      fi
+    else
+      # Multiple selections - assume nvim for all
+      local quoted_items=()
+      for item in "${items[@]}"; do
+        quoted_items+=(${(q)item:a})
+      done
+      BUFFER="nvim ${quoted_items[*]}"
+    fi
+
+    zle accept-line
+    local ret=$?
+    unset selected items quoted_items # cleanup
+    zle reset-prompt
+    return $ret
+  }
+
 # ================================================================
 # Start Zoxide, at end of zshrc, AFTER compinit.
 # Docker desktop should run to avoid error message form compinit.
@@ -579,6 +623,5 @@ source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-h
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
 
 alias claude="/home/magnus/.claude/local/claude"

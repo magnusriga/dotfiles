@@ -6,6 +6,7 @@ echo "Running setup_packages_cargo.sh as $(whoami), with HOME $HOME and USER $US
 cargo install ast-grep --locked
 cargo install eza
 cargo install --locked tree-sitter-cli
+cargo install ripdrag
 
 # - Only build `jless` from source on Debian-based systems.
 # - Installed with `pacman` on Arch Linux.

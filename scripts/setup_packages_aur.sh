@@ -306,7 +306,8 @@ yay -Syu --cleanafter --nodiffmenu --nocleanmenu --noconfirm catppuccin-gtk-them
   python-screeninfo \
   python-pywalfox \
   bibata-cursor-theme \
-  matugen-bin
+  matugen-bin \
+  xdg-desktop-portal-termfilechooser-hunkyburrito-git
 
 # ==================================
 # `paru`: Install AUR packages.

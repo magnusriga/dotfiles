@@ -23,6 +23,8 @@ ya pkg add dedukun/bookmarks
 ya pkg add yazi-rs/plugins:chmod
 ya pkg add Lil-Dank/lazygit
 ya pkg add yazi-rs/plugins:smart-filter
+ya pkg add yazi-rs/plugins:smart-paste
 ya pkg add yazi-rs/plugins:git
 ya pkg add Rolv-Apneseth/starship
 ya pkg add yazi-rs/plugins:diff
+ya pkg add yazi-rs/plugins:toggle-pane
