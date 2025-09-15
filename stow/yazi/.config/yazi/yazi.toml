@@ -3,6 +3,7 @@
 show_hidden = true
 sort_dir_first = true
 show_symlink = true
+linemode = "size_and_mtime"
 
 [plugin]
 prepend_previewers = [

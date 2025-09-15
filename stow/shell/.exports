@@ -136,13 +136,13 @@ export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 # Consider setting in `.shrc`, so variables are created for interactive shells only.
 # ================================================================
 # Set path to command history file.
-HISTFILE="/commandhistory/.shell_history"
+export HISTFILE="/commandhistory/.shell_history"
 # Avoid duplicates in command history.
-HISTCONTROL=ignoredups:erasedups
+export HISTCONTROL=ignoredups:erasedups
 # Allow 32³ entries; the default is 500.
-HISTSIZE=32768
-SAVEHIST="${HISTSIZE}"
-HISTFILESIZE="${HISTSIZE}"
+export HISTSIZE=32768
+export SAVEHIST="${HISTSIZE}"
+export HISTFILESIZE="${HISTSIZE}"
 # When shell exits, append to command history file instead of overwriting it.
 # - Set for bash in `.bashrc`: `shopt -s histappend`.
 # - Set for zsh in `.zshrc`: `setopt INC_APPEND_HISTORY`.
@@ -154,7 +154,7 @@ HISTFILESIZE="${HISTSIZE}"
 #   if terminal slows down (should not happen with < 100k entries).
 # Check if history command is already in PROMPT_COMMAND to avoid duplication.
 if [[ "$PROMPT_COMMAND" != *"history -a; history -c; history -r"* ]]; then
-  PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
+  export PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND$'\n'}history -a; history -c; history -r"
 fi
 
 # ================================================================

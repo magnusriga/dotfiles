@@ -114,6 +114,8 @@
 # ================================================================
 [[ $- == *i* ]] || [ -n "$PS1" ] || return
 
+[[ -n "$SHELL_DEBUG" ]] && echo "Running .zshrc, about to setup shell integrations, then source .shrc..."
+
 # `TERM`:
 # - Needed to ensure correct `infocmp`, i.e. ghostty's,
 #   and to run ghostty shell integration.
@@ -199,7 +201,6 @@ fi
 # ================================================================
 # Run Generic Interactive Shell Configuration.
 # ================================================================
-[[ -n "$SHELL_DEBUG" ]] && echo "Running .zshrc, about to source .shrc..."
 source "$HOME/.shrc"
 
 # ==================================
@@ -261,7 +262,7 @@ bindkey '^N' history-beginning-search-forward
 # ================================================================
 # History file for ZSH, overwrites bash default which is sset to
 # `/commandhistory/.shell_hisotry` in `.shrc`.
-HISTFILE=/commandhistory/.zsh_history
+export HISTFILE=/commandhistory/.zsh_history
 # Turn off `INC_APPEND_HISTORY` when `SHARE_HISTORY` is set,
 # as `SHARE_HISTORY` also makes ZSH append every command to history file,
 # when command is typed, just like `INC_APPEND_HISTORY`.
