@@ -155,16 +155,35 @@ if [ ! -d "$BUILD_HOME" ]; then
   mkdir -p "$BUILD_HOME/makepkglogs"
 fi
 
-export CACHE_HOME="${MY_CACHE:-$HOME/.cache}"
+export CACHE_HOME="${CACHE_HOME:-$HOME/.cache}"
 if [ ! -d "$CACHE_HOME" ]; then
   mkdir -p "$CACHE_HOME"
   mkdir -p "$CACHE_HOME/wal"
+  mkdir -p "$CACHE_HOME/google-drive/nfront-shared"
+  mkdir -p "$CACHE_HOME/google-drive/nfront-mydrive"
+  mkdir -p "$CACHE_HOME/google-drive/personal-mydrive"
 fi
 
 export CACHE_MY="${CACHE_MY:-$CACHE_HOME/my}"
 if [ ! -d "$CACHE_MY" ]; then
   mkdir -p "$CACHE_MY"
   mkdir -p "$CACHE_MY/hyprland-dotfiles/"
+fi
+
+export LOG_HOME="${LOG_HOME:-$HOME/.log}"
+if [ ! -d "$LOG_HOME" ]; then
+  mkdir -p "$LOG_HOME"
+  mkdir -p "$LOG_HOME/google-drive/nfront-shared"
+  mkdir -p "$LOG_HOME/google-drive/nfront-mydrive"
+  mkdir -p "$LOG_HOME/google-drive/personal-mydrive"
+fi
+
+export TMP_HOME="${TMP_HOME:-$HOME/.tmp}"
+if [ ! -d "$TMP_HOME" ]; then
+  mkdir -p "$TMP_HOME"
+  mkdir -p "$TMP_HOME/google-drive/nfront-shared"
+  mkdir -p "$TMP_HOME/google-drive/nfront-mydrive"
+  mkdir -p "$TMP_HOME/google-drive/personal-mydrive"
 fi
 
 export NOTES_HOME="${NOTES_HOME:-$HOME/notes}"

@@ -12,8 +12,8 @@ prepend_keymap = [
   { on = "p", run = "plugin smart-paste", desc = "Paste into the hovered directory or CWD" },
 
   { on = ["g", "r"], run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"', desc = "Go to git root directory" },
-  { on = ["g", "g"], run = 'shell -- ya emit cd "$HOME/google"', desc = "Go to git root directory" },
-  { on = ["g", "n"], run = 'shell -- ya emit cd "$HOME/google/nfront-shared/"', desc = "Go to git root directory" },
+  { on = ["g", "g"], run = 'shell -- ya emit cd "$HOME/google"', desc = "Go to google drive parent directory" },
+  { on = ["g", "n"], run = 'shell -- ya emit cd "$HOME/google/nfront-shared/"', desc = "Go to nfront-shared directory" },
 
   # Drag and drop selected files, via `ripdrag`, e.g. `ripdrag $(fzf)`.
   { on = [ "<C-n>" ], run = '''
