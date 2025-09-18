@@ -7,13 +7,26 @@
 
 [mgr]
 prepend_keymap = [
+  # ---------------------------
+  # GO-TO
+  # ---------------------------
+  { on = ["g", "r"], run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"', desc = "Go to git root" },
+
+  { on = ["g", "n"], run = 'shell -- ya emit cd "$HOME/nfront/"', desc = "Go to ~/nfront" },
+  { on = ["g", "w"], run = 'shell -- ya emit cd "$HOME/nfront/apps/nfront-academy/"', desc = "Go to academy" },
+  { on = ["g", "a"], run = 'shell -- ya emit cd "$HOME/nfront/apps/nfront-website/"', desc = "Go to website" },
+
+  { on = ["g", "g", "p"], run = 'shell -- ya emit cd "$HOME/google"', desc = "Go to google drive parent" },
+  { on = ["g", "g", "n"], run = 'shell -- ya emit cd "$HOME/google/nfront-shared/"', desc = "Go to nfront-shared" },
+
+  { on = ["g", "p", "i"], run = "plugin lazygit", desc = "run lazygit" },
+
+  { on = ["g", "p", "d"], run = "plugin diff", desc = "Diff the selected with the hovered file" },
+
+  # ---------------------------
+  # SHELL
+  # ---------------------------
   { on = "!", for = "unix", run = 'shell "$SHELL" --block', desc = "Open $SHELL here" },
-
-  { on = "p", run = "plugin smart-paste", desc = "Paste into the hovered directory or CWD" },
-
-  { on = ["g", "r"], run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"', desc = "Go to git root directory" },
-  { on = ["g", "g"], run = 'shell -- ya emit cd "$HOME/google"', desc = "Go to google drive directory" },
-  { on = ["g", "n"], run = 'shell -- ya emit cd "$HOME/google/nfront-shared/"', desc = "Go to nfront-shared directory" },
 
   # Drag and drop selected files, via `ripdrag`, e.g. `ripdrag $(fzf)`.
   { on = [ "<C-n>" ], run = '''
@@ -23,16 +36,27 @@ prepend_keymap = [
   # Copy selected files to the system clipboard while yanking.
   { on = ["y"], run = [ 'shell -- for path in "$@"; do echo "file://$path"; done | wl-copy -t text/uri-list', "yank" ] , desc = "Yank selected file paths to clipboard" },
 
-  # Hide | Show preview.
-  { on = ["T"], run = "plugin toggle-pane min-preview", desc = "Show or hide preview pane" },
+  # ---------------------------
+  # PASTE
+  # ---------------------------
+  { on = ["p", "p"], run = "paste", desc = "Paste into CWD" },
+  { on = ["p", "s"], run = "plugin smart-paste", desc = "Paste into hovered directory or CWD" },
 
-  # Maximize | Restore preview.
-  { on = ["T"], run = "plugin toggle-pane max-preview", desc = "Maximize or restore preview pane" },
-
+  # ---------------------------
+  # TRASH
+  # ---------------------------
+  { on = ["d","d"], run = "remove", desc = "Trash selected files" },
   # Restore last deleted file|directory.
   { on = ["d", "u"], run = "plugin restore", desc = "Restore last deleted files/folders" },
   # Throw error if file|directory exists.
   { on = [ "d", "U" ], run = "plugin restore -- --interactive", desc = "Restore deleted files/folders (Interactive)" },
+
+  # ---------------------------
+  # PLUGIN
+  # ---------------------------
+  # Preview: Hide | Show, Maximize | Restore.
+  { on = ["T"], run = "plugin toggle-pane min-preview", desc = "Show or hide preview pane" },
+  { on = ["T"], run = "plugin toggle-pane max-preview", desc = "Maximize or restore preview pane" },
 
   { on = ["m"], run = "plugin bookmarks save", desc = "Save current position as a bookmark" },
   { on = ["'"], run = "plugin bookmarks jump", desc = "Jump to a bookmark" },
@@ -40,8 +64,6 @@ prepend_keymap = [
   { on = ["b", "D"], run = "plugin bookmarks delete_all", desc = "Delete all bookmarks" },
   
   { on = ["c", "m"], run = "plugin chmod", desc = "Chmod on selected files" },
-  { on = ["g", "i"], run = "plugin lazygit", desc = "run lazygit" },
-  { on = ["g", "d"], run = "plugin diff", desc = "Diff the selected with the hovered file" },
 
   # { on = ["1"], run = "plugin relative-motions 1", desc = "Move in relative steps" },
   # { on = ["2"], run = "plugin relative-motions 2", desc = "Move in relative steps" },

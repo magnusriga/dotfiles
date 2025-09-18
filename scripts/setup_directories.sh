@@ -161,7 +161,7 @@ if [ ! -d "$CACHE_HOME" ]; then
   mkdir -p "$CACHE_HOME/wal"
   mkdir -p "$CACHE_HOME/google-drive/nfront-shared"
   mkdir -p "$CACHE_HOME/google-drive/nfront-mydrive"
-  mkdir -p "$CACHE_HOME/google-drive/personal-mydrive"
+  mkdir -p "$CACHE_HOME/google-drive/personal"
 fi
 
 export CACHE_MY="${CACHE_MY:-$CACHE_HOME/my}"
@@ -175,7 +175,7 @@ if [ ! -d "$LOG_HOME" ]; then
   mkdir -p "$LOG_HOME"
   mkdir -p "$LOG_HOME/google-drive/nfront-shared"
   mkdir -p "$LOG_HOME/google-drive/nfront-mydrive"
-  mkdir -p "$LOG_HOME/google-drive/personal-mydrive"
+  mkdir -p "$LOG_HOME/google-drive/personal"
 fi
 
 export TMP_HOME="${TMP_HOME:-$HOME/.tmp}"
@@ -183,7 +183,7 @@ if [ ! -d "$TMP_HOME" ]; then
   mkdir -p "$TMP_HOME"
   mkdir -p "$TMP_HOME/google-drive/nfront-shared"
   mkdir -p "$TMP_HOME/google-drive/nfront-mydrive"
-  mkdir -p "$TMP_HOME/google-drive/personal-mydrive"
+  mkdir -p "$TMP_HOME/google-drive/personal"
 fi
 
 export NOTES_HOME="${NOTES_HOME:-$HOME/notes}"

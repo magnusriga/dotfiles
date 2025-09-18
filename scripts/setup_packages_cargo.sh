@@ -7,6 +7,7 @@ cargo install ast-grep --locked
 cargo install eza
 cargo install --locked tree-sitter-cli
 cargo install ripdrag
+cargo install resvg
 
 # - Only build `jless` from source on Debian-based systems.
 # - Installed with `pacman` on Arch Linux.
