@@ -215,7 +215,8 @@ if [ "$DISTRO" = "arch" ]; then
     figlet \
     gum \
     xdg-user-dirs \
-    xdg-desktop-portal xdg-desktop-portal-hyprland \
+    grim slurp \
+    xdg-desktop-portal-gtk \
     pasystray \
     wl-clipboard \
     cliphist \

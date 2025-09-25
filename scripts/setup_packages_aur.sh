@@ -307,6 +307,7 @@ yay -Syu --cleanafter --nodiffmenu --nocleanmenu --noconfirm catppuccin-gtk-them
   python-pywalfox \
   bibata-cursor-theme \
   matugen-bin \
+  xdg-desktop-portal-hyprland-git \
   xdg-desktop-portal-termfilechooser-hunkyburrito-git
 
 # ==================================

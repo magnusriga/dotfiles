@@ -155,6 +155,12 @@ if [ ! -d "$BUILD_HOME" ]; then
   mkdir -p "$BUILD_HOME/makepkglogs"
 fi
 
+export GOOGLE_DRIVE_HOME="${GOOGLE_DRIVE_HOME:-$HOME/google-drive}"
+if [ ! -d "$GOOGLE_DRIVE_HOME" ]; then
+  mkdir -p "$GOOGLE_DRIVE_HOME/nfront-shared"
+  mkdir -p "$GOOGLE_DRIVE_HOME/personal"
+fi
+
 export CACHE_HOME="${CACHE_HOME:-$HOME/.cache}"
 if [ ! -d "$CACHE_HOME" ]; then
   mkdir -p "$CACHE_HOME"
