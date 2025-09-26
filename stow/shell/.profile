@@ -152,33 +152,37 @@ export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
 # ================================================================
 # Start SSH agent to Avoid Typing Github Password
 # ================================================================
+# - Avoid when login shell started by sandboxed AI, e.g. `codex`.
 # NOTE: Do NOT start agent like below, when using agent forwarding,
 # as agent on host is used instead, via unix socket `SSH_AUTH_SOCKET`.
-env=~/.ssh/agent.env
+if [ -z "$CODEX_MANAGED_BY_NPM" ]; then
+  env=~/.ssh/agent.env
 
-agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
+  agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
 
-agent_start() {
-  (
-    umask 077
-    ssh-agent >|"$env"
+  agent_start() {
+    (
+      umask 077
+      ssh-agent >|"$env"
+      chmod 666 "$env"
+    )
+    . "$env" >|/dev/null
+  }
+
+  agent_load_env
+
+  # agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
+  agent_run_state=$(
+    ssh-add -l >|/dev/null 2>&1
+    echo $?
   )
-  . "$env" >|/dev/null
-}
 
-agent_load_env
+  if [ ! "$SSH_AUTH_SOCK" ] || [ "$agent_run_state" = 2 ]; then
+    agent_start
+    ssh-add
+  elif [ "$SSH_AUTH_SOCK" ] && [ "$agent_run_state" = 1 ]; then
+    ssh-add
+  fi
 
-# agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
-agent_run_state=$(
-  ssh-add -l >|/dev/null 2>&1
-  echo $?
-)
-
-if [ ! "$SSH_AUTH_SOCK" ] || [ $agent_run_state = 2 ]; then
-  agent_start
-  ssh-add
-elif [ "$SSH_AUTH_SOCK" ] && [ $agent_run_state = 1 ]; then
-  ssh-add
+  unset env
 fi
-
-unset env
