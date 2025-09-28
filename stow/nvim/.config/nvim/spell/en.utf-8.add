@@ -421,3 +421,15 @@ Commitizen's
 PRs
 typecheck
 CSRF
+AWS
+STS
+OIDC
+IAM
+SDK
+AssumeRoleWithWebIdentity
+AssumeRoleWithSAML
+GetCallerIdentity
+Hetzner
+Cloudflare
+balancer
+Terraform

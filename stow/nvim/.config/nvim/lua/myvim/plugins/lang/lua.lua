@@ -36,4 +36,13 @@ return {
     -- Using `opts_extend`, see `plugins/mason.lua`.
     opts = { ensure_installed = { lsp_name } },
   },
+
+  {
+    "mason-org/mason.nvim",
+    opts = function(_, opts)
+      -- Uses custom `ensure_installed`, see: `plugins/mason.lua`.
+      opts.ensure_installed = opts.ensure_installed or {}
+      vim.list_extend(opts.ensure_installed, { "stylua" })
+    end,
+  },
 }
