@@ -306,6 +306,10 @@ autoload -Uz compinit
 # Force rebuild of `.zcompdump`.
 rm -f "${ZDOTDIR}/.zcompdump"; compinit
 
+# `terraform` completions.
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/bin/terraform terraform
+
 # ================================================================
 # Enable vi mode in zsh (at end of zshrc).
 # ZSH_HOME: ZSH plugin directory.
@@ -624,6 +628,3 @@ source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-h
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-
-alias claude="/home/magnus/.claude/local/claude"

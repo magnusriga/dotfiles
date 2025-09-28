@@ -96,7 +96,7 @@ function setup_ubuntu_repositories() {
 
   # HashiCorp HCP CLI.
   wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg --yes
-  echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
   # Docker Engine (following https://docs.docker.com/engine/install/ubuntu/)
   sudo install -m 0755 -d /etc/apt/keyrings
@@ -145,6 +145,7 @@ COMMON_PACKAGES=(
   stow
   strace nmap
   sudo
+  terraform
   texinfo
   tk gnuplot sysstat
   tmux
