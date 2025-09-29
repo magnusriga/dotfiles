@@ -296,7 +296,13 @@ cd "$CWD" || exit
 echo 'Done with aur installs, proceding with yay.'
 # echo 'done with aur installs, executing: yay -Sua'
 # yay -Sua
-yay -Syu --cleanafter --nodiffmenu --nocleanmenu --noconfirm catppuccin-gtk-theme-mocha \
+
+# Set yay options.
+yay --save --answerclean=None --answerdiff=None --cleanafter
+
+# General packages.
+yay -Syu --noconfirm \
+  catppuccin-gtk-theme-mocha \
   zen-browser-bin \
   google-chrome \
   hyprshade \
@@ -309,6 +315,15 @@ yay -Syu --cleanafter --nodiffmenu --nocleanmenu --noconfirm catppuccin-gtk-them
   matugen-bin \
   xdg-desktop-portal-hyprland-git \
   xdg-desktop-portal-termfilechooser-hunkyburrito-git
+
+# Ensure right permissions for `gpg-agent`, then restart it.
+killall gpg-agent dirmngr 2>/dev/null
+chmod 700 "$GNUPGHOME"/crls.d/
+gpg-agent --daemon 2>/dev/null
+
+# Packages for development.
+yay -Syu --noconfirm \
+  doppler-cli
 
 # ==================================
 # `paru`: Install AUR packages.
