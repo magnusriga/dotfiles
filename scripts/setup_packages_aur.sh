@@ -323,7 +323,7 @@ gpg-agent --daemon 2>/dev/null
 
 # Packages for development.
 yay -Syu --noconfirm \
-  doppler-cli
+  doppler-cli-bin
 
 # ==================================
 # `paru`: Install AUR packages.
