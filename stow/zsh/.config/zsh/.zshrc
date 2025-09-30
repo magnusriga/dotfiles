@@ -528,7 +528,8 @@ source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-h
 # ================================================================
 # Claude Code local install.
 # - Does not work in aliases, only in `zshrc` directly.
-alias claude="/home/magnus/.claude/local/claude"
+# - Must use `~`, not `$HOME`.
+alias claude="~/.claude/local/claude"
 
 # ================================================================
 # oh-my-zsh settings.
