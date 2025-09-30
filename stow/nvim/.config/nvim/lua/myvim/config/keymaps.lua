@@ -36,7 +36,8 @@ map({ "n", "x" }, "<Up>", "v:count == 0 ? 'gk' : 'k'", { desc = "Up", expr = tru
 -- Window.
 ---------------------------------
 -- Move to window using `c^hjkl`.
--- No need, use built-in w-bindings: `<C-W>hjkl`.
+-- Nice when combined with `snacks.nvim` terminal keymaps.
+-- Alternative: Built-in w-bindings: `<C-W>hjkl`.
 -- map("n", "<C-h>", "<C-w>h", { desc = "Go to Left Window", remap = true })
 -- map("n", "<C-j>", "<C-w>j", { desc = "Go to Lower Window", remap = true })
 -- map("n", "<C-k>", "<C-w>k", { desc = "Go to Upper Window", remap = true })
@@ -389,20 +390,18 @@ map("n", "<leader>uI", function() vim.treesitter.inspect_tree() vim.api.nvim_inp
 ---------------------------------
 -- Terminal.
 ---------------------------------
--- Open `snacks.nvim` terminal: Leader.
+-- `snacks.nvim`: Floating terminal.
 map("n", "<leader>fT", function() Snacks.terminal() end, { desc = "Terminal (cwd)" })
 map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
+map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
 
--- - Open `snacks.nvim` terminal: CTRL.
--- - `<c-/>`: Replaced with open `claudecode.nvim`, see `plugins/ai/claude.lua`.
--- - Also need "<c-_>", as `<c-/>` is not recognized on macOS.
--- map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
--- map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
-
+-- Terminal Mappings
 -- - Close current window when in terminal mode.
--- - Also works on `claudecode.nvim`.
-map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+map("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
 map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
+-- map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+-- map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
 
 -- Exit terminal mode in builtin terminal with shortcut that is easier to remember.
 -- Will not work in all terminal emulators or in tmux.

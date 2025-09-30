@@ -144,6 +144,11 @@ export VISUAL=$EDITOR
 # Ghostty Shell Integration for ZSH.
 # Must be Placed at Top of `.zshrc`.
 # ================================================================
+if [[ "$TERMINFO" == *ghostty* ]]; then
+  [[ -n "$SHELL_DEBUG" ]] && echo "Detected Ghostty terminal, setting TERM_PROGRAM='ghostty' and TERM='xterm-ghostty'."
+  TERM_PROGRAM='ghostty'
+  TERM=xterm-ghostty
+fi
 # FIX: Remove once Ghostty makes automatic shell integration work in ssh:
 # https://github.com/ghostty-org/ghostty/discussions/5892
 export GHOSTTY_SHELL_INTEGRATION_NO_CURSOR=1
