@@ -524,6 +524,13 @@ export ZSH_HIGHLIGHT_STYLES["double-quoted-argument"]='fg=green'
 source "${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # ================================================================
+# Aliases not in `.aliases`, for various reasons.
+# ================================================================
+# Claude Code local install.
+# - Does not work in aliases, only in `zshrc` directly.
+alias claude="/home/magnus/.claude/local/claude"
+
+# ================================================================
 # oh-my-zsh settings.
 # Not using oh-my-zsh, but keeping the settings here for reference.
 # ================================================================
