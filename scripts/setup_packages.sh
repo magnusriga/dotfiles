@@ -183,6 +183,7 @@ if [ "$DISTRO" = "arch" ]; then
     git-delta \
     zsh-doc \
     libxkbcommon-x11 wayland waypipe \
+    libreoffice-fresh \
     ctags \
     openssh \
     iproute2 iputils dnsutils \
@@ -300,6 +301,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     zsh-doc \
     chromium-browser \
     libxkbcommon-x11-0 libwayland-client0 waypipe \
+    libreoffice \
     exuberant-ctags \
     openssh-client openssh-server \
     iproute2 iputils-ping \
