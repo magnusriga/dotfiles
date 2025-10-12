@@ -342,9 +342,12 @@ cd "$CURRENTDIR" || exit
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
-# Install uv, python package manager.
+# Various installs via custom scripts.
 # ================================================
+# `uv`: Python package manager.
 curl -LsSf https://astral.sh/uv/install.sh | sh
+# `tflint`: Terraform linter.
+curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
 # ================================================
 # Install Stow (needs `autoconf` pre-installed).
