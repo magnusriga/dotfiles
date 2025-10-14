@@ -314,7 +314,8 @@ yay -Syu --noconfirm \
   bibata-cursor-theme \
   matugen-bin \
   xdg-desktop-portal-hyprland-git \
-  xdg-desktop-portal-termfilechooser-hunkyburrito-git
+  xdg-desktop-portal-termfilechooser-hunkyburrito-git \
+  zoom
 
 # Ensure right permissions for `gpg-agent`, then restart it.
 killall gpg-agent dirmngr 2>/dev/null
