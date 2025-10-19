@@ -61,6 +61,7 @@ x86_64)
   ARCH_NEOVIM="x86_64"
   ARCH_ZIG="x86_64"
   ARCH_TECTONIC="x86_64"
+  ARCH_KUBECTL="amd64"
   ;;
 aarch64 | arm64)
   ARCH_TODOCHECK="arm64"
@@ -70,6 +71,7 @@ aarch64 | arm64)
   ARCH_NEOVIM="arm64"
   ARCH_ZIG="aarch64"
   ARCH_TECTONIC="aarch64"
+  ARCH_KUBECTL="arm64"
   ;;
 *)
   echo "Unsupported architecture: $ARCH"
@@ -342,14 +344,6 @@ cd "$CURRENTDIR" || exit
 stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
-# Various installs via custom scripts.
-# ================================================
-# `uv`: Python package manager.
-curl -LsSf https://astral.sh/uv/install.sh | sh
-# `tflint`: Terraform linter.
-curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-
-# ================================================
 # Install Stow (needs `autoconf` pre-installed).
 # Use `pacman -Syu stow` instead.
 # ================================================
@@ -450,11 +444,6 @@ fi
 unset -f version_compare
 
 # ================================================
-# Install `rclone`.
-# ================================================
-curl https://rclone.org/install.sh | sudo bash
-
-# ================================================
 # Install AWS CLI.
 # ================================================
 PACKAGE="awscliv2"
@@ -505,6 +494,32 @@ else
   # Update: `sudo "$TMPDIR/aws/install" --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update`
   # Uninstall: `sudo /usr/local/aws-cli/v2/current/uninstall`
 fi
+
+# ================================================
+# Install `kubectl`.
+# ================================================
+PACKAGE="kubectl"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH_KUBECTL}/kubectl"
+sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
+curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH_KUBECTL}/kubectl.sha256"
+echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256") $STOWDIR/$PACKAGE/bin/$PACKAGE" | sha256sum --check
+stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+
+# ================================================
+# Various installs via custom scripts.
+# ================================================
+# `uv`: Python package manager.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+curl https://rclone.org/install.sh | sudo bash
+curl -sL https://talos.dev/install | sh
+sudo modprobe br_netfilter # Needed for Talos.
+go install sigs.k8s.io/kind@latest
 
 # ================================================
 # Install fzf.

@@ -311,9 +311,27 @@ autoload -Uz compinit
 # Force rebuild of `.zcompdump`.
 rm -f "${ZDOTDIR}/.zcompdump"; compinit
 
-# `terraform` completions.
+# ================================================================
+# `terraform` Completetions.
+# ================================================================
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/bin/terraform terraform
+
+# ================================================================
+# `kubectl` Completetions.
+# ================================================================
+# Load the kubectl completion code for zsh[1] into the current shell
+source <(kubectl completion zsh)
+# Set the kubectl completion code for zsh[1] to autoload on startup
+kubectl completion zsh > "${fpath[1]}/_kubectl"
+
+# ================================================================
+# `talosctl` Completetions.
+# ================================================================
+# Load `talosctl` completion code into current shell.
+source <(talosctl completion zsh)
+# Set `talosctl` completion code to autoload on startup.
+talosctl completion zsh > "${fpath[1]}/_talosctl"
 
 # ================================================================
 # Enable vi mode in zsh (at end of zshrc).
