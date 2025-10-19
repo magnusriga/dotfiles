@@ -65,6 +65,14 @@ if [ -d "/snap/bin" ]; then
 fi
 
 # ================================================================
+# Add go binary directory to PATH.
+# ================================================================
+go_bin_dir="$(go env GOPATH)/bin"
+if [ -d "$go_bin_dir" ]; then
+  export PATH="$go_bin_dir:$PATH"
+fi
+
+# ================================================================
 # Add fzf binary directory to PATH.
 # ================================================================
 if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
