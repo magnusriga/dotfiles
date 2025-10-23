@@ -305,6 +305,9 @@ fpath=("${ZSH_HOME:-$HOME/.local/share/zsh}/zsh-completions/src" $fpath)
 #   into `EZA_HOME/eza` then adding it to `fpath` below.
 export FPATH="${EZA_HOME:-$HOME/.local/share/eza}/eza/completions/zsh:$FPATH"
 
+# `kind`.
+kind completion zsh > /usr/local/share/zsh/site-functions/_kind
+
 # Activate ZSH completion engine.
 autoload -Uz compinit
 

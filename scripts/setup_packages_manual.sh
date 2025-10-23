@@ -511,6 +511,21 @@ echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256") $STOWDIR/$PACKAGE/bin/$PACKAGE" 
 stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 
 # ================================================
+# Install Helm CLI (Note: Architecture).
+# ================================================
+PACKAGE="helm"
+VERSION=$(curl -s "https://api.github.com/repos/helm/helm/releases/latest" | \grep -Po '"tag_name": *"\K[^"]*')
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://get.helm.sh/helm-${VERSION}-linux-${ARCH_KUBECTL}.tar.gz"
+tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+sudo mv "$TMPDIR/$PACKAGE/linux-${ARCH_KUBECTL}/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+
+# ================================================
 # Various installs via custom scripts.
 # ================================================
 # `uv`: Python package manager.

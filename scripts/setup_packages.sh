@@ -125,6 +125,7 @@ COMMON_PACKAGES=(
   blueprint-compiler gettext
   btrfs-progs
   ca-certificates
+  cabextract
   cmake
   coreutils
   curl
