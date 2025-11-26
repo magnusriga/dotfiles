@@ -315,7 +315,8 @@ yay -Syu --noconfirm \
   matugen-bin \
   xdg-desktop-portal-hyprland-git \
   xdg-desktop-portal-termfilechooser-hunkyburrito-git \
-  zoom
+  zoom \
+  whispering-bin
 
 # Ensure right permissions for `gpg-agent`, then restart it.
 killall gpg-agent dirmngr 2>/dev/null
