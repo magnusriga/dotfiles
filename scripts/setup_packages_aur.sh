@@ -313,6 +313,7 @@ yay -Syu --noconfirm \
   python-pywalfox \
   bibata-cursor-theme \
   matugen-bin \
+  hyprutils-git hyprlang-git hyprwayland-scanner-git \
   xdg-desktop-portal-hyprland-git \
   xdg-desktop-portal-termfilechooser-hunkyburrito-git \
   zoom \
