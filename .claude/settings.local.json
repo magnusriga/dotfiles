@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(hyprctl clients:*)",
+      "Bash(systemctl:*)",
+      "Bash(journalctl:*)",
+      "Bash(busctl:*)",
+      "Bash(hyprctl globalshortcuts:*)",
+      "Bash(hyprctl binds:*)",
+      "Bash(hyprctl dispatch:*)",
+      "Bash(echo:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
