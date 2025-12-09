@@ -1,9 +1,11 @@
 local lsp_name = "biome"
 -- Manually enable, since not installing executable with `mason-lspconfig`.
 vim.lsp.config(lsp_name, {
-	-- Use `pnpm` to run `biome` executable.
-	cmd = { "pnpm", "biome", "lsp-proxy" },
-	-- filetypes = {
+  -- Use globally installed biome.
+  -- NOTE: biome logs "Loading configuration from..." to stderr, which Neovim
+  -- shows as [ERROR] in lsp.log - this is informational, not an actual error.
+  cmd = { "biome", "lsp-proxy" },
+  -- filetypes = {
 	--   "astro",
 	--   -- Both `cssls` and `biome` reports errors on certain tailwind syntax,
 	--   -- e.g. `@import 'tailwindcss' prefix(tw)`, thus might as well keep both for `css`.

@@ -46,7 +46,8 @@ return {
     opts = function(_, opts)
       -- Uses custom `ensure_installed`, see: `plugins/mason.lua`.
       opts.ensure_installed = opts.ensure_installed or {}
-      vim.list_extend(opts.ensure_installed, { "markdownlint-cli2", "markdownlint", "markdown-toc" })
+      -- vim.list_extend(opts.ensure_installed, { "markdownlint-cli2", "markdownlint", "markdown-toc" })
+      vim.list_extend(opts.ensure_installed, { "markdownlint-cli2", "markdown-toc" })
     end,
   },
 
@@ -73,10 +74,13 @@ return {
   --   end,
   -- },
 
-  -- - Using `markdownlint` instead of `markdownlint-cli2`, as `markdownlint` supports `--stdin`,
-  --   meaning it can update diagnostics on `InsertLeave` and `TextChanged` events,
-  --   not just after buffer has been written to file.
-  -- - Also, prefer `nvim-lint` over `none-ls`.
+  -- - Using `markdownlint-cli2`, like LazyVim.
+  -- - `markdownlint-cli2` limitation
+  --   - Cannot update diagnostics on `InsertLeave` and `TextChanged` events,
+  --     only when buffer written to file.
+  --   - `markdownlint` does not have this limitation.
+  --   - Stick with `markdownlint-cli2`, more popular.
+  -- - Prefer `nvim-lint` over `none-ls`.
   --   - Avoids installing another LSP server.
   --   - `nvim-lint` offer better linting messages.
   --   - `nvim-lint` also used for other file linting, setup in `plugins/linting.lua`.
@@ -84,10 +88,16 @@ return {
     "mfussenegger/nvim-lint",
     opts = {
       linters_by_ft = {
-        -- markdown = { "markdownlint-cli2" },
-        markdown = { "markdownlint" },
+        markdown = { "markdownlint-cli2" },
+        -- markdown = { "markdownlint" },
+      },
+      linters = {
+        ["markdownlint-cli2"] = {
+          args = { "--config", vim.fn.expand("$HOME/.config/markdownlint-cli2/.markdownlint-cli2.jsonc"), "--" },
+        },
       },
     },
+
     -- init = function()
     -- local markdownlint = require("lint").linters.markdownlint
     -- markdownlint.args = {

@@ -8,7 +8,12 @@
       "Bash(hyprctl globalshortcuts:*)",
       "Bash(hyprctl binds:*)",
       "Bash(hyprctl dispatch:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(nvim --version:*)",
+      "Bash(nvim:*)",
+      "Bash(pnpm biome:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm -g bin:*)"
     ],
     "deny": [],
     "ask": []

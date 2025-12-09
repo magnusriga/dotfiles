@@ -1,5 +1,13 @@
 local lsp_name = "jsonls"
 
+-- Handler for `workspace/diagnostic/refresh` request.
+-- `jsonls`, and other servers, send this when using pull diagnostics mode.
+-- Return empty response to acknowledge the request.
+-- Avoids "No handler" error.
+vim.lsp.handlers["workspace/diagnostic/refresh"] = function()
+  return vim.NIL
+end
+
 vim.lsp.config(lsp_name, {
   settings = {
     json = {
