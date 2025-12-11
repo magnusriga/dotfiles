@@ -13,7 +13,13 @@
       "Bash(nvim:*)",
       "Bash(pnpm biome:*)",
       "Bash(pnpm add:*)",
-      "Bash(pnpm -g bin:*)"
+      "Bash(pnpm -g bin:*)",
+      "WebFetch(domain:neovim.io)",
+      "WebSearch",
+      "Bash(pacman -Ql:*)",
+      "Bash(curl:*)",
+      "Bash(/usr/local/bin/zig version)",
+      "WebFetch(domain:ziglang.org)"
     ],
     "deny": [],
     "ask": []

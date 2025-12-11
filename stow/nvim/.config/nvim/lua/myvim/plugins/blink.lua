@@ -619,45 +619,60 @@ return {
         end
       end
 
-      -- - `plugins/blink.lua` (below):
-      --   `<Tab>` mapped to call each `MyVim.action` function, in sequence.
+      -- ==========================================
+      -- `<Tab>` behavior.
+      -- ==========================================
+      -- - `sidekick.lua`
+      --   - Setup `<Tab>` there, thus commented out below.
+      --   - `<Tab>` runs `MyVim.cmp.actions`, in turn.
       --
-      -- - `MyVim.cmp.lua`:
-      --   `snippet_forward` and `snippet_backward` functions are added to
-      --   `MyVim.cmp.actions` table, which moves forward and backward in snippet ONLY if
-      --   snippet is active, i.e. being filled in on screen, otherwise does nothing.
+      -- - `MyVim.cmp.lua`
+      --   - `snippet_forward`, `snippet_backward`, and other functions are added to
+      --     `MyVim.cmp.actions` table.
+      --   - Snippet functions move forward and backward in snippet ONLY if snippet is active,
+      --     i.e. being filled in on screen, otherwise does nothing.
+      --   - No need to include `snippet_forward` on `<Tab>`, in e.g. `sidekick`
+      --     `keys`, as `default` `blink.cmp` preset above handles it.
       --
-      -- - `plugins/copilot.lua`:
-      --   `ai_accept` function is added to `MyVim.cmp.actions` table,
-      --   which accepts AI suggestion if visible ONLY if Copilot suggestion is visible,
-      --   which is always when typing, since `auto_trigger` is `true`, otherwise does nothing.
+      -- - Thus, `<Tab>` calls these functions, in sequence:
+      --   - If snippet visible: `snippet_forward`, to move forward to next snippet input.
+      --   - `sidekick.nes_jump_or_apply()`.
+      --   - `vim.inline_completion.accept()`.
+      --   - `<tab>` fallback, i.e. inserts tab character.
       --
-      -- - `else` condition below applies, as `super-tab` preset is not used, see above,
-      --   using `default` preset instead, which follows Neovim built-in completion keymaps,
-      --   e.g. `<C-y>` | etc.
+      -- - `plugins/blink.lua` (below)
+      --   - If not commented out, only `else`-block below applies,
+      --     as not using `super-tab` preset.
+      --   - Commented out, does not apply.
       --
-      -- - Thus, `<Tab>` calls these functions in sequence:
-      --   - If snippet visible: `snippet_forward` function, to move forward to next snippet input.
-      --   - If Copilot suggestion visible: `ai_accept` function, to accept Copilot suggestion.
+      -- - `plugins/copilot.lua`
+      --   - Not used, using `vim.inline_completion` instead.
+      --   - Thus, no tab setup there.
+      --   - Before
+      --     - `ai_accept` function was added to `MyVim.cmp.actions` table.
+      --     - Accepted AI suggestion if visible, ONLY if Copilot suggestion is visible,
+      --       which is always when typing, since `auto_trigger` is `true`,
+      --       otherwise does nothing.
+      --     - No longer applies.
       --
-      if not opts.keymap["<Tab>"] then
-        if opts.keymap.preset == "super-tab" then
-          opts.keymap["<Tab>"] = {
-            require("blink.cmp.keymap.presets")["super-tab"]["<Tab>"][1],
-            MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
-            "fallback",
-          }
-        else
-          -- - This condition applies, overwriting `Tab` in selected preset, i.e. `default`.
-          -- - Land in this `else`, as not using `super-tab` preset.
-          -- - Thus, `<Tab>` calls `snippet_forward` if snippet is visible,
-          --   then `ai_accept` if Copilot suggestion is visible.
-          opts.keymap["<Tab>"] = {
-            MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
-            "fallback",
-          }
-        end
-      end
+      -- if not opts.keymap["<Tab>"] then
+      --   if opts.keymap.preset == "super-tab" then
+      --     opts.keymap["<Tab>"] = {
+      --       require("blink.cmp.keymap.presets")["super-tab"]["<Tab>"][1],
+      --       MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
+      --       "fallback",
+      --     }
+      --   else
+      --     -- - This condition applies, overwriting `Tab` in selected preset, i.e. `default`.
+      --     -- - Land in this `else`, as not using `super-tab` preset.
+      --     -- - Thus, `<Tab>` calls `snippet_forward` if snippet is visible,
+      --     --   then `ai_accept` if Copilot suggestion is visible.
+      --     opts.keymap["<Tab>"] = {
+      --       MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
+      --       "fallback",
+      --     }
+      --   end
+      -- end
 
       -- Unset custom prop to pass `blink.cmp` validation.
       opts.sources.compat = nil

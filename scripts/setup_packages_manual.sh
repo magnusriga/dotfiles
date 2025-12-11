@@ -252,7 +252,10 @@ sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir "$TMPDIR/$PACKAGE"
 mkdir -p "$STOWDIR/$PACKAGE"
-curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${ARCH_NEOVIM}.tar.gz"
+# Stable release:
+# curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${ARCH_NEOVIM}.tar.gz"
+# Nightly release (0.12-dev) - needed for vim.lsp.inline_completion:
+curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-${ARCH_NEOVIM}.tar.gz"
 tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE" --strip-components=1
 # Copy the extracted files to stow directory
 sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
@@ -264,7 +267,8 @@ stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 # Needed for `ghostty`.
 # ================================================
 PACKAGE="zig"
-VERSION=$(curl -s "https://api.github.com/repos/ziglang/zig/releases/latest" | \grep -Po '"tag_name": *"\K[^"]*')
+# Use ziglang.org JSON index instead of GitHub API (which may lag behind actual releases).
+VERSION=$(curl -s https://ziglang.org/download/index.json | \grep -oP '"[0-9]+\.[0-9]+\.[0-9]+"' | head -1 | tr -d '"')
 sudo rm -rf "$TMPDIR/$PACKAGE"
 sudo rm -rf "$STOWDIR/$PACKAGE"
 mkdir -p "$TMPDIR/$PACKAGE/bin"
