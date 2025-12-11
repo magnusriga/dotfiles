@@ -19,7 +19,10 @@
       "Bash(pacman -Ql:*)",
       "Bash(curl:*)",
       "Bash(/usr/local/bin/zig version)",
-      "WebFetch(domain:ziglang.org)"
+      "WebFetch(domain:ziglang.org)",
+      "Bash(grep:*)",
+      "Bash(ps:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

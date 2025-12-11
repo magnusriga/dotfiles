@@ -396,18 +396,6 @@ map("n", "<leader>ft", function() Snacks.terminal(nil, { cwd = MyVim.root() }) e
 map("n", "<c-/>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "Terminal (Root Dir)" })
 map("n", "<c-_>",      function() Snacks.terminal(nil, { cwd = MyVim.root() }) end, { desc = "which_key_ignore" })
 
--- Terminal Mappings
--- - Close current window when in terminal mode.
-map("t", "<C-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
-map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
--- map("t", "<c-/>", "<cmd>close<cr>", { desc = "Hide Terminal" })
--- map("t", "<c-_>", "<cmd>close<cr>", { desc = "which_key_ignore" })
-
--- Exit terminal mode in builtin terminal with shortcut that is easier to remember.
--- Will not work in all terminal emulators or in tmux.
--- No need, use built-in: <C-\><C-n>.
--- vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
-
 ---------------------------------
 -- Tabs.
 ---------------------------------
