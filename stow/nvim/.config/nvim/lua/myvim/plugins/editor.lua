@@ -584,4 +584,44 @@ return {
       },
     },
   },
+
+  -- Colorizes color codes in files.
+  -- Examples: `#ff0000`, `rgb(255,0,0)`, `hsl(0, 100%, 50%)`, `oklch(0.3 0.1406 26.42)`, `red`, etc.
+  -- It also adds colors to these, from `tailwind` LSP: `oklch(0.3_0.1406_26.42)`.
+  -- Turn `names` off, not using names for color.
+  {
+    "catgoose/nvim-colorizer.lua",
+    event = "BufReadPre",
+    opts = {
+      user_default_options = {
+        -- Enable all CSS *features*:
+        -- `names`, `RGB`, `RGBA`, `RRGGBB`, `RRGGBBAA`, `AARRGGBB`, `rgb_fn`, `hsl_fn`, `oklch_fn`.
+        css = true,
+        names = false,
+
+        -- Enable tailwind colors: boolean | 'normal' | 'lsp' | 'both'.
+        -- True sets to 'normal'.
+        tailwind = "both",
+
+        -- Options for highlighting tailwind names.
+        tailwind_opts = {
+          -- When using tailwind = 'both', update tailwind names from LSP results.
+          update_names = true,
+        },
+
+        -- Enable `sass` colors.
+        sass = { enable = true, parsers = { "css" } },
+
+        -- Enable `xterm` 256-color codes: `#xNN` | `\e[38;5;NNNm`.
+        xterm = true,
+
+        -- Highlighting mode: 'background' | 'foreground' | 'virtualtext'.
+        mode = "background",
+
+        -- Update color values even if buffer is not focused.
+        -- Example use: cmp_menu, cmp_docs.
+        always_update = true,
+      },
+    },
+  },
 }
