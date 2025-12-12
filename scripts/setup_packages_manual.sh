@@ -129,6 +129,9 @@ if command -v luarocks &>/dev/null; then
   sudo luarocks install luasocket
 fi
 
+# Install bun.
+curl -fsSL https://bun.com/install | bash
+
 # ================================================
 # Install eza theme.
 # ================================================

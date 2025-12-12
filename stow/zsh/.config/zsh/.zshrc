@@ -663,3 +663,6 @@ alias claude="~/.claude/local/claude"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+
+# bun completions
+[ -s "/home/magnus/.bun/_bun" ] && source "/home/magnus/.bun/_bun"
