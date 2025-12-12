@@ -619,12 +619,19 @@ return {
         end
       end
 
+      -- Add inline_completion to `cmp` actions, called below.
+      MyVim.cmp.actions.inline_completion = function()
+        if vim.lsp.inline_completion.get() then
+          return true
+        end
+      end
+
       -- ==========================================
       -- `<Tab>` behavior.
       -- ==========================================
       -- - `sidekick.lua`
-      --   - Setup `<Tab>` there, thus commented out below.
-      --   - `<Tab>` runs `MyVim.cmp.actions`, in turn.
+      --   - Not sure if the below covers normal mode.
+      --   - Thus, setup `<Tab>` there as well, for normal mode.
       --
       -- - `MyVim.cmp.lua`
       --   - `snippet_forward`, `snippet_backward`, and other functions are added to
@@ -633,21 +640,17 @@ return {
       --     i.e. being filled in on screen, otherwise does nothing.
       --   - No need to include `snippet_forward` on `<Tab>`, in e.g. `sidekick`
       --     `keys`, as `default` `blink.cmp` preset above handles it.
+      --   - Still, include to be safe.
       --
       -- - Thus, `<Tab>` calls these functions, in sequence:
       --   - If snippet visible: `snippet_forward`, to move forward to next snippet input.
       --   - `sidekick.nes_jump_or_apply()`.
+      --   - `ai_accept` function, if added to `MyVim.cmp.actions`.
       --   - `vim.inline_completion.accept()`.
       --   - `<tab>` fallback, i.e. inserts tab character.
       --
-      -- - `plugins/blink.lua` (below)
-      --   - If not commented out, only `else`-block below applies,
-      --     as not using `super-tab` preset.
-      --   - Commented out, does not apply.
-      --
       -- - `plugins/copilot.lua`
       --   - Not used, using `vim.inline_completion` instead.
-      --   - Thus, no tab setup there.
       --   - Before
       --     - `ai_accept` function was added to `MyVim.cmp.actions` table.
       --     - Accepted AI suggestion if visible, ONLY if Copilot suggestion is visible,
@@ -655,24 +658,32 @@ return {
       --       otherwise does nothing.
       --     - No longer applies.
       --
-      -- if not opts.keymap["<Tab>"] then
-      --   if opts.keymap.preset == "super-tab" then
-      --     opts.keymap["<Tab>"] = {
-      --       require("blink.cmp.keymap.presets")["super-tab"]["<Tab>"][1],
-      --       MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
-      --       "fallback",
-      --     }
-      --   else
-      --     -- - This condition applies, overwriting `Tab` in selected preset, i.e. `default`.
-      --     -- - Land in this `else`, as not using `super-tab` preset.
-      --     -- - Thus, `<Tab>` calls `snippet_forward` if snippet is visible,
-      --     --   then `ai_accept` if Copilot suggestion is visible.
-      --     opts.keymap["<Tab>"] = {
-      --       MyVim.cmp.map({ "snippet_forward", "ai_accept" }),
-      --       "fallback",
-      --     }
-      --   end
-      -- end
+      if not opts.keymap["<Tab>"] then
+        if opts.keymap.preset == "super-tab" then -- super-tab
+          opts.keymap["<Tab>"] = {
+            require("blink.cmp.keymap.presets").get("super-tab")["<Tab>"][1],
+            MyVim.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }),
+            function()
+              return vim.lsp.inline_completion.get()
+            end,
+            "fallback",
+          }
+        else
+          -- - This condition applies, overwriting `Tab` in selected preset, i.e. `default`.
+          -- - Land in this `else`, as not using `super-tab` preset.
+          -- - Thus, `<Tab>` calls `snippet_forward` if snippet is visible,
+          --   then `ai_nes` if Copilot suggestion is visible,
+          --   then `inline_completion` if inline suggestion is visible,
+          --   otherwise falls back to inserting tab character.
+          opts.keymap["<Tab>"] = {
+            MyVim.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }),
+            function()
+              return vim.lsp.inline_completion.get()
+            end,
+            "fallback",
+          }
+        end
+      end
 
       -- Unset custom prop to pass `blink.cmp` validation.
       opts.sources.compat = nil

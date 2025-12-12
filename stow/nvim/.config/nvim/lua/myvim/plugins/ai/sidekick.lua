@@ -58,7 +58,7 @@ return {
 
   {
     "folke/sidekick.nvim",
-    opts = function()
+    opts = function(_, opts)
       -- Accept inline suggestions or next edits.
       MyVim.cmp.actions.ai_nes = function()
         local Nes = require("sidekick.nes")
@@ -66,13 +66,7 @@ return {
           return true
         end
       end
-      -- Add inline_completion to `cmp` actions, called below.
-      MyVim.cmp.actions.inline_completion = function()
-        print("Applying inline completion")
-        if vim.lsp.inline_completion.get() then
-          return true
-        end
-      end
+
       -- Toggle to disable | enable NES.
       Snacks.toggle({
         name = "Sidekick NES",
@@ -83,14 +77,28 @@ return {
           require("sidekick.nes").enable(state)
         end,
       }):map("<leader>uN")
+
+      -- Merge in static options.
+      opts = vim.tbl_deep_extend("force", opts, {
+        cli = {
+          -- Persists terminal sessions across Neovim restarts.
+          mux = {
+            enabled = true,
+          },
+          -- Custom diagnostic prompts.
+          -- prompts = {
+          --   magnus = "Can you help me fix this?",
+          -- },
+        },
+      })
+
+      return opts
     end,
     -- stylua: ignore
     keys = {
-      -- `<tab>`, normal mode: `nes` > Normal tab.
-      { "<tab>", MyVim.cmp.map({ "snippet_forward", "ai_nes" }, "<tab>"), mode = { "n" }, expr = true },
-
-      -- `<tab>`, insert mode: `vim.inline_completion`.
-      { "<tab>", MyVim.cmp.map({ "inline_completion" }, "<tab>"), mode = { "i" }, expr = true },
+      -- `nes` also useful in normal mode.
+      -- Other `<tab>` shortcuts setup in `blink.cmp`.
+      { "<tab>", MyVim.cmp.map({ "ai_nes" }, "<tab>"), mode = { "n" }, expr = true },
 
       { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
 

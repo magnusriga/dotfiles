@@ -26,6 +26,7 @@ return {
     "folke/snacks.nvim",
     opts = {
       picker = {
+        ui_select = true, -- Use snacks.picker for vim.ui.select (sidekick prompts, code actions, etc.)
         win = {
           input = {
             keys = {

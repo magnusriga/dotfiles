@@ -576,17 +576,18 @@ return {
       require("fzf-lua").setup(opts)
     end,
     init = function()
-      MyVim.on_very_lazy(function()
-        -- Overwrite `vim.ui.select`, i.e. interactive select menu,
-        -- with `fzf-lua`, passing in `opt.ui_select` from above,
-        -- when `lazy.nvim` is done installing and loading plugins.
-        vim.ui.select = function(...)
-          require("lazy").load({ plugins = { "fzf-lua" } })
-          local opts = MyVim.opts("fzf-lua") or {}
-          require("fzf-lua").register_ui_select(opts.ui_select or nil)
-          return vim.ui.select(...)
-        end
-      end)
+      -- Using Snacks instead.
+      -- MyVim.on_very_lazy(function()
+      --   -- Overwrite `vim.ui.select`, i.e. interactive select menu,
+      --   -- with `fzf-lua`, passing in `opt.ui_select` from above,
+      --   -- when `lazy.nvim` is done installing and loading plugins.
+      --   vim.ui.select = function(...)
+      --     require("lazy").load({ plugins = { "fzf-lua" } })
+      --     local opts = MyVim.opts("fzf-lua") or {}
+      --     require("fzf-lua").register_ui_select(opts.ui_select or nil)
+      --     return vim.ui.select(...)
+      --   end
+      -- end)
 
       -- - Overwrite behaviour for built-in LSP keybindings, and/or from `plugins/lsp/keymaps.lua` (not used),
       --   so `fzf-lua` is used in case LSP command could returns multiple results from language server.
