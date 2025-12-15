@@ -147,7 +147,7 @@ adjust-cell-height = 5%
 # foreground = ffffff
 
 # theme = dark:catppuccin-mocha,light:catppuccin-latte
-theme = OneHalfDark
+theme = One Half Dark
 
 # If `true`, bold text will use the bright color palette.
 # Default: bold-is-bright = false
