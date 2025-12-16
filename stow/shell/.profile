@@ -128,16 +128,6 @@ done
 unset file
 
 # ================================================================
-# Load:`nvm`, `node`, `npm`.
-# ================================================================
-[[ -n "$SHELL_DEBUG" ]] && echo ".profile > Loading nvm, node, and npm..."
-export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}
-# Load nvm.
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-# Load nvm bash completion.
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-# ================================================================
 # Bun completions.
 # ================================================================
 [[ -n "$SHELL_DEBUG" ]] && echo ".profile > Loading Bun completions..."
