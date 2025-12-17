@@ -139,6 +139,7 @@ COMMON_PACKAGES=(
   git
   glow
   gnupg
+  inotify-tools
   # lazygit
   lsb-release
   luarocks

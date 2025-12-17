@@ -9,6 +9,11 @@ vim.lsp.config("*", {
   --   debounce_text_changes = 1000,
   -- },
   capabilities = {
+    general = {
+      -- Ensure all LSP clients use the same position encoding.
+      -- UTF-16 is the LSP spec default and most widely supported.
+      positionEncodings = { "utf-16" },
+    },
     textDocument = {
       semanticTokens = {
         multilineTokenSupport = true,

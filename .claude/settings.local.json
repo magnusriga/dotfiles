@@ -22,7 +22,9 @@
       "WebFetch(domain:ziglang.org)",
       "Bash(grep:*)",
       "Bash(ps:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(pacman -Q:*)",
+      "Bash(pacman:*)"
     ],
     "deny": [],
     "ask": []
