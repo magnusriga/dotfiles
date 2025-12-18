@@ -24,7 +24,10 @@
       "Bash(ps:*)",
       "Bash(cat:*)",
       "Bash(pacman -Q:*)",
-      "Bash(pacman:*)"
+      "Bash(pacman:*)",
+      "WebFetch(domain:wiki.hypr.land)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

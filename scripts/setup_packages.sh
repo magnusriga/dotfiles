@@ -195,7 +195,7 @@ if [ "$DISTRO" = "arch" ]; then
     ttf-fira-sans ttf-fira-code ttf-firacode-nerd ttf-dejavu \
     noto-fonts noto-fonts-emoji noto-fonts-cjk noto-fonts-extra \
     hyprland hyprpaper hypridle hyprlock \
-    hyprshot hyprpicker hyprsunset \
+    hyprpicker hyprsunset \
     nwg-look \
     nwg-displays \
     nwg-dock-hyprland \
@@ -303,6 +303,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     zsh-doc \
     chromium-browser \
     libxkbcommon-x11-0 libwayland-client0 waypipe \
+    grim slurp wl-clipboard \
     libreoffice \
     exuberant-ctags \
     openssh-client openssh-server \
