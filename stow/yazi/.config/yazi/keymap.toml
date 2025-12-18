@@ -8,6 +8,14 @@
 [mgr]
 prepend_keymap = [
   # ---------------------------
+  # NAVIGATION (vim-style jumplist)
+  # ---------------------------
+  # Overwrites yazi.nvim's "open and pick window" (disabled in yazi.lua).
+  { on = ["<C-o>"], run = "back", desc = "Jump back" },
+  # Note: Outside nvim, <C-i> and <Tab> share same keycode - add <Tab> binding if needed.
+  { on = ["<C-i>"], run = "forward", desc = "Jump forward" },
+
+  # ---------------------------
   # GO-TO
   # ---------------------------
   { on = ["g", "r"], run = 'shell -- ya emit cd "$(git rev-parse --show-toplevel)"', desc = "Go to git root" },

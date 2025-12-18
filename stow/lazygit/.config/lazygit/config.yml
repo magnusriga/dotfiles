@@ -2,9 +2,9 @@ gui:
   nerdFontsVersion: "3"
   scrollHeight: 20
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
 keybinding:
   universal:
     prevBlock: <c-p>

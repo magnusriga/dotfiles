@@ -62,6 +62,7 @@ x86_64)
   ARCH_ZIG="x86_64"
   ARCH_TECTONIC="x86_64"
   ARCH_KUBECTL="amd64"
+  ARCH_LAZYGIT="x86_64"
   ;;
 aarch64 | arm64)
   ARCH_TODOCHECK="arm64"
@@ -72,6 +73,7 @@ aarch64 | arm64)
   ARCH_ZIG="aarch64"
   ARCH_TECTONIC="aarch64"
   ARCH_KUBECTL="arm64"
+  ARCH_LAZYGIT="arm64"
   ;;
 *)
   echo "Unsupported architecture: $ARCH"
@@ -89,7 +91,7 @@ if [ -f /etc/os-release ]; then
 fi
 
 echo "Detected architecture: $ARCH"
-echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC"
+echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC, lazygit: $ARCH_LAZYGIT"
 
 # ================================================
 # Setup directories and variables needed for
@@ -439,7 +441,7 @@ if [ "$INSTALL_LAZYGIT" = true ]; then
   VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
   sudo rm -rf "$TMPDIR/$PACKAGE"
   sudo rm -rf "$STOWDIR/$PACKAGE"
-  curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_arm64.tar.gz"
+  curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_${ARCH_LAZYGIT}.tar.gz"
   # tar'ed file name: lazygit.
   tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR"
   sudo install "$TMPDIR/$PACKAGE" -D -t "$STOWDIR/$PACKAGE/bin"

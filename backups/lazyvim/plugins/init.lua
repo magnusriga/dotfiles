@@ -24,8 +24,11 @@ return {
 
       opts.formatters.biome = {
         args = {
-          "check", "--fix", "--stdin-file-path", "$FILENAME"
-        }
+          "check",
+          "--fix",
+          "--stdin-file-path",
+          "$FILENAME",
+        },
       }
     end,
   },
@@ -142,11 +145,11 @@ return {
     },
     keys = {
       -- Add `which-key` group name.
-      { "<leader>a",  nil,                   desc = "AI/Claude Code" },
+      { "<leader>a", nil, desc = "AI/Claude Code" },
 
       -- Launch ClaudeCode.
       { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude" },
-      { "<c-/>",      "<cmd>ClaudeCode<cr>", mode = "n",             desc = "Toggle Claude" },
+      { "<c-/>", "<cmd>ClaudeCode<cr>", mode = "n", desc = "Toggle Claude" },
 
       -- - Swap to left window, with standard Neovim keybinding.
       -- - Removes `<c-w` to delete word in terminal, when in insert mode,
@@ -165,19 +168,19 @@ return {
 
       -- - Move cursor to ClaudeCode window.
       -- - No need, use `<c-w>l` | `<c-w>w`.
-      { "<leader>af", "<cmd>ClaudeCodeFocus<cr>",       desc = "Focus Claude" },
+      { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
 
       -- `--continue`: Automaticlly continue most recent conversation.
       -- `--resume`: Show convestation picker.
       -- BUG: Does not currently work in `claudecode.nvim`.
-      { "<leader>ar", "<cmd>ClaudeCode --resume<cr>",   desc = "Resume Claude" },
+      { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume Claude" },
       { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue Claude" },
 
       -- Start ClaudeCode with current buffer as context.
-      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>",       desc = "Add current buffer" },
+      { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add current buffer" },
 
       -- Start ClaudeCode with visual selection as context.
-      { "<leader>as", "<cmd>ClaudeCodeSend<cr>",        mode = "v",                 desc = "Send to Claude" },
+      { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send to Claude" },
 
       -- Start ClaudeCode with file(s) from file explorere as context.
       {
@@ -192,7 +195,7 @@ return {
       --   - Accept: `:w`
       --   - Reject: `:q`
       { "<leader>aa", "<cmd>ClaudeCodeDiffAccept<cr>", desc = "Accept diff" },
-      { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>",   desc = "Deny diff" },
+      { "<leader>ad", "<cmd>ClaudeCodeDiffDeny<cr>", desc = "Deny diff" },
     },
   },
 }
