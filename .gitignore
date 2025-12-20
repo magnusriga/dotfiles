@@ -16,4 +16,5 @@ Thumbs.db
 # Zsh compiled files and cache
 .zcompdump
 .zcompdump-*
+.zcompdump.*
 *.zwc
