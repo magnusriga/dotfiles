@@ -56,7 +56,7 @@ echo "Target username: $TARGET_USERNAME"
 # - setup_git_credentials
 # - setup_fonts
 # - setup_nvm
-# - setup_pnpm
+# - setup_bun
 # - setup_symlinks
 # - setup_tmux
 # - setup_yazi

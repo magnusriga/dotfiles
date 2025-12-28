@@ -172,18 +172,11 @@ if [ -f "./setup_nvm.sh" ]; then
 fi
 
 # ================================================
-# Install: `pnpm` and global `pnpm` packages.
+# Install: `bun` and global packages.
 # ================================================
-if [ -f "./setup_pnpm.sh" ]; then
-  . ./setup_pnpm.sh
+if [ -f "./setup_bun.sh" ]; then
+  . ./setup_bun.sh
 fi
-
-# ================================================
-# Install: `bun`.
-# ================================================
-curl -fsSL https://bun.sh/install | bash
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
 
 # ================================================
 # Install: `Clipboard`.

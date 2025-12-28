@@ -337,6 +337,16 @@ source <(talosctl completion zsh)
 talosctl completion zsh > "${fpath[1]}/_talosctl"
 
 # ================================================================
+# `bun` Completions.
+# ================================================================
+[ -s "/home/magnus/.bun/_bun" ] && source "/home/magnus/.bun/_bun"
+
+# ================================================================
+# `claude code` LSP support.
+# ================================================================
+export ENABLE_LSP_TOOL=1
+
+# ================================================================
 # Enable vi mode in zsh (at end of zshrc).
 # ZSH_HOME: ZSH plugin directory.
 # ================================================================
@@ -664,5 +674,3 @@ alias claude="~/.claude/local/claude"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
 
-# bun completions
-[ -s "/home/magnus/.bun/_bun" ] && source "/home/magnus/.bun/_bun"

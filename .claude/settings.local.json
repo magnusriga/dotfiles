@@ -28,7 +28,8 @@
       "WebFetch(domain:wiki.hypr.land)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(timedatectl status:*)"
+      "Bash(timedatectl status:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
