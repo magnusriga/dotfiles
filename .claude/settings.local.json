@@ -27,7 +27,8 @@
       "Bash(pacman:*)",
       "WebFetch(domain:wiki.hypr.land)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(timedatectl status:*)"
     ],
     "deny": [],
     "ask": []

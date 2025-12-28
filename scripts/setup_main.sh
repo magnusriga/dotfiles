@@ -86,6 +86,14 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
 fi
 
 # ================================================
+# Setup: Time synchronization (NTP) on Arch Linux.
+# ================================================
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ]; then
+  echo "Enabling time synchronization (systemd-timesyncd)."
+  sudo systemctl enable --now systemd-timesyncd
+fi
+
+# ================================================
 # Setup: Rust toolchain via `rustup`, and add it to path.
 # ================================================
 echo "Setup rust toolchain via rustup and add it to path."
