@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Hyprpicker
+Comment=Color picker for Hyprland
+Exec=hyprpicker -a -f hex
+Icon=color-select-symbolic
+Terminal=false
+Type=Application
+Categories=Utility;Graphics;
+Keywords=color;picker;eyedropper;
