@@ -52,6 +52,14 @@ if [ -d "$CLAUDE_HOME/local" ]; then
 fi
 
 # ================================================================
+# Add OpenCode to Path
+# ================================================================
+export OPENCODE_HOME="$HOME/.opencode"
+if [ -d "$OPENCODE_HOME/bin" ]; then
+  export PATH="$OPENCODE_HOME/bin:$PATH"
+fi
+
+# ================================================================
 # Add Homebrew to Path
 # Not using Homebrew on Linux.
 # ================================================================

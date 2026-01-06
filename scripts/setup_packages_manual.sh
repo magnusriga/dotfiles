@@ -540,6 +540,8 @@ curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/instal
 curl https://rclone.org/install.sh | sudo bash
 curl -sL https://talos.dev/install | sh
 sudo modprobe br_netfilter # Needed for Talos.
+# `opencode`: AI-powered coding assistant.
+curl -fsSL https://opencode.ai/install | bash
 go install sigs.k8s.io/kind@latest
 
 # ================================================
