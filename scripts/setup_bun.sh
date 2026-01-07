@@ -26,7 +26,8 @@ function install_global_packages() {
     @mermaid-js/mermaid-cli \
     @anthropic-ai/claude-code \
     @openai/codex \
-    @playwright/test@latest
+    @playwright/test@latest \
+    @mixedbread/mgrep
 }
 
 echo "Installing global packages with bun."
@@ -34,6 +35,11 @@ install_global_packages
 
 # Clean up function
 unset install_global_packages
+
+# Install mgrep plugins for AI coding assistants.
+mgrep install-claude-code  # Claude Code
+mgrep install-opencode     # OpenCode
+mgrep install-codex        # Codex
 
 # Install Playwright browsers - handle dependencies differently per distro
 if [ -f /etc/arch-release ]; then
