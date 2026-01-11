@@ -106,3 +106,10 @@ if [ -d "/opt/orbstack-guest/bin" ]; then
   *) export PATH="/opt/orbstack-guest/bin:$PATH" ;;
   esac
 fi
+
+# ================================================================
+# Add lua-language-server to PATH.
+# ================================================================
+if [ -d "$HOME/.local/share/lua-language-server/bin" ]; then
+  export PATH="$HOME/.local/share/lua-language-server/bin:$PATH"
+fi

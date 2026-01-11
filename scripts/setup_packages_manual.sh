@@ -606,6 +606,23 @@ go install sigs.k8s.io/kind@latest
 # stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
+# Install lua-language-server from source.
+# Guide: https://luals.github.io/wiki/build/
+# Requires: ninja, C++17 support.
+# Note: Must run in-place, add bin/ to PATH.
+# ================================================
+PACKAGE="lua-language-server"
+LUALS_DIR="$HOME/.local/share/$PACKAGE"
+rm -rf "$LUALS_DIR"
+git clone https://github.com/LuaLS/lua-language-server.git "$LUALS_DIR"
+cd "$LUALS_DIR" || exit
+git submodule update --depth 1 --init --recursive
+bash ./make.sh
+cd "$CURRENTDIR" || exit
+echo "lua-language-server installed to $LUALS_DIR"
+echo "Ensure $LUALS_DIR/bin is in PATH."
+
+# ================================================
 # Install luarocks, needed by lazyvim.
 # Use `pacman -Syu luarocks` instead.
 # ================================================

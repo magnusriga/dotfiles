@@ -29,7 +29,14 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(timedatectl status:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "WebFetch(domain:luals.github.io)",
+      "Bash(bash -c '\n# Variable setup from top of file\nCURRENTDIR=$\\(pwd\\)\nTARGETDIR=\"\"/usr/local\"\"\nSTOWDIR=\"\"/usr/local/stow\"\"\nTMPDIR=\"\"$HOME/build\"\"\n\nsudo mkdir -p $STOWDIR\nsudo chown -R \"\"$USER\"\":\"\"$USER\"\" $TARGETDIR $STOWDIR\nsudo chmod -R 755 $TARGETDIR\n\n# Install lua-language-server from source\nPACKAGE=\"\"lua-language-server\"\"\nsudo rm -rf \"\"$TMPDIR/$PACKAGE\"\"\nsudo rm -rf \"\"$STOWDIR/$PACKAGE\"\"\nmkdir -p \"\"$STOWDIR/$PACKAGE\"\"\ngit clone https://github.com/LuaLS/lua-language-server.git \"\"$TMPDIR/$PACKAGE\"\"\ncd \"\"$TMPDIR/$PACKAGE\"\" || exit\ngit submodule update --depth 1 --init --recursive\n./make.sh\n# Copy the entire build output to stow directory\nsudo cp -r \"\"$TMPDIR/$PACKAGE/bin\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo chmod 755 \"\"$STOWDIR/$PACKAGE/bin/$PACKAGE\"\"\ncd \"\"$CURRENTDIR\"\" || exit\nstow -vv -d \"\"$STOWDIR\"\" -t \"\"$TARGETDIR\"\" \"\"$PACKAGE\"\"\n')",
+      "Bash(bash -c '\nCURRENTDIR=$\\(pwd\\)\nTARGETDIR=\"\"/usr/local\"\"\nSTOWDIR=\"\"/usr/local/stow\"\"\nTMPDIR=\"\"$HOME/build\"\"\n\nPACKAGE=\"\"lua-language-server\"\"\nsudo rm -rf \"\"$STOWDIR/$PACKAGE\"\"\nmkdir -p \"\"$STOWDIR/$PACKAGE\"\"\ncd \"\"$TMPDIR/$PACKAGE\"\" || exit\nbash ./make.sh\nsudo cp -r \"\"$TMPDIR/$PACKAGE/bin\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo chmod 755 \"\"$STOWDIR/$PACKAGE/bin/$PACKAGE\"\"\ncd \"\"$CURRENTDIR\"\" || exit\nstow -vv -d \"\"$STOWDIR\"\" -t \"\"$TARGETDIR\"\" \"\"$PACKAGE\"\"\n')",
+      "Bash(lua-language-server:*)",
+      "Bash(bash -c '\nTARGETDIR=\"\"/usr/local\"\"\nSTOWDIR=\"\"/usr/local/stow\"\"\nTMPDIR=\"\"$HOME/build\"\"\nPACKAGE=\"\"lua-language-server\"\"\n\n# Remove old stow and re-stow properly\nstow -vv -D -d \"\"$STOWDIR\"\" -t \"\"$TARGETDIR\"\" \"\"$PACKAGE\"\" 2>/dev/null || true\nsudo rm -rf \"\"$STOWDIR/$PACKAGE\"\"\nmkdir -p \"\"$STOWDIR/$PACKAGE/bin\"\"\n\n# Copy binary\nsudo cp \"\"$TMPDIR/$PACKAGE/bin/lua-language-server\"\" \"\"$STOWDIR/$PACKAGE/bin/\"\"\nsudo chmod 755 \"\"$STOWDIR/$PACKAGE/bin/lua-language-server\"\"\n\n# Copy required runtime files to stow root\nsudo cp \"\"$TMPDIR/$PACKAGE/main.lua\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp \"\"$TMPDIR/$PACKAGE/debugger.lua\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp -r \"\"$TMPDIR/$PACKAGE/locale\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp -r \"\"$TMPDIR/$PACKAGE/script\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp -r \"\"$TMPDIR/$PACKAGE/meta\"\" \"\"$STOWDIR/$PACKAGE/\"\"\n\nstow -vv -d \"\"$STOWDIR\"\" -t \"\"$TARGETDIR\"\" \"\"$PACKAGE\"\"\n')",
+      "Bash(find:*)",
+      "Bash(uvx:*)"
     ],
     "deny": [],
     "ask": []

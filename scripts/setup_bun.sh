@@ -27,11 +27,34 @@ function install_global_packages() {
     @anthropic-ai/claude-code \
     @openai/codex \
     @playwright/test@latest \
-    @mixedbread/mgrep
+    @mixedbread/mgrep \
+    lighthouse
 }
 
 echo "Installing global packages with bun."
 install_global_packages
+
+echo "Trusting all global bun dependencies with scripts."
+bun pm -g trust --all
+
+# Gemini CLI requires npm (not compatible with bun)
+echo "Installing Gemini CLI with npm."
+npm install -g @google/gemini-cli
+
+echo "Installing Gemini CLI extensions..."
+gemini extensions install https://github.com/ChromeDevTools/chrome-devtools-mcp --consent
+# gemini extensions install https://github.com/github/github-mcp-server --consent
+gemini extensions install https://github.com/upstash/context7 --consent
+# gemini extensions install https://github.com/stripe/ai --consent
+gemini extensions install https://github.com/hashicorp/terraform-mcp-server --consent
+# gemini extensions install https://github.com/elevenlabs/elevenlabs-mcp --consent
+gemini extensions install https://github.com/gemini-cli-extensions/nanobanana --consent
+gemini extensions install https://github.com/redis/mcp-redis --consent
+gemini extensions install https://github.com/gemini-cli-extensions/security --consent
+gemini extensions install https://github.com/gemini-cli-extensions/code-review --consent
+gemini extensions install https://github.com/gemini-cli-extensions/jules --consent
+gemini extensions install https://github.com/gemini-cli-extensions/workspace --consent
+gemini extensions install https://github.com/googleapis/genai-toolbox --consent
 
 # Clean up function
 unset install_global_packages
@@ -43,14 +66,16 @@ mgrep install-codex        # Codex
 
 # Install Playwright browsers - handle dependencies differently per distro
 if [ -f /etc/arch-release ]; then
-  echo "Installing Playwright browsers on Arch (system deps should be installed via pacman)..."
-  # On Arch, system deps like chromium libs should be installed via pacman
-  # Just install the browser binaries without system deps
-  bunx playwright install
+  echo "Installing Playwright browsers on Arch (Chromium + Firefox only, WebKit not supported)..."
+  # Arch is not officially supported by Playwright. Chromium and Firefox work fine,
+  # but WebKit fails due to missing Ubuntu-specific library versions (libflite1, libvpx9, libicu74).
+  # See: https://github.com/microsoft/playwright/issues/8100
+  bunx playwright install chromium firefox
 else
-  echo "Installing Playwright browsers with system dependencies on Ubuntu/Debian..."
-  # On Ubuntu/Debian, let Playwright install system deps via apt
-  bunx playwright install --with-deps
+  echo "Installing Playwright system dependencies on Ubuntu/Debian..."
+  bunx playwright install-deps
+  echo "Installing Playwright browsers..."
+  bunx playwright install
 fi
 
 # Migrate to local `claude` installation.
