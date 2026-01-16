@@ -36,7 +36,10 @@
       "Bash(lua-language-server:*)",
       "Bash(bash -c '\nTARGETDIR=\"\"/usr/local\"\"\nSTOWDIR=\"\"/usr/local/stow\"\"\nTMPDIR=\"\"$HOME/build\"\"\nPACKAGE=\"\"lua-language-server\"\"\n\n# Remove old stow and re-stow properly\nstow -vv -D -d \"\"$STOWDIR\"\" -t \"\"$TARGETDIR\"\" \"\"$PACKAGE\"\" 2>/dev/null || true\nsudo rm -rf \"\"$STOWDIR/$PACKAGE\"\"\nmkdir -p \"\"$STOWDIR/$PACKAGE/bin\"\"\n\n# Copy binary\nsudo cp \"\"$TMPDIR/$PACKAGE/bin/lua-language-server\"\" \"\"$STOWDIR/$PACKAGE/bin/\"\"\nsudo chmod 755 \"\"$STOWDIR/$PACKAGE/bin/lua-language-server\"\"\n\n# Copy required runtime files to stow root\nsudo cp \"\"$TMPDIR/$PACKAGE/main.lua\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp \"\"$TMPDIR/$PACKAGE/debugger.lua\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp -r \"\"$TMPDIR/$PACKAGE/locale\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp -r \"\"$TMPDIR/$PACKAGE/script\"\" \"\"$STOWDIR/$PACKAGE/\"\"\nsudo cp -r \"\"$TMPDIR/$PACKAGE/meta\"\" \"\"$STOWDIR/$PACKAGE/\"\"\n\nstow -vv -d \"\"$STOWDIR\"\" -t \"\"$TARGETDIR\"\" \"\"$PACKAGE\"\"\n')",
       "Bash(find:*)",
-      "Bash(uvx:*)"
+      "Bash(uvx:*)",
+      "Bash(pgrep:*)",
+      "WebFetch(domain:gist.github.com)",
+      "Bash(tail:*)"
     ],
     "deny": [],
     "ask": []
