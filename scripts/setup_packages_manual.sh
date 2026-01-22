@@ -63,6 +63,7 @@ x86_64)
   ARCH_TECTONIC="x86_64"
   ARCH_KUBECTL="amd64"
   ARCH_LAZYGIT="x86_64"
+  ARCH_HCLOUD="amd64"
   ;;
 aarch64 | arm64)
   ARCH_TODOCHECK="arm64"
@@ -74,6 +75,7 @@ aarch64 | arm64)
   ARCH_TECTONIC="aarch64"
   ARCH_KUBECTL="arm64"
   ARCH_LAZYGIT="arm64"
+  ARCH_HCLOUD="arm64"
   ;;
 *)
   echo "Unsupported architecture: $ARCH"
@@ -91,7 +93,7 @@ if [ -f /etc/os-release ]; then
 fi
 
 echo "Detected architecture: $ARCH"
-echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC, lazygit: $ARCH_LAZYGIT"
+echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC, lazygit: $ARCH_LAZYGIT, hcloud: $ARCH_HCLOUD"
 
 # ================================================
 # Setup directories and variables needed for
@@ -528,6 +530,22 @@ mkdir -p "$STOWDIR/$PACKAGE/bin"
 curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://get.helm.sh/helm-${VERSION}-linux-${ARCH_KUBECTL}.tar.gz"
 tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
 sudo mv "$TMPDIR/$PACKAGE/linux-${ARCH_KUBECTL}/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+
+# ================================================
+# Install hcloud CLI (Note: Architecture).
+# Hetzner Cloud command-line interface.
+# ================================================
+PACKAGE="hcloud"
+VERSION=$(curl -s "https://api.github.com/repos/hetznercloud/cli/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/hetznercloud/cli/releases/download/v${VERSION}/hcloud-linux-${ARCH_HCLOUD}.tar.gz"
+tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
 chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
 stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 

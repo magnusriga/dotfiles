@@ -98,8 +98,6 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-alias claude="/Users/magnus/.claude/local/claude"
-
 # bun completions
 [ -s "/Users/magnus/.bun/_bun" ] && source "/Users/magnus/.bun/_bun"
 
