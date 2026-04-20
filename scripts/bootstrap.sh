@@ -284,7 +284,6 @@ function doIt() {
     # ==========================================================
     echo "Installations and setup now done, restart shell to start using ZSH."
     echo "Next: Manually authenticate tools, including gh auth login, :Copilot auth in nvim, and claude."
-    echo "Next: Run 'mgrep login' to authenticate, then 'mgrep watch' in each project directory to index files."
     cd "$HOME" || return
   fi
 }

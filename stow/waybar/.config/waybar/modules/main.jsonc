@@ -13,7 +13,8 @@
     "on-click": "activate",
     "active-only": false,
     "all-outputs": true,
-    "format": "{}",
+    "show-special": true,
+    "format": "{name}",
     "format-icons": {
       "urgent": "!",
       "active": "●",
@@ -63,7 +64,7 @@
 
   // Tools
   "custom/tools": {
-    "format": "",
+    "format": "",
     "tooltip-format": "Tools"
   },
 
@@ -87,8 +88,6 @@
   // Settings
   "custom/settings": {
     "format": "",
-    // "on-click": "sleep 0.1 && com.ml4w.dotfilessettings",
-    // "tooltip-format": "ML4W Dotfiles Settings"
     "on-click": "sleep 0.1 && gnome-control-center",
     "tooltip-format": "Gnome Control Center"
 
@@ -122,9 +121,9 @@
 
   // AI Launcher
   "custom/ai": {
-    "format": "",
+    "format": "",
     "on-click": "chromium --app=https://claude.ai/chat",
-    "tooltip": false
+    "tooltip-format": "Open Claude"
   },
 
   // Calculator
@@ -231,24 +230,25 @@
     "tooltip": false,
     // "timezone": "",
     "on-click": "sleep 0.1 && gnome-calendar"
-    // "on-click": "flatpak run com.ml4w.calendar",
   },
 
   // System
   "custom/system": {
-    "format": "",
+    "format": "",
     "tooltip": false
   },
 
   // CPU
   "cpu": {
     "format": "/ C {usage}% ",
+    "tooltip-format": "CPU usage: {usage}%",
     "on-click": "~/.config/hypr/settings/system-monitor.sh"
   },
 
   // Memory
   "memory": {
     "format": "/ M {}% ",
+    "tooltip-format": "Memory: {used:0.1f} GiB / {total:0.1f} GiB ({percentage}%)",
     "on-click": "~/.config/hypr/settings/system-monitor.sh"
   },
 
@@ -256,12 +256,14 @@
   "disk": {
     "interval": 30,
     "format": "D {percentage_used}% ",
+    "tooltip-format": "Disk: {used} / {total} used ({percentage_used}%)",
     "path": "/",
     "on-click": "~/.config/hypr/settings/system-monitor.sh"
   },
 
   "hyprland/language": {
-    "format": "/ K {short}"
+    "format": "/ K {short}",
+    "tooltip-format": "Keyboard layout: {long}"
   },
 
   // Group Hardware
@@ -272,7 +274,7 @@
       "children-class": "not-memory",
       "transition-left-to-right": false
     },
-    "modules": ["custom/system", "disk", "cpu", "memory", "hyprland/language"]
+    "modules": ["custom/system", "disk", "cpu", "memory"]
   },
 
   // Group Tools
@@ -294,7 +296,7 @@
   // Group Links
   "group/links": {
     "orientation": "horizontal",
-    "modules": ["custom/ai", "custom/empty"]
+    "modules": ["custom/ai"]
   },
 
   // Group Settings
@@ -322,7 +324,7 @@
     // "tooltip-format-wifi": "Signal Strength: {signalStrength}% | {ipaddr}"
 
     "format": "{ifname}",
-    "format-wifi": " {essid} ({signalStrength}%)",
+    "format-wifi": "  {essid} ({signalStrength}%)",
     "format-ethernet": "  {ifname}",
     "format-disconnected": "Disconnected !",
     "tooltip-format": " {ifname} via {gwaddri}",
@@ -330,8 +332,7 @@
     "tooltip-format-ethernet": " {ifname}\nIP: {ipaddr}\n up: {bandwidthUpBits} down: {bandwidthDownBits}",
     "tooltip-format-disconnected": "Disconnected",
     "max-length": 50,
-    "on-click": "~/.config/hypr/settings/networkmanager.sh",
-    "on-click-right": "~/.config/hypr/scripts/nm-applet.sh toggle"
+    "on-click": "~/.config/hypr/settings/networkmanager.sh"
   },
 
   // Battery
@@ -348,7 +349,7 @@
     // "format-good": "", // An empty format will hide the module
     // "format-full": "",
     "format-icons": [" ", " ", " ", " ", " "],
-    "tooltip-format": "{time}"
+    "tooltip-format": "{time}",
 
     // "format": "<span size='13000' foreground='#a6e3a1'>{icon} </span> {capacity}%",
     // "format-alt": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {time}",
@@ -358,6 +359,7 @@
     // "format-icons": ["", "", "", "", ""],
     // "format-plugged": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
     // "format-warning": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {capacity}%",
+    "on-click": "~/.config/hypr/scripts/power-menu.sh"
   },
 
   // Power Profiles Daemon
@@ -378,12 +380,7 @@
     "exec": "~/.config/hypr/scripts/power-profiles.sh",
     "return-type": "json",
     "interval": 2,
-    "format": "{icon}",
-    "format-icons": {
-      "performance": "🔥",
-      "balanced": "⚖️",
-      "power-saver": "🔋"
-    },
+    "format": "{}",
     "on-click": "~/.config/hypr/scripts/power-profiles.sh toggle",
     "tooltip": true
   },
@@ -399,8 +396,8 @@
 
     // "scroll-step": 1, // %, can be a float
     "format": "{icon}  {volume}%",
-    "format-bluetooth": "{volume}% {icon} {format_source}",
-    "format-bluetooth-muted": " {icon} {format_source}",
+    "format-bluetooth": "{volume}% {icon}󰂲 {format_source}",
+    "format-bluetooth-muted": " {icon}󰂲 {format_source}",
     "format-muted": " {format_source}",
     "format-source": "{volume}% ",
     "format-source-muted": "",
@@ -418,12 +415,16 @@
 
   // Bluetooth
   "bluetooth": {
-    "format": " {status}",
-    "format-disabled": " Disabled",
-    "format-off": " Off",
+    "format": "<span size='115%'></span>  {status}",
+    "format-disabled": "<span size='115%'>󰂲</span>",
+    "format-off": "<span size='115%'>󰂲</span>",
+    "format-no-controller": "<span size='115%'>󰂲</span>",
+    "format-connected": "<span size='115%'></span>  {num_connections}",
+    "tooltip-format": "{controller_alias}\t{controller_address}",
+    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
     "interval": 30,
-    "on-click": "sleep 0.1 && ~/.config/hypr/settings/bluetooth.sh",
-    "format-no-controller": " No Controller"
+    "on-click": "~/.config/hypr/settings/bluetooth.sh"
   },
 
   // Other

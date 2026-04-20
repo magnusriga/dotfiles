@@ -127,6 +127,13 @@
 # export TERM_PROGRAM='ghostty'
 
 # ================================================================
+# Add Homebrew to Path.
+# ================================================================
+if [ -d "/home/linuxbrew/.linuxbrew" ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv zsh)"
+fi
+
+# ================================================================
 # Make nvim the default editor.
 # ================================================================
 # - Before, `EDITOR` would be set to `ed`, a line-based text editor,

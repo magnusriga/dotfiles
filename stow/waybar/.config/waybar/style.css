@@ -24,7 +24,7 @@
  * ----------------------------------------------------- */
 
  * {
-    font-family: "Fira Sans Semibold", "Font Awesome 7 Free", "Font Awesome 7 Brands", "Font Awesome 6 Free", "Font Awesome 6 Brands", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Fira Sans Semibold", "Symbols Nerd Font", "Font Awesome 7 Free", "Font Awesome 7 Brands", sans-serif;
     border: none;
     border-radius: 0px;
 }
@@ -104,7 +104,7 @@ tooltip label {
  * ----------------------------------------------------- */
 
 #window {
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     padding: 2px 10px 0px 10px;
     border-radius: 5px 5px 5px 5px;
     color:@icon_color;
@@ -122,7 +122,7 @@ window#waybar.empty #window {
 
 #taskbar {
     background: @primary;
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     padding:0px;
     border-radius: 5px 5px 5px 5px;
     font-weight: normal;
@@ -160,6 +160,7 @@ window#waybar.empty #window {
  * Custom Quicklinks
  * ----------------------------------------------------- */
 
+#custom-ai,
 #custom-brave,
 #custom-browser,
 #custom-keybindings,
@@ -172,10 +173,8 @@ window#waybar.empty #window {
 #custom-cliphist,
 #custom-settings,
 #custom-wallpaper,
-#custom-system,
 #custom-hyprshade,
 #custom-hypridle,
-#custom-tools,
 #custom-quicklink1,
 #custom-quicklink2,
 #custom-quicklink3,
@@ -214,8 +213,12 @@ window#waybar.empty #window {
     margin-right: 24px;
 }
 
-#custom-tools {
-    margin-right:12px;
+#custom-system {
+    margin: 0px 16px 0px 0px;
+    font-size: 20px;
+    color: @icon_color;
+    font-family: "Symbols Nerd Font", "Font Awesome 7 Free", sans-serif;
+    font-weight: normal;
 }
 
 #custom-hypridle.active {
@@ -225,15 +228,6 @@ window#waybar.empty #window {
 #custom-hypridle.notactive {
     color: @error;
 }
-
-/* #custom-ml4w-welcome { */
-/*     margin-right: 12px; */
-/*     background-image: url("../assets/ml4w-icon.svg"); */
-/*     background-position: center; */
-/*     background-repeat: no-repeat; */
-/*     background-size: contain; */
-/*     padding-right: 20px; */
-/* } */
 
 /* -----------------------------------------------------
  * Idle Inhibitor
@@ -301,7 +295,7 @@ window#waybar.empty #window {
     color: @on_surface;
     border-radius: 5px 5px 5px 5px;
     padding: 2px 10px 0px 10px;
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     border: 3px solid @border_color;
 }
 
@@ -345,6 +339,26 @@ window#waybar.empty #window {
     color: @icon_color;
 }
 
+#custom-power-profiles {
+    background-color: @background;
+    font-size: 16px;
+    color: @on_surface;
+    border-radius: 5px 5px 5px 5px;
+    padding: 2px 15px 0px 10px;
+    margin: 3px 13px 3px 0px;
+    border: 3px solid @border_color;
+}
+
+#custom-power-profiles.warning {
+    background-color: @tertiary;
+    color: @on_tertiary;
+}
+
+#custom-power-profiles.critical {
+    background-color: @error;
+    color: @on_error;
+}
+
 /* -----------------------------------------------------
  * Clock
  * ----------------------------------------------------- */
@@ -355,7 +369,7 @@ window#waybar.empty #window {
     color: @on_surface;
     border-radius: 3px 5px 3px 5px;
     padding: 1px 10px 0px 10px;
-    margin: 3px 0px 3px 0px;
+    margin: 3px 6px 3px 0px;
     border: 3px solid @border_color;
 }
 
@@ -369,7 +383,7 @@ window#waybar.empty #window {
     color: @on_surface;
     border-radius: 5px 5px 5px 5px;
     padding: 2px 10px 0px 10px;
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     border: 3px solid @border_color;
 }
 
@@ -383,7 +397,7 @@ window#waybar.empty #window {
     color: @on_surface;
     border-radius: 5px 5px 5px 5px;
     padding: 2px 10px 0px 10px;
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     opacity: 1.0;
     border: 3px solid @border_color;
 }
@@ -403,7 +417,7 @@ window#waybar.empty #window {
     color: @on_surface;
     border-radius: 5px 5px 5px 5px;
     padding: 2px 10px 0px 10px;
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     border: 3px solid @border_color;
 }
 
@@ -427,7 +441,7 @@ window#waybar.empty #window {
     color: @on_surface;
     border-radius: 5px 5px 5px 5px;
     padding: 2px 10px 0px 10px;
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     border: 3px solid @border_color;
 }
 
@@ -447,7 +461,7 @@ window#waybar.empty #window {
     color: @on_surface;
     border-radius: 5px 5px 5px 5px;
     padding: 2px 15px 0px 10px;
-    margin: 3px 15px 3px 0px;
+    margin: 3px 6px 3px 0px;
     opacity: 1.0;
     border: 3px solid @border_color;
 }

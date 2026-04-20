@@ -39,7 +39,18 @@
       "Bash(uvx:*)",
       "Bash(pgrep:*)",
       "WebFetch(domain:gist.github.com)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(brew install:*)",
+      "Bash(openclaw doctor:*)",
+      "Bash(openclaw skills:*)",
+      "Bash(brew search:*)",
+      "Bash(openclaw --help:*)",
+      "Bash(command -v:*)",
+      "Skill(mgrep)",
+      "Bash(mgrep:*)",
+      "WebFetch(domain:www.infracost.io)",
+      "Bash(sh:*)",
+      "Bash(infracost --version:*)"
     ],
     "deny": [],
     "ask": []

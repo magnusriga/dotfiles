@@ -64,6 +64,7 @@ x86_64)
   ARCH_KUBECTL="amd64"
   ARCH_LAZYGIT="x86_64"
   ARCH_HCLOUD="amd64"
+  ARCH_STRIPE="x86_64"
   ;;
 aarch64 | arm64)
   ARCH_TODOCHECK="arm64"
@@ -76,6 +77,7 @@ aarch64 | arm64)
   ARCH_KUBECTL="arm64"
   ARCH_LAZYGIT="arm64"
   ARCH_HCLOUD="arm64"
+  ARCH_STRIPE="arm64"
   ;;
 *)
   echo "Unsupported architecture: $ARCH"
@@ -93,7 +95,7 @@ if [ -f /etc/os-release ]; then
 fi
 
 echo "Detected architecture: $ARCH"
-echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC, lazygit: $ARCH_LAZYGIT, hcloud: $ARCH_HCLOUD"
+echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC, lazygit: $ARCH_LAZYGIT, hcloud: $ARCH_HCLOUD, stripe: $ARCH_STRIPE"
 
 # ================================================
 # Setup directories and variables needed for
@@ -550,6 +552,39 @@ chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
 stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 
 # ================================================
+# Install argocd CLI (Note: Architecture).
+# Argo CD command-line interface.
+# ================================================
+PACKAGE="argocd"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-${ARCH_KUBECTL}"
+sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+
+# ================================================
+# Install Stripe CLI (Note: Architecture).
+# Stripe command-line interface.
+# ================================================
+PACKAGE="stripe"
+VERSION=$(curl -s "https://api.github.com/repos/stripe/stripe-cli/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+sudo rm -rf "$TMPDIR/$PACKAGE"
+sudo rm -rf "$STOWDIR/$PACKAGE"
+mkdir "$TMPDIR/$PACKAGE"
+mkdir -p "$STOWDIR/$PACKAGE/bin"
+curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/stripe/stripe-cli/releases/download/v${VERSION}/stripe_${VERSION}_linux_${ARCH_STRIPE}.tar.gz" --output "$TMPDIR/$PACKAGE.checksums" "https://github.com/stripe/stripe-cli/releases/download/v${VERSION}/stripe-linux-checksums.txt"
+if echo "$(grep "linux_${ARCH_STRIPE}.tar.gz" "$TMPDIR/$PACKAGE.checksums" | awk '{print $1}') $TMPDIR/$PACKAGE.tar.gz" | sha256sum --check --status; then
+  echo "${PACKAGE} checksum verified, extracting and installing."
+  tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+  sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+  chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+  stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+fi
+
+# ================================================
 # Various installs via custom scripts.
 # ================================================
 # `uv`: Python package manager.
@@ -558,8 +593,19 @@ curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/instal
 curl https://rclone.org/install.sh | sudo bash
 curl -sL https://talos.dev/install | sh
 sudo modprobe br_netfilter # Needed for Talos.
+# `claude`: Claude Code CLI.
+curl -fsSL https://claude.ai/install.sh | bash
 # `opencode`: AI-powered coding assistant.
 curl -fsSL https://opencode.ai/install | bash
+# `infracost`: Cloud cost estimates for Terraform.
+curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
+# `homebrew`: Package manager for macOS and Linux.
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+# `codexbar`: Cost tracking for AI coding assistants (needed by openclaw).
+brew install steipete/tap/codexbar
+# `openclaw`: AI coding assistant CLI.
+curl -fsSL https://openclaw.ai/install.sh | bash
 go install sigs.k8s.io/kind@latest
 
 # ================================================

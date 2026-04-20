@@ -23,10 +23,10 @@ echo "Starting Claude Code migration to local install..."
 # ---------------------------------------------------------
 echo "Checking for Claude installation..."
 
-# Check if claude is installed globally
-if ! pnpm list -g | grep -q 'claude'; then
-  echo "Claude not found. Installing Claude..."
-  pnpm add -g --allow-build=@anthropic-ai/claude-code @anthropic-ai/claude-code
+# Check if claude is installed
+if ! command -v claude &>/dev/null; then
+  echo "Claude not found. Installing Claude via official installer..."
+  curl -fsSL https://claude.ai/install.sh | bash
 else
   echo "Claude is installed, proceeding with migration."
 fi

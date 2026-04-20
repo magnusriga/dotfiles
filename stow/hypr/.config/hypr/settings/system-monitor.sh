@@ -1,1 +1,2 @@
-$(cat ~/.config/hypr/settings/terminal.sh) --class dotfiles-floating -e btop
+#!/usr/bin/env bash
+ghostty --class=my.dotfiles.floating -e btop

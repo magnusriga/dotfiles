@@ -1,1 +1,2 @@
-$(cat ~/.config/hypr/settings/terminal.sh) --class dotfiles-floating -e nmtui
+#!/usr/bin/env bash
+ghostty --class=my.dotfiles.floating -e nmtui

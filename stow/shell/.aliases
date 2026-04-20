@@ -94,6 +94,14 @@ alias pb="pnpm build"
 alias pt="pnpm test"
 
 # ============================================================
+# Power Management.
+# ============================================================
+alias nosleep='systemd-inhibit --what=idle:sleep --who="nosleep" --why="manual inhibit" --mode=block sleep infinity'
+alias cc='systemd-inhibit --what=idle:sleep --who="claude" --why="claude code session" --mode=block claude --dangerously-skip-permissions --chrome '
+alias cx='systemd-inhibit --what=idle:sleep --who="codex" --why="codex session" --mode=block codex --dangerously-bypass-approvals-and-sandbox'
+alias clauder='systemd-inhibit --what=idle:sleep --who="claude" --why="browser automation" --mode=block claude --dangerously-skip-permissions remote-control'
+
+# ============================================================
 # Processes.
 # ============================================================
 # `.exports` contains `PS_FORMAT` which sets `ps` columns.

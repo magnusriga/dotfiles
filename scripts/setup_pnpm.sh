@@ -22,7 +22,6 @@ function install_global_packages() {
     --allow-build=contentful-cli \
     --allow-build=puppeteer \
     --allow-build=vue-demi \
-    --allow-build=@anthropic-ai/claude-code \
     --allow-build=yarn \
     add -g \
     contentful-cli \
@@ -33,7 +32,6 @@ function install_global_packages() {
     yarn \
     mcp-hub@latest \
     @mermaid-js/mermaid-cli \
-    @anthropic-ai/claude-code \
     @openai/codex
 }
 
