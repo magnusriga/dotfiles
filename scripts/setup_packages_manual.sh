@@ -359,7 +359,7 @@ PACKAGE="sddm-astronaut-theme"
 ASTRONAUT_DIR="/usr/share/sddm/themes/sddm-astronaut-theme"
 # Default active preset — to switch, replace with another preset name
 # (e.g. `jake_the_dog.conf`) from dotfiles/usr/share/sddm/themes/<theme>/Themes/.
-ASTRONAUT_PRESET="my_wallpaper.conf"
+ASTRONAUT_PRESET="purple_leaves.conf"
 sudo rm -rf "$TMPDIR/$PACKAGE"
 git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$TMPDIR/$PACKAGE"
 sudo mkdir -p /usr/share/sddm/themes
