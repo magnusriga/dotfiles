@@ -223,3 +223,17 @@ swaync-client -rs
 
 # Wait for background processes to complete
 wait
+
+# -----------------------------------------------------
+# Sync the generated PNG into the SDDM astronaut theme so the login screen
+# shows the same wallpaper as hyprlock + the desktop. The theme preset
+# `my_wallpaper.conf` (see dotfiles/usr/share/sddm/themes/...) references
+# `Backgrounds/current_wallpaper.png` — a fixed filename the `sddm` system
+# user can read under /usr/share.
+# -----------------------------------------------------
+sddm_theme_bg="/usr/share/sddm/themes/sddm-astronaut-theme/Backgrounds/current_wallpaper.png"
+if [ -f "$currentwallpaper" ] && [ -d "$(dirname "$sddm_theme_bg")" ]; then
+  sudo install -m644 "$currentwallpaper" "$sddm_theme_bg" 2>/dev/null \
+    && _writeLog "Synced login wallpaper to $sddm_theme_bg" \
+    || _writeLog "Could not sync login wallpaper (sudo failed?)"
+fi

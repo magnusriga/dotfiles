@@ -359,7 +359,7 @@ PACKAGE="sddm-astronaut-theme"
 ASTRONAUT_DIR="/usr/share/sddm/themes/sddm-astronaut-theme"
 # Default active preset — to switch, replace with another preset name
 # (e.g. `jake_the_dog.conf`) from dotfiles/usr/share/sddm/themes/<theme>/Themes/.
-ASTRONAUT_PRESET="pixel_sakura.conf"
+ASTRONAUT_PRESET="my_wallpaper.conf"
 sudo rm -rf "$TMPDIR/$PACKAGE"
 git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$TMPDIR/$PACKAGE"
 sudo mkdir -p /usr/share/sddm/themes
@@ -381,6 +381,14 @@ sudo chmod -R a+rX "$ASTRONAUT_DIR/Themes"
 # Point the theme at our active preset.
 sudo sed -i "s|^ConfigFile=.*|ConfigFile=Themes/$ASTRONAUT_PRESET|" \
   "$ASTRONAUT_DIR/metadata.desktop"
+# Seed the login-screen wallpaper from waypaper's current cached PNG, so the
+# theme has something to render on the very first boot after setup. On every
+# subsequent wallpaper change, `scripts/wallpaper.sh` re-syncs this file.
+current_wp_png="$HOME/.cache/my/hyprland-dotfiles/current_wallpaper.png"
+if [ -f "$current_wp_png" ]; then
+  sudo install -m644 "$current_wp_png" "$ASTRONAUT_DIR/Backgrounds/current_wallpaper.png"
+fi
+unset current_wp_png
 # Activate astronaut as the SDDM theme.
 sudo mkdir -p /etc/sddm.conf.d
 sudo install -m644 "$CURRENTDIR/../etc/sddm.conf.d/theme.conf" \
