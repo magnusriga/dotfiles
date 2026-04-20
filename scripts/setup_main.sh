@@ -102,7 +102,8 @@ fi
 # - Enable `gcr-ssh-agent.socket` so SSH keys are served by gnome-keyring
 #   (unlocked by PAM at SDDM login). Replaces the legacy `ssh-agent` +
 #   `ssh-add` block formerly in `~/.profile`.
-# - SDDM theme: sddm-astronaut-theme with the `pixel_sakura` preset.
+# - SDDM theme activation lives in `setup_packages_manual.sh` (where the
+#   theme is installed), not here.
 if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ]; then
   echo "Enabling gcr-ssh-agent user socket."
   systemctl --user enable gcr-ssh-agent.socket
@@ -114,16 +115,6 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ];
   fi
   if [ -f /usr/share/wayland-sessions/hyprland.desktop ]; then
     sudo sed -i '/^Hidden=true$/d' /usr/share/wayland-sessions/hyprland.desktop
-  fi
-
-  echo "SDDM theme: astronaut / pixel_sakura preset."
-  sudo install -Dm644 /dev/stdin /etc/sddm.conf.d/theme.conf <<'EOF'
-[Theme]
-Current=sddm-astronaut-theme
-EOF
-  if [ -f /usr/share/sddm/themes/sddm-astronaut-theme/metadata.desktop ]; then
-    sudo sed -i 's|^ConfigFile=.*|ConfigFile=Themes/pixel_sakura.conf|' \
-      /usr/share/sddm/themes/sddm-astronaut-theme/metadata.desktop
   fi
 fi
 

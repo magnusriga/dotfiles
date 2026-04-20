@@ -214,6 +214,7 @@ if [ "$DISTRO" = "arch" ]; then
     qt5-wayland qt6-wayland \
     qt6-virtualkeyboard qt6-multimedia-ffmpeg \
     qt5-graphicaleffects qt5-quickcontrols2 qt5-svg \
+    gnome-keyring gcr-4 seahorse \
     hyprpolkitagent \
     papirus-icon-theme \
     breeze \

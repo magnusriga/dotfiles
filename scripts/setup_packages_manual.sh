@@ -329,6 +329,12 @@ sudo rm -rf /usr/share/sddm/themes/sequoia
 sudo cp -r "$TMPDIR/$PACKAGE" /usr/share/sddm/themes/sequoia
 # Set permissions
 sudo chmod -R 755 /usr/share/sddm/themes/sequoia
+# Theme references `backgrounds/CURRENTWALLPAPER`, which the theme does not
+# ship — without this symlink SDDM renders a blank black background when
+# sequoia is the active theme.
+if [ -f /usr/share/sddm/themes/sequoia/backgrounds/towering-trees.jpg ]; then
+  sudo ln -sf towering-trees.jpg /usr/share/sddm/themes/sequoia/backgrounds/CURRENTWALLPAPER
+fi
 echo "Sequoia SDDM theme installed to /usr/share/sddm/themes/sequoia"
 echo "Remember to:"
 echo "  1. Install required packages: qt6 qt6-declarative qt6-5compat"
@@ -339,37 +345,98 @@ echo "  3. Edit SDDM config to set Current=sequoia under [Theme] section"
 # Install Astronaut SDDM theme.
 # https://github.com/Keyitdev/sddm-astronaut-theme
 # ================================================
+# - Vendor theme files are cloned from upstream.
+# - Customizations (e.g. screen/font size for our HiDPI panel) are kept in the
+#   dotfiles repo under `system/sddm/` and symlinked over the vendor files,
+#   so upstream updates don't clobber them and edits in the repo take effect
+#   immediately.
+# Pattern (same as the eza themes install above):
+#   - Clone the vendor repo into a persistent user location.
+#   - Our customized files live in `dotfiles/stow/sddm-astronaut-theme/`
+#     and are stowed over the clone via plain `stow` (no sudo).
+#   - SDDM reads from `/usr/share/sddm/themes/...`, so a single `sudo ln -s`
+#     points that system path at the user-owned clone.
 PACKAGE="sddm-astronaut-theme"
-sudo rm -rf "$TMPDIR/$PACKAGE"
-git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$TMPDIR/$PACKAGE"
-sudo mkdir -p /usr/share/sddm/themes
-sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
-sudo cp -r "$TMPDIR/$PACKAGE" /usr/share/sddm/themes/sddm-astronaut-theme
-sudo chmod -R 755 /usr/share/sddm/themes/sddm-astronaut-theme
+ASTRONAUT_HOME="$HOME/.local/share/sddm/themes/sddm-astronaut-theme"
+# Default active preset — to switch, replace with another preset name
+# (e.g. `jake_the_dog.conf`) from the stow package's Themes/ directory.
+ASTRONAUT_PRESET="pixel_sakura.conf"
+mkdir -p "$(dirname "$ASTRONAUT_HOME")"
+rm -rf "$ASTRONAUT_HOME"
+git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$ASTRONAUT_HOME"
 # Bundled fonts from the theme repo
-if [ -d "/usr/share/sddm/themes/sddm-astronaut-theme/Fonts" ]; then
-  sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/
+if [ -d "$ASTRONAUT_HOME/Fonts" ]; then
+  sudo cp -r "$ASTRONAUT_HOME/Fonts/"* /usr/share/fonts/
   sudo fc-cache -f
 fi
-echo "Astronaut SDDM theme installed to /usr/share/sddm/themes/sddm-astronaut-theme"
+# Overlay our customized (HiDPI-patched) preset files via stow.
+rm -rf "$ASTRONAUT_HOME/Themes"
+stow -vv -d "$HOME/dotfiles/stow" -t "$HOME" "$PACKAGE"
+# Point the theme at our active preset.
+sed -i "s|^ConfigFile=.*|ConfigFile=Themes/$ASTRONAUT_PRESET|" \
+  "$ASTRONAUT_HOME/metadata.desktop"
+# Make SDDM find the theme — system path points at our user-owned clone.
+sudo mkdir -p /usr/share/sddm/themes
+sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
+sudo ln -s "$ASTRONAUT_HOME" /usr/share/sddm/themes/sddm-astronaut-theme
+# Activate astronaut as the SDDM theme via stow'd /etc config
+# (same sudo-stow pattern used for sshd_config in bootstrap.sh).
+sudo mkdir -p /etc/sddm.conf.d
+sudo stow --no-folding -vv \
+  -d "$HOME/dotfiles/etc" \
+  -t /etc/sddm.conf.d \
+  sddm.conf.d
+echo "Astronaut SDDM theme installed at $ASTRONAUT_HOME"
 echo "  - Requires: qt6-svg qt6-virtualkeyboard qt6-multimedia-ffmpeg"
-echo "  - To activate: set Current=sddm-astronaut-theme under [Theme] in /etc/sddm.conf.d/theme.conf"
-echo "  - Pick a preset: edit metadata.desktop, set ConfigFile to one of Themes/*.conf"
+echo "  - Active preset: $ASTRONAUT_PRESET (edit ASTRONAUT_PRESET above to change)"
+unset PACKAGE ASTRONAUT_HOME ASTRONAUT_PRESET
+
+# ================================================
+# Download motion wallpapers into the user wallpapers folder used by waypaper.
+# These are referenced by sddm-astronaut-theme presets (jake_the_dog,
+# purple_leaves, etc.) but also usable as desktop wallpapers.
+# Source: https://motionbgs.com
+# ================================================
+WALLPAPERS_DIR="$HOME/.config/my/wallpapers"
+mkdir -p "$WALLPAPERS_DIR"
+# name:remote-url pairs (highest available resolution per motionbgs.com)
+declare -A motion_wallpapers=(
+  ["jake-the-dog.mp4"]="https://motionbgs.com/media/2996/jake-the-dog.1920x1080.mp4"
+  ["andvari-last-origin.mp4"]="https://motionbgs.com/media/1047/andvari-last-origin.3840x2160.mp4"
+)
+for name in "${!motion_wallpapers[@]}"; do
+  dest="$WALLPAPERS_DIR/$name"
+  if [ -f "$dest" ]; then
+    echo "Wallpaper already present: $dest"
+  else
+    echo "Downloading: $name"
+    curl -fL -o "$dest" "${motion_wallpapers[$name]}"
+  fi
+done
+unset motion_wallpapers WALLPAPERS_DIR
 
 # ================================================
 # Install Sugar Candy SDDM theme.
 # https://framagit.org/MarianArlt/sddm-sugar-candy
 # ================================================
+# Same pattern as the astronaut theme above / eza: vendor cloned to a
+# user-owned dir, our customizations stowed over it, system path symlinked.
 PACKAGE="sddm-sugar-candy"
-sudo rm -rf "$TMPDIR/$PACKAGE"
-git clone --depth 1 https://framagit.org/MarianArlt/sddm-sugar-candy.git "$TMPDIR/$PACKAGE"
+SUGAR_HOME="$HOME/.local/share/sddm/themes/sugar-candy"
+mkdir -p "$(dirname "$SUGAR_HOME")"
+rm -rf "$SUGAR_HOME"
+git clone --depth 1 https://framagit.org/MarianArlt/sddm-sugar-candy.git "$SUGAR_HOME"
+# Overlay our HiDPI-patched theme.conf via stow.
+rm -f "$SUGAR_HOME/theme.conf"
+stow -vv -d "$HOME/dotfiles/stow" -t "$HOME" "$PACKAGE"
+# Make SDDM find the theme — system path points at our user-owned clone.
 sudo mkdir -p /usr/share/sddm/themes
 sudo rm -rf /usr/share/sddm/themes/sugar-candy
-sudo cp -r "$TMPDIR/$PACKAGE" /usr/share/sddm/themes/sugar-candy
-sudo chmod -R 755 /usr/share/sddm/themes/sugar-candy
-echo "Sugar Candy SDDM theme installed to /usr/share/sddm/themes/sugar-candy"
+sudo ln -s "$SUGAR_HOME" /usr/share/sddm/themes/sugar-candy
+echo "Sugar Candy SDDM theme installed at $SUGAR_HOME"
 echo "  - Requires: qt5-graphicaleffects qt5-quickcontrols2 qt5-svg (Qt5 theme)"
 echo "  - To activate: set Current=sugar-candy under [Theme] in /etc/sddm.conf.d/theme.conf"
+unset PACKAGE SUGAR_HOME
 
 # ================================================
 # Install yazi from source.
