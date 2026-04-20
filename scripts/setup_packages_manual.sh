@@ -345,40 +345,41 @@ echo "  3. Edit SDDM config to set Current=sequoia under [Theme] section"
 # Install Astronaut SDDM theme.
 # https://github.com/Keyitdev/sddm-astronaut-theme
 # ================================================
-# - Vendor theme files are cloned from upstream.
-# - Customizations (e.g. screen/font size for our HiDPI panel) are kept in the
-#   dotfiles repo under `system/sddm/` and symlinked over the vendor files,
-#   so upstream updates don't clobber them and edits in the repo take effect
-#   immediately.
-# Pattern (same as the eza themes install above):
-#   - Clone the vendor repo into a persistent user location.
-#   - Our customized files live in `dotfiles/stow/sddm-astronaut-theme/`
-#     and are stowed over the clone via plain `stow` (no sudo).
-#   - SDDM reads from `/usr/share/sddm/themes/...`, so a single `sudo ln -s`
-#     points that system path at the user-owned clone.
+# - SDDM runs as a system user `sddm` before any user logs in, so theme files
+#   MUST live in a path sddm can read (i.e. `/usr/share/sddm/themes/...`).
+#   Cloning into ~/.local/share and symlinking doesn't work — sddm can't
+#   traverse a 700 home directory.
+# - Vendor theme is cloned into /usr/share/sddm/themes/<theme>.
+# - Our customized files (HiDPI-patched presets) live in dotfiles and are
+#   symlinked over the vendor files via `sudo stow`, so upstream updates
+#   don't clobber them and edits in the repo take effect immediately.
+# - See `setup_main.sh` for the `chmod a+x "$HOME"` required so sddm can
+#   actually follow these symlinks back into the dotfiles repo.
 PACKAGE="sddm-astronaut-theme"
-ASTRONAUT_HOME="$HOME/.local/share/sddm/themes/sddm-astronaut-theme"
+ASTRONAUT_DIR="/usr/share/sddm/themes/sddm-astronaut-theme"
 # Default active preset — to switch, replace with another preset name
-# (e.g. `jake_the_dog.conf`) from the stow package's Themes/ directory.
+# (e.g. `jake_the_dog.conf`) from dotfiles/usr/share/sddm/themes/<theme>/Themes/.
 ASTRONAUT_PRESET="pixel_sakura.conf"
-mkdir -p "$(dirname "$ASTRONAUT_HOME")"
-rm -rf "$ASTRONAUT_HOME"
-git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$ASTRONAUT_HOME"
-# Bundled fonts from the theme repo
-if [ -d "$ASTRONAUT_HOME/Fonts" ]; then
-  sudo cp -r "$ASTRONAUT_HOME/Fonts/"* /usr/share/fonts/
+sudo rm -rf "$TMPDIR/$PACKAGE"
+git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$TMPDIR/$PACKAGE"
+sudo mkdir -p /usr/share/sddm/themes
+sudo rm -rf "$ASTRONAUT_DIR"
+sudo cp -r "$TMPDIR/$PACKAGE" "$ASTRONAUT_DIR"
+sudo chmod -R 755 "$ASTRONAUT_DIR"
+if [ -d "$ASTRONAUT_DIR/Fonts" ]; then
+  sudo cp -r "$ASTRONAUT_DIR/Fonts/"* /usr/share/fonts/
   sudo fc-cache -f
 fi
-# Overlay our customized (HiDPI-patched) preset files via stow.
-rm -rf "$ASTRONAUT_HOME/Themes"
-stow -vv -d "$HOME/dotfiles/stow" -t "$HOME" "$PACKAGE"
+# Overlay our customized preset files via stow. Vendor Themes/ is removed
+# first so the whole directory can be replaced as a single symlink.
+sudo rm -rf "$ASTRONAUT_DIR/Themes"
+sudo stow --no-folding -vv \
+  -d "$HOME/dotfiles/usr/share/sddm/themes" \
+  -t "$ASTRONAUT_DIR" \
+  sddm-astronaut-theme
 # Point the theme at our active preset.
-sed -i "s|^ConfigFile=.*|ConfigFile=Themes/$ASTRONAUT_PRESET|" \
-  "$ASTRONAUT_HOME/metadata.desktop"
-# Make SDDM find the theme — system path points at our user-owned clone.
-sudo mkdir -p /usr/share/sddm/themes
-sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
-sudo ln -s "$ASTRONAUT_HOME" /usr/share/sddm/themes/sddm-astronaut-theme
+sudo sed -i "s|^ConfigFile=.*|ConfigFile=Themes/$ASTRONAUT_PRESET|" \
+  "$ASTRONAUT_DIR/metadata.desktop"
 # Activate astronaut as the SDDM theme via stow'd /etc config
 # (same sudo-stow pattern used for sshd_config in bootstrap.sh).
 sudo mkdir -p /etc/sddm.conf.d
@@ -386,10 +387,10 @@ sudo stow --no-folding -vv \
   -d "$HOME/dotfiles/etc" \
   -t /etc/sddm.conf.d \
   sddm.conf.d
-echo "Astronaut SDDM theme installed at $ASTRONAUT_HOME"
+echo "Astronaut SDDM theme installed at $ASTRONAUT_DIR"
 echo "  - Requires: qt6-svg qt6-virtualkeyboard qt6-multimedia-ffmpeg"
 echo "  - Active preset: $ASTRONAUT_PRESET (edit ASTRONAUT_PRESET above to change)"
-unset PACKAGE ASTRONAUT_HOME ASTRONAUT_PRESET
+unset PACKAGE ASTRONAUT_DIR ASTRONAUT_PRESET
 
 # ================================================
 # Download motion wallpapers into the user wallpapers folder used by waypaper.
@@ -419,24 +420,25 @@ unset motion_wallpapers WALLPAPERS_DIR
 # Install Sugar Candy SDDM theme.
 # https://framagit.org/MarianArlt/sddm-sugar-candy
 # ================================================
-# Same pattern as the astronaut theme above / eza: vendor cloned to a
-# user-owned dir, our customizations stowed over it, system path symlinked.
+# Same install pattern as the astronaut theme above.
 PACKAGE="sddm-sugar-candy"
-SUGAR_HOME="$HOME/.local/share/sddm/themes/sugar-candy"
-mkdir -p "$(dirname "$SUGAR_HOME")"
-rm -rf "$SUGAR_HOME"
-git clone --depth 1 https://framagit.org/MarianArlt/sddm-sugar-candy.git "$SUGAR_HOME"
-# Overlay our HiDPI-patched theme.conf via stow.
-rm -f "$SUGAR_HOME/theme.conf"
-stow -vv -d "$HOME/dotfiles/stow" -t "$HOME" "$PACKAGE"
-# Make SDDM find the theme — system path points at our user-owned clone.
+SUGAR_DIR="/usr/share/sddm/themes/sugar-candy"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+git clone --depth 1 https://framagit.org/MarianArlt/sddm-sugar-candy.git "$TMPDIR/$PACKAGE"
 sudo mkdir -p /usr/share/sddm/themes
-sudo rm -rf /usr/share/sddm/themes/sugar-candy
-sudo ln -s "$SUGAR_HOME" /usr/share/sddm/themes/sugar-candy
-echo "Sugar Candy SDDM theme installed at $SUGAR_HOME"
+sudo rm -rf "$SUGAR_DIR"
+sudo cp -r "$TMPDIR/$PACKAGE" "$SUGAR_DIR"
+sudo chmod -R 755 "$SUGAR_DIR"
+# Overlay our HiDPI-patched theme.conf via stow.
+sudo rm -f "$SUGAR_DIR/theme.conf"
+sudo stow --no-folding -vv \
+  -d "$HOME/dotfiles/usr/share/sddm/themes" \
+  -t "$SUGAR_DIR" \
+  sugar-candy
+echo "Sugar Candy SDDM theme installed at $SUGAR_DIR"
 echo "  - Requires: qt5-graphicaleffects qt5-quickcontrols2 qt5-svg (Qt5 theme)"
 echo "  - To activate: set Current=sugar-candy under [Theme] in /etc/sddm.conf.d/theme.conf"
-unset PACKAGE SUGAR_HOME
+unset PACKAGE SUGAR_DIR
 
 # ================================================
 # Install yazi from source.

@@ -116,6 +116,15 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ];
   if [ -f /usr/share/wayland-sessions/hyprland.desktop ]; then
     sudo sed -i '/^Hidden=true$/d' /usr/share/wayland-sessions/hyprland.desktop
   fi
+
+  # SDDM runs as system user `sddm` (uid 959) before any user logs in.
+  # Our SDDM theme overlay symlinks (installed by setup_packages_manual.sh)
+  # point into ~/dotfiles, which is unreachable behind the default 700 home.
+  # Grant traversal-only on $HOME (doesn't let others `ls`) and read-only on
+  # the SDDM theme subtree in dotfiles.
+  echo "Opening traversal for sddm user to reach dotfiles theme files."
+  chmod a+x "$HOME"
+  chmod -R a+rX "$HOME/dotfiles/usr/share/sddm"
 fi
 
 # ================================================
