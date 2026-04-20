@@ -212,6 +212,8 @@ if [ "$DISTRO" = "arch" ]; then
     qalculate-gtk \
     sddm qt6-svg qt6-declarative qt6ct \
     qt5-wayland qt6-wayland \
+    qt6-virtualkeyboard qt6-multimedia-ffmpeg \
+    qt5-graphicaleffects qt5-quickcontrols2 qt5-svg \
     hyprpolkitagent \
     papirus-icon-theme \
     breeze \

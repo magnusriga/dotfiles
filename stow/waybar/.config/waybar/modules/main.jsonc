@@ -232,6 +232,15 @@
     "on-click": "sleep 0.1 && gnome-calendar"
   },
 
+  // Hardware stats toggle (click to expand/collapse)
+  "custom/hardware-toggle": {
+    "exec": "~/.config/hypr/scripts/hardware-toggle.sh",
+    "interval": 2,
+    "return-type": "json",
+    "on-click": "~/.config/hypr/scripts/hardware-toggle.sh toggle",
+    "signal": 10
+  },
+
   // System
   "custom/system": {
     "format": "",

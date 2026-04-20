@@ -94,6 +94,40 @@ if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ];
 fi
 
 # ================================================
+# Setup: Hyprland session + SSH agent.
+# ================================================
+# - As of July 2025, Hyprland upstream and the Arch wiki recommend AGAINST
+#   launching via uwsm — hide `hyprland-uwsm.desktop` in favour of plain
+#   `hyprland.desktop`. See https://wiki.hypr.land/Useful-Utilities/Systemd-start/
+# - Enable `gcr-ssh-agent.socket` so SSH keys are served by gnome-keyring
+#   (unlocked by PAM at SDDM login). Replaces the legacy `ssh-agent` +
+#   `ssh-add` block formerly in `~/.profile`.
+# - SDDM theme: sddm-astronaut-theme with the `pixel_sakura` preset.
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ]; then
+  echo "Enabling gcr-ssh-agent user socket."
+  systemctl --user enable gcr-ssh-agent.socket
+
+  echo "Hyprland session: hide uwsm-managed entry, keep plain."
+  if [ -f /usr/share/wayland-sessions/hyprland-uwsm.desktop ]; then
+    grep -q '^Hidden=true$' /usr/share/wayland-sessions/hyprland-uwsm.desktop \
+      || echo "Hidden=true" | sudo tee -a /usr/share/wayland-sessions/hyprland-uwsm.desktop >/dev/null
+  fi
+  if [ -f /usr/share/wayland-sessions/hyprland.desktop ]; then
+    sudo sed -i '/^Hidden=true$/d' /usr/share/wayland-sessions/hyprland.desktop
+  fi
+
+  echo "SDDM theme: astronaut / pixel_sakura preset."
+  sudo install -Dm644 /dev/stdin /etc/sddm.conf.d/theme.conf <<'EOF'
+[Theme]
+Current=sddm-astronaut-theme
+EOF
+  if [ -f /usr/share/sddm/themes/sddm-astronaut-theme/metadata.desktop ]; then
+    sudo sed -i 's|^ConfigFile=.*|ConfigFile=Themes/pixel_sakura.conf|' \
+      /usr/share/sddm/themes/sddm-astronaut-theme/metadata.desktop
+  fi
+fi
+
+# ================================================
 # Setup: Rust toolchain via `rustup`, and add it to path.
 # ================================================
 echo "Setup rust toolchain via rustup and add it to path."

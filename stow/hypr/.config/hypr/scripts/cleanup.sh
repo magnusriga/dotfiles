@@ -18,4 +18,7 @@ clear
 aur_helper="$(cat ~/.config/my/settings/aur.sh)"
 figlet -f smslant "Cleanup"
 echo
-$aur_helper -Scc
+# --noconfirm: this script runs via Hyprland exec-once, where stdin is
+# attached to a TTY hidden under the compositor — interactive prompts would
+# block session startup invisibly.
+$aur_helper -Scc --noconfirm

@@ -336,6 +336,42 @@ echo "  2. Install a Nerd Font (v3.0+) system-wide"
 echo "  3. Edit SDDM config to set Current=sequoia under [Theme] section"
 
 # ================================================
+# Install Astronaut SDDM theme.
+# https://github.com/Keyitdev/sddm-astronaut-theme
+# ================================================
+PACKAGE="sddm-astronaut-theme"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+git clone --depth 1 https://github.com/Keyitdev/sddm-astronaut-theme.git "$TMPDIR/$PACKAGE"
+sudo mkdir -p /usr/share/sddm/themes
+sudo rm -rf /usr/share/sddm/themes/sddm-astronaut-theme
+sudo cp -r "$TMPDIR/$PACKAGE" /usr/share/sddm/themes/sddm-astronaut-theme
+sudo chmod -R 755 /usr/share/sddm/themes/sddm-astronaut-theme
+# Bundled fonts from the theme repo
+if [ -d "/usr/share/sddm/themes/sddm-astronaut-theme/Fonts" ]; then
+  sudo cp -r /usr/share/sddm/themes/sddm-astronaut-theme/Fonts/* /usr/share/fonts/
+  sudo fc-cache -f
+fi
+echo "Astronaut SDDM theme installed to /usr/share/sddm/themes/sddm-astronaut-theme"
+echo "  - Requires: qt6-svg qt6-virtualkeyboard qt6-multimedia-ffmpeg"
+echo "  - To activate: set Current=sddm-astronaut-theme under [Theme] in /etc/sddm.conf.d/theme.conf"
+echo "  - Pick a preset: edit metadata.desktop, set ConfigFile to one of Themes/*.conf"
+
+# ================================================
+# Install Sugar Candy SDDM theme.
+# https://framagit.org/MarianArlt/sddm-sugar-candy
+# ================================================
+PACKAGE="sddm-sugar-candy"
+sudo rm -rf "$TMPDIR/$PACKAGE"
+git clone --depth 1 https://framagit.org/MarianArlt/sddm-sugar-candy.git "$TMPDIR/$PACKAGE"
+sudo mkdir -p /usr/share/sddm/themes
+sudo rm -rf /usr/share/sddm/themes/sugar-candy
+sudo cp -r "$TMPDIR/$PACKAGE" /usr/share/sddm/themes/sugar-candy
+sudo chmod -R 755 /usr/share/sddm/themes/sugar-candy
+echo "Sugar Candy SDDM theme installed to /usr/share/sddm/themes/sugar-candy"
+echo "  - Requires: qt5-graphicaleffects qt5-quickcontrols2 qt5-svg (Qt5 theme)"
+echo "  - To activate: set Current=sugar-candy under [Theme] in /etc/sddm.conf.d/theme.conf"
+
+# ================================================
 # Install yazi from source.
 # Use manual build instead of `pacman -Syu yazi`.
 # ================================================

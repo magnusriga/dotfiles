@@ -16,6 +16,15 @@ export XDG_CONFIG_HOME=$HOME/.config
 export COLORTERM="truecolor"
 
 # ================================================================
+# SSH agent socket — provided by gcr-ssh-agent (gnome-keyring successor).
+# Enabled via `systemctl --user enable gcr-ssh-agent.socket` in setup_main.sh.
+# PAM unlocks the login keyring at SDDM login; the SSH key passphrase is
+# retrieved automatically after being saved once via seahorse.
+# See https://wiki.archlinux.org/title/GNOME/Keyring#SSH_keys
+# ================================================================
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR}/gcr/ssh"
+
+# ================================================================
 # Set default shell to ZSH.
 # ================================================================
 SHELL=$(which zsh)

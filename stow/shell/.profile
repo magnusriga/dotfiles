@@ -142,37 +142,49 @@ unset file
 # ================================================================
 # Start SSH agent to Avoid Typing Github Password
 # ================================================================
+# DISABLED: this block used to start `ssh-agent` and call `ssh-add` on every
+# login shell. Problem: SDDM wraps Hyprland session startup in `zsh --login`,
+# so this ran before the compositor was visible and prompted for the key
+# passphrase on a hidden TTY — the black-screen-on-login bug.
+#
+# Replaced with gcr-ssh-agent (from the `gcr-4` package, already installed),
+# enabled via `systemctl --user enable gcr-ssh-agent.socket` in
+# scripts/setup_main.sh. The `SSH_AUTH_SOCK` export lives in `.exports`.
+# PAM unlocks the login keyring at SDDM login, so the key passphrase is
+# retrieved automatically after being saved once via seahorse/GUI askpass.
+# See https://wiki.archlinux.org/title/GNOME/Keyring#SSH_keys
+#
 # - Avoid when login shell started by sandboxed AI, e.g. `codex`.
 # NOTE: Do NOT start agent like below, when using agent forwarding,
 # as agent on host is used instead, via unix socket `SSH_AUTH_SOCKET`.
-if [ -z "$CODEX_MANAGED_BY_NPM" ]; then
-  env=~/.ssh/agent.env
-
-  agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
-
-  agent_start() {
-    (
-      umask 077
-      ssh-agent >|"$env"
-      chmod 666 "$env"
-    )
-    . "$env" >|/dev/null
-  }
-
-  agent_load_env
-
-  # agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
-  agent_run_state=$(
-    ssh-add -l >|/dev/null 2>&1
-    echo $?
-  )
-
-  if [ ! "$SSH_AUTH_SOCK" ] || [ "$agent_run_state" = 2 ]; then
-    agent_start
-    ssh-add
-  elif [ "$SSH_AUTH_SOCK" ] && [ "$agent_run_state" = 1 ]; then
-    ssh-add
-  fi
-
-  unset env
-fi
+# if [ -z "$CODEX_MANAGED_BY_NPM" ]; then
+#   env=~/.ssh/agent.env
+#
+#   agent_load_env() { test -f "$env" && . "$env" >|/dev/null; }
+#
+#   agent_start() {
+#     (
+#       umask 077
+#       ssh-agent >|"$env"
+#       chmod 666 "$env"
+#     )
+#     . "$env" >|/dev/null
+#   }
+#
+#   agent_load_env
+#
+#   # agent_run_state: 0=agent running w/ key; 1=agent w/o key; 2=agent not running
+#   agent_run_state=$(
+#     ssh-add -l >|/dev/null 2>&1
+#     echo $?
+#   )
+#
+#   if [ ! "$SSH_AUTH_SOCK" ] || [ "$agent_run_state" = 2 ]; then
+#     agent_start
+#     ssh-add
+#   elif [ "$SSH_AUTH_SOCK" ] && [ "$agent_run_state" = 1 ]; then
+#     ssh-add
+#   fi
+#
+#   unset env
+# fi
