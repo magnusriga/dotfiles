@@ -370,23 +370,21 @@ if [ -d "$ASTRONAUT_DIR/Fonts" ]; then
   sudo cp -r "$ASTRONAUT_DIR/Fonts/"* /usr/share/fonts/
   sudo fc-cache -f
 fi
-# Overlay our customized preset files via stow. Vendor Themes/ is removed
-# first so the whole directory can be replaced as a single symlink.
-sudo rm -rf "$ASTRONAUT_DIR/Themes"
-sudo stow --no-folding -vv \
-  -d "$HOME/dotfiles/usr/share/sddm/themes" \
-  -t "$ASTRONAUT_DIR" \
-  sddm-astronaut-theme
+# Overlay our customized preset files by copying from the dotfiles repo.
+# `$CURRENTDIR/..` is the repo root (this script runs from `<repo>/scripts/`).
+# Copy (not symlink) because SDDM runs as the `sddm` system user before any
+# user login and can't traverse a 700 home directory to reach symlinks back
+# into dotfiles. Chmod after cp in case the dotfiles parent is 700.
+sudo cp -rT "$CURRENTDIR/../usr/share/sddm/themes/sddm-astronaut-theme/Themes" \
+  "$ASTRONAUT_DIR/Themes"
+sudo chmod -R a+rX "$ASTRONAUT_DIR/Themes"
 # Point the theme at our active preset.
 sudo sed -i "s|^ConfigFile=.*|ConfigFile=Themes/$ASTRONAUT_PRESET|" \
   "$ASTRONAUT_DIR/metadata.desktop"
-# Activate astronaut as the SDDM theme via stow'd /etc config
-# (same sudo-stow pattern used for sshd_config in bootstrap.sh).
+# Activate astronaut as the SDDM theme.
 sudo mkdir -p /etc/sddm.conf.d
-sudo stow --no-folding -vv \
-  -d "$HOME/dotfiles/etc" \
-  -t /etc/sddm.conf.d \
-  sddm.conf.d
+sudo install -m644 "$CURRENTDIR/../etc/sddm.conf.d/theme.conf" \
+  /etc/sddm.conf.d/theme.conf
 echo "Astronaut SDDM theme installed at $ASTRONAUT_DIR"
 echo "  - Requires: qt6-svg qt6-virtualkeyboard qt6-multimedia-ffmpeg"
 echo "  - Active preset: $ASTRONAUT_PRESET (edit ASTRONAUT_PRESET above to change)"
@@ -429,12 +427,10 @@ sudo mkdir -p /usr/share/sddm/themes
 sudo rm -rf "$SUGAR_DIR"
 sudo cp -r "$TMPDIR/$PACKAGE" "$SUGAR_DIR"
 sudo chmod -R 755 "$SUGAR_DIR"
-# Overlay our HiDPI-patched theme.conf via stow.
-sudo rm -f "$SUGAR_DIR/theme.conf"
-sudo stow --no-folding -vv \
-  -d "$HOME/dotfiles/usr/share/sddm/themes" \
-  -t "$SUGAR_DIR" \
-  sugar-candy
+# Overlay our HiDPI-patched theme.conf by copying from the dotfiles repo
+# (see comment above for why copy, not symlink).
+sudo install -m644 "$CURRENTDIR/../usr/share/sddm/themes/sugar-candy/theme.conf" \
+  "$SUGAR_DIR/theme.conf"
 echo "Sugar Candy SDDM theme installed at $SUGAR_DIR"
 echo "  - Requires: qt5-graphicaleffects qt5-quickcontrols2 qt5-svg (Qt5 theme)"
 echo "  - To activate: set Current=sugar-candy under [Theme] in /etc/sddm.conf.d/theme.conf"
