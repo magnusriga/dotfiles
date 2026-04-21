@@ -31,6 +31,20 @@ Rectangle {
     readonly property int boxRadius: boxHeight / 2
     readonly property int boxFontSize: 20
 
+    // Popup/menu styling for the ComboBox dropdowns. Deliberately NOT reusing
+    // boxRadius: the closed ComboBox is a short pill (radius = half-height
+    // reads as fully rounded), but a tall popup with the same radius blows
+    // out the corners and makes per-item hover highlights look pill-shaped.
+    // Use a modest outer corner + inner padding so hovered items have room
+    // to breathe inside the rounded shell.
+    readonly property int popupRadius: 12
+    readonly property int popupItemRadius: 6
+    readonly property int popupPadding: 8
+
+    // Hover highlight: full accent is too loud behind white text; blend it
+    // down with alpha so the surface shows through (reads as a muted purple).
+    readonly property color colHoverBg: Qt.rgba(colAccent.r, colAccent.g, colAccent.b, 0.35)
+
     property int attempts: 0
     readonly property string targetUser: userBox.currentText
 
@@ -150,11 +164,11 @@ Rectangle {
         }
 
         delegate: ItemDelegate {
-            width: userBox.width
+            width: userBox.width - 2 * root.popupPadding
             height: 40
             highlighted: userBox.highlightedIndex === index
             contentItem: Text {
-                leftPadding: 20
+                leftPadding: 16
                 text: model[userBox.textRole]
                 font: userBox.font
                 color: root.colText
@@ -162,16 +176,16 @@ Rectangle {
                 elide: Text.ElideRight
             }
             background: Rectangle {
-                color: highlighted ? root.colAccent : "transparent"
-                radius: root.boxRadius
+                color: highlighted ? root.colHoverBg : "transparent"
+                radius: root.popupItemRadius
             }
         }
 
         popup: Popup {
             y: userBox.height + 6
             width: userBox.width
-            implicitHeight: contentItem.implicitHeight + 8
-            padding: 4
+            implicitHeight: contentItem.implicitHeight + 2 * root.popupPadding
+            padding: root.popupPadding
 
             contentItem: ListView {
                 clip: true
@@ -184,7 +198,7 @@ Rectangle {
                 color: root.colSurface
                 border.color: root.colAccent
                 border.width: root.boxBorder
-                radius: root.boxRadius
+                radius: root.popupRadius
             }
         }
 
@@ -256,70 +270,61 @@ Rectangle {
         text: ""
     }
 
-    // --- Session selector (bottom-center) ---
+    // --- Session selector (bottom-center; plain text styled like the
+    // power icons — no box, no border, just a clickable label with a ▾). ---
     ComboBox {
         id: sessionBox
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 40
-        width: root.boxWidth
-        height: root.boxHeight
+        anchors.bottomMargin: 30
+        width: 240
+        height: 44
+        padding: 0
         model: sessionModel
         textRole: "name"
         font.family: root.fontFamily
-        font.pixelSize: root.boxFontSize
-        clip: true
+        font.pixelSize: 18
 
         background: Rectangle {
-            color: root.colSurface
-            border.color: root.colAccent
-            border.width: root.boxBorder
-            radius: root.boxRadius
+            color: "transparent"
+            border.width: 0
         }
 
         contentItem: Text {
-            leftPadding: 20
-            rightPadding: sessionBox.indicator.width + 20
-            text: sessionBox.displayText
+            text: sessionBox.displayText + "  ▾"
             font: sessionBox.font
             color: root.colText
+            opacity: 0.85
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
         }
 
-        indicator: Text {
-            x: sessionBox.width - width - 20
-            y: sessionBox.topPadding + (sessionBox.availableHeight - height) / 2
-            text: "▾"
-            font.family: root.fontFamily
-            font.pixelSize: root.boxFontSize
-            color: root.colText
-        }
+        indicator: Item { width: 0; height: 0 }
 
         delegate: ItemDelegate {
-            width: sessionBox.width
+            width: sessionBox.popup.width - 2 * root.popupPadding
             height: 40
             highlighted: sessionBox.highlightedIndex === index
             contentItem: Text {
-                leftPadding: 20
+                leftPadding: 16
                 text: model[sessionBox.textRole]
-                font: sessionBox.font
+                font.family: root.fontFamily
+                font.pixelSize: 18
                 color: root.colText
                 verticalAlignment: Text.AlignVCenter
                 elide: Text.ElideRight
             }
             background: Rectangle {
-                color: highlighted ? root.colAccent : "transparent"
-                radius: root.boxRadius
+                color: highlighted ? root.colHoverBg : "transparent"
+                radius: root.popupItemRadius
             }
         }
 
         popup: Popup {
             y: -implicitHeight - 6
-            width: sessionBox.width
-            implicitHeight: contentItem.implicitHeight + 8
-            padding: 4
+            width: Math.max(sessionBox.width, 240)
+            implicitHeight: contentItem.implicitHeight + 2 * root.popupPadding
+            padding: root.popupPadding
 
             contentItem: ListView {
                 clip: true
@@ -332,7 +337,7 @@ Rectangle {
                 color: root.colSurface
                 border.color: root.colAccent
                 border.width: root.boxBorder
-                radius: root.boxRadius
+                radius: root.popupRadius
             }
         }
 
