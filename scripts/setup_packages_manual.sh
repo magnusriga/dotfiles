@@ -350,17 +350,25 @@ echo "  3. Edit SDDM config to set Current=sequoia under [Theme] section"
 # - Theme source files live under `dotfiles/usr/share/sddm/themes/hyprlock/`.
 # - Backgrounds/current_wallpaper.png is seeded from the waypaper cache and
 #   kept in sync by `stow/hypr/.config/hypr/scripts/wallpaper.sh`.
-# - Assets/avatar.jpg is copied from ~/.config/my/headshots/default.jpg
-#   (same file hyprlock uses).
+# - Assets/avatar.jpg is a generic silhouette (stow/my/.../headshots/generic.jpg),
+#   the fallback shown when the selected user has no per-user face icon.
+# - Per-user face icons live at /usr/share/sddm/faces/<user>.face.icon, where
+#   SDDM can actually read them (home dirs are 700 and the sddm user can't
+#   traverse them). The current user's headshot is seeded there from
+#   stow/my/.../headshots/default.jpg so the avatar ComboBox binding picks
+#   it up via userModel.icon.
 HYPRLOCK_SRC="$CURRENTDIR/../usr/share/sddm/themes/hyprlock"
 HYPRLOCK_DIR="/usr/share/sddm/themes/hyprlock"
+HEADSHOTS_SRC="$CURRENTDIR/../stow/my/.config/my/headshots"
 sudo mkdir -p "$HYPRLOCK_DIR/Backgrounds" "$HYPRLOCK_DIR/Assets"
 sudo install -m644 "$HYPRLOCK_SRC/Main.qml"         "$HYPRLOCK_DIR/Main.qml"
 sudo install -m644 "$HYPRLOCK_SRC/metadata.desktop" "$HYPRLOCK_DIR/metadata.desktop"
 sudo install -m644 "$HYPRLOCK_SRC/theme.conf"       "$HYPRLOCK_DIR/theme.conf"
-if [ -f "$HOME/.config/my/headshots/default.jpg" ]; then
-  sudo install -m644 "$HOME/.config/my/headshots/default.jpg" \
-    "$HYPRLOCK_DIR/Assets/avatar.jpg"
+sudo install -m644 "$HEADSHOTS_SRC/generic.jpg"     "$HYPRLOCK_DIR/Assets/avatar.jpg"
+if [ -f "$HEADSHOTS_SRC/default.jpg" ]; then
+  sudo mkdir -p /usr/share/sddm/faces
+  sudo install -m644 "$HEADSHOTS_SRC/default.jpg" \
+    /usr/share/sddm/faces/"$USER".face.icon
 fi
 if [ -f "$HOME/.cache/my/hyprland-dotfiles/current_wallpaper.png" ]; then
   sudo install -m644 "$HOME/.cache/my/hyprland-dotfiles/current_wallpaper.png" \
@@ -371,7 +379,7 @@ sudo mkdir -p /etc/sddm.conf.d
 sudo install -m644 "$CURRENTDIR/../etc/sddm.conf.d/theme.conf" \
   /etc/sddm.conf.d/theme.conf
 echo "Hyprlock-like SDDM theme installed at $HYPRLOCK_DIR"
-unset HYPRLOCK_SRC HYPRLOCK_DIR
+unset HYPRLOCK_SRC HYPRLOCK_DIR HEADSHOTS_SRC
 
 # ================================================
 # Install Astronaut SDDM theme.

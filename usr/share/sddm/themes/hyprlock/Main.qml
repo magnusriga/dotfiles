@@ -4,9 +4,8 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
 import Qt5Compat.GraphicalEffects
-import SddmComponents 2.0
 
 Rectangle {
     id: root
@@ -23,8 +22,17 @@ Rectangle {
     readonly property color colYellow:  config.colorYellow  ? config.colorYellow  : "#f9e2af"
     readonly property string fontFamily: config.fontFamily  ? config.fontFamily   : "JetBrainsMono Nerd Font"
 
+    // Shared sizing for the three input-like boxes (user, password, session)
+    // so they stay visually locked together. Matches hyprlock's input-field:
+    // 300x60, 4px outline, default rounding = -1 → half-height (pill).
+    readonly property int boxWidth: 300
+    readonly property int boxHeight: 60
+    readonly property int boxBorder: 4
+    readonly property int boxRadius: boxHeight / 2
+    readonly property int boxFontSize: 20
+
     property int attempts: 0
-    readonly property string targetUser: userModel.lastUser ? userModel.lastUser : ""
+    readonly property string targetUser: userBox.currentText
 
     // --- Background ---
     Image {
@@ -85,20 +93,104 @@ Rectangle {
             id: avatar
             anchors.fill: parent
             anchors.margins: 4
-            source: config.avatar ? config.avatar : "Assets/avatar.jpg"
+            source: userBox.currentValue ? userBox.currentValue : (config.avatar ? config.avatar : "Assets/avatar.jpg")
             fillMode: Image.PreserveAspectCrop
             smooth: true
-            visible: false
-        }
-        OpacityMask {
-            anchors.fill: avatar
-            source: avatar
-            maskSource: Rectangle {
-                width: avatar.width
-                height: avatar.height
-                radius: width / 2
-                visible: false
+            layer.enabled: true
+            layer.effect: OpacityMask {
+                maskSource: Rectangle {
+                    width: avatar.width
+                    height: avatar.height
+                    radius: width / 2
+                }
             }
+        }
+    }
+
+    // --- User selector (between avatar and password) ---
+    ComboBox {
+        id: userBox
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: avatarRing.bottom
+        anchors.topMargin: 16
+        width: root.boxWidth
+        height: root.boxHeight
+        model: userModel
+        textRole: "name"
+        valueRole: "icon"
+        font.family: root.fontFamily
+        font.pixelSize: root.boxFontSize
+        clip: true
+
+        background: Rectangle {
+            color: root.colSurface
+            border.color: root.colAccent
+            border.width: root.boxBorder
+            radius: root.boxRadius
+        }
+
+        contentItem: Text {
+            leftPadding: 20
+            rightPadding: userBox.indicator.width + 20
+            text: userBox.displayText
+            font: userBox.font
+            color: root.colText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+        }
+
+        indicator: Text {
+            x: userBox.width - width - 20
+            y: userBox.topPadding + (userBox.availableHeight - height) / 2
+            text: "▾"
+            font.family: root.fontFamily
+            font.pixelSize: root.boxFontSize
+            color: root.colText
+        }
+
+        delegate: ItemDelegate {
+            width: userBox.width
+            height: 40
+            highlighted: userBox.highlightedIndex === index
+            contentItem: Text {
+                leftPadding: 20
+                text: model[userBox.textRole]
+                font: userBox.font
+                color: root.colText
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+            background: Rectangle {
+                color: highlighted ? root.colAccent : "transparent"
+                radius: root.boxRadius
+            }
+        }
+
+        popup: Popup {
+            y: userBox.height + 6
+            width: userBox.width
+            implicitHeight: contentItem.implicitHeight + 8
+            padding: 4
+
+            contentItem: ListView {
+                clip: true
+                implicitHeight: contentHeight
+                model: userBox.popup.visible ? userBox.delegateModel : null
+                currentIndex: userBox.highlightedIndex
+            }
+
+            background: Rectangle {
+                color: root.colSurface
+                border.color: root.colAccent
+                border.width: root.boxBorder
+                radius: root.boxRadius
+            }
+        }
+
+        Component.onCompleted: {
+            if (userModel && userModel.lastIndex !== undefined)
+                currentIndex = userModel.lastIndex
         }
     }
 
@@ -106,13 +198,13 @@ Rectangle {
     Rectangle {
         id: passwordFrame
         anchors.horizontalCenter: parent.horizontalCenter
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.verticalCenterOffset: 35
-        width: 300
-        height: 60
-        radius: 8
+        anchors.top: userBox.bottom
+        anchors.topMargin: 16
+        width: root.boxWidth
+        height: root.boxHeight
+        radius: root.boxRadius
         color: root.colSurface
-        border.width: 4
+        border.width: root.boxBorder
         border.color: root.attempts > 0
             ? root.colRed
             : (keyboard.capsLock ? root.colYellow : root.colAccent)
@@ -120,13 +212,14 @@ Rectangle {
         TextInput {
             id: passwordInput
             anchors.fill: parent
-            anchors.leftMargin: 18
-            anchors.rightMargin: 18
+            anchors.leftMargin: 20
+            anchors.rightMargin: 20
             color: root.colText
             font.family: root.fontFamily
-            font.pixelSize: 20
+            font.pixelSize: root.boxFontSize
             echoMode: TextInput.Password
             passwordCharacter: "●"
+            horizontalAlignment: TextInput.AlignHCenter
             verticalAlignment: TextInput.AlignVCenter
             focus: true
             clip: true
@@ -138,13 +231,14 @@ Rectangle {
 
         Text {
             anchors.fill: passwordInput
+            horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             color: root.colText
             opacity: 0.55
             font.family: root.fontFamily
-            font.pixelSize: 20
+            font.pixelSize: root.boxFontSize
             font.italic: true
-            text: "  Logged in as " + root.targetUser
+            text: keyboard.capsLock ? "Password (Caps Lock on)" : "Password"
             visible: passwordInput.text.length === 0
         }
     }
@@ -163,28 +257,88 @@ Rectangle {
     }
 
     // --- Session selector (bottom-center) ---
-    RowLayout {
+    ComboBox {
+        id: sessionBox
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 40
-        spacing: 10
+        width: root.boxWidth
+        height: root.boxHeight
+        model: sessionModel
+        textRole: "name"
+        font.family: root.fontFamily
+        font.pixelSize: root.boxFontSize
+        clip: true
 
-        Text {
-            color: root.colText
-            opacity: 0.7
-            font.family: root.fontFamily
-            font.pixelSize: 14
-            text: "Session:"
+        background: Rectangle {
+            color: root.colSurface
+            border.color: root.colAccent
+            border.width: root.boxBorder
+            radius: root.boxRadius
         }
 
-        ComboBox {
-            id: sessionBox
-            Layout.preferredWidth: 220
-            model: sessionModel
-            textRole: "name"
-            currentIndex: sessionModel.lastIndex
+        contentItem: Text {
+            leftPadding: 20
+            rightPadding: sessionBox.indicator.width + 20
+            text: sessionBox.displayText
+            font: sessionBox.font
+            color: root.colText
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            elide: Text.ElideRight
+        }
+
+        indicator: Text {
+            x: sessionBox.width - width - 20
+            y: sessionBox.topPadding + (sessionBox.availableHeight - height) / 2
+            text: "▾"
             font.family: root.fontFamily
-            font.pixelSize: 14
+            font.pixelSize: root.boxFontSize
+            color: root.colText
+        }
+
+        delegate: ItemDelegate {
+            width: sessionBox.width
+            height: 40
+            highlighted: sessionBox.highlightedIndex === index
+            contentItem: Text {
+                leftPadding: 20
+                text: model[sessionBox.textRole]
+                font: sessionBox.font
+                color: root.colText
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+            background: Rectangle {
+                color: highlighted ? root.colAccent : "transparent"
+                radius: root.boxRadius
+            }
+        }
+
+        popup: Popup {
+            y: -implicitHeight - 6
+            width: sessionBox.width
+            implicitHeight: contentItem.implicitHeight + 8
+            padding: 4
+
+            contentItem: ListView {
+                clip: true
+                implicitHeight: contentHeight
+                model: sessionBox.popup.visible ? sessionBox.delegateModel : null
+                currentIndex: sessionBox.highlightedIndex
+            }
+
+            background: Rectangle {
+                color: root.colSurface
+                border.color: root.colAccent
+                border.width: root.boxBorder
+                radius: root.boxRadius
+            }
+        }
+
+        Component.onCompleted: {
+            if (sessionModel && sessionModel.lastIndex !== undefined)
+                currentIndex = sessionModel.lastIndex
         }
     }
 
