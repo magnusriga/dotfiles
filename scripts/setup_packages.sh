@@ -213,6 +213,7 @@ if [ "$DISTRO" = "arch" ]; then
     sddm qt6-svg qt6-declarative qt6ct \
     qt5-wayland qt6-wayland \
     qt6-virtualkeyboard qt6-multimedia-ffmpeg \
+    layer-shell-qt nlohmann-json cpio vulkan-headers \
     qt5-graphicaleffects qt5-quickcontrols2 qt5-svg \
     gnome-keyring gcr-4 seahorse \
     hyprpolkitagent \

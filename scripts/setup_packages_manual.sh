@@ -836,6 +836,43 @@ echo "lua-language-server installed to $LUALS_DIR"
 echo "Ensure $LUALS_DIR/bin is in PATH."
 
 # ================================================
+# Install HyprCapture (Hyprland screenshot/recording plugin).
+# https://github.com/gfhdhytghd/HyprCapture
+# ================================================
+# - Replaces the previous grim/slurp screenshot bindings.
+# - Built via `hyprpm`, Hyprland's plugin manager. `hyprpm` compiles the
+#   compositor plugin against the running Hyprland's headers and installs
+#   the Qt helper to ~/.local/bin/hyprcapture-ui.
+# - Plugin config + keybindings live in:
+#     stow/hypr/.config/hypr/conf/my.conf
+#     stow/hypr/.config/hypr/conf/keybindings/default.conf
+# - Build deps (layer-shell-qt, nlohmann-json, qt6-base, cmake, ffmpeg,
+#   wl-clipboard) are installed via `setup_packages.sh`.
+# - `hyprpm reload` only succeeds when Hyprland is already running; on a
+#   fresh setup the plugin loads automatically on the next Hyprland start.
+PACKAGE="hyprcapture"
+HYPRCAPTURE_REPO="https://github.com/gfhdhytghd/HyprCapture"
+if command -v hyprpm &>/dev/null; then
+  echo "Installing HyprCapture plugin via hyprpm..."
+  hyprpm update
+  if ! hyprpm list 2>/dev/null | grep -q "$PACKAGE"; then
+    hyprpm add "$HYPRCAPTURE_REPO"
+  else
+    echo "HyprCapture repo already registered with hyprpm."
+  fi
+  hyprpm enable "$PACKAGE"
+  if pgrep -x Hyprland >/dev/null; then
+    hyprpm reload
+  else
+    echo "Hyprland not running; plugin will load on next session start."
+  fi
+  echo "HyprCapture plugin installed."
+else
+  echo "hyprpm not found; skipping HyprCapture install (install Hyprland first)."
+fi
+unset PACKAGE HYPRCAPTURE_REPO
+
+# ================================================
 # Install luarocks, needed by lazyvim.
 # Use `pacman -Syu luarocks` instead.
 # ================================================
