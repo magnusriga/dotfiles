@@ -847,7 +847,8 @@ echo "Ensure $LUALS_DIR/bin is in PATH."
 #     stow/hypr/.config/hypr/conf/my.conf
 #     stow/hypr/.config/hypr/conf/keybindings/default.conf
 # - Build deps (layer-shell-qt, nlohmann-json, qt6-base, cmake, ffmpeg,
-#   wl-clipboard) are installed via `setup_packages.sh`.
+#   wl-clipboard) and the runtime recorder (gpu-screen-recorder, used for
+#   fullscreen/region video) are installed via `setup_packages.sh`.
 # - `hyprpm reload` only succeeds when Hyprland is already running; on a
 #   fresh setup the plugin loads automatically on the next Hyprland start.
 PACKAGE="hyprcapture"

@@ -316,7 +316,8 @@ yay -Syu --noconfirm \
   xdg-desktop-portal-hyprland \
   xdg-desktop-portal-termfilechooser-hunkyburrito-git \
   zoom \
-  whispering-bin
+  whispering-bin \
+  adobe-reader-11
 
 # Ensure right permissions for `gpg-agent`, then restart it.
 killall gpg-agent dirmngr 2>/dev/null
