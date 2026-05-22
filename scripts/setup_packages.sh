@@ -237,8 +237,9 @@ if [ "$DISTRO" = "arch" ]; then
     mpv \
     celluloid \
     vlc vlc-plugin-ffmpeg \
-    kdenlive \
-    obs-studio \
+    kdenlive bigsh0t kimageformats qt6-imageformats \
+    noise-suppression-for-voice python-srt_equalizer python-vosk \
+    obs-studio v4l2loopback-dkms obs-studio-plugin-browser \
     file-roller \
     tumbler \
     netcat \
