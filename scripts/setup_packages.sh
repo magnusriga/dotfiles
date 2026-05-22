@@ -195,7 +195,7 @@ if [ "$DISTRO" = "arch" ]; then
     ttf-fira-sans ttf-fira-code ttf-firacode-nerd ttf-dejavu \
     noto-fonts noto-fonts-emoji noto-fonts-cjk noto-fonts-extra \
     hyprland hyprpaper hypridle hyprlock \
-    hyprpicker hyprsunset \
+    hyprpicker hyprsunset hyprlauncher \
     nwg-look \
     nwg-displays \
     nwg-dock-hyprland \
@@ -236,6 +236,7 @@ if [ "$DISTRO" = "arch" ]; then
     cliphist \
     mpv \
     vlc \
+    kdenlive \
     file-roller \
     tumbler \
     netcat \
