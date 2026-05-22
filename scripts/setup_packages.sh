@@ -235,8 +235,10 @@ if [ "$DISTRO" = "arch" ]; then
     wl-clipboard \
     cliphist \
     mpv \
-    vlc \
+    celluloid \
+    vlc vlc-plugin-ffmpeg \
     kdenlive \
+    obs-studio \
     file-roller \
     tumbler \
     netcat \
