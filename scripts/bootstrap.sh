@@ -146,6 +146,13 @@ function doIt() {
     sudo ln -s "${ROOTPATH}/etc/pacman.conf" /etc
   fi
 
+  # Link `logind.conf.d/no-poweroff-key.conf`, drop-in override for
+  # systemd-logind that ignores KEY_POWER (some keyboards send it on Fn+Esc
+  # and would otherwise trigger an immediate shutdown).
+  sudo mkdir -p /etc/systemd/logind.conf.d
+  sudo rm -f /etc/systemd/logind.conf.d/no-poweroff-key.conf
+  sudo ln -s "${ROOTPATH}/etc/systemd/logind.conf.d/no-poweroff-key.conf" /etc/systemd/logind.conf.d/
+
   # Link `.stow-global-ignore`, used by `stow`.
   rm -f "$HOME/.stow-global-ignore"
   ln -s "${ROOTPATH}/stow/.stow-global-ignore" "$HOME"
