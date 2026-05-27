@@ -8,6 +8,7 @@ cargo install eza
 cargo install --locked tree-sitter-cli
 cargo install ripdrag
 cargo install resvg
+cargo install vtracer
 
 # - Only build `jless` from source on Debian-based systems.
 # - Installed with `pacman` on Arch Linux.

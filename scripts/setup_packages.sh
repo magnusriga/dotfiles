@@ -139,12 +139,14 @@ COMMON_PACKAGES=(
   git
   glow
   gnupg
+  inkscape
   inotify-tools
   # lazygit
   lsb-release
   luarocks
   make
   man-db
+  potrace
   ripgrep
   rsync
   socat net-tools lsof
