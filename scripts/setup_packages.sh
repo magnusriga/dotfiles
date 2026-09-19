@@ -61,6 +61,32 @@ if [ "$DISTRO" != "arch" ] && [ "$DISTRO" != "ubuntu" ]; then
 fi
 
 # ==========================================================
+# Arch-specific setup
+# ==========================================================
+function setup_arch_repositories() {
+  echo "Setting up Arch repositories..."
+
+  # ChatGPT desktop app (for package `chatgpt-bin`).
+  # - Repository `[openai-chatgpt]` is defined in `etc/pacman.conf`.
+  # - Signing key is verified against the fingerprint pinned by OpenAI's installer.
+  #   https://learn.chatgpt.com/docs/linux/linux-app
+  local key_url="https://persistent.oaistatic.com/codex-app-prod/linux/repository-signing-key.gpg"
+  local key_fingerprint="3BFA0E4AE8B8CC16A2D9BA684A3B4A566C4660E4"
+  local key_file gnupg_home fingerprint
+  key_file=$(mktemp)
+  gnupg_home=$(mktemp -d)
+  curl --proto '=https' --tlsv1.2 -fsSL -o "$key_file" "$key_url"
+  fingerprint=$(gpg --homedir "$gnupg_home" --batch --show-keys --with-colons "$key_file" | awk -F: '$1 == "fpr" { print $10; exit }')
+  if [ "$fingerprint" = "$key_fingerprint" ]; then
+    sudo pacman-key --add "$key_file"
+    sudo pacman-key --lsign-key "$key_fingerprint"
+  else
+    echo "ERROR: OpenAI repository signing key fingerprint mismatch, not importing key."
+  fi
+  rm -rf "$key_file" "$gnupg_home"
+}
+
+# ==========================================================
 # Ubuntu-specific setup
 # ==========================================================
 function setup_ubuntu_repositories() {
@@ -174,6 +200,11 @@ COMMON_PACKAGES=(
 if [ "$DISTRO" = "arch" ]; then
   echo "Installing packages for Arch Linux..."
 
+  # Add third-party repositories and their signing keys (host only, Docker uses its own `pacman.conf`).
+  if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+    setup_arch_repositories
+  fi
+
   # Update system and install common + Arch-specific packages.
   sudo pacman -Syu --noconfirm \
     "${COMMON_PACKAGES[@]}" \
@@ -264,6 +295,7 @@ if [ "$DISTRO" = "arch" ]; then
     gdk-pixbuf2 gimp java-runtime \
     libwmf libopenraw libavif libheif libjxl librsvg webp-pixbuf-loader \
     python-setuptools python-keyring python-xdg python python-pip python-pipx \
+    python-fonttools \
     python-gobject \
     lua \
     gtk4 gtk4-layer-shell libadwaita \
@@ -275,6 +307,11 @@ if [ "$DISTRO" = "arch" ]; then
     xorg-xauth xorg-server-xvfb \
     libxcb \
     libevent ncurses bison pkgconf
+
+  # Install packages from third-party repositories (host only).
+  if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ]; then
+    sudo pacman -S --needed --noconfirm chatgpt-bin
+  fi
 
   # Clean cache for unused packages.
   # sudo pacman -Sc --noconfirm
@@ -295,7 +332,6 @@ elif [ "$DISTRO" = "ubuntu" ]; then
 
   # Setup repositories.
   setup_ubuntu_repositories
-    python-fonttools \
 
   # Check Ubuntu version for conditional packages.
   UBUNTU_24_10_OR_LATER=$(check_ubuntu_version 24 10)
@@ -338,6 +374,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     libgdk-pixbuf2.0-dev gimp default-jre \
     libwmf-dev libopenraw-dev libavif-dev libheif-dev libjxl-dev librsvg2-dev \
     python3-setuptools python3-keyring python3-xdg python3 python3-pip pipx \
+    python3-fonttools \
     lua5.4 \
     libgtk-4-dev libadwaita-1-dev libxml2-utils \
     libjpeg-turbo8-dev libpng-dev zlib1g-dev \
@@ -372,8 +409,8 @@ fi
 
 # Clean up functions.
 unset -f detect_distro
+unset -f setup_arch_repositories
 unset -f setup_ubuntu_repositories
 unset -f check_ubuntu_version
-    python3-fonttools \
 
 echo "Package installation completed for $DISTRO!"
