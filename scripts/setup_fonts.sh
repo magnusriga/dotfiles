@@ -44,6 +44,117 @@ if [[ $(uname) != "Darwin" ]]; then
 fi
 
 # ================================================
+# Install design fonts
+# ------------------------------------------------
+# Modern sans-serifs commonly used in product/UI/logo design.
+# Installed system-wide alongside Nerd Fonts so design tools
+# (Inkscape, GIMP, Figma desktop, etc.) can pick them up.
+# ================================================
+design_font_dir="${sys_share_dir}/${font_subdir}/Design"
+echo "Installing design fonts in directory $design_font_dir"
+sudo rm -rf "$design_font_dir"
+sudo mkdir -p "$design_font_dir"
+
+# Helper: download Fontshare TTF (Satoshi, General Sans) and fix the
+# corrupted name table that Fontshare's CDN ships in some weights.
+# Requires `python-fonttools` (Arch) / `python3-fonttools` (Ubuntu), installed by `setup_packages.sh`.
+function install_fontshare_font() {
+  local slug="$1"      # URL slug, e.g. "satoshi"
+  local family="$2"    # Display family, e.g. "Satoshi"
+  local weights="$3"   # Space-separated weights, e.g. "400 500 700 900"
+
+  local wcsv="${weights// /,}"
+  local css
+  css="$(curl -fsSL "https://api.fontshare.com/v2/css?f%5B%5D=${slug}@${wcsv}&display=swap" \
+    -H "User-Agent: Mozilla/5.0")"
+
+  for w in $weights; do
+    local ttf_url
+    ttf_url=$(awk -v w="$w" '
+      /^@font-face/ { block="" }
+      { block = block "\n" $0 }
+      /font-weight:/ {
+        if (block ~ ("font-weight: *" w)) {
+          match(block, /\/\/cdn\.fontshare\.com\/[^'\'']+\.ttf/)
+          if (RSTART) print substr(block, RSTART, RLENGTH)
+        }
+      }
+    ' <<< "$css" | head -1)
+
+    if [ -z "$ttf_url" ]; then
+      echo "    skip: no $family weight $w on Fontshare"
+      continue
+    fi
+
+    local outpath="$design_font_dir/${family// /}-${w}.ttf"
+    sudo curl -fsSL -o "$outpath" "https:${ttf_url}"
+
+    # Repair name table: Fontshare ships some weights with name ID 1 set to "false".
+    sudo python3 - "$outpath" "$family" "$w" <<'PY'
+import sys
+from fontTools.ttLib import TTFont
+path, family, weight = sys.argv[1], sys.argv[2], sys.argv[3]
+subfam_map = {"400":"Regular","500":"Medium","600":"SemiBold","700":"Bold","800":"ExtraBold","900":"Black"}
+subfam = subfam_map.get(weight, weight)
+full = f"{family} {subfam}"
+ps   = f"{family.replace(' ','')}-{subfam}"
+t = TTFont(path)
+for n in t["name"].names:
+    if   n.nameID == 1: val = family
+    elif n.nameID == 2: val = subfam
+    elif n.nameID == 4: val = full
+    elif n.nameID == 6: val = ps
+    else: continue
+    n.string = val.encode("utf-16-be") if n.platformID == 3 else val.encode("latin-1")
+t.save(path)
+PY
+  done
+}
+
+# Inter (rsms/inter) — static TTFs from the v4.1 release.
+echo "  - Inter"
+inter_tmp=$(mktemp -d)
+sudo curl -fsSL -o "$inter_tmp/inter.zip" \
+  "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip"
+sudo unzip -j -o "$inter_tmp/inter.zip" "extras/ttf/*.ttf" -d "$design_font_dir" >/dev/null
+sudo rm -rf "$inter_tmp"
+
+# Geist (vercel/geist-font) — static TTFs from the Next.js distribution.
+echo "  - Geist"
+for w in Thin UltraLight Light Regular Medium SemiBold Bold Black UltraBlack; do
+  sudo curl -fsSL --output-dir "$design_font_dir" -O \
+    "https://github.com/vercel/geist-font/raw/main/packages/next/dist/fonts/geist-sans/Geist-${w}.ttf"
+done
+
+# Cal Sans (calcom/sans, distributed via Google Fonts) — single weight, popular for headings.
+echo "  - Cal Sans"
+sudo curl -fsSL -o "$design_font_dir/CalSans-Regular.ttf" \
+  "https://raw.githubusercontent.com/google/fonts/main/ofl/calsans/CalSans-Regular.ttf"
+
+# Google Fonts variable fonts — DM Sans, Manrope, Plus Jakarta Sans, Outfit, Onest.
+echo "  - DM Sans, Manrope, Plus Jakarta Sans, Outfit, Onest (Google Fonts)"
+sudo curl -fsSL -o "$design_font_dir/DMSans.ttf" \
+  "https://raw.githubusercontent.com/google/fonts/main/ofl/dmsans/DMSans%5Bopsz%2Cwght%5D.ttf"
+sudo curl -fsSL -o "$design_font_dir/Manrope.ttf" \
+  "https://raw.githubusercontent.com/google/fonts/main/ofl/manrope/Manrope%5Bwght%5D.ttf"
+sudo curl -fsSL -o "$design_font_dir/PlusJakartaSans.ttf" \
+  "https://raw.githubusercontent.com/google/fonts/main/ofl/plusjakartasans/PlusJakartaSans%5Bwght%5D.ttf"
+sudo curl -fsSL -o "$design_font_dir/Outfit.ttf" \
+  "https://raw.githubusercontent.com/google/fonts/main/ofl/outfit/Outfit%5Bwght%5D.ttf"
+sudo curl -fsSL -o "$design_font_dir/Onest.ttf" \
+  "https://raw.githubusercontent.com/google/fonts/main/ofl/onest/Onest%5Bwght%5D.ttf"
+
+# Fontshare fonts — Satoshi and General Sans, with name-table repair.
+echo "  - Satoshi, General Sans (Fontshare)"
+install_fontshare_font "satoshi"      "Satoshi"      "400 500 700 900"
+install_fontshare_font "general-sans" "General Sans" "400 500 600 700"
+unset -f install_fontshare_font
+
+if [[ $(uname) != "Darwin" ]]; then
+  fc-cache -fv
+fi
+
+# ================================================
 # Install PowerPoint Viewer fonts
 # ================================================
 export DOWNLOAD_URL="https://archive.org/download/PowerPointViewer_201801/PowerPointViewer.exe"

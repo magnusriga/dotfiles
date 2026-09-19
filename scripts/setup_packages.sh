@@ -295,6 +295,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
 
   # Setup repositories.
   setup_ubuntu_repositories
+    python-fonttools \
 
   # Check Ubuntu version for conditional packages.
   UBUNTU_24_10_OR_LATER=$(check_ubuntu_version 24 10)
@@ -373,5 +374,6 @@ fi
 unset -f detect_distro
 unset -f setup_ubuntu_repositories
 unset -f check_ubuntu_version
+    python3-fonttools \
 
 echo "Package installation completed for $DISTRO!"
