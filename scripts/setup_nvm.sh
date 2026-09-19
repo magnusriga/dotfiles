@@ -15,8 +15,12 @@ NVM_DIR=${NVM_DIR:-$HOME/.nvm}
 # "node" is an alias for the latest version, however we must use an actual version number for the addition to PATH to work.
 # NODE_VERSION="22.14.0"
 NODE_VERSION="node"
-curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+# `PROFILE=/dev/null`: skip profile edits, `.shrc` already loads nvm.
+# Re-running the installer also updates an existing nvm to this version.
+curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.7/install.sh | PROFILE=/dev/null bash
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 nvm install $NODE_VERSION
 nvm alias default $NODE_VERSION
 nvm use default
+# Node bundles an older npm, upgrade to latest npm supported by this Node.
+nvm install-latest-npm
