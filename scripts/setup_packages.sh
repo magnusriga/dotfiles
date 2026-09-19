@@ -196,7 +196,7 @@ if [ "$DISTRO" = "arch" ]; then
     ttf-cascadia-code-nerd \
     ttf-fira-sans ttf-fira-code ttf-firacode-nerd ttf-dejavu \
     noto-fonts noto-fonts-emoji noto-fonts-cjk noto-fonts-extra \
-    hyprland hyprpaper hypridle hyprlock \
+    hyprland hyprpm hyprpaper hypridle hyprlock \
     hyprpicker hyprsunset hyprlauncher \
     nwg-look \
     nwg-displays \

@@ -8,11 +8,11 @@ LAPTOP_DISABLED=$(hyprctl monitors -j | jq '.[] | select(.name == "eDP-1") | .di
 
 if [ "$LAPTOP_DISABLED" = "true" ]; then
   # Enable laptop display if it's disabled
-  hyprctl keyword monitor eDP-1,preferred,auto,1.6
+  hyprctl eval 'hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1.6 })'
   notify-send "Display" "Laptop display enabled"
 elif [ "$MONITOR_COUNT" -gt 1 ]; then
   # Only disable if there are other monitors active
-  hyprctl keyword monitor eDP-1,disable
+  hyprctl eval 'hl.monitor({ output = "eDP-1", disabled = true })'
   notify-send "Display" "Laptop display disabled"
 else
   notify-send "Display" "Cannot disable only active monitor" -u critical

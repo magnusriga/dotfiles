@@ -844,8 +844,8 @@ echo "Ensure $LUALS_DIR/bin is in PATH."
 #   compositor plugin against the running Hyprland's headers and installs
 #   the Qt helper to ~/.local/bin/hyprcapture-ui.
 # - Plugin config + keybindings live in:
-#     stow/hypr/.config/hypr/conf/my.conf
-#     stow/hypr/.config/hypr/conf/keybindings/default.conf
+#     stow/hypr/.config/hypr/conf/my.lua
+#     stow/hypr/.config/hypr/conf/keybindings/default.lua
 # - Build deps (layer-shell-qt, nlohmann-json, qt6-base, cmake, ffmpeg,
 #   wl-clipboard) and the runtime recorder (gpu-screen-recorder, used for
 #   fullscreen/region video) are installed via `setup_packages.sh`.
@@ -869,7 +869,7 @@ if command -v hyprpm &>/dev/null; then
   fi
   echo "HyprCapture plugin installed."
 else
-  echo "hyprpm not found; skipping HyprCapture install (install Hyprland first)."
+  echo "hyprpm not found; skipping HyprCapture install (install the hyprpm package first)."
 fi
 unset PACKAGE HYPRCAPTURE_REPO
 

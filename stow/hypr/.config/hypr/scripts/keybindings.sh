@@ -7,32 +7,19 @@
 #           |___/                             |___/
 #
 # -----------------------------------------------------
-# Get keybindings location based on variation
+# List registered keybindings with their `description` flag
+# (set in conf/keybindings/*.lua) from `hyprctl binds`.
 # -----------------------------------------------------
-config_file=$(<~/.config/hypr/conf/keybinding.conf)
-config_file=${config_file//source = ~//home/$USER}
 
-# -----------------------------------------------------
-# Path to keybindings config file
-# -----------------------------------------------------
-echo "Reading from: $config_file"
-
-keybinds=$(awk -F'[=#]' '
-    $1 ~ /^bind/ {
-        # Replace the string "$mainMod" with "SUPER" (for the super key)
-        gsub(/\$mainMod/, "SUPER", $0)
-
-        # Remove "bind" and extra spaces, if any, at the beginning of the line
-        gsub(/^bind[[:space:]]*=+[[:space:]]*/, "", $0)
-
-        # Split the keybinding part (e.g., "Mod1,Return") using a comma
-        split($1, kbarr, ",")
-
-        # Format the keybinding and associated command and prepare for output:
-        # Concatenate the two keybinding keys (e.g., "Mod1" + "Return") and append the command
-        print kbarr[1] "  + " kbarr[2] "\r" $2
-    }
-' "$config_file")
+keybinds=$(hyprctl -j binds | jq -r '
+  .[]
+  | select(.has_description)
+  | . as $bind
+  | [ [64, "SUPER"], [4, "CTRL"], [8, "ALT"], [1, "SHIFT"] ]
+  | map(select(($bind.modmask / .[0] | floor) % 2 == 1) | .[1])
+  | . + [$bind.key]
+  | "\(join(" + "))\r\($bind.description)"
+')
 
 sleep 0.2
 wofi --dmenu --insensitive --allow-markup --prompt="Keybinds" <<<"$keybinds"

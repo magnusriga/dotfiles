@@ -18,14 +18,8 @@ chosen="$(echo -e "$options" | wofi --dmenu --prompt "Settings" --width 300 --he
 
 case $chosen in
   "󰤨  WiFi Settings")
-    # Apply window rules for NetworkManager before launching
-    hyprctl keyword windowrule "float on, center on, size 1100 700, match:class (com.mitchellh.ghostty), match:title (NetworkManager)"
-
-    # Launch nmtui with NetworkManager title
-    ghostty --title="NetworkManager" -e nmtui
-
-    # Clean up the rule after nmtui exits
-    hyprctl keyword windowrule "unset, match:class (com.mitchellh.ghostty), match:title (NetworkManager)" &
+    # Launch nmtui with NetworkManager title (floated by the window rule in conf/my.lua)
+    ghostty --title="NetworkManager" -e nmtui &
     ;;
   "󰂲  Bluetooth")
     if command -v blueman-manager &> /dev/null; then
@@ -65,7 +59,7 @@ case $chosen in
     hyprlock &
     ;;
   "󰗼  Logout")
-    hyprctl dispatch exit
+    hyprctl dispatch 'hl.dsp.exit()'
     ;;
   "󰜉  Reboot")
     systemctl reboot
