@@ -202,7 +202,7 @@ export FZF_CTRL_T_OPTS="
   --bind 'enter:accept'
   --bind 'ctrl-o:execute(nvim {})'
   --bind 'ctrl-e:execute-silent(echo {} | wl-copy && command -v notify-send >/dev/null && notify-send \"Clipboard\" \"Copied: {}\")'
-  --header 'CTRL-T: Files/Dirs | CTRL-R: All | ENTER: Smart Open | CTRL-O: Force Nvim | CTRL-E: Copy Path'"
+  --header 'CTRL-T: Files/Dirs | CTRL-R: All | ENTER: Insert Path | CTRL-O: Force Nvim | CTRL-E: Copy Path'"
 
 export FZF_ALT_C_COMMAND="$FZF_DEFAULT_COMMAND --type d"
 export FZF_ALT_C_OPTS="
