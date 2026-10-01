@@ -111,6 +111,8 @@ alias clauder='systemd-inhibit --what=idle:sleep --who="claude" --why="browser a
 # ============================================================
 # Various Programs.
 # ============================================================
+alias lo="libreoffice"
+
 # alias n="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
 # alias nvim="infisical run --env=dev --tags=nvim --projectId=5e229f8f-bb80-493c-bd26-b118fefc73ad -- nvim"
 # alias n="hcp vault-secrets run -- nvim"
