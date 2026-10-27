@@ -466,8 +466,8 @@ return {
       -- Replaces `vim.ui.input` with prettier prompt.
       input = { enabled = true },
 
-      -- Old alternative to `noice.nvim`, avoid.
-      -- notifier = { enabled = true },
+      -- Shows `vim.notify` messages as pop-ups in the corner (LazyVim default).
+      notifier = { enabled = true },
 
       -- Creates scopes based on indent and treesitter elements,
       -- and adds operators to navigate scopes.
