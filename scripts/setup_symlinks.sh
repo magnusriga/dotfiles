@@ -12,7 +12,7 @@ fi
 # ================================================================
 # Remove existing symlinks.
 # ================================================================
-rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat ~/.local/bin/pbcopy ~/.local/bin/pbpaste
+rm -f ~/.local/bin/fd ~/.local/bin/sg ~/.local/bin/bat
 
 # ================================================================
 # Add software symlinks.
@@ -30,12 +30,18 @@ if [ -n "$(which batcat 2>/dev/null)" ]; then
   ln -fs "$(which batcat)" ~/.local/bin/bat
 fi
 
-if [ -f "$HOME/dotfiles/usr/local/bin/rpbcopy" ]; then
-  chmod a+x "$HOME/dotfiles/usr/local/bin/rpbcopy"
-  ln -fs "$HOME/dotfiles/usr/local/bin/rpbcopy" ~/.local/bin/pbcopy
-fi
-
-if [ -f "$HOME/dotfiles/usr/local/bin/rpbpaste" ]; then
-  chmod a+x "$HOME/dotfiles/usr/local/bin/rpbpaste"
-  ln -fs "$HOME/dotfiles/usr/local/bin/rpbpaste" ~/.local/bin/pbpaste
-fi
+# Keep the remote clipboard helpers distinct from the native commands they call.
+# Installing rpbpaste as pbpaste makes its local fallback recurse indefinitely.
+for clipboard_command in pbcopy pbpaste; do
+  clipboard_helper="$HOME/dotfiles/usr/local/bin/r$clipboard_command"
+  clipboard_alias="$HOME/.local/bin/$clipboard_command"
+  # Migrate only aliases owned by this installer; preserve native/user commands.
+  if [ -L "$clipboard_alias" ] && [ "$(readlink "$clipboard_alias")" = "$clipboard_helper" ]; then
+    rm "$clipboard_alias"
+  fi
+  if [ -f "$clipboard_helper" ]; then
+    chmod a+x "$clipboard_helper"
+    ln -fs "$clipboard_helper" "$HOME/.local/bin/r$clipboard_command"
+  fi
+done
+unset clipboard_command clipboard_helper clipboard_alias

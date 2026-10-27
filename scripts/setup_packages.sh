@@ -391,7 +391,7 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     libgl1-mesa-dev libnss-nis libxss1 libxtst6 \
     xauth xvfb \
     libxcb1-dev libxcb-render0-dev libxcb-shape0-dev libxcb-xfixes0-dev \
-    libevent-dev libncurses-dev bison pkgconf
+    libevent-dev libncurses-dev ncurses-term bison pkgconf
 
   # Install libgtk4-layer-shell-dev on Ubuntu 24.10 or later
   if [ "$UBUNTU_24_10_OR_LATER" = "true" ]; then
