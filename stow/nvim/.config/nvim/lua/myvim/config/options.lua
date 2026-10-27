@@ -130,7 +130,14 @@ vim.g.root_lsp_ignore = { "biome", "eslint", "tailwindcss", "copilot" }
 vim.g.trouble_lualine = true
 
 -- Template directory for new markdown files, created with `:MarkdownNewTemplate`.
-vim.g.template_dir = MyVim.root() .. "/templates"
+vim.g.template_dir = vim.fn.stdpath("config") .. "/templates"
+
+-- No configured plugin uses Neovim's remote-plugin hosts.
+-- External language servers and CLI tools do not use these providers.
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
 
 -- Used to determine icons in `Lazy` ui.
 vim.g.have_nerd_font = true
@@ -428,11 +435,6 @@ opt.splitkeep = "screen"
 
 -- When vertically splitting window, e.g. `vs`, put new window to right of current window.
 opt.splitright = true
-
--- Using custom `statuscolumn`, i.e. margin to left containing:
--- Gitsigns (or other signs), diagnostics, todo-comments, line numbers, fold icons, border, etc.
-opt.statuscolumn = [[%!v:lua.require'snacks.statuscolumn'.get()]]
--- opt.statuscolumn = [[%!v:lua.require'myvim.util.statuscolumn'.get()]]
 
 -- Number of spaces tabs count for.
 opt.tabstop = 2

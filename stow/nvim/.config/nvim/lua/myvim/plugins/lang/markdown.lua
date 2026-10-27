@@ -1,10 +1,15 @@
 local lsp_name = "marksman"
 
-MyVim.on_very_lazy(function()
-  vim.filetype.add({
-    extension = { mdx = "markdown.mdx" },
-  })
-end)
+-- User-level `markdownlint-cli2` configuration, applied when linting and fixing.
+-- `markdownlint-cli2` only discovers configuration files in cwd and below,
+-- so pass path explicitly to share one configuration across all projects.
+local markdownlint_config = vim.fn.expand("$HOME/.config/markdownlint-cli2/.markdownlint-cli2.jsonc")
+
+-- Register `.mdx` at startup, so filetype is known before any buffer is read
+-- and before `:checkhealth vim.lsp` validates `marksman` filetypes.
+vim.filetype.add({
+  extension = { mdx = "markdown.mdx" },
+})
 
 return {
   {
@@ -21,6 +26,7 @@ return {
           end,
         },
         ["markdownlint-cli2"] = {
+          prepend_args = { "--config", markdownlint_config },
           condition = function(_, ctx)
             local diag = vim.tbl_filter(function(d)
               return d.source == "markdownlint"
@@ -75,11 +81,7 @@ return {
   -- },
 
   -- - Using `markdownlint-cli2`, like LazyVim.
-  -- - `markdownlint-cli2` limitation
-  --   - Cannot update diagnostics on `InsertLeave` and `TextChanged` events,
-  --     only when buffer written to file.
-  --   - `markdownlint` does not have this limitation.
-  --   - Stick with `markdownlint-cli2`, more popular.
+  -- - Lint stdin so diagnostics include unsaved buffer edits.
   -- - Prefer `nvim-lint` over `none-ls`.
   --   - Avoids installing another LSP server.
   --   - `nvim-lint` offer better linting messages.
@@ -92,8 +94,9 @@ return {
         -- markdown = { "markdownlint" },
       },
       linters = {
+        -- Built-in linter reads buffer from stdin, `-` glob selects stdin in `markdownlint-cli2`.
         ["markdownlint-cli2"] = {
-          args = { "--config", vim.fn.expand("$HOME/.config/markdownlint-cli2/.markdownlint-cli2.jsonc"), "--" },
+          args = { "--config", markdownlint_config, "-" },
         },
       },
     },
@@ -215,6 +218,10 @@ return {
       -- File types this plugin runs on.
       -- Default: `markdown`.
       file_types = { "markdown", "norg", "rmd", "org", "codecompanion", "Avante" },
+
+      -- Keep optional LaTeX conversion off; ordinary Markdown rendering stays enabled.
+      -- Enabling it requires `utftex` or `latex2text` in the system package setup.
+      latex = { enabled = false },
     },
     -- Lazy-load on filetype.
     ft = { "markdown", "norg", "rmd", "org", "codecompanion", "Avante" },

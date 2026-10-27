@@ -333,53 +333,8 @@ return {
             ueberzug_scaler = "fit_contain",
           },
         },
-        -- Overwrite `vim.ui.select`, i.e. interactive select menu, with `fzf-lua`.
-        -- Actual replacement is done below, via VeryLazy autocmd.
-        ui_select = function(fzf_opts, items)
-          -- `vim.o.lines`: Number of lines in the current window, i.e. screen height.
-          -- `items`      : Number of items to select from, e.g. number of code action items.
-          return vim.tbl_deep_extend("force", fzf_opts, {
-            prompt = " ",
-            fzf_opts = {
-              ["--no-header"] = true,
-            },
-            winopts = {
-              title = " " .. vim.trim((fzf_opts.prompt or "Select"):gsub("%s*:%s*$", "")) .. " ",
-              title_pos = "center",
-            },
-          }, fzf_opts.kind == "codeaction" and {
-            winopts = {
-              layout = "vertical",
-              -- To determine height, start with number of ui select items,
-              -- add 2 lines for top and bottom `fzf` padding, see above,
-              -- add 2 lines for query line and separator below query line,
-              -- add 16 lines for preview window and its border.
-              height = math.floor(math.min(vim.o.lines * 0.8 - 16, #items + 4) + 0.5) + 16,
-              width = 0.5,
-
-              -- Preview window starts as hidden if language server is `vtsls`, i.e. file is typescript.
-              preview = not vim.tbl_isempty(MyVim.lsp.get_clients({ bufnr = 0, name = "vtsls" }))
-                  and {
-                    layout = "vertical",
-                    vertical = "down:15",
-                    -- `border`: "rounded" (default) | "border-top" | "none" | `nvim_open_win` options.
-                    border = "border-top",
-                    hidden = "hidden",
-                  }
-                or {
-                  layout = "vertical",
-                  vertical = "down:15",
-                  border = "border-top",
-                },
-            },
-          } or {
-            winopts = {
-              width = 0.5,
-              -- Height is number of items, with a max of 80% screen height.
-              height = math.floor(math.min(vim.o.lines * 0.8, #items + 2) + 0.5),
-            },
-          })
-        end,
+        -- Snacks owns vim.ui.select, including after fzf-lua is loaded.
+        ui_select = false,
         winopts = {
           width = 0.8,
           height = 0.8,
@@ -635,7 +590,7 @@ return {
       -- These built-in bindings are not remapped:
       -- - `grn`: `vim.lsp.buf.rename()`, no remap needed, cannot return multiple results.
       -- - `gra`: `vim.lsp.buf.code_action()`, no remap needed, just calls `vim.ui.select`,
-      --          which is overwritten with `fzf-lua` picker.
+      --          which is provided by Snacks picker.
       --
       -- These new bindings are created, following built-in `gr<x>` format, as no built-in binding exists:
       -- - `grd`: Go to definintion, same as built-in `ctrl-]`.

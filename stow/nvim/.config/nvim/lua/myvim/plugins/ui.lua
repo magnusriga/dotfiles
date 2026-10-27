@@ -336,12 +336,12 @@ return {
       },
     },
     init = function()
-      -- Should not be needed, as not using `nvim-web-devicons` anywhere.
-      -- For some reason, `use_file_extension` is not called unless below is included.
-      -- package.preload["nvim-web-devicons"] = function()
-      --   require("mini.icons").mock_nvim_web_devicons()
-      --   return package.loaded["nvim-web-devicons"]
-      -- end
+      -- Serve `nvim-web-devicons` API from `mini.icons`, for plugins that
+      -- `require("nvim-web-devicons")`, e.g. `which-key` | `fzf-lua` | `trouble`.
+      package.preload["nvim-web-devicons"] = function()
+        require("mini.icons").mock_nvim_web_devicons()
+        return package.loaded["nvim-web-devicons"]
+      end
     end,
   },
 
@@ -506,11 +506,16 @@ return {
         },
       },
 
-      -- Smoooth scrolling, e.g. when navigating up/down with `c-u|d`.
-      -- scroll = { enabled = true },
+      -- Keep native scrolling without animation.
+      scroll = { enabled = false },
 
-      -- `statuscolumn` is enabled in `config/options.lua`.
-      statuscolumn = { enabled = false },
+      -- `vim.notify` replacement, with notification history.
+      notifier = { enabled = true },
+
+      -- Custom `statuscolumn`, i.e. margin to left containing:
+      -- Gitsigns (or other signs), diagnostics, todo-comments, line numbers, fold icons, border, etc.
+      -- `snacks.nvim` sets `vim.o.statuscolumn` when enabled.
+      statuscolumn = { enabled = true },
 
       -- `toggle`:
       -- - Saves state of any function that can be toggled on|off, allowing easy toggling.
@@ -523,9 +528,9 @@ return {
         map = MyVim.safe_keymap_set,
       },
 
-      -- Highlight matching words to word under cursor, in current buffer,
-      -- using LSP references.
-      -- words = { enabled = true },
+      -- Automatic reference highlighting is intentionally off; LSP reference
+      -- navigation remains available through the normal LSP keymaps.
+      words = { enabled = false },
     },
     -- stylua: ignore
     keys = {

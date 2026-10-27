@@ -5,57 +5,42 @@ vim.lsp.config(lsp_name, {
     tailwindCSS = {
       -- For autocompletee inside Class Variance Authority (CVA) functions.
       classFunctions = { "cva", "cx" },
+      includeLanguages = { ["markdown.mdx"] = "mdx" },
     },
   },
-  -- Filetypes copied and adjusted from tailwindcss-intellisense.
+  -- Filetypes copied from tailwindcss-intellisense, limited to filetypes Neovim detects.
+  -- VSCode language identifiers without Neovim filetype, e.g. `ejs` | `hbs` | `postcss`,
+  -- are excluded, Neovim equivalents, e.g. `eruby` | `handlebars`, are included.
   filetypes = {
     -- html
-    "aspnetcorerazor",
     "astro",
-    "astro-markdown",
     "blade",
     "clojure",
-    "django-html",
     "htmldjango",
-    "edge",
-    "eelixir", -- vim ft
+    "eelixir",
     "elixir",
-    "ejs",
-    "erb",
-    "eruby", -- vim ft
-    "gohtml",
-    "gohtmltmpl",
+    "eruby",
     "haml",
     "handlebars",
-    "hbs",
     "html",
     "htmlangular",
-    "html-eex",
     "heex",
-    "jade",
-    "leaf",
     "liquid",
     -- 'markdown', -- Exclude.
-    "mdx",
+    "markdown.mdx",
     "mustache",
-    "njk",
-    "nunjucks",
     "php",
     "razor",
-    "slim",
     "twig",
     -- css
     "css",
     "less",
-    "postcss",
     "sass",
     "scss",
     "stylus",
-    "sugarss",
     -- js
     "javascript",
     "javascriptreact",
-    "reason",
     "rescript",
     "typescript",
     "typescriptreact",

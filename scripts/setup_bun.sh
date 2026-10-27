@@ -28,7 +28,6 @@ function install_global_packages() {
     neonctl@latest \
     @mistweaverco/kulala-ls@latest \
     node-gyp@latest node-gyp-build@latest \
-    neovim@latest \
     yarn@latest \
     mcp-hub@latest \
     @mermaid-js/mermaid-cli@latest \

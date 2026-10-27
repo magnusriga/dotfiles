@@ -36,13 +36,12 @@ local js_ts_opts = {
 vim.lsp.config(lsp_name, {
   -- Explicitly add default filetypes,
   -- to be able to extend list in other related specs.
+  -- `.jsx` | `.tsx` files get `javascriptreact` | `typescriptreact` filetypes.
   filetypes = {
     "javascript",
     "javascriptreact",
-    "javascript.jsx",
     "typescript",
     "typescriptreact",
-    "typescript.tsx",
   },
 
   -- - Use `.git` directory as project root, instead of default

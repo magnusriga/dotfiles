@@ -1,6 +1,17 @@
 local lsp_name = "yamlls"
 
+-- GitLab CI files get `yaml.gitlab` filetype, which `yamlls` attaches to with GitLab CI schema.
+vim.filetype.add({
+  filename = {
+    [".gitlab-ci.yml"] = "yaml.gitlab",
+    [".gitlab-ci.yaml"] = "yaml.gitlab",
+  },
+})
+
 vim.lsp.config(lsp_name, {
+  -- Filetypes registered by Neovim and `plugins/lang/docker.lua`.
+  -- Helm values use ordinary `yaml` here; no Helm-specific filetype is registered.
+  filetypes = { "yaml", "yaml.docker-compose", "yaml.gitlab" },
   -- For yamlls line folding.
   capabilities = {
     textDocument = {

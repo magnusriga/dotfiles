@@ -11,7 +11,6 @@ local biome_ft = {
   "jsonc",
   "svelte",
   "typescript",
-  "typescript.tsx",
   "typescriptreact",
   "vue",
 }

@@ -1,43 +1,11 @@
 return {
   {
-    "folke/which-key.nvim",
-    opts = {
-      spec = {
-        { "<BS>", desc = "Decrement Selection", mode = "x" },
-        { "<c-space>", desc = "Increment Selection", mode = { "x", "n" } },
-      },
-    },
-  },
-
-  -- Treesitter is a new parser generator tool that we can
-  -- use in Neovim to power faster and more accurate
-  -- syntax highlighting.
-  {
     "nvim-treesitter/nvim-treesitter",
-    version = false, -- last release is way too old and doesn't work on Windows.
+    branch = "main",
+    lazy = false,
     build = ":TSUpdate",
-    event = { "LazyFile", "VeryLazy" },
-    lazy = vim.fn.argc(-1) == 0, -- Load treesitter right away when opening file from cmdline.
-    init = function(plugin)
-      -- PERF: Add nvim-treesitter queries to rtp and it's custom query predicates early.
-      -- This is needed because a bunch of plugins no longer `require("nvim-treesitter")`, which
-      -- no longer trigger the **nvim-treesitter** module to be loaded in time.
-      -- Luckily, the only things that those plugins need are the custom queries,
-      -- which we here make available before loading plugins.
-      require("lazy.core.loader").add_to_rtp(plugin)
-      require("nvim-treesitter.query_predicates")
-    end,
-    cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
-    keys = {
-      { "<c-space>", desc = "Increment Selection" },
-      { "<bs>", desc = "Decrement Selection", mode = "x" },
-    },
     opts_extend = { "ensure_installed" },
-    ---@type TSConfig
-    ---@diagnostic disable-next-line: missing-fields
     opts = {
-      highlight = { enable = true },
-      indent = { enable = true },
       ensure_installed = {
         "bash",
         "c",
@@ -47,14 +15,12 @@ return {
         "javascript",
         "jsdoc",
         "json",
-        "jsonc",
         "latex",
         "lua",
         "luadoc",
         "luap",
         "markdown",
         "markdown_inline",
-        "norg",
         "printf",
         "python",
         "query",
@@ -71,72 +37,77 @@ return {
         "xml",
         "yaml",
       },
-      incremental_selection = {
-        enable = true,
-        keymaps = {
-          -- init_selection = "<leader>ci",
-          -- node_incremental = "<leader>ci",
-          init_selection = "<C-Space>",
-          node_incremental = "<C-Space>",
-          scope_incremental = false,
-          node_decremental = "<bs>",
-        },
-      },
-      textobjects = {
-        move = {
-          enable = true,
-          goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
-          goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
-          goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
-          goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
-
-          -- `[|]a`: Built-in previous|next argument, i.e. file, thus do not overwrite here, see: `:h vim-diff`.
-          -- goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer", ["]a"] = "@parameter.inner" },
-          -- goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer", ["]A"] = "@parameter.inner" },
-          -- goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer", ["[a"] = "@parameter.inner" },
-          -- goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer", ["[A"] = "@parameter.inner" },
-        },
-      },
     },
-    ---@param opts TSConfig
     config = function(_, opts)
-      local ensure_installed = opts.ensure_installed
-      if type(ensure_installed) == "table" then
-        opts.ensure_installed = MyVim.dedup(ensure_installed)
+      local ts = require("nvim-treesitter")
+      ts.setup()
+      -- The JSON grammar includes comments; there is no separate jsonc parser.
+      vim.treesitter.language.register("json", "jsonc")
+
+      local function attach(buf)
+        if not vim.api.nvim_buf_is_loaded(buf) or vim.bo[buf].buftype ~= "" then
+          return
+        end
+        local lang = vim.treesitter.language.get_lang(vim.bo[buf].filetype)
+        if lang and pcall(vim.treesitter.language.add, lang) then
+          vim.treesitter.start(buf, lang)
+          vim.bo[buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end
       end
-      require("nvim-treesitter.configs").setup(opts)
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("MyVimTreesitter", { clear = true }),
+        callback = function(event)
+          attach(event.buf)
+        end,
+      })
+      -- Install missing parsers on a fresh machine and attach buffers opened
+      -- before their asynchronous installation finished.
+      ts.install(MyVim.dedup(opts.ensure_installed)):await(function(err, installed)
+        vim.schedule(function()
+          if err or not installed then
+            vim.notify(
+              "Treesitter parser installation failed: " .. tostring(err or "see :messages"),
+              vim.log.levels.ERROR
+            )
+            return
+          end
+          for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+            attach(buf)
+          end
+        end)
+      end)
+
+      -- Native node selection replaces the retired incremental-selection module.
+      vim.keymap.set("n", "<C-Space>", "van", { remap = true, desc = "Increment Selection" })
+      vim.keymap.set("x", "<C-Space>", "an", { remap = true, desc = "Increment Selection" })
+      vim.keymap.set("x", "<BS>", "in", { remap = true, desc = "Decrement Selection" })
     end,
   },
 
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
-    event = "VeryLazy",
-    enabled = true,
-    config = function()
-      -- If treesitter is already loaded, run config again for textobjects.
-      if MyVim.is_loaded("nvim-treesitter") then
-        local opts = MyVim.opts("nvim-treesitter")
-        require("nvim-treesitter.configs").setup({ textobjects = opts.textobjects })
-      end
-
-      -- When in diff mode, use default vim text objects c & C
-      -- instead of treesitter ones.
-      local move = require("nvim-treesitter.textobjects.move") ---@type table<string,fun(...)>
-      local configs = require("nvim-treesitter.configs")
-      for name, fn in pairs(move) do
-        if name:find("goto") == 1 then
-          move[name] = function(q, ...)
-            if vim.wo.diff then
-              local config = configs.get_module("textobjects.move")[name] ---@type table<string,string>
-              for key, query in pairs(config or {}) do
-                if q == query and key:find("[%]%[][cC]") then
-                  vim.cmd("normal! " .. key)
-                  return
-                end
-              end
+    branch = "main",
+    lazy = false,
+    opts = { move = { set_jumps = true } },
+    config = function(_, opts)
+      require("nvim-treesitter-textobjects").setup(opts)
+      local move = require("nvim-treesitter-textobjects.move")
+      local mappings = {
+        goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
+        goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
+        goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
+        goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
+      }
+      for method, mappings_by_key in pairs(mappings) do
+        for key, query in pairs(mappings_by_key) do
+          vim.keymap.set({ "n", "x", "o" }, key, function()
+            -- Keep Vim's built-in change navigation in diff windows.
+            if vim.wo.diff and key:find("[cC]") then
+              vim.cmd.normal({ key, bang = true })
+            else
+              move[method](query, "textobjects")
             end
-            return fn(q, ...)
-          end
+          end, { desc = method:gsub("_", " ") .. " " .. query })
         end
       end
     end,
