@@ -266,6 +266,8 @@ function y() {
 
 # ================================================================
 # Load: `nvm`, `node`, `npm`.
+# - Ubuntu: `nvm` installed in `$NVM_DIR` by `setup_nvm.sh`.
+# - Arch: `node` and `npm` come from `pacman`, `$NVM_DIR` does not exist, nothing is loaded.
 # ================================================================
 [[ -n "$SHELL_DEBUG" ]] && echo ".shrc > Loading nvm, node, and npm..."
 export NVM_DIR=${NVM_DIR:-"$HOME/.nvm"}

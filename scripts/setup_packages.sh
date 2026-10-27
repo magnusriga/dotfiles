@@ -3,25 +3,9 @@
 echo "Running setup_packages.sh as $(whoami), with HOME $HOME and USER $USER."
 
 # ==========================================================
-# Detect Linux distribution
+# Detect Linux distribution (exports `DISTRO`).
 # ==========================================================
-function detect_distro() {
-  if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    # Handle Arch Linux ARM which has ID=archarm but ID_LIKE=arch.
-    if [ "$ID" = "archarm" ] && [ "$ID_LIKE" = "arch" ]; then
-      echo "arch"
-    else
-      echo "$ID"
-    fi
-  elif [ -f /etc/arch-release ]; then
-    echo "arch"
-  elif [ -f /etc/debian_version ]; then
-    echo "ubuntu"
-  else
-    echo "unknown"
-  fi
-}
+. "$(dirname "${BASH_SOURCE[0]}")/setup_distro.sh"
 
 # ==========================================================
 # Check Ubuntu version for conditional package installation
@@ -51,7 +35,6 @@ function check_ubuntu_version() {
   fi
 }
 
-DISTRO=$(detect_distro)
 echo "Detected distribution: $DISTRO"
 
 if [ "$DISTRO" != "arch" ] && [ "$DISTRO" != "ubuntu" ]; then
@@ -169,6 +152,8 @@ COMMON_PACKAGES=(
   inotify-tools
   # lazygit
   lsb-release
+  7zip
+  trash-cli
   luarocks
   make
   man-db
@@ -216,6 +201,25 @@ if [ "$DISTRO" = "arch" ]; then
     lazygit \
     jless \
     git-delta \
+    nodejs npm pnpm bun \
+    go \
+    gemini-cli \
+    uv \
+    starship \
+    neovim \
+    eza resvg viu ast-grep tree-sitter-cli \
+    yazi \
+    zig ghostty \
+    tectonic \
+    aws-cli-v2 \
+    kubectl helm argocd kind crictl talosctl \
+    hcloud \
+    vault \
+    tflint \
+    rclone \
+    curl-impersonate \
+    opencode \
+    zsh-completions \
     zsh-doc \
     libxkbcommon-x11 wayland waypipe \
     libreoffice-fresh \
@@ -225,6 +229,7 @@ if [ "$DISTRO" = "arch" ]; then
     woff2-font-awesome \
     ttf-jetbrains-mono-nerd \
     ttf-cascadia-code-nerd \
+    ttf-nerd-fonts-symbols \
     ttf-fira-sans ttf-fira-code ttf-firacode-nerd ttf-dejavu \
     noto-fonts noto-fonts-emoji noto-fonts-cjk noto-fonts-extra \
     hyprland hyprpm hyprpaper hypridle hyprlock \
@@ -345,6 +350,8 @@ elif [ "$DISTRO" = "ubuntu" ]; then
     devscripts libpq-dev \
     infisical \
     hcp \
+    vault \
+    golang-go \
     lynx \
     libjsoncpp-dev libjsoncpp-doc \
     ninja-build qt6-base-dev qt6-5compat-dev libasound2-dev gettext \
@@ -408,7 +415,6 @@ elif [ "$DISTRO" = "ubuntu" ]; then
 fi
 
 # Clean up functions.
-unset -f detect_distro
 unset -f setup_arch_repositories
 unset -f setup_ubuntu_repositories
 unset -f check_ubuntu_version

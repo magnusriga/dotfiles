@@ -210,4 +210,3 @@ _talosctl()
 if [ "$funcstack[1]" = "_talosctl" ]; then
     _talosctl
 fi
-compdef _talosctl talosctl

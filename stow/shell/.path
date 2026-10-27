@@ -17,18 +17,8 @@ if [ -d "$HOME/.local/bin" ]; then
 fi
 
 # ================================================================
-# Add the Global pnpm Store (CAS) to Path.
-# ================================================================
-export PNPM_HOME="$HOME/.local/share/pnpm"
-if [ -d "$HOME/.local/share/pnpm" ]; then
-  case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-  esac
-fi
-
-# ================================================================
-# Add Bun to Path
+# Add Bun global binaries to Path.
+# Arch: `bun` itself comes from `pacman`, `$BUN_INSTALL/bin` only holds global packages.
 # ================================================================
 export BUN_INSTALL="$HOME/.bun"
 if [ -d "$BUN_INSTALL" ]; then
@@ -52,17 +42,12 @@ if [ -d "$CLAUDE_HOME/local" ]; then
 fi
 
 # ================================================================
-# Add OpenCode to Path
+# Add OpenCode to Path (Ubuntu: vendor installer, Arch: `pacman`).
 # ================================================================
 export OPENCODE_HOME="$HOME/.opencode"
 if [ -d "$OPENCODE_HOME/bin" ]; then
   export PATH="$OPENCODE_HOME/bin:$PATH"
 fi
-
-# ================================================================
-# Add Homebrew to Path
-# Homebrew is set up in .zshrc instead, to run for every shell.
-# ================================================================
 
 # ================================================================
 # Add snap binary directory to PATH.
@@ -77,13 +62,6 @@ fi
 go_bin_dir="$(go env GOPATH)/bin"
 if [ -d "$go_bin_dir" ]; then
   export PATH="$go_bin_dir:$PATH"
-fi
-
-# ================================================================
-# Add fzf binary directory to PATH.
-# ================================================================
-if [[ ! "$PATH" == *$HOME/.fzf/bin* ]]; then
-  export PATH="${PATH:+${PATH}:}$HOME/.fzf/bin"
 fi
 
 # ================================================================
@@ -104,11 +82,4 @@ if [ -d "/opt/orbstack-guest/bin" ]; then
   *":/opt/orbstack-guest/bin:"*) ;;
   *) export PATH="/opt/orbstack-guest/bin:$PATH" ;;
   esac
-fi
-
-# ================================================================
-# Add lua-language-server to PATH.
-# ================================================================
-if [ -d "$HOME/.local/share/lua-language-server/bin" ]; then
-  export PATH="$HOME/.local/share/lua-language-server/bin:$PATH"
 fi

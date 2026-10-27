@@ -7,6 +7,18 @@ export PATH="$PATH:$HOME/.local/bin"
 
 echo "Running setup_main.sh as $(whoami), with HOME $HOME and USER $USER."
 
+# ================================================
+# Detect distribution, exported as `DISTRO` (`arch` | `ubuntu`).
+# Every setup script branches on this variable.
+# ================================================
+. "$(dirname "${BASH_SOURCE[0]}")/setup_distro.sh"
+echo "Detected distribution: $DISTRO"
+
+# ================================================
+# Shared helpers, e.g. `github_latest_tag`.
+# ================================================
+. "$(dirname "${BASH_SOURCE[0]}")/setup_helpers.sh"
+
 # ==========================================================
 # Change directory to path of current script,
 # to execute other scripts with relative path.
@@ -46,7 +58,7 @@ fi
 # ================================================
 # Arch User Repository (AUR): Install packages, if on Arch Linux.
 # ================================================
-if [ -f "./setup_packages_aur.sh" ] && [ -f "/etc/arch-release" ]; then
+if [ -f "./setup_packages_aur.sh" ] && [ "$DISTRO" = "arch" ]; then
   echo "Running: . ./setup_packages_aur.sh."
   . ./setup_packages_aur.sh
 fi
@@ -88,7 +100,7 @@ fi
 # ================================================
 # Setup: Time synchronization (NTP) on Arch Linux.
 # ================================================
-if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ]; then
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ "$DISTRO" = "arch" ]; then
   echo "Enabling time synchronization (systemd-timesyncd)."
   sudo systemctl enable --now systemd-timesyncd
 fi
@@ -104,7 +116,7 @@ fi
 #   `ssh-add` block formerly in `~/.profile`.
 # - SDDM theme activation lives in `setup_packages_manual.sh` (where the
 #   theme is installed), not here.
-if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ -f "/etc/arch-release" ]; then
+if [ ! -f /.dockerenv ] && [ -z "$DOCKER_BUILD" ] && [ "$DISTRO" = "arch" ]; then
   echo "Enabling gcr-ssh-agent user socket."
   systemctl --user enable gcr-ssh-agent.socket
 
@@ -141,32 +153,10 @@ if [ -f "./setup_packages_manual.sh" ]; then
 fi
 
 # ================================================
-# `pip`: Install packages.
-# ================================================
-if [ -f "./setup_packages_pip.sh" ]; then
-  . ./setup_packages_pip.sh
-fi
-
-# ================================================
-# Not using Homebrew on Linux.
-# ================================================
-# if [ -f "./setup_brew.sh" ]; then
-#   . ./setup_brew.sh
-# fi
-
-# ================================================
 # Setup Wezterm shell integration.
 # ================================================
 rm -rf "$WEZTERM_HOME/shell-integration"
 curl -fsSLO --create-dirs --output-dir "$WEZTERM_HOME/shell-integration" https://raw.githubusercontent.com/wez/wezterm/refs/heads/main/assets/shell-integration/wezterm.sh
-
-# ================================================
-# Setup Ghostty shell integration.
-# ================================================
-# Ghostty previously built in `/usr/local/stow/ghostty`,
-# then stowed to `/usr/local/bin/ghostty` and `/usr/local/share/ghostty`,
-# latter holding ghostty resources.
-export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
 
 # ================================================
 # Clone `delta` repo for themes.
@@ -183,16 +173,17 @@ git clone https://github.com/dandavison/delta.git "$HOME/.config/delta"
 # fi
 
 # ================================================
-# Install: `oh-my-zsh` and ZLE widgets.
+# Install: ZLE widgets and ZSH plugins.
 # ================================================
 if [ -f "./setup_zsh.sh" ]; then
   . ./setup_zsh.sh
 fi
 
 # ================================================
-# Install: `nvm` and `node`.
+# Install: `nvm`, `node`, `npm`, `pnpm`.
+# Arch: `nodejs`, `npm`, `pnpm` installed with `pacman` (`setup_packages.sh`).
 # ================================================
-if [ -f "./setup_nvm.sh" ]; then
+if [ -f "./setup_nvm.sh" ] && [ "$DISTRO" != "arch" ]; then
   . ./setup_nvm.sh
 fi
 
@@ -204,27 +195,31 @@ if [ -f "./setup_bun.sh" ]; then
 fi
 
 # ================================================
+# Install: `nano-pdf` via `uv`, used by AI agents to produce PDFs.
+# `--upgrade` re-resolves to latest on every run, no-op when already current.
+# `uv`: Arch `pacman`, Ubuntu astral installer (`setup_packages_manual.sh`).
+# ================================================
+uv tool install --upgrade nano-pdf
+
+# ================================================
 # Install: `Clipboard`.
 # Not needed, using xclip.
 # ================================================
 # curl -sSL https://github.com/Slackadays/Clipboard/raw/main/install.sh | sh -s -- -y
 
 # ================================================
-# Install: `Starship`.
+# `trash-cli` zsh completions.
+# - `trash-cli` itself is installed with the package manager on every distro (`setup_packages.sh`).
+# - Arch: `pacman` package ships zsh completions in `/usr/share/zsh/site-functions`.
+# - Ubuntu: Generated from the installed commands into `/usr/local/share/zsh/site-functions`, which is in `fpath`.
 # ================================================
-curl -sS https://starship.rs/install.sh | sh -s -- -y
-
-# ================================================
-# Install: `trash-cli`.
-# ================================================
-pipx ensurepath
-pipx install 'trash-cli[completion]'
-cmds=(trash-empty trash-list trash-restore trash-put trash)
-for cmd in "${cmds[@]}"; do
-  $cmd --print-completion bash | sudo tee /usr/share/bash-completion/completions/"$cmd"
-  $cmd --print-completion zsh | sudo tee /usr/share/zsh/site-functions/_"$cmd"
-  $cmd --print-completion tcsh | sudo tee /etc/profile.d/"$cmd".completion.csh
-done
+if [ "$DISTRO" != "arch" ]; then
+  sudo mkdir -p /usr/local/share/zsh/site-functions
+  for cmd in trash-empty trash-list trash-restore trash-put trash; do
+    "$cmd" --print-completion zsh | sudo tee /usr/local/share/zsh/site-functions/_"$cmd" >/dev/null
+  done
+  unset cmd
+fi
 
 # ================================================
 # Install: Fonts.

@@ -38,9 +38,9 @@ The `compose.sh` script provides several commands:
 The Docker bootstrap sets up a complete development environment with:
 
 ### Development Tools
-- **Languages:** Node.js (via NVM), Rust (via rustup), Python
-- **Package Managers:** PNPM, Cargo, pipx
-- **Version Managers:** NVM for Node.js, rustup for Rust
+- **Languages:** Node.js (pacman on Arch, NVM on Ubuntu), Rust (via rustup), Python
+- **Package Managers:** bun, pnpm, Cargo, pipx
+- **Version Managers:** rustup for Rust, NVM for Node.js (Ubuntu only)
 
 ### CLI Tools
 - **File Management:** eza, yazi, trash-cli
@@ -50,8 +50,8 @@ The Docker bootstrap sets up a complete development environment with:
 - **Development:** neovim, todocheck, pre-commit
 
 ### Shell Environment
-- **Shell:** Zsh with Oh-My-Zsh
-- **Plugins:** zsh-syntax-highlighting, zsh-autosuggestions, zsh-vi-mode
+- **Shell:** Zsh
+- **Plugins:** zsh-syntax-highlighting, zsh-autosuggestions, zsh-completions
 - **Prompt:** Starship with custom configuration
 - **Terminal Integration:** Wezterm shell integration
 
@@ -81,7 +81,7 @@ The container sets up the following directory structure:
 ├── .cargo/           # Rust toolchain
 ├── .config/          # Application configurations
 ├── .local/           # Local binaries and data
-├── .nvm/             # Node Version Manager
+├── .bun/             # Bun global packages
 ├── dotfiles/         # Dotfiles repository
 └── projects/         # Workspace for development projects
 ```

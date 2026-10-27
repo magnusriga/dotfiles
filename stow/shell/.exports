@@ -109,7 +109,14 @@ export WEZTERM_HOME="$HOME/.local/share/wezterm"
 # Used for shell integrations, themes, and more.
 # ================================================================
 export GHOSTTY_HOME="${BUILD_HOME:-$HOME/build}/repositories/ghostty"
-export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
+# - Arch: `/usr/share/ghostty` (`pacman`). Ubuntu: `/usr/local/share/ghostty` (source build).
+# - Ghostty itself exports this variable for its child shells, which takes precedence.
+if [ -z "$GHOSTTY_RESOURCES_DIR" ]; then
+  for ghostty_resources_dir in /usr/share/ghostty /usr/local/share/ghostty; do
+    [ -d "$ghostty_resources_dir" ] && { export GHOSTTY_RESOURCES_DIR="$ghostty_resources_dir"; break; }
+  done
+  unset ghostty_resources_dir
+fi
 
 # ================================================================
 # Export EZA_HOME shell variable.

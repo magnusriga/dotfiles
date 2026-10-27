@@ -6,10 +6,10 @@ The primary user is `nfu`, and the setup scripts are designed to create this use
 
 ## Key Technologies and Tools
 
-*   **Shell:** Zsh, configured with `oh-my-zsh` and various plugins.
+*   **Shell:** Zsh, with `zsh-syntax-highlighting`, `zsh-autosuggestions` and `zsh-completions` plugins.
 *   **Terminal:** Wezterm, Ghostty
 *   **Editor:** Neovim, with a custom configuration.
-*   **Package Managers:** `pacman` (Arch Linux), `apt` (Ubuntu), `snap`, `cargo` (Rust), `pip` (Python), `pnpm` (Node.js).
+*   **Package Managers:** `pacman` (Arch Linux), `apt` (Ubuntu), `snap`, `cargo` (Rust), `pip` (Python), `bun` and `pnpm` (Node.js).
 *   **Window Manager:** Hyprland
 *   **Dotfile Management:** `stow`
 *   **Containerization:** Docker

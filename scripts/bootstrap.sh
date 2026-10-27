@@ -31,36 +31,26 @@ echo "Target username: $TARGET_USERNAME"
 # Setup Script Overview.
 # ==========================================================
 # ----------------------------------------------------------
-# Files not needing any user.
+# Files needing sudo, run before target user exists.
 # ----------------------------------------------------------
-# print_versions
-# setup_brew
+# - bootstrap
+# - setup_user
 #
 # ----------------------------------------------------------
-# Files needing sudo.
+# Files run by target user (use $HOME, $USER, populate home directory),
+# sourced in this order by `setup_main`.
 # ----------------------------------------------------------
-# bootstrap
-# setup_apt-get_packages
-# setup_docker
-# setup_entry
-#
-# ----------------------------------------------------------
-# Files needing to be run by new user,
-# because it uses $HOME, $USERNAME,
-# or otherwise populates new user's home directory.
-# ----------------------------------------------------------
-# - bootstrap (also nees sudo)
-# - setup_main
-# - setup_eza (also needs sudo, add new user to sudoers.d/[username])
+# - setup_distro (exports `DISTRO`), setup_helpers
 # - setup_directories
-# - setup_git_credentials
-# - setup_fonts
-# - setup_nvm
-# - setup_bun
-# - setup_symlinks
-# - setup_tmux
-# - setup_yazi
+# - setup_packages (also run as root in Docker build), setup_packages_aur (Arch)
+# - setup_packages_cargo, setup_packages_manual
 # - setup_zsh
+# - setup_nvm (Ubuntu), setup_bun
+# - setup_fonts
+# - setup_yazi
+# - setup_symlinks
+# - print_versions
+# - post_setup (run by `bootstrap` after `setup_main`)
 #
 # ==========================================================
 
@@ -234,7 +224,7 @@ function doIt() {
       echo "Starting, enabling (on boot), and re-starting, sshd service with systemd."
       sudo systemctl start sshd
       # Enable SSH service - service name differs between distros
-      if [ -f /etc/arch-release ]; then
+      if [ "$DISTRO" = "arch" ]; then
         sudo systemctl enable sshd  # Arch uses 'sshd'
       else
         sudo systemctl enable ssh   # Ubuntu/Debian uses 'ssh'

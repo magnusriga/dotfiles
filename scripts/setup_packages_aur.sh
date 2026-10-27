@@ -326,7 +326,13 @@ gpg-agent --daemon 2>/dev/null
 
 # Packages for development.
 yay -Syu --noconfirm \
-  doppler-cli-bin
+  doppler-cli-bin \
+  infracost-bin \
+  stripe-cli-bin \
+  grpcurl-bin \
+  hcloud-upload-image-bin \
+  ripdrag \
+  vtracer
 
 # ==================================
 # `paru`: Install AUR packages.

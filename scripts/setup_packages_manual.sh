@@ -55,9 +55,7 @@ ARCH=$(uname -m)
 case $ARCH in
 x86_64)
   ARCH_TODOCHECK="x86_64"
-  ARCH_7ZIP="x64"
   ARCH_GRPCURL="x86_64"
-  ARCH_VAULT="amd64"
   ARCH_NEOVIM="x86_64"
   ARCH_ZIG="x86_64"
   ARCH_TECTONIC="x86_64"
@@ -68,9 +66,7 @@ x86_64)
   ;;
 aarch64 | arm64)
   ARCH_TODOCHECK="arm64"
-  ARCH_7ZIP="arm64"
   ARCH_GRPCURL="arm64"
-  ARCH_VAULT="arm64"
   ARCH_NEOVIM="arm64"
   ARCH_ZIG="aarch64"
   ARCH_TECTONIC="aarch64"
@@ -85,17 +81,20 @@ aarch64 | arm64)
   ;;
 esac
 
-# Detect Ubuntu version if on Ubuntu
-if [ -f /etc/os-release ]; then
-  . /etc/os-release
-  if [ "$ID" = "ubuntu" ]; then
-    UBUNTU_VERSION="$VERSION_ID"
-    echo "Detected Ubuntu version: $UBUNTU_VERSION"
-  fi
+# `DISTRO` is exported by `setup_distro.sh` (sourced by `setup_main.sh`).
+# - Arch: Every tool below that pacman or AUR provides is installed by
+#   `setup_packages.sh` / `setup_packages_aur.sh`, so its manual section is skipped.
+# - Ubuntu: Manual sections run, each resolving the latest release at run time.
+if [ "$DISTRO" = "ubuntu" ] && [ -f /etc/os-release ]; then
+  UBUNTU_VERSION=$(. /etc/os-release && echo "$VERSION_ID")
+  echo "Detected Ubuntu version: $UBUNTU_VERSION"
 fi
 
 echo "Detected architecture: $ARCH"
-echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, 7zip: $ARCH_7ZIP, grpcurl: $ARCH_GRPCURL, vault: $ARCH_VAULT, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC, lazygit: $ARCH_LAZYGIT, hcloud: $ARCH_HCLOUD, stripe: $ARCH_STRIPE"
+echo "Architecture mappings - todocheck: $ARCH_TODOCHECK, grpcurl: $ARCH_GRPCURL, neovim: $ARCH_NEOVIM, zig: $ARCH_ZIG, tectonic: $ARCH_TECTONIC, kubectl: $ARCH_KUBECTL, lazygit: $ARCH_LAZYGIT, hcloud: $ARCH_HCLOUD, stripe: $ARCH_STRIPE"
+
+# Shared helpers (`github_latest_tag`).
+. "$(dirname "${BASH_SOURCE[0]}")/setup_helpers.sh"
 
 # ================================================
 # Setup directories and variables needed for
@@ -123,9 +122,12 @@ sudo chmod -R 755 $TARGETDIR
 # Setup packages not relating to specific repos.
 # ================================================
 
-# Install `github-cli` extension: `Copilot`.
+# Install `github-cli` extension: `Copilot`, then upgrade all extensions.
 if command -v gh &>/dev/null; then
-  gh extension install github/gh-copilot
+  if ! gh extension list | grep -q 'github/gh-copilot'; then
+    gh extension install github/gh-copilot
+  fi
+  gh extension upgrade --all
 fi
 
 # Install luasocket.
@@ -134,186 +136,211 @@ if command -v luarocks &>/dev/null; then
 fi
 
 # ================================================
+# Helper: Clone git repository, or update existing clone.
+# ================================================
+# - `$1`: Repository URL.
+# - `$2`: Target directory.
+# - `$3`: Optional git ref (tag) to check out, otherwise latest default branch.
+function clone_or_update_repo() {
+  local url="$1" dir="$2" ref="$3"
+  if [ -d "$dir/.git" ]; then
+    # `--force`: Moving tags (e.g. `latest`) are updated instead of rejected.
+    git -C "$dir" fetch --tags --force --prune origin
+  else
+    rm -rf "$dir"
+    git clone "$url" "$dir"
+  fi
+  if [ -n "$ref" ]; then
+    git -C "$dir" checkout --quiet "$ref"
+  else
+    git -C "$dir" remote set-head origin --auto >/dev/null
+    git -C "$dir" checkout --quiet "$(git -C "$dir" rev-parse --abbrev-ref origin/HEAD | sed 's|^origin/||')"
+    git -C "$dir" pull --ff-only
+  fi
+}
+
+# ================================================
 # Install eza theme.
 # ================================================
 # eza uses the theme.yml file stored in $EZA_CONFIG_DIR, or if that is not defined then in $XDG_CONFIG_HOME/eza.
 # Download theme repo as reference, but do not symlink $EZA_CONFIG_DIR/theme to it,
 # instead just keep own theme from dotfiles sync.
-rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
-git clone https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
+clone_or_update_repo https://github.com/eza-community/eza-themes.git "${EZA_HOME:-$HOME/.local/share/eza}/eza-themes"
 
 # ================================================
 # Install eza completions.
 # ================================================
-# `eza` software itself is installed with `cargo`.
-rm -rf "${EZA_HOME:-$HOME/.local/share/eza}/eza"
-git clone https://github.com/eza-community/eza.git "${EZA_HOME:-$HOME/.local/share/eza}/eza"
+# - Arch: `eza` and its completions are installed with `pacman`.
+# - Ubuntu: `eza` is installed with `cargo` (`setup_packages_cargo.sh`),
+#   completions come from the `eza` git repository, added to `fpath` in `.zshrc`.
+if [ "$DISTRO" != "arch" ]; then
+  clone_or_update_repo https://github.com/eza-community/eza.git "${EZA_HOME:-$HOME/.local/share/eza}/eza"
+fi
 
 # ================================================
 # Manually install tmux plugins, including tmux plugin manager.
 # ================================================
-rm -rf "${TMUX_HOME:-$HOME/.config/tmux}/plugins"
-git clone https://github.com/tmux-plugins/tpm "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tpm"
-git clone -b v2.1.1 https://github.com/catppuccin/tmux.git "${TMUX_HOME:-$HOME/.config/tmux}/plugins/catppuccin/tmux"
-git clone https://github.com/tmux-plugins/tmux-battery "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-battery"
-git clone https://github.com/tmux-plugins/tmux-cpu "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-cpu"
+# `catppuccin/tmux` is pinned to its latest release tag, resolved at run time.
+clone_or_update_repo https://github.com/tmux-plugins/tpm "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tpm"
+if CATPPUCCIN_TMUX_TAG=$(github_latest_tag catppuccin/tmux); then
+  clone_or_update_repo https://github.com/catppuccin/tmux.git "${TMUX_HOME:-$HOME/.config/tmux}/plugins/catppuccin/tmux" "$CATPPUCCIN_TMUX_TAG"
+else
+  echo "catppuccin/tmux: could not resolve latest release, keeping existing install." >&2
+fi
+unset CATPPUCCIN_TMUX_TAG
+clone_or_update_repo https://github.com/tmux-plugins/tmux-battery "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-battery"
+clone_or_update_repo https://github.com/tmux-plugins/tmux-cpu "${TMUX_HOME:-$HOME/.config/tmux}/plugins/tmux-cpu"
 
 # ================================================
 # Install tectonic (Note: Architecture).
+# Arch: `pacman`. Ubuntu: Manual install below.
 # ================================================
-PACKAGE="tectonic"
-VERSION=$(curl -s "https://api.github.com/repos/tectonic-typesetting/tectonic/releases/latest" | \grep -Po '"tag_name": *"tectonic@\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p $STOWDIR/$PACKAGE/bin
-# Choose appropriate Linux variant based on architecture
-if [ "$ARCH_TECTONIC" = "aarch64" ]; then
-  LINUX_VARIANT="unknown-linux-musl"
-else
-  LINUX_VARIANT="unknown-linux-gnu"
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="tectonic"
+  if VERSION=$(github_latest_tag tectonic-typesetting/tectonic); then
+    VERSION="${VERSION#tectonic@}"
+    sudo rm -rf "$TMPDIR/$PACKAGE"
+    mkdir "$TMPDIR/$PACKAGE"
+    # Choose appropriate Linux variant based on architecture
+    if [ "$ARCH_TECTONIC" = "aarch64" ]; then
+      LINUX_VARIANT="unknown-linux-musl"
+    else
+      LINUX_VARIANT="unknown-linux-gnu"
+    fi
+    if curl -fL --output "$TMPDIR/$PACKAGE/$PACKAGE.tar.gz" "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic@${VERSION}/tectonic-${VERSION}-${ARCH_TECTONIC}-${LINUX_VARIANT}.tar.gz"; then
+      sudo rm -rf "$STOWDIR/$PACKAGE"
+      mkdir -p "$STOWDIR/$PACKAGE/bin"
+      tar xzf "$TMPDIR/$PACKAGE/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+      sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+      chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+      stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+    else
+      echo "$PACKAGE: download failed, keeping existing install." >&2
+    fi
+  else
+    echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
+  fi
 fi
-curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE.tar.gz" "https://github.com/tectonic-typesetting/tectonic/releases/download/tectonic@${VERSION}/tectonic-${VERSION}-${ARCH_TECTONIC}-${LINUX_VARIANT}.tar.gz"
-tar xzf "$TMPDIR/$PACKAGE/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
-sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
 # Install todocheck (Note: Architecture).
 # ================================================
 PACKAGE="todocheck"
-VERSION=$(curl -s "https://api.github.com/repositories/280693435/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p $STOWDIR/$PACKAGE/bin
-curl -L --output "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-${ARCH_TODOCHECK}" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://github.com/preslavmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-${ARCH_TODOCHECK}.sha256"
-if echo "$(awk '{print $1}' "$TMPDIR/$PACKAGE/$PACKAGE.sha256") $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status; then
-  echo "${PACKAGE} checksum verified, moving binary to stow directory, then stowing."
-  sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-  chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
-  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+if VERSION=$(github_latest_tag presmihaylov/todocheck); then
+  VERSION="${VERSION#v}"
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  mkdir "$TMPDIR/$PACKAGE"
+  if curl -fL --output "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/presmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-${ARCH_TODOCHECK}" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://github.com/presmihaylov/todocheck/releases/download/v${VERSION}/todocheck-v${VERSION}-linux-${ARCH_TODOCHECK}.sha256" &&
+    echo "$(awk '{print $1}' "$TMPDIR/$PACKAGE/$PACKAGE.sha256") $TMPDIR/$PACKAGE/$PACKAGE" | sha256sum --check --status; then
+    echo "${PACKAGE} checksum verified, moving binary to stow directory, then stowing."
+    sudo rm -rf "$STOWDIR/$PACKAGE"
+    mkdir -p "$STOWDIR/$PACKAGE/bin"
+    sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+    chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+    stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+  else
+    echo "$PACKAGE: download or checksum failed, keeping existing install." >&2
+  fi
+else
+  echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
 fi
 
 # ================================================
-# Install 7zip (Note: Architecture and Version).
-# ================================================
-PACKAGE="7z"
-VERSION=$(curl -s "https://api.github.com/repos/ip7z/7zip/releases/latest" | \grep -Po '"tag_name": *"\K[^"]*')
-VERSION_NO_DOT=$(echo "$VERSION" | tr -d '.')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://github.com/ip7z/7zip/releases/download/${VERSION}/7z${VERSION_NO_DOT}-linux-${ARCH_7ZIP}.tar.xz"
-tar xf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE"
-sudo mv "$TMPDIR"/"$PACKAGE"/7zz{,s} "$STOWDIR/$PACKAGE/bin"
-chmod 755 "$STOWDIR/$PACKAGE"/bin/7zz{,s}
-stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
-
-# ================================================
 # Install grpcurl (Note: Architecture).
+# Arch: AUR `grpcurl-bin`. Ubuntu: Manual install below.
 # ================================================
-PACKAGE="grpcurl"
-VERSION=$(curl -s "https://api.github.com/repos/fullstorydev/grpcurl/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/fullstorydev/grpcurl/releases/download/v${VERSION}/grpcurl_${VERSION}_linux_${ARCH_GRPCURL}.tar.gz"
-# tar'ed file name: grpcurl.
-tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
-sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
-stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
-
-# ================================================
-# Install HashiCorp vault (Note: Architecture).
-# ================================================
-PACKAGE="vault"
-# `grep -P`: Use perl-compatible regex (PCRE).
-# `grep -o`: Output match only, not whole line.
-# `\K`     : Start match from this position.
-# `[^/]*`  : Zero or more off all characters except `/`.
-# Thus, match ends when first slash is encountered, and match is printed.
-VERSION=$(curl -s "https://releases.hashicorp.com/vault/" | \grep -Po '"/vault/\K[^/]*' | grep -v '[-+]' | head -n 1)
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p $STOWDIR/$PACKAGE/bin
-curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE.zip" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_linux_${ARCH_VAULT}.zip" --output "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://releases.hashicorp.com/${PACKAGE}/${VERSION}/${PACKAGE}_${VERSION}_SHA256SUMS"
-if echo "$(grep "linux_${ARCH_VAULT}" "$TMPDIR/$PACKAGE/$PACKAGE.sha256" | awk '{print $1}') $TMPDIR/$PACKAGE/$PACKAGE.zip" | sha256sum --check --status; then
-  unzip "$TMPDIR/$PACKAGE/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
-  sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-  chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
-  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="grpcurl"
+  if VERSION=$(github_latest_tag fullstorydev/grpcurl); then
+    VERSION="${VERSION#v}"
+    sudo rm -rf "$TMPDIR/$PACKAGE"
+    mkdir "$TMPDIR/$PACKAGE"
+    if curl -fLo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/fullstorydev/grpcurl/releases/download/v${VERSION}/grpcurl_${VERSION}_linux_${ARCH_GRPCURL}.tar.gz"; then
+      sudo rm -rf "$STOWDIR/$PACKAGE"
+      mkdir -p "$STOWDIR/$PACKAGE/bin"
+      # tar'ed file name: grpcurl.
+      tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+      sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+      chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+      stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+    else
+      echo "$PACKAGE: download failed, keeping existing install." >&2
+    fi
+  else
+    echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
+  fi
 fi
 
 # ================================================
 # Install neovim (Note: Architecture).
+# Arch: `pacman`. Ubuntu: Manual install below.
 # ================================================
-PACKAGE="neovim"
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE"
-# Stable release:
-# curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${ARCH_NEOVIM}.tar.gz"
-# Nightly release (0.12-dev) - needed for vim.lsp.inline_completion:
-curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-${ARCH_NEOVIM}.tar.gz"
-tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE" --strip-components=1
-# Copy the extracted files to stow directory
-sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
-sudo chmod 755 "$STOWDIR/$PACKAGE/bin/nvim"
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="neovim"
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$STOWDIR/$PACKAGE"
+  mkdir "$TMPDIR/$PACKAGE"
+  mkdir -p "$STOWDIR/$PACKAGE"
+  # Latest stable release.
+  curl -fLo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${ARCH_NEOVIM}.tar.gz"
+  tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE" --strip-components=1
+  # Copy the extracted files to stow directory
+  sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
+  sudo chmod 755 "$STOWDIR/$PACKAGE/bin/nvim"
+  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+fi
 
 # ================================================
 # Install zig (Note: Architecture).
 # Needed for `ghostty`.
+# Arch: `pacman`. Ubuntu: Manual install below.
 # ================================================
-PACKAGE="zig"
-# Use ziglang.org JSON index instead of GitHub API (which may lag behind actual releases).
-VERSION=$(curl -s https://ziglang.org/download/index.json | \grep -oP '"[0-9]+\.[0-9]+\.[0-9]+"' | head -1 | tr -d '"')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir -p "$TMPDIR/$PACKAGE/bin"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.xz" "https://ziglang.org/download/${VERSION}/zig-${ARCH_ZIG}-linux-${VERSION}.tar.xz"
-tar xf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE" --strip-components=1
-sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$TMPDIR/$PACKAGE/bin/$PACKAGE"
-sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
-sudo chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
-stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="zig"
+  # Use ziglang.org JSON index instead of GitHub API (which may lag behind actual releases).
+  VERSION=$(curl -s https://ziglang.org/download/index.json | \grep -oP '"[0-9]+\.[0-9]+\.[0-9]+"' | head -1 | tr -d '"')
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$STOWDIR/$PACKAGE"
+  mkdir -p "$TMPDIR/$PACKAGE/bin"
+  mkdir -p "$STOWDIR/$PACKAGE/bin"
+  curl -fLo "$TMPDIR/$PACKAGE.tar.xz" "https://ziglang.org/download/${VERSION}/zig-${ARCH_ZIG}-linux-${VERSION}.tar.xz"
+  tar xf "$TMPDIR/$PACKAGE.tar.xz" -C "$TMPDIR/$PACKAGE" --strip-components=1
+  sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$TMPDIR/$PACKAGE/bin/$PACKAGE"
+  sudo cp -r "$TMPDIR/$PACKAGE"/* "$STOWDIR/$PACKAGE/"
+  sudo chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+  stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+fi
 
 # ================================================
 # Install ghostty from source.
-# Use manual build instead of `pacman -Syu ghostty`.
+# Arch: `pacman`. Ubuntu: Built from source below, requires `zig`.
 # ================================================
-# # - Prefix sets ghostty's install directory,
-# #   including where `theme`, `shell-integration`, etc. is stored,
-# #   e.g. `$prefix/share/ghostty/shell-integration`.
-# # - Use `PREFIX=/usr/local/stow/ghostty`,
-# #   which is symlinked to `/usr/local/ghostty`,
-# #   meaning `shell-integration` folder.
-# # - Ghostty install adds several directories directly into `$PREFIX/share`,
-# #   i.e. not only into `$PREFIX/share/ghostty`,
-# #   containing various application configurations for ghostty,
-# #   e.g. `bat` folder contains syntax highlighting file for ghostty.
-# # - Thus, as always, stow dotfiles into home directory after this file has run,
-# #   to ensure symlinks are not overwritten.
-PACKAGE=ghostty
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-sudo rm -rf "$HOME/.config/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir "$STOWDIR/$PACKAGE"
-mkdir "$HOME/.config/$PACKAGE"
-git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
-cd "$TMPDIR/$PACKAGE" || exit
-zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
-cd "$CURRENTDIR" || exit
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+if [ "$DISTRO" != "arch" ]; then
+  # - Prefix sets ghostty's install directory,
+  #   including where `theme`, `shell-integration`, etc. is stored,
+  #   e.g. `$prefix/share/ghostty/shell-integration`.
+  # - Use `PREFIX=/usr/local/stow/ghostty`,
+  #   which is symlinked to `/usr/local/ghostty`,
+  #   meaning `shell-integration` folder.
+  # - Ghostty install adds several directories directly into `$PREFIX/share`,
+  #   i.e. not only into `$PREFIX/share/ghostty`,
+  #   containing various application configurations for ghostty,
+  #   e.g. `bat` folder contains syntax highlighting file for ghostty.
+  # - Thus, as always, stow dotfiles into home directory after this file has run,
+  #   to ensure symlinks are not overwritten.
+  PACKAGE=ghostty
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$STOWDIR/$PACKAGE"
+  sudo rm -rf "$HOME/.config/$PACKAGE"
+  mkdir "$TMPDIR/$PACKAGE"
+  mkdir "$STOWDIR/$PACKAGE"
+  mkdir "$HOME/.config/$PACKAGE"
+  git clone https://github.com/ghostty-org/ghostty.git "$TMPDIR/$PACKAGE"
+  cd "$TMPDIR/$PACKAGE" || exit
+  zig build --prefix $STOWDIR/$PACKAGE -Doptimize=ReleaseFast
+  cd "$CURRENTDIR" || exit
+  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+fi
 
 # ================================================
 # Install Sequoia SDDM theme.
@@ -486,21 +513,23 @@ unset PACKAGE SUGAR_DIR
 
 # ================================================
 # Install yazi from source.
-# Use manual build instead of `pacman -Syu yazi`.
+# Arch: `pacman`. Ubuntu: Built from source below, requires `cargo`.
 # ================================================
-# Update rustup, also done in `setup_main.sh`.
-rustup update
-PACKAGE=yazi
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE"/bin # Deviation.
-git clone https://github.com/sxyazi/yazi.git "$TMPDIR/$PACKAGE"
-cd "$TMPDIR/$PACKAGE" || exit
-cargo build --release --locked
-mv target/release/yazi target/release/ya $STOWDIR/$PACKAGE/bin
-cd "$CURRENTDIR" || exit
-stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+if [ "$DISTRO" != "arch" ]; then
+  # Update rustup, also done in `setup_main.sh`.
+  rustup update
+  PACKAGE=yazi
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$STOWDIR/$PACKAGE"
+  mkdir "$TMPDIR/$PACKAGE"
+  mkdir -p "$STOWDIR/$PACKAGE"/bin # Deviation.
+  git clone https://github.com/sxyazi/yazi.git "$TMPDIR/$PACKAGE"
+  cd "$TMPDIR/$PACKAGE" || exit
+  cargo build --release --locked
+  mv target/release/yazi target/release/ya $STOWDIR/$PACKAGE/bin
+  cd "$CURRENTDIR" || exit
+  stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+fi
 
 # ================================================
 # Install Stow (needs `autoconf` pre-installed).
@@ -572,44 +601,52 @@ function version_compare() {
   return 0 # equal
 }
 
-# Only install lazygit on Ubuntu 25.04 or earlier
+# Only install lazygit manually on Ubuntu 25.04 or earlier.
+# Arch and Ubuntu 25.10+ get lazygit from the package manager (`setup_packages.sh`).
 INSTALL_LAZYGIT=false
-if [ "$ID" = "ubuntu" ] && [ -n "$UBUNTU_VERSION" ]; then
+if [ "$DISTRO" = "ubuntu" ] && [ -n "$UBUNTU_VERSION" ]; then
   version_compare "$UBUNTU_VERSION" "25.04"
   version_result=$?
   if [ $version_result -eq 2 ] || [ $version_result -eq 0 ]; then # Ubuntu version <= 25.04
     INSTALL_LAZYGIT=true
     echo "Ubuntu $UBUNTU_VERSION detected - installing lazygit manually"
   else
-    echo "Ubuntu $UBUNTU_VERSION detected - skipping manual lazygit install (use 'sudo apt install lazygit' instead)"
+    echo "Ubuntu $UBUNTU_VERSION detected - skipping manual lazygit install (installed with apt)"
   fi
-elif [ "$ID" != "ubuntu" ]; then
-  # Not Ubuntu, install lazygit
-  INSTALL_LAZYGIT=true
-  echo "Non-Ubuntu system detected - install lazygit with package manager."
+else
+  echo "$DISTRO detected - lazygit installed with package manager, skipping manual install."
 fi
 
 if [ "$INSTALL_LAZYGIT" = true ]; then
   PACKAGE="lazygit"
-  VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-  sudo rm -rf "$TMPDIR/$PACKAGE"
-  sudo rm -rf "$STOWDIR/$PACKAGE"
-  curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_${ARCH_LAZYGIT}.tar.gz"
-  # tar'ed file name: lazygit.
-  tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR"
-  sudo install "$TMPDIR/$PACKAGE" -D -t "$STOWDIR/$PACKAGE/bin"
-  stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+  if VERSION=$(github_latest_tag jesseduffield/lazygit); then
+    VERSION="${VERSION#v}"
+    sudo rm -rf "$TMPDIR/$PACKAGE"
+    if curl -fLo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/jesseduffield/lazygit/releases/download/v${VERSION}/lazygit_${VERSION}_Linux_${ARCH_LAZYGIT}.tar.gz"; then
+      sudo rm -rf "$STOWDIR/$PACKAGE"
+      # tar'ed file name: lazygit.
+      tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR"
+      sudo install "$TMPDIR/$PACKAGE" -D -t "$STOWDIR/$PACKAGE/bin"
+      stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+    else
+      echo "$PACKAGE: download failed, keeping existing install." >&2
+    fi
+  else
+    echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
+  fi
 fi
 unset -f version_compare
 
 # ================================================
 # Install AWS CLI.
+# Arch: `pacman`. Ubuntu: Manual install below.
 # ================================================
-PACKAGE="awscliv2"
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$TMPDIR/$PACKAGE.zip"
-curl -Lo "$TMPDIR/$PACKAGE.zip" "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip"
-cat <<EOF >"$TMPDIR/${PACKAGE}_public_key.asc"
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="awscliv2"
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$TMPDIR/$PACKAGE.zip"
+  curl -fLo "$TMPDIR/$PACKAGE.zip" "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip"
+  cat <<EOF >"$TMPDIR/${PACKAGE}_public_key.asc"
 -----BEGIN PGP PUBLIC KEY BLOCK-----
 
 mQINBF2Cr7UBEADJZHcgusOJl7ENSyumXh85z0TRV0xJorM2B/JL0kHOyigQluUG
@@ -640,122 +677,186 @@ E91G7bb0hOb/cA==
 =knv7
 -----END PGP PUBLIC KEY BLOCK-----
 EOF
-chmod 600 "$HOME"/.gnupg/*
-chmod 700 "$HOME"/.gnupg
-gpg --import "$TMPDIR/${PACKAGE}_public_key.asc"
-curl -Lo "$TMPDIR/$PACKAGE.zip.sig" "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip.sig"
-if ! gpg --verify "$TMPDIR/$PACKAGE.zip.sig" "$TMPDIR/$PACKAGE.zip" >/dev/null 2>&1; then
-  echo "AWS CLI signature verification failed, aborting installation."
-else
-  echo "AWS CLI signature verified, proceeding with installation."
-  unzip "$TMPDIR/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
-  sudo "$TMPDIR/$PACKAGE/aws/install" --bin-dir "$TARGETDIR/bin" --install-dir "$STOWDIR/$PACKAGE" --update
-  # Update in place: `aws update` (or rerun this section).
-  # Uninstall: `sudo rm "$TARGETDIR/bin/aws" "$TARGETDIR/bin/aws_completer" && sudo rm -rf "$STOWDIR/$PACKAGE"`
+  chmod 600 "$HOME"/.gnupg/*
+  chmod 700 "$HOME"/.gnupg
+  gpg --import "$TMPDIR/${PACKAGE}_public_key.asc"
+  curl -fLo "$TMPDIR/$PACKAGE.zip.sig" "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip.sig"
+  if ! gpg --verify "$TMPDIR/$PACKAGE.zip.sig" "$TMPDIR/$PACKAGE.zip" >/dev/null 2>&1; then
+    echo "AWS CLI signature verification failed, aborting installation."
+  else
+    echo "AWS CLI signature verified, proceeding with installation."
+    unzip "$TMPDIR/$PACKAGE.zip" -d "$TMPDIR/$PACKAGE"
+    sudo "$TMPDIR/$PACKAGE/aws/install" --bin-dir "$TARGETDIR/bin" --install-dir "$STOWDIR/$PACKAGE" --update
+    # Update in place: `aws update` (or rerun this section).
+    # Uninstall: `sudo rm "$TARGETDIR/bin/aws" "$TARGETDIR/bin/aws_completer" && sudo rm -rf "$STOWDIR/$PACKAGE"`
+  fi
 fi
 
 # ================================================
 # Install `kubectl`.
+# Arch: `pacman`. Ubuntu: Manual install below.
 # ================================================
-PACKAGE="kubectl"
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH_KUBECTL}/kubectl"
-sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
-curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH_KUBECTL}/kubectl.sha256"
-echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256") $STOWDIR/$PACKAGE/bin/$PACKAGE" | sha256sum --check
-stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="kubectl"
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$STOWDIR/$PACKAGE"
+  mkdir "$TMPDIR/$PACKAGE"
+  mkdir -p "$STOWDIR/$PACKAGE/bin"
+  curl -fLo "$TMPDIR/$PACKAGE/$PACKAGE" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH_KUBECTL}/kubectl"
+  sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+  chmod 755 $STOWDIR/$PACKAGE/bin/$PACKAGE
+  curl -fLo "$TMPDIR/$PACKAGE/$PACKAGE.sha256" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/${ARCH_KUBECTL}/kubectl.sha256"
+  echo "$(cat "$TMPDIR/$PACKAGE/$PACKAGE.sha256") $STOWDIR/$PACKAGE/bin/$PACKAGE" | sha256sum --check
+  stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+fi
 
 # ================================================
 # Install Helm CLI (Note: Architecture).
+# Arch: `pacman`. Ubuntu: Manual install below.
 # ================================================
-PACKAGE="helm"
-VERSION=$(curl -s "https://api.github.com/repos/helm/helm/releases/latest" | \grep -Po '"tag_name": *"\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://get.helm.sh/helm-${VERSION}-linux-${ARCH_KUBECTL}.tar.gz"
-tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
-sudo mv "$TMPDIR/$PACKAGE/linux-${ARCH_KUBECTL}/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
-stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="helm"
+  if VERSION=$(github_latest_tag helm/helm); then
+    sudo rm -rf "$TMPDIR/$PACKAGE"
+    mkdir "$TMPDIR/$PACKAGE"
+    if curl -fLo "$TMPDIR/$PACKAGE.tar.gz" "https://get.helm.sh/helm-${VERSION}-linux-${ARCH_KUBECTL}.tar.gz"; then
+      sudo rm -rf "$STOWDIR/$PACKAGE"
+      mkdir -p "$STOWDIR/$PACKAGE/bin"
+      tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+      sudo mv "$TMPDIR/$PACKAGE/linux-${ARCH_KUBECTL}/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+      chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+      stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+    else
+      echo "$PACKAGE: download failed, keeping existing install." >&2
+    fi
+  else
+    echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
+  fi
+fi
 
 # ================================================
 # Install hcloud CLI (Note: Architecture).
+# Arch: `pacman`. Ubuntu: Manual install below.
 # Hetzner Cloud command-line interface.
 # ================================================
-PACKAGE="hcloud"
-VERSION=$(curl -s "https://api.github.com/repos/hetznercloud/cli/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/hetznercloud/cli/releases/download/v${VERSION}/hcloud-linux-${ARCH_HCLOUD}.tar.gz"
-tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
-sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
-stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="hcloud"
+  if VERSION=$(github_latest_tag hetznercloud/cli); then
+    VERSION="${VERSION#v}"
+    sudo rm -rf "$TMPDIR/$PACKAGE"
+    mkdir "$TMPDIR/$PACKAGE"
+    if curl -fLo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/hetznercloud/cli/releases/download/v${VERSION}/hcloud-linux-${ARCH_HCLOUD}.tar.gz"; then
+      sudo rm -rf "$STOWDIR/$PACKAGE"
+      mkdir -p "$STOWDIR/$PACKAGE/bin"
+      tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+      sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+      chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+      stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+    else
+      echo "$PACKAGE: download failed, keeping existing install." >&2
+    fi
+  else
+    echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
+  fi
+fi
 
 # ================================================
 # Install argocd CLI (Note: Architecture).
+# Arch: `pacman`. Ubuntu: Manual install below.
 # Argo CD command-line interface.
 # ================================================
-PACKAGE="argocd"
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-${ARCH_KUBECTL}"
-sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
-chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
-stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
-
-# ================================================
-# Install Stripe CLI (Note: Architecture).
-# Stripe command-line interface.
-# ================================================
-PACKAGE="stripe"
-VERSION=$(curl -s "https://api.github.com/repos/stripe/stripe-cli/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
-sudo rm -rf "$TMPDIR/$PACKAGE"
-sudo rm -rf "$STOWDIR/$PACKAGE"
-mkdir "$TMPDIR/$PACKAGE"
-mkdir -p "$STOWDIR/$PACKAGE/bin"
-curl -Lo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/stripe/stripe-cli/releases/download/v${VERSION}/stripe_${VERSION}_linux_${ARCH_STRIPE}.tar.gz" --output "$TMPDIR/$PACKAGE.checksums" "https://github.com/stripe/stripe-cli/releases/download/v${VERSION}/stripe-linux-checksums.txt"
-if echo "$(grep "linux_${ARCH_STRIPE}.tar.gz" "$TMPDIR/$PACKAGE.checksums" | awk '{print $1}') $TMPDIR/$PACKAGE.tar.gz" | sha256sum --check --status; then
-  echo "${PACKAGE} checksum verified, extracting and installing."
-  tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="argocd"
+  sudo rm -rf "$TMPDIR/$PACKAGE"
+  sudo rm -rf "$STOWDIR/$PACKAGE"
+  mkdir "$TMPDIR/$PACKAGE"
+  mkdir -p "$STOWDIR/$PACKAGE/bin"
+  curl -fLo "$TMPDIR/$PACKAGE/$PACKAGE" "https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-${ARCH_KUBECTL}"
   sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
   chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
   stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
 fi
 
 # ================================================
+# Install Stripe CLI (Note: Architecture).
+# Arch: AUR `stripe-cli-bin`. Ubuntu: Manual install below.
+# Stripe command-line interface.
+# ================================================
+if [ "$DISTRO" != "arch" ]; then
+  PACKAGE="stripe"
+  if VERSION=$(github_latest_tag stripe/stripe-cli); then
+    VERSION="${VERSION#v}"
+    sudo rm -rf "$TMPDIR/$PACKAGE"
+    mkdir "$TMPDIR/$PACKAGE"
+    if curl -fLo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/stripe/stripe-cli/releases/download/v${VERSION}/stripe_${VERSION}_linux_${ARCH_STRIPE}.tar.gz" --output "$TMPDIR/$PACKAGE.checksums" "https://github.com/stripe/stripe-cli/releases/download/v${VERSION}/stripe-linux-checksums.txt" &&
+      echo "$(grep "linux_${ARCH_STRIPE}.tar.gz" "$TMPDIR/$PACKAGE.checksums" | awk '{print $1}') $TMPDIR/$PACKAGE.tar.gz" | sha256sum --check --status; then
+      echo "${PACKAGE} checksum verified, extracting and installing."
+      sudo rm -rf "$STOWDIR/$PACKAGE"
+      mkdir -p "$STOWDIR/$PACKAGE/bin"
+      tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$TMPDIR/$PACKAGE"
+      sudo mv "$TMPDIR/$PACKAGE/$PACKAGE" "$STOWDIR/$PACKAGE/bin"
+      chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+      stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+    else
+      echo "$PACKAGE: download or checksum failed, keeping existing install." >&2
+    fi
+  else
+    echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
+  fi
+fi
+
+# ================================================
 # Various installs via custom scripts.
 # ================================================
-# `uv`: Python package manager.
-curl -LsSf https://astral.sh/uv/install.sh | sh
-curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-curl https://rclone.org/install.sh | sudo bash
-curl -sL https://talos.dev/install | sh
-sudo modprobe br_netfilter # Needed for Talos.
-# `claude`: Claude Code CLI.
+# `claude`: Claude Code CLI (native installer, all distros).
 curl -fsSL https://claude.ai/install.sh | bash
-# `opencode`: AI-powered coding assistant.
-curl -fsSL https://opencode.ai/install | bash
-# `infracost`: Cloud cost estimates for Terraform.
-curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
-# `homebrew`: Package manager for macOS and Linux.
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-# `codexbar`: Cost tracking for AI coding assistants (needed by openclaw).
-brew install steipete/tap/codexbar
-# `openclaw`: AI coding assistant CLI.
-curl -fsSL https://openclaw.ai/install.sh | bash
-go install sigs.k8s.io/kind@latest
+# Kernel module needed by Talos.
+sudo modprobe br_netfilter
+
+# Arch: All tools below come from `pacman` or AUR.
+# Ubuntu: Vendor installers resolve the latest release at run time.
+if [ "$DISTRO" != "arch" ]; then
+  # `uv`: Python package manager.
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  # `tflint`: Terraform linter.
+  curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+  # `rclone`: Cloud storage sync.
+  curl https://rclone.org/install.sh | sudo bash
+  # `talosctl`: Talos Linux CLI.
+  curl -sL https://talos.dev/install | sh
+  # `opencode`: AI-powered coding assistant.
+  curl -fsSL https://opencode.ai/install | bash
+  # `infracost`: Cloud cost estimates for Terraform.
+  curl -fsSL https://raw.githubusercontent.com/infracost/infracost/master/scripts/install.sh | sh
+  # `starship`: Shell prompt.
+  curl -sS https://starship.rs/install.sh | sh -s -- -y
+  # `kind`: Kubernetes in Docker, with zsh completion (Arch: shipped by the `kind` package).
+  go install sigs.k8s.io/kind@latest
+  sudo mkdir -p /usr/local/share/zsh/site-functions
+  "$(go env GOPATH)/bin/kind" completion zsh | sudo tee /usr/local/share/zsh/site-functions/_kind >/dev/null
+  # `hcloud-upload-image`: Upload custom images to Hetzner Cloud.
+  go install github.com/apricote/hcloud-upload-image@latest
+
+  # `crictl`: CRI CLI (Note: Architecture).
+  PACKAGE="crictl"
+  if VERSION=$(github_latest_tag kubernetes-sigs/cri-tools); then
+    sudo rm -rf "$TMPDIR/$PACKAGE"
+    mkdir "$TMPDIR/$PACKAGE"
+    if curl -fLo "$TMPDIR/$PACKAGE.tar.gz" "https://github.com/kubernetes-sigs/cri-tools/releases/download/${VERSION}/crictl-${VERSION}-linux-${ARCH_KUBECTL}.tar.gz" --output "$TMPDIR/$PACKAGE.sha256" "https://github.com/kubernetes-sigs/cri-tools/releases/download/${VERSION}/crictl-${VERSION}-linux-${ARCH_KUBECTL}.tar.gz.sha256" &&
+      echo "$(awk '{print $1}' "$TMPDIR/$PACKAGE.sha256") $TMPDIR/$PACKAGE.tar.gz" | sha256sum --check --status; then
+      echo "${PACKAGE} checksum verified, extracting and installing."
+      sudo rm -rf "$STOWDIR/$PACKAGE"
+      mkdir -p "$STOWDIR/$PACKAGE/bin"
+      tar xzf "$TMPDIR/$PACKAGE.tar.gz" -C "$STOWDIR/$PACKAGE/bin"
+      chmod 755 "$STOWDIR/$PACKAGE/bin/$PACKAGE"
+      stow -vv -d "$STOWDIR" -t "$TARGETDIR" "$PACKAGE"
+    else
+      echo "$PACKAGE: download or checksum failed, keeping existing install." >&2
+    fi
+  else
+    echo "$PACKAGE: could not resolve latest release, keeping existing install." >&2
+  fi
+fi
 
 # ================================================
 # Install fzf.
@@ -819,23 +920,6 @@ go install sigs.k8s.io/kind@latest
 # stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
 
 # ================================================
-# Install lua-language-server from source.
-# Guide: https://luals.github.io/wiki/build/
-# Requires: ninja, C++17 support.
-# Note: Must run in-place, add bin/ to PATH.
-# ================================================
-PACKAGE="lua-language-server"
-LUALS_DIR="$HOME/.local/share/$PACKAGE"
-rm -rf "$LUALS_DIR"
-git clone https://github.com/LuaLS/lua-language-server.git "$LUALS_DIR"
-cd "$LUALS_DIR" || exit
-git submodule update --depth 1 --init --recursive
-bash ./make.sh
-cd "$CURRENTDIR" || exit
-echo "lua-language-server installed to $LUALS_DIR"
-echo "Ensure $LUALS_DIR/bin is in PATH."
-
-# ================================================
 # Install HyprCapture (Hyprland screenshot/recording plugin).
 # https://github.com/gfhdhytghd/HyprCapture
 # ================================================
@@ -892,3 +976,6 @@ unset PACKAGE HYPRCAPTURE_REPO
 # sudo luarocks install luasocket
 # lua require "socket"
 # stow -vv -d $STOWDIR -t $TARGETDIR $PACKAGE
+
+# Clean up helper functions.
+unset -f clone_or_update_repo

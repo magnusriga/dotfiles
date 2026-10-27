@@ -5,24 +5,15 @@ echo "Running setup_directories.sh as $(whoami), with HOME $HOME and USER $USER.
 # Set needed environment variables.
 export XDG_CONFIG_HOME="$HOME/.config"
 
-# export LINUXBREW_HOME="/home/linuxbrew/.linuxbrew"
-# if [ ! -d $LINUXBREW_HOME ]; then
-#   sudo mkdir -p $LINUXBREW_HOME
-# fi
-
 export BUN_INSTALL="$HOME/.bun"
 if [ ! -d "$BUN_INSTALL" ]; then
   mkdir -p "$BUN_INSTALL"
 fi
 
+# `nvm` is only used on Ubuntu, Arch installs `nodejs` with `pacman`.
 export NVM_DIR="$HOME/.nvm"
-if [ ! -d "$NVM_DIR" ]; then
+if [ "$DISTRO" != "arch" ] && [ ! -d "$NVM_DIR" ]; then
   mkdir -p "$NVM_DIR"
-fi
-
-export PNPM_HOME="$HOME/.local/share/pnpm"
-if [ ! -d "$PNPM_HOME" ]; then
-  mkdir -p "$PNPM_HOME"
 fi
 
 export FONT_HOME="$HOME/.local/share/fonts"
@@ -40,10 +31,14 @@ if [ ! -d "$WEZTERM_HOME" ]; then
   mkdir -p "$WEZTERM_HOME"
 fi
 
-# Directory for ghostty resources, created by stowing ghostty to
-# `/usr/local/bin/ghostty` and `/usr/local/share/ghostty` (resources dir),
-# after installing to `/usr/local/stow/ghostty` in `setup_packages_manual.sh`.
-export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
+# Directory for ghostty resources.
+# - Arch: `/usr/share/ghostty`, from `pacman`.
+# - Ubuntu: `/usr/local/share/ghostty`, from the source build stowed in `setup_packages_manual.sh`.
+if [ "$DISTRO" = "arch" ]; then
+  export GHOSTTY_RESOURCES_DIR="/usr/share/ghostty"
+else
+  export GHOSTTY_RESOURCES_DIR="/usr/local/share/ghostty"
+fi
 export GHOSTTY_HOME="${BUILD_HOME:-$HOME/build}/repositories/ghostty"
 # Let git make the folder.
 
@@ -109,12 +104,6 @@ if [ ! -d "$ZSH_HOME" ]; then
   mkdir -p "$ZSH_HOME"
 fi
 
-export ZSH="$ZSH_HOME/oh-my-zsh"
-# Do not pre-create $ZSH directory, otherwise oh-my-zsh will complain.
-# if [ ! -d "$ZSH" ]; then
-#   mkdir -p "$ZSH"
-# fi
-
 export EZA_HOME="$HOME/.local/share/eza"
 if [ ! -d "$EZA_HOME" ]; then
   mkdir -p "$EZA_HOME"
@@ -123,11 +112,6 @@ fi
 export EZA_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/eza"
 if [ ! -d "$EZA_CONFIG_DIR" ]; then
   mkdir -p "$EZA_CONFIG_DIR"
-fi
-
-export PNPM_CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/pnpm"
-if [ ! -d "$PNPM_CONFIG_DIR" ]; then
-  mkdir -p "$PNPM_CONFIG_DIR"
 fi
 
 export TRASH_HOME="$HOME/.local/share/Trash"
@@ -202,9 +186,6 @@ if [ ! -d "$PACMAN_HOME" ]; then
   mkdir -p "$PACMAN_HOME"
 fi
 
-# For trash-cli completion.
-sudo mkdir -p "/usr/share/zsh/site-functions/"
-sudo chown "$(id -u "$USER"):$(id -g "$USER")" "/usr/share/zsh/site-functions/"
 sudo mkdir -p "/usr/share/bash-completion/completions"
 sudo chown "$(id -u "$USER"):$(id -g "$USER")" "/usr/share/bash-completion/completions"
 sudo mkdir -p "/etc/profile.d"

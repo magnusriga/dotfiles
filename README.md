@@ -104,7 +104,7 @@ g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
 
 ## Post Setup Configuration
 
-- Transition `claude` to local install: `yes | pnpm claude migrate-installer`.
+- Transition `claude` to local install: `yes | claude migrate-installer`.
 - Login to `claude`: `claude`, then follow steps.
 - Login to `gh`: `gh auth login`, then follow steps.
 - Login to `Copilot` in Neovim, for shadow-text, i.e. smart auto-complete:
@@ -114,7 +114,7 @@ g. Copy terminfo to container: `infocmp -x | ssh <user>-<machine> -- tic -x -`.
 
 ## Install and Run Pre-Commit Hooks
 
-- Not needed, automatic during `nfront` > `pnpm i`.
+- Not needed, automatic during `nfront` > `bun i`.
 - Before:
   - Add hooks to `.git/hooks`, by running: `pre-commit install`
   - Run added hooks on all files: `pre-commit run --all-files`
