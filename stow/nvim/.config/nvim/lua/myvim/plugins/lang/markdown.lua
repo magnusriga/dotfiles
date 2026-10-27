@@ -1,46 +1,5 @@
 local lsp_name = "marksman"
 
-vim.lsp.config(lsp_name, {
-  -- Do not fall back to lspconfig's .git marker after on_dir(nil).
-  root_markers = {},
-  root_dir = function(bufnr, on_dir)
-    -- An explicit Markdown workspace always takes precedence.
-    local root = vim.fs.root(bufnr, ".marksman.toml")
-    if root then
-      on_dir(root)
-      return
-    end
-
-    root = vim.fs.root(bufnr, ".git")
-    local monorepo = vim.fs.root(bufnr, { "pnpm-workspace.yaml", "lerna.json", "turbo.json" })
-    if root and not monorepo then
-      local manifest = vim.fs.joinpath(root, "package.json")
-      if vim.fn.filereadable(manifest) == 1 then
-        local ok, package = pcall(vim.json.decode, table.concat(vim.fn.readfile(manifest), "\n"))
-        monorepo = ok and type(package) == "table" and type(package.workspaces) == "table" and root or nil
-      end
-    end
-
-    if monorepo then
-      -- Marksman recursively indexes before attaching and ignores .git/info/exclude.
-      -- Bound monorepos to their nearest docs tree; other files use single-file mode.
-      for dir in vim.fs.parents(vim.api.nvim_buf_get_name(bufnr)) do
-        if dir == monorepo then
-          break
-        end
-        if vim.fs.basename(dir) == "docs" then
-          on_dir(dir)
-          return
-        end
-      end
-      on_dir(nil)
-      return
-    end
-
-    on_dir(root)
-  end,
-})
-
 -- User-level `markdownlint-cli2` configuration, applied when linting and fixing.
 -- `markdownlint-cli2` only discovers configuration files in cwd and below,
 -- so pass path explicitly to share one configuration across all projects.
@@ -258,14 +217,14 @@ return {
 
       -- File types this plugin runs on.
       -- Default: `markdown`.
-      file_types = { "markdown", "norg", "rmd", "org", "codecompanion", "Avante" },
+      file_types = { "markdown", "rmd", "org", "codecompanion", "Avante" },
 
       -- Keep optional LaTeX conversion off; ordinary Markdown rendering stays enabled.
       -- Enabling it requires `utftex` or `latex2text` in the system package setup.
       latex = { enabled = false },
     },
     -- Lazy-load on filetype.
-    ft = { "markdown", "norg", "rmd", "org", "codecompanion", "Avante" },
+    ft = { "markdown", "rmd", "org", "codecompanion", "Avante" },
     config = function(_, opts)
       require("render-markdown").setup(opts)
       Snacks.toggle({

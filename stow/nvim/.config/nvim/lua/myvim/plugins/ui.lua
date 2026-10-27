@@ -509,9 +509,6 @@ return {
       -- Keep native scrolling without animation.
       scroll = { enabled = false },
 
-      -- `vim.notify` replacement, with notification history.
-      notifier = { enabled = true },
-
       -- Custom `statuscolumn`, i.e. margin to left containing:
       -- Gitsigns (or other signs), diagnostics, todo-comments, line numbers, fold icons, border, etc.
       -- `snacks.nvim` sets `vim.o.statuscolumn` when enabled.

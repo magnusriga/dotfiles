@@ -1,9 +1,9 @@
 #!/bin/bash
 
-[ -n "$SSH_CLIENT" ] && SESSION_TYPE="remote"
-
-if [[ $SESSION_TYPE == "remote" ]]; then
-  nc localhost 2225
+if [[ -n "$SSH_CLIENT" || $SESSION_TYPE == "remote" ]]; then
+  exec nc localhost 2225
+elif [[ $(uname -s) == "Darwin" ]]; then
+  exec /usr/bin/pbpaste
 else
-  pbpaste
+  exec wl-paste --no-newline
 fi

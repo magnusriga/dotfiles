@@ -1,9 +1,9 @@
 #!/bin/bash
 
-[ -n "$SSH_CLIENT" ] && SESSION_TYPE="remote"
-
-if [[ $SESSION_TYPE == "remote" ]]; then
-  cat | nc -q1 localhost 2224
+if [[ -n "$SSH_CLIENT" || $SESSION_TYPE == "remote" ]]; then
+  exec nc -q1 localhost 2224
+elif [[ $(uname -s) == "Darwin" ]]; then
+  exec /usr/bin/pbcopy
 else
-  cat | pbcopy
+  exec wl-copy
 fi

@@ -130,7 +130,7 @@ vim.g.root_lsp_ignore = { "biome", "eslint", "tailwindcss", "copilot" }
 vim.g.trouble_lualine = true
 
 -- Template directory for new markdown files, created with `:MarkdownNewTemplate`.
-vim.g.template_dir = vim.fn.stdpath("config") .. "/templates"
+vim.g.template_dir = (vim.env.NOTES_HOME or vim.fn.expand("~/notes")) .. "/templates"
 
 -- No configured plugin uses Neovim's remote-plugin hosts.
 -- External language servers and CLI tools do not use these providers.
