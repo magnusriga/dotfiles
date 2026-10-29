@@ -212,6 +212,8 @@ hl.config({
 -- https://github.com/gfhdhytghd/HyprCapture#configuration
 -- -----------------------------------------------------
 if hl.plugin.hyprcapture ~= nil then
+  local capture_dir = os.getenv("HOME") .. "/Downloads/screenshots"
+
   hl.config({
     plugin = {
       hyprcapture = {
@@ -220,9 +222,9 @@ if hl.plugin.hyprcapture ~= nil then
         save = true,
         clipboard = true,
         show_thumbnail = true,
-        save_dir = "$HOME/Downloads/screenshots",
+        save_dir = capture_dir,
         filename_template = "screenshot-%Y%m%d-%H%M%S.png",
-        record_save_dir = "$HOME/Downloads/screenshots",
+        record_save_dir = capture_dir,
         record_filename_template = "recording-%Y%m%d-%H%M%S.mp4",
         record_codec = "auto",
         record_fps = 60,
