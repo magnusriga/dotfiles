@@ -39,6 +39,14 @@ function install_global_packages() {
 echo "Installing global packages with bun."
 install_global_packages
 
+# TypeScript language server, used by editors and Claude Code's `typescript-lsp` plugin.
+# - Arch: `pacman` (`setup_packages.sh`).
+# - Ubuntu: `bun`, run by `node` from `nvm` (`setup_nvm.sh`).
+if [ "$DISTRO" != "arch" ]; then
+  echo "Installing TypeScript language server with bun."
+  bun add -g typescript@latest typescript-language-server@latest
+fi
+
 echo "Trusting all global bun dependencies with scripts."
 bun pm -g trust --all
 

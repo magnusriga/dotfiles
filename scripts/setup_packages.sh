@@ -202,6 +202,7 @@ if [ "$DISTRO" = "arch" ]; then
     jless \
     git-delta \
     nodejs npm pnpm bun \
+    typescript typescript-language-server \
     go \
     gemini-cli \
     uv \
